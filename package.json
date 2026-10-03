@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@nestjs/config": "^12.0.1",
+    "drizzle-orm": "0.45.3",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "0.31.11"
+  }
+}
