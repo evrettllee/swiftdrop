@@ -6,5 +6,10 @@ export function validateEnv(config: Record<string, unknown>) {
     throw new Error(`PORT must be an integer between 1 and 65535, got: ${JSON.stringify(rawPort)}`);
   }
 
+  const databaseUrl = config.DATABASE_URL;
+  if (typeof databaseUrl !== 'string' || databaseUrl.length === 0) {
+    throw new Error('DATABASE_URL is required');
+  }
+
   return { ...config, PORT: port };
 }
