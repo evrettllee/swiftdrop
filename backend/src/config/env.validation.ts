@@ -32,6 +32,9 @@ export function validateEnv(config: Record<string, unknown>) {
 
   requireString(config, 'DATABASE_URL');
   requireString(config, 'JWT_ACCESS_SECRET', JWT_SECRET_MIN_LENGTH);
+  requireString(config, 'GOOGLE_CLIENT_ID');
+  requireString(config, 'GOOGLE_CLIENT_SECRET');
+  requireString(config, 'GOOGLE_CALLBACK_URL');
 
   return { ...config, PORT: port };
 }
