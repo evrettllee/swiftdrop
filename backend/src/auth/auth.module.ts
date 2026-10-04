@@ -12,6 +12,7 @@ import { OAuthStateService } from './oauth-state.service';
 import { PasswordService } from './password.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { YandexStrategy } from './strategies/yandex.strategy';
 import { TokensCleanupService } from './tokens-cleanup.service';
 import { TokensService } from './tokens.service';
 
@@ -38,6 +39,7 @@ import { TokensService } from './tokens.service';
     PasswordService,
     TokensCleanupService,
     TokensService,
+    YandexStrategy,
   ],
 })
 export class AuthModule {}

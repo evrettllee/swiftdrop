@@ -1,18 +1,10 @@
-import { type ExecutionContext, Injectable } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import type { Response } from 'express';
+import { Injectable } from '@nestjs/common';
+import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
 import { GOOGLE_STRATEGY_NAME } from '../oauth.constants';
-import { OAuthStateService } from '../oauth-state.service';
+import { createOAuthInitiateGuard } from './oauth-guard.factory';
 
 @Injectable()
-export class GoogleAuthGuard extends AuthGuard(GOOGLE_STRATEGY_NAME) {
-  constructor(private readonly oauthStateService: OAuthStateService) {
-    super();
-  }
-
-  getAuthenticateOptions(context: ExecutionContext): { state: string } {
-    const response = context.switchToHttp().getResponse<Response>();
-
-    return { state: this.oauthStateService.issue(response) };
-  }
-}
+export class GoogleAuthGuard extends createOAuthInitiateGuard(
+  GOOGLE_STRATEGY_NAME,
+  OAUTH_PROVIDER.GOOGLE,
+) {}

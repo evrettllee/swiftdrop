@@ -25,6 +25,8 @@ import { registerSchema, type RegisterDto } from './dto/register.dto';
 import { OAuthFailureFilter } from './filters/oauth-failure.filter';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { GoogleCallbackGuard } from './guards/google-callback.guard';
+import { YandexAuthGuard } from './guards/yandex-auth.guard';
+import { YandexCallbackGuard } from './guards/yandex-callback.guard';
 import { OAUTH_SUCCESS_REDIRECT } from './oauth.constants';
 import type { OAuthRequest } from './oauth.types';
 
@@ -102,6 +104,27 @@ export class AuthController {
   @UseFilters(OAuthFailureFilter)
   @Get(AUTH_ROUTES.GOOGLE_CALLBACK)
   async googleCallback(@Req() request: OAuthRequest, @Res() response: Response): Promise<void> {
+    await this.completeOAuthLogin(request, response);
+  }
+
+  @Public()
+  @Throttle(AUTH_THROTTLE)
+  @UseGuards(YandexAuthGuard)
+  @Get(AUTH_ROUTES.YANDEX)
+  yandexLogin(): void {
+    // The guard redirects to Yandex before this handler runs.
+  }
+
+  @Public()
+  @Throttle(AUTH_THROTTLE)
+  @UseGuards(YandexCallbackGuard)
+  @UseFilters(OAuthFailureFilter)
+  @Get(AUTH_ROUTES.YANDEX_CALLBACK)
+  async yandexCallback(@Req() request: OAuthRequest, @Res() response: Response): Promise<void> {
+    await this.completeOAuthLogin(request, response);
+  }
+
+  private async completeOAuthLogin(request: OAuthRequest, response: Response): Promise<void> {
     const result = await this.authService.loginWithOAuth(request.user);
 
     this.authCookiesService.setRefreshToken(response, result.refreshToken);

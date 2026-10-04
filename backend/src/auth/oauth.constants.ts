@@ -5,8 +5,8 @@ import { AUTH_ROUTES } from './auth-routes.constants';
 export const GOOGLE_STRATEGY_NAME = 'google';
 export const GOOGLE_SCOPES = ['openid', 'email', 'profile'];
 
-export const OAUTH_STATE_COOKIE_NAME = 'oauth_state';
-export const OAUTH_STATE_COOKIE_PATH = `/${GLOBAL_PREFIX}/${AUTH_ROUTES.BASE}/${AUTH_ROUTES.GOOGLE}`;
+export const OAUTH_STATE_COOKIE_PREFIX = 'oauth_state_';
+export const OAUTH_STATE_COOKIE_BASE_PATH = `/${GLOBAL_PREFIX}/${AUTH_ROUTES.BASE}`;
 export const OAUTH_STATE_BYTES = 16;
 export const OAUTH_STATE_ENCODING = 'base64url';
 export const OAUTH_STATE_TTL_MINUTES = 10;

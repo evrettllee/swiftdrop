@@ -35,6 +35,9 @@ export function validateEnv(config: Record<string, unknown>) {
   requireString(config, 'GOOGLE_CLIENT_ID');
   requireString(config, 'GOOGLE_CLIENT_SECRET');
   requireString(config, 'GOOGLE_CALLBACK_URL');
+  requireString(config, 'YANDEX_CLIENT_ID');
+  requireString(config, 'YANDEX_CLIENT_SECRET');
+  requireString(config, 'YANDEX_CALLBACK_URL');
 
   return { ...config, PORT: port };
 }

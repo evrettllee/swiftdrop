@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Request, Response } from 'express';
 import { NODE_ENV_PRODUCTION } from '../common/constants/env.constants';
+import type { OAuthProvider } from '../common/enums/oauth-provider.enum';
 import {
   REFRESH_COOKIE_NAME,
   REFRESH_COOKIE_PATH,
@@ -9,8 +10,8 @@ import {
   REFRESH_TOKEN_TTL_MS,
 } from './auth-token.constants';
 import {
-  OAUTH_STATE_COOKIE_NAME,
-  OAUTH_STATE_COOKIE_PATH,
+  OAUTH_STATE_COOKIE_BASE_PATH,
+  OAUTH_STATE_COOKIE_PREFIX,
   OAUTH_STATE_TTL_MS,
 } from './oauth.constants';
 
@@ -33,19 +34,31 @@ export class AuthCookiesService {
     return this.readCookie(request, REFRESH_COOKIE_NAME);
   }
 
-  setOAuthState(response: Response, state: string): void {
-    response.cookie(OAUTH_STATE_COOKIE_NAME, state, {
-      ...this.buildBaseOptions(OAUTH_STATE_COOKIE_PATH),
+  setOAuthState(response: Response, provider: OAuthProvider, state: string): void {
+    response.cookie(this.buildStateCookieName(provider), state, {
+      ...this.buildBaseOptions(this.buildStateCookiePath(provider)),
       maxAge: OAUTH_STATE_TTL_MS,
     });
   }
 
-  clearOAuthState(response: Response): void {
-    response.clearCookie(OAUTH_STATE_COOKIE_NAME, this.buildBaseOptions(OAUTH_STATE_COOKIE_PATH));
+  clearOAuthState(response: Response, provider: OAuthProvider): void {
+    response.clearCookie(
+      this.buildStateCookieName(provider),
+      this.buildBaseOptions(this.buildStateCookiePath(provider)),
+    );
   }
 
-  getOAuthState(request: Request): string | undefined {
-    return this.readCookie(request, OAUTH_STATE_COOKIE_NAME);
+  getOAuthState(request: Request, provider: OAuthProvider): string | undefined {
+    return this.readCookie(request, this.buildStateCookieName(provider));
+  }
+
+  private buildStateCookieName(provider: OAuthProvider): string {
+    return `${OAUTH_STATE_COOKIE_PREFIX}${provider}`;
+  }
+
+  // The provider name doubles as the route segment, so the cookie is sent only to that provider's routes.
+  private buildStateCookiePath(provider: OAuthProvider): string {
+    return `${OAUTH_STATE_COOKIE_BASE_PATH}/${provider}`;
   }
 
   private readCookie(request: Request, name: string): string | undefined {
