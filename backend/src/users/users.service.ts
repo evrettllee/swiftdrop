@@ -34,6 +34,15 @@ export class UsersService {
     return createdUser;
   }
 
+  // Used when an unverified account is claimed through a verified provider email:
+  // the password may belong to someone who only knew the address, so it is dropped.
+  async verifyEmailAndClearPassword(userId: number): Promise<void> {
+    await this.db
+      .update(users)
+      .set({ emailVerifiedAt: new Date(), passwordHash: null })
+      .where(eq(users.userId, userId));
+  }
+
   private async findActiveWithRole(condition: SQL): Promise<UserWithRole | null> {
     const [row] = await this.db
       .select({ user: users, roleName: roles.name })

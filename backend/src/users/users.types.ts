@@ -8,6 +8,7 @@ export type UserWithRole = User & { roleName: RoleName };
 export type CreateUserInput = Pick<
   User,
   'firstName' | 'lastName' | 'email' | 'phone' | 'passwordHash'
-> & {
-  roleName: RoleName;
-};
+> &
+  Partial<Pick<User, 'emailVerifiedAt'>> & {
+    roleName: RoleName;
+  };

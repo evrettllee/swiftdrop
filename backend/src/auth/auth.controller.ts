@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -11,6 +22,11 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
 import { loginSchema, type LoginDto } from './dto/login.dto';
 import { registerSchema, type RegisterDto } from './dto/register.dto';
+import { OAuthFailureFilter } from './filters/oauth-failure.filter';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { GoogleCallbackGuard } from './guards/google-callback.guard';
+import { OAUTH_SUCCESS_REDIRECT } from './oauth.constants';
+import type { OAuthRequest } from './oauth.types';
 
 @Controller(AUTH_ROUTES.BASE)
 export class AuthController {
@@ -70,6 +86,26 @@ export class AuthController {
   @Get(AUTH_ROUTES.ME)
   me(@CurrentUser() user: AuthUser): AuthUser {
     return user;
+  }
+
+  @Public()
+  @Throttle(AUTH_THROTTLE)
+  @UseGuards(GoogleAuthGuard)
+  @Get(AUTH_ROUTES.GOOGLE)
+  googleLogin(): void {
+    // The guard redirects to Google before this handler runs.
+  }
+
+  @Public()
+  @Throttle(AUTH_THROTTLE)
+  @UseGuards(GoogleCallbackGuard)
+  @UseFilters(OAuthFailureFilter)
+  @Get(AUTH_ROUTES.GOOGLE_CALLBACK)
+  async googleCallback(@Req() request: OAuthRequest, @Res() response: Response): Promise<void> {
+    const result = await this.authService.loginWithOAuth(request.user);
+
+    this.authCookiesService.setRefreshToken(response, result.refreshToken);
+    response.redirect(OAUTH_SUCCESS_REDIRECT);
   }
 
   private respondWithTokens(result: AuthResult, response: Response): AuthResponse {

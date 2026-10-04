@@ -5,4 +5,6 @@ export const AUTH_ROUTES = {
   REFRESH: 'refresh',
   LOGOUT: 'logout',
   ME: 'me',
+  GOOGLE: 'google',
+  GOOGLE_CALLBACK: 'google/callback',
 } as const;

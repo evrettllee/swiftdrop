@@ -7,6 +7,8 @@ import { toAuthUser } from './auth-user.mapper';
 import type { AuthResult } from './auth.types';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterDto } from './dto/register.dto';
+import { OAuthService } from './oauth.service';
+import type { OAuthProfile } from './oauth.types';
 import { PasswordService } from './password.service';
 import { TokensService } from './tokens.service';
 
@@ -16,6 +18,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly passwordService: PasswordService,
     private readonly tokensService: TokensService,
+    private readonly oauthService: OAuthService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
@@ -42,6 +45,14 @@ export class AuthService {
     if (!user || !isPasswordValid) {
       throw new UnauthorizedException(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
     }
+
+    this.ensureNotBlocked(user);
+
+    return this.buildAuthResult(user, user.roleName);
+  }
+
+  async loginWithOAuth(profile: OAuthProfile): Promise<AuthResult> {
+    const user = await this.oauthService.resolveUser(profile);
 
     this.ensureNotBlocked(user);
 

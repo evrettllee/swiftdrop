@@ -71,6 +71,13 @@ export class TokensService {
       );
   }
 
+  async revokeAllForUser(userId: number): Promise<void> {
+    await this.db
+      .update(refreshTokens)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(refreshTokens.userId, userId), isNull(refreshTokens.revokedAt)));
+  }
+
   hashToken(token: string): string {
     return createHash(TOKEN_HASH_ALGORITHM).update(token).digest(TOKEN_HASH_ENCODING);
   }
@@ -86,12 +93,5 @@ export class TokensService {
     if (reused) {
       await this.revokeAllForUser(reused.userId);
     }
-  }
-
-  private async revokeAllForUser(userId: number): Promise<void> {
-    await this.db
-      .update(refreshTokens)
-      .set({ revokedAt: new Date() })
-      .where(and(eq(refreshTokens.userId, userId), isNull(refreshTokens.revokedAt)));
   }
 }
