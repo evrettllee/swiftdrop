@@ -46,9 +46,7 @@ export function LandingHeader() {
     <>
       {/* Dims the page under the open menu; the keyboard closes the menu with Escape. */}
       {isMenuOpen ? (
-        <button
-          type="button"
-          tabIndex={-1}
+        <div
           aria-hidden="true"
           onClick={closeMenu}
           className="fixed inset-0 z-10 cursor-default bg-scrim lg:hidden"

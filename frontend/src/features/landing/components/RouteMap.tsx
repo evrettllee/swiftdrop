@@ -6,7 +6,7 @@ import { IS_MAPBOX_CONFIGURED } from '../../../shared/config';
 import { CITY_CENTER } from '../../../shared/constants';
 import type { GeoPoint } from '../../pricing/types';
 import { MAP_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM, ROUTE_POINT } from '../constants';
-import { useExpandedMap } from '../lib/useExpandedMap';
+import { useExpandedMap, usePrefersReducedMotion } from '../lib/useExpandedMap';
 import type { RoutePointKind } from '../types';
 import { FitToPoints } from './FitToPoints';
 import { MapControls } from './MapControls';
@@ -49,7 +49,8 @@ export function RouteMap({
   className = '',
 }: RouteMapProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
-  const { isExpanded, toggle } = useExpandedMap(map);
+  const { isExpanded, toggle, toggleButtonRef } = useExpandedMap(map);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   if (!IS_MAPBOX_CONFIGURED) {
     return <MapUnavailable className={className} />;
@@ -71,6 +72,7 @@ export function RouteMap({
           minZoom={MAP_ZOOM.MIN}
           maxZoom={MAP_ZOOM.MAX}
           zoomControl={false}
+          zoomAnimation={!prefersReducedMotion}
           attributionControl={false}
           className="isolate size-full"
         >
@@ -103,7 +105,12 @@ export function RouteMap({
             />
           )}
         </MapContainer>
-        <MapControls map={map} isExpanded={isExpanded} onToggleExpand={toggle} />
+        <MapControls
+          map={map}
+          isExpanded={isExpanded}
+          onToggleExpand={toggle}
+          expandButtonRef={toggleButtonRef}
+        />
         {hint === null ? null : <MapHint kind={hint} />}
       </div>
     </div>

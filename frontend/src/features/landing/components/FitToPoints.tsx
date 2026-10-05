@@ -2,7 +2,8 @@ import { latLngBounds, type LatLngTuple } from 'leaflet';
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import type { GeoPoint } from '../../pricing/types';
-import { MAP_FIT_PADDING, MAP_ZOOM, REDUCED_MOTION_QUERY } from '../constants';
+import { MAP_FIT_PADDING, MAP_ZOOM } from '../constants';
+import { usePrefersReducedMotion } from '../lib/useExpandedMap';
 
 type FitToPointsProps = {
   pickup: GeoPoint | null;
@@ -17,6 +18,7 @@ function toLatLng(point: GeoPoint): LatLngTuple {
 // in a field. Points that are visible never move the map, so clicks and drags do not make it jump.
 export function FitToPoints({ pickup, delivery }: FitToPointsProps) {
   const map = useMap();
+  const animate = !usePrefersReducedMotion();
 
   useEffect(() => {
     const points = [pickup, delivery]
@@ -33,8 +35,6 @@ export function FitToPoints({ pickup, delivery }: FitToPointsProps) {
       return;
     }
 
-    const animate = !window.matchMedia(REDUCED_MOTION_QUERY).matches;
-
     if (points.length === 1) {
       map.setView(bounds.getCenter(), Math.max(map.getZoom(), MAP_ZOOM.FOCUS), { animate });
     } else {
@@ -44,7 +44,7 @@ export function FitToPoints({ pickup, delivery }: FitToPointsProps) {
         animate,
       });
     }
-  }, [map, pickup, delivery]);
+  }, [map, pickup, delivery, animate]);
 
   return null;
 }
