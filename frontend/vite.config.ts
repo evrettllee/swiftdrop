@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // One .env for the whole repository: the client gets only the variables that start with VITE_.
+  envDir: '..',
   server: {
     proxy: {
       '/api': {

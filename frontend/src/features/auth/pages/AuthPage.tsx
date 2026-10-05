@@ -17,6 +17,7 @@ import {
   AUTH_ERROR_QUERY_PARAM,
   AUTH_ID_PREFIX,
   AUTH_TAB,
+  AUTH_TAB_QUERY_PARAM,
   AUTH_TEXTS,
 } from '../constants';
 import type { AuthTabId } from '../types';
@@ -25,6 +26,13 @@ const TABS = [
   { id: AUTH_TAB.LOGIN, label: AUTH_TEXTS.TAB_LOGIN },
   { id: AUTH_TAB.REGISTER, label: AUTH_TEXTS.TAB_REGISTER },
 ];
+
+// The sign-up links of the app lead to /auth?tab=register, any other address opens the login.
+function getInitialTab(searchParams: URLSearchParams): AuthTabId {
+  return searchParams.get(AUTH_TAB_QUERY_PARAM) === AUTH_TAB.REGISTER
+    ? AUTH_TAB.REGISTER
+    : AUTH_TAB.LOGIN;
+}
 
 // The backend redirects here with ?error=<code> after a failed provider login.
 function OAuthErrorAlert() {
@@ -72,7 +80,8 @@ function AuthPanel({ title, showConsent, children }: AuthPanelProps) {
 }
 
 export function AuthPage() {
-  const [tab, setTab] = useState<AuthTabId>(AUTH_TAB.LOGIN);
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState<AuthTabId>(() => getInitialTab(searchParams));
 
   return (
     <div className="flex min-h-dvh flex-col">

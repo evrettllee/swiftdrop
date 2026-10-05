@@ -5,7 +5,13 @@ import { Pool } from 'pg';
 import { ROLE_NAMES } from '../../src/common/enums/role.enum';
 import type { Database } from '../../src/database/database.module';
 import * as schema from '../../src/db/schema';
-import { MIGRATIONS_FOLDER, TEST_DB_NAME_SUFFIX } from './constants';
+import {
+  MIGRATIONS_FOLDER,
+  TEST_DB_NAME_SUFFIX,
+  TEST_TARIFF,
+  TEST_ZONE_NAME,
+  TEST_ZONE_POLYGON,
+} from './constants';
 
 export async function prepareTestDatabase(): Promise<void> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -34,5 +40,19 @@ async function assertTestDatabase(db: Database): Promise<void> {
 
 export async function resetTestData(db: Database): Promise<void> {
   await assertTestDatabase(db);
-  await db.execute(sql`TRUNCATE TABLE users RESTART IDENTITY CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE users, tariffs, service_zones RESTART IDENTITY CASCADE`);
+}
+
+// One active tariff and one active zone that covers the central Minsk test points.
+export async function seedServiceArea(db: Database): Promise<void> {
+  const [tariff] = await db
+    .insert(schema.tariffs)
+    .values(TEST_TARIFF)
+    .returning({ tariffId: schema.tariffs.tariffId });
+
+  await db.insert(schema.serviceZones).values({
+    name: TEST_ZONE_NAME,
+    polygon: TEST_ZONE_POLYGON,
+    tariffId: tariff.tariffId,
+  });
 }
