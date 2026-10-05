@@ -73,6 +73,9 @@ export function RouteMarker({ kind, point, onMove, onRemove }: RouteMarkerProps)
       position={[point.latitude, point.longitude]}
       icon={MARKER_ICONS[kind]}
       draggable
+      // A marker cannot be moved or activated from the keyboard, so it is not a tab stop: the
+      // address fields and the cross in the tag do the same work.
+      keyboard={false}
       eventHandlers={eventHandlers}
     >
       <Tooltip permanent interactive direction="top" className={MAP_CLASS.TAG}>
