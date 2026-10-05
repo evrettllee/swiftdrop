@@ -4,11 +4,11 @@ import { FeatureCard } from './FeatureCard';
 
 const { REPEAT } = FEATURES;
 
-// The example row of an order is shown on a desktop only, as in the design.
+// The example row of an order is a picture, not a control.
 export function RepeatCard() {
   return (
     <FeatureCard tone="page" className="lg:col-span-2" title={REPEAT.TITLE} text={REPEAT.TEXT}>
-      <div className="hidden items-center justify-between gap-4 rounded-lg border border-border bg-surface p-4 lg:flex">
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface p-4">
         <div>
           <p className="font-semibold tabular-nums">{REPEAT.ORDER}</p>
           <p className="flex items-center gap-2 text-small">

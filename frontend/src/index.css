@@ -54,6 +54,8 @@
   --color-primary-hover: var(--primary-hover);
   --color-primary-pressed: var(--primary-pressed);
   --color-on-primary: var(--on-primary);
+  --color-inverse: var(--inverse);
+  --color-on-inverse: var(--on-inverse);
   --color-danger: var(--danger);
   --color-danger-solid: var(--danger-solid);
   --color-danger-solid-hover: var(--danger-solid-hover);
@@ -96,6 +98,8 @@
   --primary-hover: #152e6e;
   --primary-pressed: #0f1f4d;
   --on-primary: #f9fafb;
+  --inverse: #fcfcfd;
+  --on-inverse: #1e3a8a;
 
   --danger: #dc2626;
   --danger-solid: #dc2626;
@@ -143,6 +147,8 @@
   --primary-hover: #2d4aab;
   --primary-pressed: #253d8c;
   --on-primary: #f9fafb;
+  --inverse: #ededed;
+  --on-inverse: #253d8c;
 
   --danger: #e89a9a;
   --danger-solid: #c43d3d;

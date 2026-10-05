@@ -7,11 +7,11 @@ const { RATING } = FEATURES;
 
 const STARS = Array.from({ length: RATING.MAX }, (_, index) => index < RATING.VALUE);
 
-// The stars are shown on a desktop only, as in the design; the label tells the grade in words.
+// The stars are a picture; the label tells the grade in words.
 export function RatingCard() {
   return (
     <FeatureCard tone="page" className="lg:col-span-2" title={RATING.TITLE} text={RATING.TEXT}>
-      <div role="img" aria-label={RATING.LABEL} className="hidden gap-1 lg:flex">
+      <div role="img" aria-label={RATING.LABEL} className="flex gap-1">
         {STARS.map((isFilled, index) => (
           <StarIcon
             key={`star-${index}`}
