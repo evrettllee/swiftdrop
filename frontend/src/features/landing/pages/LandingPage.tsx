@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { SkipLink } from '../../../shared/ui/SkipLink';
+import { AddressField } from '../../geocoding/components/AddressField';
+import type { AddressSuggestion } from '../../geocoding/types';
 import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
 import { RouteMap } from '../components/RouteMap';
@@ -7,6 +10,8 @@ import { useRoutePoints } from '../lib/useRoutePoints';
 
 export function LandingPage() {
   const { pickup, delivery, target, setPoint, pickPoint } = useRoutePoints();
+  const [addressText, setAddressText] = useState('');
+  const [chosen, setChosen] = useState<AddressSuggestion | null>(null);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -23,6 +28,19 @@ export function LandingPage() {
         >
           {LANDING_TEXTS.HERO_TITLE}
         </h1>
+        <div className="mx-auto w-full max-w-120">
+          <AddressField
+            label="Откуда"
+            placeholder="Начните вводить адрес"
+            value={addressText}
+            onChange={setAddressText}
+            onSelect={(suggestion) => {
+              setAddressText(suggestion.name);
+              setChosen(suggestion);
+            }}
+          />
+        </div>
+        <p className="text-small text-fg-secondary">{JSON.stringify(chosen)}</p>
         <RouteMap
           pickup={pickup}
           delivery={delivery}
@@ -31,7 +49,6 @@ export function LandingPage() {
           onMove={setPoint}
           className="h-96 lg:h-140"
         />
-        <p className="text-small text-fg-secondary">{JSON.stringify({ pickup, delivery })}</p>
       </main>
       <LandingFooter />
     </div>

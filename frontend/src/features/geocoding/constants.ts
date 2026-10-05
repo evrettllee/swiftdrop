@@ -21,6 +21,8 @@ export const GEOCODING_PARAMS = {
 
 // Shorter queries are not sent at all: they match too many places.
 export const GEOCODING_MIN_QUERY_LENGTH = 3;
+// The request goes out when the user has stopped typing for this long.
+export const GEOCODING_DEBOUNCE_MS = 300;
 
 // A cancelled request is not an error: the caller has already asked for something newer.
 export const ABORT_ERROR_NAME = 'AbortError';
@@ -28,4 +30,25 @@ export const ABORT_ERROR_NAME = 'AbortError';
 export const GEOCODING_ERROR_MESSAGES = {
   NETWORK: 'Нет соединения. Проверьте интернет и повторите попытку',
   UNAVAILABLE: 'Поиск адресов временно недоступен. Укажите точку на карте',
+} as const;
+
+export const SEARCH_STATUS = {
+  IDLE: 'idle',
+  LOADING: 'loading',
+  READY: 'ready',
+  ERROR: 'error',
+} as const;
+
+// Address field
+export const ADDRESS_FIELD_KEY = {
+  ARROW_DOWN: 'ArrowDown',
+  ARROW_UP: 'ArrowUp',
+  ENTER: 'Enter',
+  ESCAPE: 'Escape',
+} as const;
+
+export const NO_ACTIVE_INDEX = -1;
+
+export const ADDRESS_FIELD_TEXTS = {
+  NO_RESULTS: 'Ничего не найдено. Уточните адрес или отметьте точку на карте',
 } as const;
