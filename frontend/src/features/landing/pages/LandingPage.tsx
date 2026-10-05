@@ -1,17 +1,29 @@
-import { useState } from 'react';
 import { SkipLink } from '../../../shared/ui/SkipLink';
 import { AddressField } from '../../geocoding/components/AddressField';
-import type { AddressSuggestion } from '../../geocoding/types';
 import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
 import { RouteMap } from '../components/RouteMap';
-import { LANDING_SECTION_ID, LANDING_TEXTS } from '../constants';
-import { useRoutePoints } from '../lib/useRoutePoints';
+import {
+  ADDRESS_PLACEHOLDER,
+  LANDING_SECTION_ID,
+  LANDING_TEXTS,
+  ROUTE_POINT_LABELS,
+  ROUTE_POINT_ORDER,
+} from '../constants';
+import { useRouteAddresses } from '../lib/useRouteAddresses';
 
 export function LandingPage() {
-  const { pickup, delivery, target, setPoint, pickPoint } = useRoutePoints();
-  const [addressText, setAddressText] = useState('');
-  const [chosen, setChosen] = useState<AddressSuggestion | null>(null);
+  const {
+    pickup,
+    delivery,
+    target,
+    texts,
+    setTarget,
+    changeText,
+    selectSuggestion,
+    placePoint,
+    pickPoint,
+  } = useRouteAddresses();
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -28,25 +40,26 @@ export function LandingPage() {
         >
           {LANDING_TEXTS.HERO_TITLE}
         </h1>
-        <div className="mx-auto w-full max-w-120">
-          <AddressField
-            label="Откуда"
-            placeholder="Начните вводить адрес"
-            value={addressText}
-            onChange={setAddressText}
-            onSelect={(suggestion) => {
-              setAddressText(suggestion.name);
-              setChosen(suggestion);
-            }}
-          />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {ROUTE_POINT_ORDER.map((kind) => (
+            <AddressField
+              key={kind}
+              label={ROUTE_POINT_LABELS[kind]}
+              placeholder={ADDRESS_PLACEHOLDER}
+              value={texts[kind]}
+              onChange={(text) => changeText(kind, text)}
+              onSelect={(suggestion) => selectSuggestion(kind, suggestion)}
+              onFocus={() => setTarget(kind)}
+            />
+          ))}
         </div>
-        <p className="text-small text-fg-secondary">{JSON.stringify(chosen)}</p>
+        <p className="text-small text-fg-secondary">{JSON.stringify({ pickup, delivery })}</p>
         <RouteMap
           pickup={pickup}
           delivery={delivery}
           target={target}
           onPick={pickPoint}
-          onMove={setPoint}
+          onMove={placePoint}
           className="h-96 lg:h-140"
         />
       </main>

@@ -9,7 +9,8 @@ export function useRoutePoints() {
   const [delivery, setDelivery] = useState<GeoPoint | null>(null);
   const [target, setTarget] = useState<RoutePointKind>(ROUTE_POINT.PICKUP);
 
-  const setPoint = useCallback((kind: RoutePointKind, point: GeoPoint) => {
+  // `null` removes the point from the map.
+  const setPoint = useCallback((kind: RoutePointKind, point: GeoPoint | null) => {
     if (kind === ROUTE_POINT.PICKUP) {
       setPickup(point);
     } else {
@@ -17,17 +18,5 @@ export function useRoutePoints() {
     }
   }, []);
 
-  // After the pickup is placed, the next click goes to the delivery point.
-  const pickPoint = useCallback(
-    (point: GeoPoint) => {
-      setPoint(target, point);
-
-      if (target === ROUTE_POINT.PICKUP) {
-        setTarget(ROUTE_POINT.DELIVERY);
-      }
-    },
-    [setPoint, target],
-  );
-
-  return { pickup, delivery, target, setTarget, setPoint, pickPoint };
+  return { pickup, delivery, target, setTarget, setPoint };
 }

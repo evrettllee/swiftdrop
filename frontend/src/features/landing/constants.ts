@@ -125,3 +125,9 @@ export const MAP_TEXTS = {
   ZOOM_IN: 'Приблизить',
   ZOOM_OUT: 'Отдалить',
 } as const;
+
+export const ROUTE_POINT_ORDER = [ROUTE_POINT.PICKUP, ROUTE_POINT.DELIVERY] as const;
+
+export const ADDRESS_PLACEHOLDER = 'Улица и номер дома';
+// Shown while the address of a point set on the map is looked up, and when it has none.
+export const POINT_ON_MAP_TEXT = 'Точка на карте';
