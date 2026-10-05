@@ -3,13 +3,12 @@ import { hash } from '@node-rs/argon2';
 import { and, eq, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import { ROLE, ROLE_NAMES } from '../common/enums/role.enum';
 import * as schema from './schema';
 
 if (existsSync('../.env')) {
   process.loadEnvFile('../.env');
 }
-
-const ROLE_NAMES = ['client', 'courier', 'manager', 'admin'];
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -54,9 +53,9 @@ async function main() {
     const [adminRole] = await db
       .select({ roleId: schema.roles.roleId })
       .from(schema.roles)
-      .where(eq(schema.roles.name, 'admin'));
+      .where(eq(schema.roles.name, ROLE.ADMIN));
     if (!adminRole) {
-      throw new Error('Role "admin" not found');
+      throw new Error(`Role "${ROLE.ADMIN}" not found`);
     }
 
     const existingAdmin = await db
