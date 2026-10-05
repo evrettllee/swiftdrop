@@ -15,7 +15,7 @@ export const priceEstimateSchema = z.object({
   currency: z.string(),
   distanceKm: z.number(),
   estimatedMinutes: z.number(),
-  // The demand coefficient: 1 means the base price, a higher value is shown to the user as a surcharge.
+  // Demand coefficient from the backend, always 1 for now; the UI will show the surcharge later.
   coefficient: z.number(),
 });
 

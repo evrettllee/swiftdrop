@@ -55,9 +55,9 @@ function ResultBody({ view }: { view: EstimateView }) {
 // The minimum height keeps the card from jumping between the states.
 export function EstimateResult({ view }: { view: EstimateView }) {
   return (
-    <section aria-live="polite" className="flex min-h-32 flex-col gap-2 rounded-lg bg-selected p-4">
+    <div aria-live="polite" className="flex min-h-32 flex-col gap-2 rounded-lg bg-selected p-4">
       <p className="text-small text-fg-secondary">{CALCULATOR_TEXTS.ESTIMATE_LABEL}</p>
       <ResultBody view={view} />
-    </section>
+    </div>
   );
 }
