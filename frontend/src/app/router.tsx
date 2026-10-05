@@ -1,10 +1,10 @@
 import { createBrowserRouter } from 'react-router';
 import { AuthPage } from '../features/auth/pages/AuthPage';
+import { LandingPage } from '../features/landing/pages/LandingPage';
 import { APP_ROUTES } from '../shared/constants';
 import { GuestRoute } from './GuestRoute';
 import { PLACEHOLDER_TEXTS } from './constants';
 import { ErrorPage } from './pages/ErrorPage';
-import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -15,7 +15,7 @@ export const router = createBrowserRouter([
     // A layout-less root: it only catches errors thrown while rendering any page below.
     errorElement: <ErrorPage />,
     children: [
-      { path: APP_ROUTES.HOME, element: <HomePage /> },
+      { path: APP_ROUTES.HOME, element: <LandingPage /> },
       { element: <GuestRoute />, children: [{ path: APP_ROUTES.AUTH, element: <AuthPage /> }] },
       {
         element: <ProtectedRoute />,
