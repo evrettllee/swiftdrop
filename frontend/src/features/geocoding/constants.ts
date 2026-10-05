@@ -1,3 +1,7 @@
+import { CITY_CENTER } from '../../shared/constants';
+
+const [CITY_CENTER_LATITUDE, CITY_CENTER_LONGITUDE] = CITY_CENTER;
+
 // Mapbox Geocoding API v6: the same public token as for the map tiles.
 export const GEOCODING_BASE_URL = 'https://api.mapbox.com/search/geocode/v6';
 
@@ -12,8 +16,8 @@ export const GEOCODING_PARAMS = {
   COUNTRY: 'by',
   TYPES: 'address,street',
   LIMIT: 5,
-  // Results near the center of Minsk go first: longitude,latitude.
-  PROXIMITY: '27.559,53.9006',
+  // Results near the city center go first; Mapbox expects longitude,latitude.
+  PROXIMITY: `${CITY_CENTER_LONGITUDE},${CITY_CENTER_LATITUDE}`,
   // Suggestions come only from the area around Minsk, where the courier service works:
   // west,south,east,north. The exact check of the service zone is done by the backend.
   BBOX: '27.3,53.75,27.85,54.05',
@@ -44,7 +48,6 @@ export const ADDRESS_FIELD_KEY = {
   ARROW_DOWN: 'ArrowDown',
   ARROW_UP: 'ArrowUp',
   ENTER: 'Enter',
-  ESCAPE: 'Escape',
 } as const;
 
 export const NO_ACTIVE_INDEX = -1;

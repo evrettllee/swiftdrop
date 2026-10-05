@@ -14,7 +14,6 @@ export function FaqSection() {
           {FAQ.ITEMS.map((item) => (
             <FaqItem
               key={item.id}
-              id={item.id}
               question={item.question}
               answer={item.answer}
               isOpen={openId === item.id}

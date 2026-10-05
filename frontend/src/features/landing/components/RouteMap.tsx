@@ -3,15 +3,9 @@ import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
 import { MapContainer, Polyline, useMapEvents } from 'react-leaflet';
 import { IS_MAPBOX_CONFIGURED } from '../../../shared/config';
+import { CITY_CENTER } from '../../../shared/constants';
 import type { GeoPoint } from '../../pricing/types';
-import {
-  MAP_CENTER,
-  MAP_CLASS,
-  MAP_PLACED_CLASS,
-  MAP_TEXTS,
-  MAP_ZOOM,
-  ROUTE_POINT,
-} from '../constants';
+import { MAP_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM, ROUTE_POINT } from '../constants';
 import { useExpandedMap } from '../lib/useExpandedMap';
 import type { RoutePointKind } from '../types';
 import { FitToPoints } from './FitToPoints';
@@ -72,7 +66,7 @@ export function RouteMap({
         {/* `isolate` keeps the high z-index values of Leaflet inside the map, below the sticky header. */}
         <MapContainer
           ref={setMap}
-          center={MAP_CENTER}
+          center={CITY_CENTER}
           zoom={MAP_ZOOM.DEFAULT}
           minZoom={MAP_ZOOM.MIN}
           maxZoom={MAP_ZOOM.MAX}

@@ -76,7 +76,6 @@ export const LANDING_FOOTER_GROUPS: readonly FooterGroup[] = [
 export const LANDING_MOBILE_MENU_ID = 'landing-mobile-menu';
 // The same single breakpoint as `lg` in index.css (1024px).
 export const LANDING_DESKTOP_MEDIA_QUERY = '(min-width: 64rem)';
-export const ESCAPE_KEY = 'Escape';
 
 // Route points
 export const ROUTE_POINT = {
@@ -89,8 +88,7 @@ export const ROUTE_POINT_LABELS: Record<RoutePointKind, string> = {
   [ROUTE_POINT.DELIVERY]: 'Куда',
 };
 
-// Map: the city center and the zoom range (12 shows the whole city core)
-export const MAP_CENTER: [number, number] = [53.9006, 27.559];
+// Map: the zoom range (12 shows the whole city core)
 export const MAP_ZOOM = {
   DEFAULT: 12,
   MIN: 9,
@@ -221,8 +219,6 @@ export const TRACKING = {
     MESSAGE: 'Написать',
   },
 } as const;
-
-export const ILLUSTRATION_ICON_SIZE = '2rem';
 
 export const FEATURES = {
   TITLE: 'Что умеет сервис',

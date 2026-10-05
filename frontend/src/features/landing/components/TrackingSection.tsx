@@ -1,10 +1,8 @@
 import { ChatCircleIcon, ClockIcon, MapPinIcon, type Icon } from '@phosphor-icons/react';
-import { ICON_WEIGHT } from '../../../shared/constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
 import { LANDING_SECTION_ID, TRACKING } from '../constants';
 import { LandingSection } from './LandingSection';
 import { TrackingCard } from './TrackingCard';
-
-const FEATURE_ICON_SIZE = '1.5rem';
 
 const FEATURE_ICONS: Record<(typeof TRACKING.FEATURES)[number]['id'], Icon> = {
   eta: ClockIcon,
@@ -29,7 +27,7 @@ export function TrackingSection() {
               return (
                 <li key={feature.id} className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-4">
                   <FeatureIcon
-                    size={FEATURE_ICON_SIZE}
+                    size={ICON_SIZE.LARGE}
                     weight={ICON_WEIGHT}
                     aria-hidden="true"
                     className="text-accent"

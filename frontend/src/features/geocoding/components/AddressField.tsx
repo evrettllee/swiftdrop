@@ -1,4 +1,5 @@
 import { useId, useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import { ESCAPE_KEY } from '../../../shared/constants';
 import { Input } from '../../../shared/ui/Input';
 import { Spinner } from '../../../shared/ui/Spinner';
 import {
@@ -89,7 +90,7 @@ export function AddressField({
         }
         break;
       }
-      case ADDRESS_FIELD_KEY.ESCAPE:
+      case ESCAPE_KEY:
         setIsOpen(false);
         break;
       default:

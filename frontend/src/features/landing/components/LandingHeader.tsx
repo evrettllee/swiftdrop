@@ -1,10 +1,9 @@
 import { ListIcon, XIcon } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { ESCAPE_KEY, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
 import { Logo } from '../../../shared/ui/Logo';
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle';
 import {
-  ESCAPE_KEY,
   LANDING_DESKTOP_MEDIA_QUERY,
   LANDING_MOBILE_MENU_ID,
   LANDING_NAV_ITEMS,

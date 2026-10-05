@@ -1,6 +1,6 @@
 import type { Map as LeafletMap } from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
-import { ESCAPE_KEY } from '../constants';
+import { ESCAPE_KEY } from '../../../shared/constants';
 
 // The map can cover the whole screen: the page below it does not scroll, Escape closes the map,
 // and Leaflet is told about the new size, because it does not notice the change by itself.

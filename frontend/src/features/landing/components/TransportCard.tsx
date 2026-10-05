@@ -6,8 +6,8 @@ import {
   TruckIcon,
   type Icon,
 } from '@phosphor-icons/react';
-import { ICON_WEIGHT } from '../../../shared/constants';
-import { FEATURES, ILLUSTRATION_ICON_SIZE } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { FEATURES } from '../constants';
 import { FeatureCard } from './FeatureCard';
 import { ResponsiveText } from './ResponsiveText';
 
@@ -41,11 +41,7 @@ export function TransportCard() {
               <span
                 className={`flex size-16 items-center justify-center rounded-lg border bg-surface ${isActive ? 'border-accent text-accent' : 'border-border'}`}
               >
-                <VehicleIcon
-                  size={ILLUSTRATION_ICON_SIZE}
-                  weight={ICON_WEIGHT}
-                  aria-hidden="true"
-                />
+                <VehicleIcon size={ICON_SIZE.XLARGE} weight={ICON_WEIGHT} aria-hidden="true" />
               </span>
               <span className={`text-small ${isActive ? 'font-semibold' : 'text-fg-secondary'}`}>
                 {label}

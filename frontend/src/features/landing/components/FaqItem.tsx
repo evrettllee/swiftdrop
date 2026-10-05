@@ -1,17 +1,18 @@
 import { CaretDownIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { useId } from 'react';
+import { ICON_SIZE, ICON_WEIGHT, ID_PART } from '../../../shared/constants';
 
-interface FaqItemProps {
-  id: string;
+type FaqItemProps = {
   question: string;
   answer: string;
   isOpen: boolean;
   onToggle: () => void;
-}
+};
 
-export function FaqItem({ id, question, answer, isOpen, onToggle }: FaqItemProps) {
-  const buttonId = `faq-button-${id}`;
-  const panelId = `faq-panel-${id}`;
+export function FaqItem({ question, answer, isOpen, onToggle }: FaqItemProps) {
+  const id = useId();
+  const buttonId = `${id}-${ID_PART.BUTTON}`;
+  const panelId = `${id}-${ID_PART.PANEL}`;
 
   return (
     <div className="border-b border-border">

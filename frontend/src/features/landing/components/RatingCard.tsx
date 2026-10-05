@@ -1,6 +1,6 @@
 import { StarIcon } from '@phosphor-icons/react';
-import { ICON_WEIGHT } from '../../../shared/constants';
-import { FEATURES, ILLUSTRATION_ICON_SIZE } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { FEATURES } from '../constants';
 import { FeatureCard } from './FeatureCard';
 
 const { RATING } = FEATURES;
@@ -15,7 +15,7 @@ export function RatingCard() {
         {STARS.map((isFilled, index) => (
           <StarIcon
             key={`star-${index}`}
-            size={ILLUSTRATION_ICON_SIZE}
+            size={ICON_SIZE.XLARGE}
             weight={ICON_WEIGHT}
             aria-hidden="true"
             className={isFilled ? 'text-star' : 'text-fg-muted'}
