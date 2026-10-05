@@ -34,6 +34,12 @@ export const LANDING_TEXTS = {
   HERO_TITLE: 'Курьерская доставка по городу, которую видно на карте',
   FOOTER_TAGLINE: 'Курьерская доставка по городу с отслеживанием на карте.',
   COPYRIGHT_OWNER: 'SwiftDrop',
+  HERO_LEAD: 'Укажите адреса на карте, узнайте цену заранее и следите за курьером до самой двери.',
+  ORDER: 'Оформить заказ',
+  HOW_IT_WORKS: 'Как это работает',
+  CALC_TITLE: 'Рассчитайте стоимость',
+  CALC_SUBTITLE: 'Результат обновляется по мере ввода.',
+  CALC_CAPTION: 'Точную цену покажем перед оплатой.',
 } as const;
 
 // Footer: the column titles and links of the desktop layout.
