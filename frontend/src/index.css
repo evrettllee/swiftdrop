@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-@theme {
+@theme static {
   --color-*: initial;
   --text-*: initial;
   --radius-*: initial;

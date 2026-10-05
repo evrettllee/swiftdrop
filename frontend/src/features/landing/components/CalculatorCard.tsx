@@ -37,7 +37,7 @@ export function CalculatorCard() {
     <section
       id={LANDING_SECTION_ID.CALCULATOR}
       aria-labelledby={titleId}
-      className="scroll-mt-20 rounded-xl border border-border bg-surface p-4 shadow-lg lg:p-6"
+      className="scroll-mt-14 lg:scroll-mt-16 rounded-xl border border-border bg-surface p-4 shadow-lg lg:p-6"
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <RouteMap

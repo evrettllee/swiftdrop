@@ -6,12 +6,12 @@ export function HeroSection() {
   return (
     <section
       id={LANDING_SECTION_ID.TOP}
-      className="flex scroll-mt-20 flex-col items-center gap-6 text-center"
+      className="flex scroll-mt-14 flex-col items-center gap-6 text-center lg:scroll-mt-16"
     >
       <h1 className="max-w-220 text-display-sm font-bold lg:text-display">
         {LANDING_TEXTS.HERO_TITLE}
       </h1>
-      <p className="max-w-2xl text-body font-normal text-fg-secondary lg:text-heading-sm">
+      <p className="max-w-2xl text-body text-fg-secondary lg:text-heading-sm">
         {LANDING_TEXTS.HERO_LEAD}
       </p>
       {/* In a column the buttons stretch to the full width by themselves. */}
