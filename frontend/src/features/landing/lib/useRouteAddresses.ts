@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { findAddressByPoint } from '../../geocoding/api';
 import type { AddressSuggestion } from '../../geocoding/types';
 import type { GeoPoint } from '../../pricing/types';
-import { POINT_ON_MAP_TEXT, ROUTE_POINT } from '../constants';
+import { POINT_ON_MAP_TEXT, ROUTE_POINT, ROUTE_POINT_ORDER } from '../constants';
 import type { RoutePointKind } from '../types';
 import { useRoutePoints } from './useRoutePoints';
 
@@ -19,6 +19,15 @@ export function useRouteAddresses() {
   const { pickup, delivery, target, setTarget, setPoint } = useRoutePoints();
   const [texts, setTexts] = useState<AddressTexts>(EMPTY_TEXTS);
   const lookups = useRef<Partial<Record<RoutePointKind, AbortController>>>({});
+
+  // While a point is missing, the next click on the map and the hint name a missing point (the
+  // field in focus wins if its point is missing too). Without missing points the click moves the
+  // point of the field in focus, and the hint is hidden.
+  const missing = ROUTE_POINT_ORDER.filter(
+    (kind) => (kind === ROUTE_POINT.PICKUP ? pickup : delivery) === null,
+  );
+  const clickTarget = missing.includes(target) ? target : (missing[0] ?? target);
+  const hint: RoutePointKind | null = missing.length > 0 ? clickTarget : null;
 
   useEffect(() => {
     const active = lookups.current;
@@ -89,22 +98,19 @@ export function useRouteAddresses() {
     [cancelLookup, setPoint, setText],
   );
 
-  // After the pickup is placed, the next click goes to the delivery point.
+  // After a click the next one goes to the delivery point, or to the pickup if it is still missing.
   const pickPoint = useCallback(
     (point: GeoPoint) => {
-      placePoint(target, point);
-
-      if (target === ROUTE_POINT.PICKUP) {
-        setTarget(ROUTE_POINT.DELIVERY);
-      }
+      placePoint(clickTarget, point);
+      setTarget(ROUTE_POINT.DELIVERY);
     },
-    [placePoint, target, setTarget],
+    [placePoint, clickTarget, setTarget],
   );
 
   return {
     pickup,
     delivery,
-    target,
+    hint,
     texts,
     setTarget,
     changeText,

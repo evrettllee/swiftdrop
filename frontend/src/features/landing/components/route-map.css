@@ -75,3 +75,7 @@
 .leaflet-control-attribution a:hover {
   text-decoration: underline;
 }
+
+.route-tag.leaflet-interactive {
+  cursor: default;
+}

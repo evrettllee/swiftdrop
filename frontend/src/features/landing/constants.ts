@@ -126,10 +126,13 @@ export const MAP_CLASS = {
 
 export const MAP_TEXTS = {
   REGION_LABEL: 'Карта города: отметьте точки «Откуда» и «Куда»',
-  HINT_PICKUP: 'Нажмите на карту, чтобы поставить точку «Откуда»',
-  HINT_DELIVERY: 'Нажмите на карту, чтобы поставить точку «Куда»',
+  HINT_PICKUP: 'Отметьте точку «Откуда»',
+  HINT_DELIVERY: 'Отметьте точку «Куда»',
   ZOOM_IN: 'Приблизить',
   ZOOM_OUT: 'Отдалить',
+  EXPAND: 'Развернуть карту',
+  COLLAPSE: 'Свернуть карту',
+  REMOVE_POINT: 'Убрать точку',
 } as const;
 
 export const ROUTE_POINT_ORDER = [ROUTE_POINT.PICKUP, ROUTE_POINT.DELIVERY] as const;

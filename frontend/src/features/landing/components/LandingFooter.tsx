@@ -5,9 +5,10 @@ import { LANDING_FOOTER_GROUPS, LANDING_SECTION_ID, LANDING_TEXTS } from '../con
 const LINK_CLASS = 'text-fg-secondary transition-colors duration-150 hover:text-fg';
 const HIDDEN_ON_MOBILE_CLASS = 'hidden lg:block';
 
-export function LandingFooter() {
-  const year = new Date().getFullYear();
+// The year does not change while the page is open, so it is read once.
+const CURRENT_YEAR = new Date().getFullYear();
 
+export function LandingFooter() {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 text-small lg:gap-12 lg:px-12 lg:pt-12 lg:pb-8">
@@ -50,7 +51,7 @@ export function LandingFooter() {
           </div>
         </div>
         <p className="text-fg-secondary">
-          © {year} {LANDING_TEXTS.COPYRIGHT_OWNER}
+          © {CURRENT_YEAR} {LANDING_TEXTS.COPYRIGHT_OWNER}
         </p>
       </div>
     </footer>

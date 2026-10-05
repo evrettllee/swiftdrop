@@ -22,7 +22,7 @@ export function CalculatorCard() {
   const {
     pickup,
     delivery,
-    target,
+    hint,
     texts,
     setTarget,
     changeText,
@@ -43,9 +43,10 @@ export function CalculatorCard() {
         <RouteMap
           pickup={pickup}
           delivery={delivery}
-          target={target}
+          hint={hint}
           onPick={pickPoint}
           onMove={placePoint}
+          onRemove={(kind) => changeText(kind, '')}
           className="h-65 lg:h-auto lg:min-h-140"
         />
         <div className="flex flex-col gap-6">
