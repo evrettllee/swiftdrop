@@ -1,5 +1,9 @@
 import { SkipLink } from '../../../shared/ui/SkipLink';
 import { AddressField } from '../../geocoding/components/AddressField';
+import { EstimateResult } from '../../pricing/components/EstimateResult';
+import { PackageFields } from '../../pricing/components/PackageFields';
+import { useEstimate } from '../../pricing/lib/useEstimate';
+import { usePackageForm } from '../../pricing/lib/usePackageForm';
 import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
 import { RouteMap } from '../components/RouteMap';
@@ -24,6 +28,8 @@ export function LandingPage() {
     placePoint,
     pickPoint,
   } = useRouteAddresses();
+  const packageForm = usePackageForm();
+  const estimate = useEstimate(pickup, delivery, packageForm.params);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -53,7 +59,10 @@ export function LandingPage() {
             />
           ))}
         </div>
-        <p className="text-small text-fg-secondary">{JSON.stringify({ pickup, delivery })}</p>
+        <div className="mx-auto flex w-full max-w-120 flex-col gap-6">
+          <PackageFields form={packageForm} />
+          <EstimateResult view={estimate} />
+        </div>
         <RouteMap
           pickup={pickup}
           delivery={delivery}
