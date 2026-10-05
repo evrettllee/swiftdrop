@@ -122,6 +122,10 @@ export const MAP_MARKER_HIT_SIZE = 44;
 // Distance from the marker center to the tag above it.
 export const MAP_MARKER_TAG_OFFSET = 14;
 
+// The frame of the map in its place in the page; the placeholder of a missing map uses it too.
+export const MAP_PLACED_CLASS =
+  'absolute inset-0 overflow-hidden rounded-lg border border-border bg-field';
+
 // Class names used by route-map.css
 export const MAP_CLASS = {
   MARKER: 'route-marker',
@@ -141,6 +145,9 @@ export const MAP_TEXTS = {
   EXPAND: 'Развернуть карту',
   COLLAPSE: 'Свернуть карту',
   REMOVE_POINT: 'Убрать точку',
+  UNAVAILABLE: 'Карта временно недоступна',
+  // Shown to a developer only (the dev server), not to a visitor.
+  UNAVAILABLE_DEV_HINT: 'Задайте VITE_MAPBOX_TOKEN в файле .env в корне репозитория.',
 } as const;
 
 export const ROUTE_POINT_ORDER = [ROUTE_POINT.PICKUP, ROUTE_POINT.DELIVERY] as const;

@@ -1,5 +1,5 @@
 import { ApiError } from '../../shared/api/http';
-import { MAPBOX_TOKEN } from '../../shared/config';
+import { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from '../../shared/config';
 import { NETWORK_ERROR_STATUS } from '../../shared/constants';
 import type { GeoPoint } from '../pricing/types';
 import {
@@ -22,6 +22,10 @@ async function requestSuggestions(
   params: Record<string, string>,
   signal?: AbortSignal,
 ): Promise<AddressSuggestion[]> {
+  if (!IS_MAPBOX_CONFIGURED) {
+    throw new ApiError(NETWORK_ERROR_STATUS, GEOCODING_ERROR_MESSAGES.UNAVAILABLE);
+  }
+
   const query = new URLSearchParams({ ...params, access_token: MAPBOX_TOKEN });
   let response: Response;
 

@@ -2,14 +2,23 @@ import type { Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
 import { MapContainer, Polyline, useMapEvents } from 'react-leaflet';
+import { IS_MAPBOX_CONFIGURED } from '../../../shared/config';
 import type { GeoPoint } from '../../pricing/types';
-import { MAP_CENTER, MAP_CLASS, MAP_TEXTS, MAP_ZOOM, ROUTE_POINT } from '../constants';
+import {
+  MAP_CENTER,
+  MAP_CLASS,
+  MAP_PLACED_CLASS,
+  MAP_TEXTS,
+  MAP_ZOOM,
+  ROUTE_POINT,
+} from '../constants';
 import { useExpandedMap } from '../lib/useExpandedMap';
 import type { RoutePointKind } from '../types';
 import { FitToPoints } from './FitToPoints';
 import { MapControls } from './MapControls';
 import { MapHint } from './MapHint';
 import { MapTiles } from './MapTiles';
+import { MapUnavailable } from './MapUnavailable';
 import { RouteMarker } from './RouteMarker';
 import './route-map.css';
 
@@ -26,8 +35,6 @@ type RouteMapProps = {
 };
 
 // The map fills its place in the page; expanded, it covers the whole screen above the header.
-const MAP_PLACED_CLASS =
-  'absolute inset-0 overflow-hidden rounded-lg border border-border bg-field';
 const MAP_EXPANDED_CLASS = 'fixed inset-0 z-50 bg-field';
 
 function ClickHandler({ onPick }: { onPick: (point: GeoPoint) => void }) {
@@ -49,6 +56,10 @@ export function RouteMap({
 }: RouteMapProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
   const { isExpanded, toggle } = useExpandedMap(map);
+
+  if (!IS_MAPBOX_CONFIGURED) {
+    return <MapUnavailable className={className} />;
+  }
 
   return (
     // This block keeps the place of the map in the page while the map itself is expanded.
