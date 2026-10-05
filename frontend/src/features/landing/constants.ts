@@ -10,6 +10,7 @@ export const LANDING_SECTION_ID = {
   TRACKING: 'tracking',
   FEATURES: 'features',
   FAQ: 'faq',
+  CTA: 'cta',
 } as const;
 
 export const LANDING_NAV_ITEMS = [

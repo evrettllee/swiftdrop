@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Spinner } from './Spinner';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'text';
+export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'inverse';
 
 const BASE_CLASS =
   'inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-md px-4 py-2.5 text-body font-semibold transition-colors duration-150 ease-in-out motion-reduce:transition-none';
@@ -13,6 +13,8 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   secondary:
     'border border-border-button bg-surface text-accent shadow-sm hover:bg-selected active:bg-border disabled:border-transparent disabled:bg-border disabled:text-fg-muted disabled:shadow-none dark:disabled:border-border dark:disabled:bg-surface-muted',
   text: 'text-accent hover:bg-selected active:bg-border disabled:bg-border disabled:text-fg-muted dark:disabled:bg-surface-muted',
+  // A light button for a block filled with the primary color.
+  inverse: 'bg-inverse text-on-inverse hover:opacity-90 active:opacity-80 disabled:opacity-50',
 };
 
 type CommonProps = {
