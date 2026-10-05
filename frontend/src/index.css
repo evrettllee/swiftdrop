@@ -44,6 +44,7 @@
   --color-selected: var(--selected);
   --color-border: var(--border);
   --color-border-elevated: var(--border-elevated);
+  --color-border-button: var(--border-button);
   --color-scrim: var(--scrim);
   --color-fg: var(--fg);
   --color-fg-secondary: var(--fg-secondary);
@@ -82,6 +83,7 @@
   --selected: #eff6ff;
   --border: #e5e7eb;
   --border-elevated: #e5e7eb;
+  --border-button: #1e3a8a;
   --scrim: rgb(17 24 39 / 0.4);
 
   --fg: #111827;
@@ -125,6 +127,7 @@
   --selected: #1e1e20;
   --border: #2a2a2d;
   --border-elevated: #333336;
+  --border-button: #3a3a3d;
   --scrim: rgb(5 5 6 / 0.5);
 
   --fg: #ededed;
