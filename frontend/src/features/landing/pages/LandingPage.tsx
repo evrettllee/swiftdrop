@@ -1,5 +1,6 @@
 import { SkipLink } from '../../../shared/ui/SkipLink';
 import { CalculatorCard } from '../components/CalculatorCard';
+import { FeaturesSection } from '../components/FeaturesSection';
 import { HeroSection } from '../components/HeroSection';
 import { HowItWorks } from '../components/HowItWorks';
 import { LandingFooter } from '../components/LandingFooter';
@@ -19,6 +20,7 @@ export function LandingPage() {
         </div>
         <HowItWorks />
         <TrackingSection />
+        <FeaturesSection />
       </main>
       <LandingFooter />
     </div>

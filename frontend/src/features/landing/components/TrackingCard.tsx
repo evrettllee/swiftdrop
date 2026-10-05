@@ -1,12 +1,12 @@
 import { ChatCircleIcon, ClockIcon, MapPinIcon, StarIcon } from '@phosphor-icons/react';
 import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
 import { TRACKING } from '../constants';
+import { ButtonLookalike } from './ButtonLookalike';
 import { TrackingMap } from './TrackingMap';
 
 const { DEMO } = TRACKING;
 
-// An example of the order screen of a client. It is a picture, not a working control: the
-// "write" button only looks like the real one, so it is hidden from keyboards and screen readers.
+// An example of the order screen of a client. It is a picture, not a working screen.
 export function TrackingCard() {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
@@ -59,13 +59,10 @@ export function TrackingCard() {
               <span className="tabular-nums">{DEMO.RATING}</span>
             </p>
           </div>
-          <span
-            aria-hidden="true"
-            className="hidden min-h-11 items-center gap-2 rounded-md border border-border-button bg-surface px-4 font-semibold text-accent lg:inline-flex"
-          >
+          <ButtonLookalike className="hidden lg:inline-flex">
             <ChatCircleIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} />
             {DEMO.MESSAGE}
-          </span>
+          </ButtonLookalike>
         </div>
 
         <p className="flex items-center gap-2 rounded-md bg-selected p-4 text-small tabular-nums">
