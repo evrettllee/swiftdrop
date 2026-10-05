@@ -1,13 +1,15 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ERROR_MESSAGES } from '../src/auth/auth-errors.constants';
-import { AUTH_ROUTES } from '../src/auth/auth-routes.constants';
-import { AUTH_THROTTLE_LIMIT } from '../src/auth/auth-throttle.constants';
-import { ROLE } from '../src/common/enums/role.enum';
-import { DRIZZLE } from '../src/database/database.constants';
-import type { Database } from '../src/database/database.module';
-import { users } from '../src/db/schema';
-import { USERS_ERROR_MESSAGES } from '../src/users/users.constants';
+import {
+  AUTH_ERROR_MESSAGES,
+  AUTH_ROUTES,
+  AUTH_THROTTLE_LIMIT,
+} from '../../src/auth/auth.constants';
+import { ROLE } from '../../src/common/enums/role.enum';
+import { DRIZZLE } from '../../src/database/database.constants';
+import type { Database } from '../../src/database/database.module';
+import { users } from '../../src/db/schema';
+import { USERS_ERROR_MESSAGES } from '../../src/users/users.constants';
 import {
   AUTHORIZATION_HEADER,
   COOKIE_HEADER,
@@ -19,12 +21,11 @@ import {
   registerUser,
   validRegistration,
   WRONG_PASSWORD,
-} from './auth-helpers';
-import { nextClientIp } from './client-ip';
-import { createTestApp } from './create-test-app';
-import { sortedStatuses } from './response-statuses';
-import { CLIENT_IP_HEADER } from './test.constants';
-import { resetTestData } from './test-database';
+} from '../support/auth';
+import { nextClientIp, sortedStatuses } from '../support/http';
+import { createTestApp } from '../support/app';
+import { CLIENT_IP_HEADER } from '../support/constants';
+import { resetTestData } from '../support/database';
 
 const SECOND_USER = {
   ...validRegistration,

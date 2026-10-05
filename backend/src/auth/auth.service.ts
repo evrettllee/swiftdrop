@@ -2,13 +2,12 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import { ROLE, type RoleName } from '../common/enums/role.enum';
 import { UsersService } from '../users/users.service';
 import type { User, UserWithRole } from '../users/users.types';
-import { AUTH_ERROR_MESSAGES } from './auth-errors.constants';
+import { AUTH_ERROR_MESSAGES } from './auth.constants';
 import { toAuthUser } from './auth-user.mapper';
-import type { AuthResult } from './auth.types';
+import type { AuthResult, OAuthProfile } from './auth.types';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterDto } from './dto/register.dto';
 import { OAuthService } from './oauth.service';
-import type { OAuthProfile } from './oauth.types';
 import { PasswordService } from './password.service';
 import { TokensService } from './tokens.service';
 

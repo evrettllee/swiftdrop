@@ -1,25 +1,27 @@
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ERROR_MESSAGES } from '../src/auth/auth-errors.constants';
-import { AUTH_ROUTES } from '../src/auth/auth-routes.constants';
-import { AuthService } from '../src/auth/auth.service';
-import { OAUTH_ERROR_MESSAGES } from '../src/auth/oauth.constants';
-import { OAUTH_PROVIDER } from '../src/common/enums/oauth-provider.enum';
-import { ROLE } from '../src/common/enums/role.enum';
-import { DRIZZLE } from '../src/database/database.constants';
-import type { Database } from '../src/database/database.module';
-import { userOauthAccounts, users } from '../src/db/schema';
+import {
+  AUTH_ERROR_MESSAGES,
+  AUTH_ROUTES,
+  OAUTH_ERROR_MESSAGES,
+} from '../../src/auth/auth.constants';
+import { AuthService } from '../../src/auth/auth.service';
+import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
+import { ROLE } from '../../src/common/enums/role.enum';
+import { DRIZZLE } from '../../src/database/database.constants';
+import type { Database } from '../../src/database/database.module';
+import { userOauthAccounts, users } from '../../src/db/schema';
 import {
   COOKIE_HEADER,
   postAuth,
   refreshCookie,
   registerUser,
   validRegistration,
-} from './auth-helpers';
-import { createTestApp } from './create-test-app';
-import { buildOAuthProfile } from './oauth-helpers';
-import { resetTestData } from './test-database';
+  buildOAuthProfile,
+} from '../support/auth';
+import { createTestApp } from '../support/app';
+import { resetTestData } from '../support/database';
 
 describe('OAuth login (e2e)', () => {
   let app: NestExpressApplication;

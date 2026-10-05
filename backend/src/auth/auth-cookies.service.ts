@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Request, Response } from 'express';
-import { NODE_ENV_PRODUCTION } from '../common/constants/env.constants';
+import { NODE_ENV_PRODUCTION } from '../common/common.constants';
 import type { OAuthProvider } from '../common/enums/oauth-provider.enum';
 import {
   REFRESH_COOKIE_NAME,
   REFRESH_COOKIE_PATH,
   REFRESH_COOKIE_SAME_SITE,
   REFRESH_TOKEN_TTL_MS,
-} from './auth-token.constants';
-import {
   OAUTH_STATE_COOKIE_BASE_PATH,
   OAUTH_STATE_COOKIE_PREFIX,
   OAUTH_STATE_TTL_MS,
-} from './oauth.constants';
+} from './auth.constants';
 
 @Injectable()
 export class AuthCookiesService {

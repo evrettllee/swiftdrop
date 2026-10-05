@@ -9,8 +9,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import type { OAuthProvider } from '../../common/enums/oauth-provider.enum';
-import { OAUTH_ERROR_MESSAGES } from '../oauth.constants';
+import { OAUTH_PROVIDER, type OAuthProvider } from '../../common/enums/oauth-provider.enum';
+import {
+  GOOGLE_STRATEGY_NAME,
+  OAUTH_ERROR_MESSAGES,
+  YANDEX_STRATEGY_NAME,
+} from '../auth.constants';
 import { OAuthStateService } from '../oauth-state.service';
 
 // Starts the redirect to the provider and issues the state value that the callback will check.
@@ -71,3 +75,27 @@ export function createOAuthCallbackGuard(
 
   return mixin(OAuthCallbackGuard);
 }
+
+@Injectable()
+export class GoogleAuthGuard extends createOAuthInitiateGuard(
+  GOOGLE_STRATEGY_NAME,
+  OAUTH_PROVIDER.GOOGLE,
+) {}
+
+@Injectable()
+export class GoogleCallbackGuard extends createOAuthCallbackGuard(
+  GOOGLE_STRATEGY_NAME,
+  OAUTH_PROVIDER.GOOGLE,
+) {}
+
+@Injectable()
+export class YandexAuthGuard extends createOAuthInitiateGuard(
+  YANDEX_STRATEGY_NAME,
+  OAUTH_PROVIDER.YANDEX,
+) {}
+
+@Injectable()
+export class YandexCallbackGuard extends createOAuthCallbackGuard(
+  YANDEX_STRATEGY_NAME,
+  OAUTH_PROVIDER.YANDEX,
+) {}

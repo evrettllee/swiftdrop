@@ -2,10 +2,10 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
-import { ROLE_NAMES } from '../src/common/enums/role.enum';
-import type { Database } from '../src/database/database.module';
-import * as schema from '../src/db/schema';
-import { MIGRATIONS_FOLDER, TEST_DB_NAME_SUFFIX } from './test.constants';
+import { ROLE_NAMES } from '../../src/common/enums/role.enum';
+import type { Database } from '../../src/database/database.module';
+import * as schema from '../../src/db/schema';
+import { MIGRATIONS_FOLDER, TEST_DB_NAME_SUFFIX } from './constants';
 
 export async function prepareTestDatabase(): Promise<void> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });

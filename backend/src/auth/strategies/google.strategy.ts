@@ -3,9 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { type Profile, Strategy } from 'passport-google-oauth20';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
-import { NAME_MAX_LENGTH } from '../auth.constants';
-import { GOOGLE_SCOPES, GOOGLE_STRATEGY_NAME, OAUTH_ERROR_MESSAGES } from '../oauth.constants';
-import type { OAuthProfile } from '../oauth.types';
+import {
+  NAME_MAX_LENGTH,
+  GOOGLE_SCOPES,
+  GOOGLE_STRATEGY_NAME,
+  OAUTH_ERROR_MESSAGES,
+} from '../auth.constants';
+import type { OAuthProfile } from '../auth.types';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_STRATEGY_NAME) {

@@ -1,5 +1,5 @@
-import { loadTestEnv } from './load-test-env';
-import { prepareTestDatabase } from './test-database';
+import { loadTestEnv } from './support/env';
+import { prepareTestDatabase } from './support/database';
 
 export default async function globalSetup(): Promise<void> {
   loadTestEnv();
