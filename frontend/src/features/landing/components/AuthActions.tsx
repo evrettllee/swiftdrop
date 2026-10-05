@@ -2,7 +2,7 @@ import { APP_ROUTES } from '../../../shared/constants';
 import { LinkButton } from '../../../shared/ui/Button';
 import { AUTH_STATUS } from '../../auth/constants';
 import { useAuthStore } from '../../auth/store';
-import { LANDING_TEXTS } from '../constants';
+import { LANDING_SIGN_UP_ROUTE, LANDING_TEXTS } from '../constants';
 
 type AuthActionsProps = {
   // In the mobile menu the buttons take the full width and the main action goes first.
@@ -20,7 +20,7 @@ export function AuthActions({ stacked = false }: AuthActionsProps) {
     </LinkButton>
   );
   const signUp = (
-    <LinkButton to={APP_ROUTES.AUTH} fullWidth={stacked}>
+    <LinkButton to={LANDING_SIGN_UP_ROUTE} fullWidth={stacked}>
       {LANDING_TEXTS.SIGN_UP}
     </LinkButton>
   );

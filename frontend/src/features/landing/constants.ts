@@ -1,4 +1,5 @@
 import { APP_ROUTES } from '../../shared/constants';
+import { AUTH_TAB, AUTH_TAB_QUERY_PARAM } from '../auth/constants';
 import type { FooterGroup } from './types';
 
 // Anchors of the landing sections: the header, the footer and the sections themselves use the same ids.
@@ -18,6 +19,9 @@ export const LANDING_NAV_ITEMS = [
   { id: LANDING_SECTION_ID.FEATURES, label: 'Возможности' },
   { id: LANDING_SECTION_ID.FAQ, label: 'Вопросы' },
 ] as const;
+
+// Sign-up opens the auth page on its registration tab.
+export const LANDING_SIGN_UP_ROUTE = `${APP_ROUTES.AUTH}?${AUTH_TAB_QUERY_PARAM}=${AUTH_TAB.REGISTER}`;
 
 export const LANDING_TEXTS = {
   LOGO_LABEL: 'SwiftDrop, на главную',
