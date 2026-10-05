@@ -23,6 +23,9 @@ export const AUTH_TAB = {
   REGISTER: 'register',
 } as const;
 
+// The tab to open is chosen by a link: /auth?tab=register
+export const AUTH_TAB_QUERY_PARAM = 'tab';
+
 // OAuth: a full-page navigation, not an API call, so the base path is included.
 export const OAUTH_START_URLS = {
   google: `${API_BASE_PATH}${AUTH_API_PATHS.GOOGLE}`,

@@ -7,6 +7,8 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
   error?: string;
   hint?: string;
   endAdornment?: ReactNode;
+  // A list under the field (suggestions): it is placed relative to the field, not to the label.
+  popup?: ReactNode;
 };
 
 function getFieldClassName(hasError: boolean, hasAdornment: boolean): string {
@@ -22,7 +24,7 @@ function getFieldClassName(hasError: boolean, hasAdornment: boolean): string {
 }
 
 // Label above the field, hint or error below it; an error replaces the hint.
-export function Input({ label, error, hint, endAdornment, ...inputProps }: InputProps) {
+export function Input({ label, error, hint, endAdornment, popup, ...inputProps }: InputProps) {
   const id = useId();
   const hintId = `${id}-${ID_PART.HINT}`;
   const errorId = `${id}-${ID_PART.ERROR}`;
@@ -52,6 +54,7 @@ export function Input({ label, error, hint, endAdornment, ...inputProps }: Input
         {endAdornment === undefined ? null : (
           <div className="absolute inset-y-0 end-0 flex items-center">{endAdornment}</div>
         )}
+        {popup}
       </div>
       {hasError ? <FieldError id={errorId}>{error}</FieldError> : null}
       {showHint ? (

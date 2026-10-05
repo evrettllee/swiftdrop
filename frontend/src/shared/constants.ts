@@ -48,6 +48,8 @@ export const HTTP_METHOD = {
 export const HTTP_STATUS = {
   NO_CONTENT: 204,
   UNAUTHORIZED: 401,
+  TOO_MANY_REQUESTS: 429,
+  SERVICE_UNAVAILABLE: 503,
 } as const;
 
 export const NETWORK_ERROR_STATUS = 0;
@@ -78,7 +80,13 @@ export const ID_PART = {
   ERROR: 'error',
   TAB: 'tab',
   PANEL: 'panel',
+  BUTTON: 'button',
 } as const;
+
+// The map and the address search are centered on Minsk: [latitude, longitude].
+export const CITY_CENTER: [number, number] = [53.9006, 27.559];
+
+export const ESCAPE_KEY = 'Escape';
 
 // Form values are kept as strings, a checkbox is one of these two.
 export const CHECKBOX_CHECKED_VALUE = 'true';

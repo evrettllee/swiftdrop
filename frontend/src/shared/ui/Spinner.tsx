@@ -9,13 +9,14 @@ const TONE_CLASSES = {
   'on-primary': 'border-on-primary/30 border-t-on-primary',
 } as const;
 
-// 20px, 2px border, 800ms linear, as in the design system; no motion when the user asks for less.
+// 20px, 2px border, 800ms linear, as in the design system. When the user asks for less motion the
+// spinner turns slower instead of stopping: it is the only sign that something is loading.
 export function Spinner({ tone = 'accent' }: SpinnerProps) {
   return (
     <span
       role="status"
       aria-label={UI_TEXTS.LOADING}
-      className={`inline-block size-5 animate-spin rounded-full border-2 [animation-duration:800ms] motion-reduce:animate-none ${TONE_CLASSES[tone]}`}
+      className={`inline-block size-5 animate-spin rounded-full border-2 [animation-duration:800ms] motion-reduce:[animation-duration:2400ms] ${TONE_CLASSES[tone]}`}
     />
   );
 }

@@ -22,7 +22,7 @@ export function RegisterForm() {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Input
           label={AUTH_TEXTS.LABEL_FIRST_NAME}
           autoComplete="given-name"

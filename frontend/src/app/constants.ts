@@ -1,8 +1,5 @@
 // Interface texts of the general pages
 export const APP_TEXTS = {
-  HOME_TITLE: 'SwiftDrop',
-  HOME_GUEST_HINT: 'Вы не вошли в аккаунт',
-  HOME_SIGNED_IN_AS: 'Вы вошли как',
   SIGN_IN: 'Войти',
   SIGN_OUT: 'Выйти',
   PROFILE: 'Профиль',
