@@ -14,6 +14,8 @@ import {
 import { CsrfGuard } from './common/guards/csrf.guard';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
+import { PricingModule } from './pricing/pricing.module';
+import { ZonesModule } from './zones/zones.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { DatabaseModule } from './database/database.module';
     }),
     DatabaseModule,
     AuthModule,
+    ZonesModule,
+    PricingModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

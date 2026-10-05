@@ -1,4 +1,11 @@
+import { MS_PER_MINUTE } from '../common/common.constants';
 import type { VehicleType } from '../common/enums/vehicle-type.enum';
+
+// Routes
+export const PRICING_ROUTES = {
+  BASE: 'pricing',
+  ESTIMATES: 'estimates',
+} as const;
 
 // Package class multipliers: the heavier the lightest suitable transport, the higher the price.
 export const CLASS_MULTIPLIERS: Record<VehicleType, number> = {
@@ -47,3 +54,12 @@ export const PRICING_VALIDATION_MESSAGES = {
   PACKAGE_VALUE_INVALID: 'Вес и размеры посылки должны быть положительными числами',
   FRAGILE_INVALID: 'Признак хрупкой посылки должен быть true или false',
 } as const;
+
+// Throttling
+// Stricter than the global limit: every estimate calls the external routing service.
+export const PRICING_THROTTLE_LIMIT = 30;
+export const PRICING_THROTTLE_TTL_MS = MS_PER_MINUTE;
+
+export const PRICING_THROTTLE = {
+  default: { limit: PRICING_THROTTLE_LIMIT, ttl: PRICING_THROTTLE_TTL_MS },
+};
