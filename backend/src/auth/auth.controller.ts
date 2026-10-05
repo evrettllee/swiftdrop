@@ -45,7 +45,7 @@ export class AuthController {
   ): Promise<AuthResponse> {
     const result = await this.authService.register(dto);
 
-    return this.respondWithTokens(result, response);
+    return this.respondWithSession(result, response);
   }
 
   @Public()
@@ -58,7 +58,7 @@ export class AuthController {
   ): Promise<AuthResponse> {
     const result = await this.authService.login(dto);
 
-    return this.respondWithTokens(result, response);
+    return this.respondWithSession(result, response);
   }
 
   @Public()
@@ -70,7 +70,7 @@ export class AuthController {
   ): Promise<AuthResponse> {
     const result = await this.authService.refresh(this.authCookiesService.getRefreshToken(request));
 
-    return this.respondWithTokens(result, response);
+    return this.respondWithSession(result, response);
   }
 
   @Public()
@@ -81,7 +81,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
     await this.authService.logout(this.authCookiesService.getRefreshToken(request));
-    this.authCookiesService.clearRefreshToken(response);
+    this.authCookiesService.clearSession(response);
   }
 
   @Get(AUTH_ROUTES.ME)
@@ -97,8 +97,8 @@ export class AuthController {
     // The guard redirects to Google before this handler runs.
   }
 
+  // Callbacks are not throttled separately: they need a one-time provider code and a matching state cookie.
   @Public()
-  @Throttle(AUTH_THROTTLE)
   @UseGuards(GoogleCallbackGuard)
   @UseFilters(OAuthFailureFilter)
   @Get(AUTH_ROUTES.GOOGLE_CALLBACK)
@@ -115,7 +115,6 @@ export class AuthController {
   }
 
   @Public()
-  @Throttle(AUTH_THROTTLE)
   @UseGuards(YandexCallbackGuard)
   @UseFilters(OAuthFailureFilter)
   @Get(AUTH_ROUTES.YANDEX_CALLBACK)
@@ -126,13 +125,13 @@ export class AuthController {
   private async completeOAuthLogin(request: OAuthRequest, response: Response): Promise<void> {
     const result = await this.authService.loginWithOAuth(request.user);
 
-    this.authCookiesService.setRefreshToken(response, result.refreshToken);
+    this.authCookiesService.setSession(response, result);
     response.redirect(OAUTH_SUCCESS_REDIRECT);
   }
 
-  private respondWithTokens(result: AuthResult, response: Response): AuthResponse {
-    this.authCookiesService.setRefreshToken(response, result.refreshToken);
+  private respondWithSession(result: AuthResult, response: Response): AuthResponse {
+    this.authCookiesService.setSession(response, result);
 
-    return { user: result.user, accessToken: result.accessToken };
+    return { user: result.user };
   }
 }

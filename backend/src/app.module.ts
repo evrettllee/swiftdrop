@@ -11,6 +11,7 @@ import {
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
 } from './common/common.constants';
+import { CsrfGuard } from './common/guards/csrf.guard';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 
@@ -31,6 +32,7 @@ import { DatabaseModule } from './database/database.module';
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: CsrfGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

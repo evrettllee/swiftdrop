@@ -4,27 +4,36 @@ import type { CookieOptions, Request, Response } from 'express';
 import { NODE_ENV_PRODUCTION } from '../common/common.constants';
 import type { OAuthProvider } from '../common/enums/oauth-provider.enum';
 import {
-  REFRESH_COOKIE_NAME,
-  REFRESH_COOKIE_PATH,
-  REFRESH_COOKIE_SAME_SITE,
-  REFRESH_TOKEN_TTL_MS,
+  ACCESS_COOKIE_NAME,
+  ACCESS_COOKIE_PATH,
+  ACCESS_TOKEN_TTL_MS,
+  AUTH_COOKIE_SAME_SITE,
   OAUTH_STATE_COOKIE_BASE_PATH,
   OAUTH_STATE_COOKIE_PREFIX,
   OAUTH_STATE_TTL_MS,
+  REFRESH_COOKIE_NAME,
+  REFRESH_COOKIE_PATH,
+  REFRESH_TOKEN_TTL_MS,
 } from './auth.constants';
+import type { AuthResult } from './auth.types';
 
 @Injectable()
 export class AuthCookiesService {
   constructor(private readonly config: ConfigService) {}
 
-  setRefreshToken(response: Response, refreshToken: string): void {
-    response.cookie(REFRESH_COOKIE_NAME, refreshToken, {
+  setSession(response: Response, tokens: Pick<AuthResult, 'accessToken' | 'refreshToken'>): void {
+    response.cookie(ACCESS_COOKIE_NAME, tokens.accessToken, {
+      ...this.buildBaseOptions(ACCESS_COOKIE_PATH),
+      maxAge: ACCESS_TOKEN_TTL_MS,
+    });
+    response.cookie(REFRESH_COOKIE_NAME, tokens.refreshToken, {
       ...this.buildBaseOptions(REFRESH_COOKIE_PATH),
       maxAge: REFRESH_TOKEN_TTL_MS,
     });
   }
 
-  clearRefreshToken(response: Response): void {
+  clearSession(response: Response): void {
+    response.clearCookie(ACCESS_COOKIE_NAME, this.buildBaseOptions(ACCESS_COOKIE_PATH));
     response.clearCookie(REFRESH_COOKIE_NAME, this.buildBaseOptions(REFRESH_COOKIE_PATH));
   }
 
@@ -70,7 +79,7 @@ export class AuthCookiesService {
     return {
       httpOnly: true,
       secure: this.config.get<string>('NODE_ENV') === NODE_ENV_PRODUCTION,
-      sameSite: REFRESH_COOKIE_SAME_SITE,
+      sameSite: AUTH_COOKIE_SAME_SITE,
       path,
     };
   }
