@@ -1,13 +1,14 @@
 import { SkipLink } from '../../../shared/ui/SkipLink';
+import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
 import { LANDING_SECTION_ID, LANDING_TEXTS } from '../constants';
 
 export function LandingPage() {
   return (
-    <>
+    <div className="flex min-h-dvh flex-col">
       <SkipLink />
       <LandingHeader />
-      <main id="main" className="mx-auto max-w-7xl px-4 py-12 lg:px-12 lg:py-24">
+      <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-12 lg:px-12 lg:py-24">
         {/* A temporary hero: the calculator and the other sections are added in the next steps. */}
         <h1
           id={LANDING_SECTION_ID.TOP}
@@ -16,6 +17,7 @@ export function LandingPage() {
           {LANDING_TEXTS.HERO_TITLE}
         </h1>
       </main>
-    </>
+      <LandingFooter />
+    </div>
   );
 }
