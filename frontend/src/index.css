@@ -65,6 +65,7 @@
   --color-status-active: var(--status-active);
   --color-status-delivered: var(--status-delivered);
   --color-status-cancelled: var(--status-cancelled);
+  --color-map-water: var(--map-water);
 
   --shadow-sm: var(--shadow-sm-value);
   --shadow-md: var(--shadow-md-value);
@@ -110,6 +111,9 @@
   --status-delivered: #16a34a;
   --status-cancelled: #dc2626;
 
+  /* The water of the schematic map on the landing (added). */
+  --map-water: #eff6ff;
+
   --shadow-sm-value: 0 1px 2px rgb(17 24 39 / 0.05);
   --shadow-md-value: 0 2px 8px rgb(17 24 39 / 0.08);
   --shadow-lg-value: 0 4px 16px rgb(17 24 39 / 0.1);
@@ -152,6 +156,8 @@
   --status-active: #9db2f2;
   --status-delivered: #86c79a;
   --status-cancelled: #e89a9a;
+
+  --map-water: #131314;
 
   --shadow-sm-value: 0 0 #0000;
   --shadow-md-value: 0 0 #0000;

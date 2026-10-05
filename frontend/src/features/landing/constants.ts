@@ -176,3 +176,40 @@ export const HOW_IT_WORKS = {
     },
   ],
 } as const;
+
+export const TRACKING = {
+  TITLE: 'Курьер на карте в реальном времени',
+  LEAD: 'Видно, где курьер, на каком этапе заказ и когда посылка будет у адресата.',
+  MAP_LABEL: 'Карта: курьер движется к адресу доставки',
+  FEATURES: [
+    {
+      id: 'eta',
+      title: 'Время прибытия',
+      text: 'Прогноз пересчитывается, пока курьер в пути.',
+    },
+    {
+      id: 'position',
+      title: 'Позиция на карте',
+      text: 'Сколько минут осталось курьеру до адреса доставки.',
+    },
+    {
+      id: 'chat',
+      title: 'Чат по заказу',
+      text: 'Договоритесь о деталях с курьером, не выходя из заказа.',
+    },
+  ],
+  // An example order that only shows how the tracking looks, it is not real data.
+  DEMO: {
+    ORDER: 'Заказ №2847',
+    DATE: '5 октября, 14:02',
+    STATUS: 'В пути',
+    ROUTE: 'пр-т Независимости, 18 → ул. Притыцкого, 29',
+    COURIER_INITIALS: 'АК',
+    COURIER_NAME: 'Артём К.',
+    VEHICLE: 'Велосипед',
+    RATING: '4,9',
+    ARRIVAL_IN: '8 мин',
+    ARRIVAL_AT: 'Курьер будет примерно в 14:32',
+    MESSAGE: 'Написать',
+  },
+} as const;

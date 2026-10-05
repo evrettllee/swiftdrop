@@ -4,6 +4,7 @@ import { HeroSection } from '../components/HeroSection';
 import { HowItWorks } from '../components/HowItWorks';
 import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
+import { TrackingSection } from '../components/TrackingSection';
 
 export function LandingPage() {
   return (
@@ -17,6 +18,7 @@ export function LandingPage() {
           <CalculatorCard />
         </div>
         <HowItWorks />
+        <TrackingSection />
       </main>
       <LandingFooter />
     </div>
