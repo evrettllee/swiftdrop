@@ -1,31 +1,42 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import {
+  ACCESS_COOKIE_NAME,
+  ACCESS_COOKIE_PATH,
+  ACCESS_TOKEN_TTL_SECONDS,
+  AUTH_COOKIE_SAME_SITE,
   AUTH_ERROR_MESSAGES,
   AUTH_ROUTES,
   AUTH_THROTTLE_LIMIT,
+  REFRESH_COOKIE_NAME,
+  REFRESH_COOKIE_PATH,
+  REFRESH_TOKEN_TTL_MS,
 } from '../../src/auth/auth.constants';
+import { MS_PER_SECOND } from '../../src/common/common.constants';
 import { ROLE } from '../../src/common/enums/role.enum';
 import { DRIZZLE } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';
 import { users } from '../../src/db/schema';
 import { USERS_ERROR_MESSAGES } from '../../src/users/users.constants';
+import { createTestApp } from '../support/app';
 import {
+  accessCookie,
   AUTHORIZATION_HEADER,
   COOKIE_HEADER,
+  extractAccessToken,
+  extractCookieValue,
   extractRefreshToken,
+  findSetCookie,
   getAuth,
-  getSetCookies,
   postAuth,
   refreshCookie,
   registerUser,
   validRegistration,
   WRONG_PASSWORD,
 } from '../support/auth';
-import { nextClientIp, sortedStatuses } from '../support/http';
-import { createTestApp } from '../support/app';
 import { CLIENT_IP_HEADER } from '../support/constants';
 import { resetTestData } from '../support/database';
+import { nextClientIp, sortedStatuses } from '../support/http';
 
 const SECOND_USER = {
   ...validRegistration,
@@ -55,7 +66,7 @@ describe('Auth (e2e)', () => {
   }
 
   describe('register', () => {
-    it('should create a client and set a refresh cookie when the data is valid', async () => {
+    it('should create a client and keep tokens out of the response body when the data is valid', async () => {
       const response = await postAuth(app, AUTH_ROUTES.REGISTER)
         .send(validRegistration)
         .expect(201);
@@ -66,8 +77,25 @@ describe('Auth (e2e)', () => {
         role: ROLE.CLIENT,
       });
       expect(response.body.user).not.toHaveProperty('passwordHash');
-      expect(response.body.accessToken).toEqual(expect.any(String));
-      expect(getSetCookies(response).join()).toContain('HttpOnly');
+      expect(response.body).not.toHaveProperty('accessToken');
+      expect(response.body).not.toHaveProperty('refreshToken');
+    });
+
+    it('should set httpOnly access and refresh cookies with their own paths and lifetimes when registering', async () => {
+      const response = await postAuth(app, AUTH_ROUTES.REGISTER)
+        .send(validRegistration)
+        .expect(201);
+      const accessSetCookie = findSetCookie(response, ACCESS_COOKIE_NAME) ?? '';
+      const refreshSetCookie = findSetCookie(response, REFRESH_COOKIE_NAME) ?? '';
+
+      expect(accessSetCookie).toContain('HttpOnly');
+      expect(accessSetCookie).toContain(`Path=${ACCESS_COOKIE_PATH};`);
+      expect(accessSetCookie).toContain(`Max-Age=${ACCESS_TOKEN_TTL_SECONDS};`);
+      expect(refreshSetCookie).toContain('HttpOnly');
+      expect(refreshSetCookie).toContain(`Path=${REFRESH_COOKIE_PATH};`);
+      expect(refreshSetCookie).toContain(`Max-Age=${REFRESH_TOKEN_TTL_MS / MS_PER_SECOND};`);
+      expect(accessSetCookie.toLowerCase()).toContain(`samesite=${AUTH_COOKIE_SAME_SITE}`);
+      expect(refreshSetCookie.toLowerCase()).toContain(`samesite=${AUTH_COOKIE_SAME_SITE}`);
     });
 
     it('should return 409 with the email message when the email is taken', async () => {
@@ -123,7 +151,7 @@ describe('Auth (e2e)', () => {
   });
 
   describe('login', () => {
-    it('should return the user and a refresh cookie when the credentials are valid', async () => {
+    it('should return the user and set both session cookies when the credentials are valid', async () => {
       await registerUser(app);
 
       const response = await postAuth(app, AUTH_ROUTES.LOGIN)
@@ -131,7 +159,8 @@ describe('Auth (e2e)', () => {
         .expect(200);
 
       expect(response.body.user.email).toBe(validRegistration.email);
-      expect(response.body.accessToken).toEqual(expect.any(String));
+      expect(response.body).not.toHaveProperty('accessToken');
+      expect(extractAccessToken(response)).toEqual(expect.any(String));
       expect(extractRefreshToken(response)).toEqual(expect.any(String));
     });
 
@@ -200,6 +229,18 @@ describe('Auth (e2e)', () => {
         .expect(401);
     });
 
+    it('should set a new access cookie and return the user without tokens when refreshing', async () => {
+      const { refreshToken } = await registerUser(app);
+
+      const response = await postAuth(app, AUTH_ROUTES.REFRESH)
+        .set(COOKIE_HEADER, refreshCookie(refreshToken))
+        .expect(200);
+
+      expect(extractAccessToken(response)).toEqual(expect.any(String));
+      expect(response.body.user.email).toBe(validRegistration.email);
+      expect(response.body).not.toHaveProperty('accessToken');
+    });
+
     it('should revoke the whole session chain when an old token is reused', async () => {
       const { refreshToken } = await registerUser(app);
       const first = await postAuth(app, AUTH_ROUTES.REFRESH)
@@ -237,14 +278,23 @@ describe('Auth (e2e)', () => {
 
   describe('logout', () => {
     it('should return 204 and make the refresh token unusable when logging out', async () => {
-      const { refreshToken } = await registerUser(app);
+      const { cookies, refreshToken } = await registerUser(app);
 
-      await postAuth(app, AUTH_ROUTES.LOGOUT)
-        .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(204);
+      await postAuth(app, AUTH_ROUTES.LOGOUT).set(COOKIE_HEADER, cookies).expect(204);
       await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
         .expect(401);
+    });
+
+    it('should clear both session cookies when logging out', async () => {
+      const { cookies } = await registerUser(app);
+
+      const response = await postAuth(app, AUTH_ROUTES.LOGOUT)
+        .set(COOKIE_HEADER, cookies)
+        .expect(204);
+
+      expect(extractCookieValue(response, ACCESS_COOKIE_NAME)).toBe('');
+      expect(extractCookieValue(response, REFRESH_COOKIE_NAME)).toBe('');
     });
 
     it('should return 204 when there is no refresh cookie', async () => {
@@ -253,29 +303,41 @@ describe('Auth (e2e)', () => {
   });
 
   describe('me', () => {
-    it('should return the current user when the access token is valid', async () => {
-      const { body } = await registerUser(app);
+    it('should return the current user when the access cookie is valid', async () => {
+      const { cookies } = await registerUser(app);
 
-      const response = await getAuth(app, AUTH_ROUTES.ME)
-        .set(AUTHORIZATION_HEADER, `Bearer ${body.accessToken}`)
-        .expect(200);
+      const response = await getAuth(app, AUTH_ROUTES.ME).set(COOKIE_HEADER, cookies).expect(200);
 
       expect(response.body.email).toBe(validRegistration.email);
     });
 
-    it('should return 401 when there is no access token', async () => {
+    it('should return 401 when there is no access cookie', async () => {
       const response = await getAuth(app, AUTH_ROUTES.ME).expect(401);
 
       expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.UNAUTHORIZED);
     });
 
-    it('should reject a valid token right away when the user gets blocked', async () => {
-      const { body } = await registerUser(app);
-      await blockUser(validRegistration.email);
+    it('should return 401 when the access cookie holds a broken token', async () => {
+      const response = await getAuth(app, AUTH_ROUTES.ME)
+        .set(COOKIE_HEADER, accessCookie('broken'))
+        .expect(401);
+
+      expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.UNAUTHORIZED);
+    });
+
+    it('should not accept a valid token sent in the Authorization header', async () => {
+      const { accessToken } = await registerUser(app);
 
       await getAuth(app, AUTH_ROUTES.ME)
-        .set(AUTHORIZATION_HEADER, `Bearer ${body.accessToken}`)
+        .set(AUTHORIZATION_HEADER, `Bearer ${accessToken}`)
         .expect(401);
+    });
+
+    it('should reject a valid cookie right away when the user gets blocked', async () => {
+      const { cookies } = await registerUser(app);
+      await blockUser(validRegistration.email);
+
+      await getAuth(app, AUTH_ROUTES.ME).set(COOKIE_HEADER, cookies).expect(401);
     });
   });
 });

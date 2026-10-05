@@ -70,6 +70,7 @@ export const AUTH_VALIDATION_MESSAGES = {
 // Tokens and cookies
 export const ACCESS_TOKEN_TTL_MINUTES = 15;
 export const ACCESS_TOKEN_TTL_SECONDS = ACCESS_TOKEN_TTL_MINUTES * SECONDS_PER_MINUTE;
+export const ACCESS_TOKEN_TTL_MS = ACCESS_TOKEN_TTL_SECONDS * MS_PER_SECOND;
 
 export const REFRESH_TOKEN_TTL_DAYS = 30;
 export const REFRESH_TOKEN_TTL_MS = REFRESH_TOKEN_TTL_DAYS * SECONDS_PER_DAY * MS_PER_SECOND;
@@ -79,12 +80,14 @@ export const REFRESH_TOKEN_ENCODING = 'base64url';
 export const TOKEN_HASH_ALGORITHM = 'sha256';
 export const TOKEN_HASH_ENCODING = 'hex';
 
+export const ACCESS_COOKIE_NAME = 'access_token';
+export const ACCESS_COOKIE_PATH = `/${GLOBAL_PREFIX}`;
 export const REFRESH_COOKIE_NAME = 'refresh_token';
 export const REFRESH_COOKIE_PATH = `/${GLOBAL_PREFIX}/${AUTH_ROUTES.BASE}`;
-export const REFRESH_COOKIE_SAME_SITE = 'lax';
+export const AUTH_COOKIE_SAME_SITE = 'lax';
 
 // Throttling
-export const AUTH_THROTTLE_LIMIT = 5;
+export const AUTH_THROTTLE_LIMIT = 10;
 export const AUTH_THROTTLE_TTL_MS = MS_PER_MINUTE;
 
 export const AUTH_THROTTLE = {

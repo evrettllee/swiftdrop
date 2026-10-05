@@ -1,11 +1,19 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import { AUTH_ROUTES, REFRESH_COOKIE_NAME } from '../../src/auth/auth.constants';
+import {
+  ACCESS_COOKIE_NAME,
+  AUTH_ROUTES,
+  REFRESH_COOKIE_NAME,
+} from '../../src/auth/auth.constants';
 import type { AuthResponse, OAuthProfile } from '../../src/auth/auth.types';
-import { GLOBAL_PREFIX } from '../../src/common/common.constants';
+import {
+  CSRF_HEADER_NAME,
+  CSRF_HEADER_VALUE,
+  GLOBAL_PREFIX,
+} from '../../src/common/common.constants';
 import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
-import { nextClientIp } from './http';
 import { CLIENT_IP_HEADER } from './constants';
+import { nextClientIp } from './http';
 
 export const AUTH_URL = `/${GLOBAL_PREFIX}/${AUTH_ROUTES.BASE}`;
 export const AUTHORIZATION_HEADER = 'Authorization';
@@ -14,7 +22,8 @@ export const SET_COOKIE_HEADER = 'set-cookie';
 export const WRONG_PASSWORD = 'Wrong1234!';
 
 const COOKIE_ATTRIBUTES_SEPARATOR = ';';
-const COOKIE_VALUE_OFFSET = REFRESH_COOKIE_NAME.length + 1;
+const COOKIE_PAIR_SEPARATOR = '; ';
+const COOKIE_NAME_VALUE_SEPARATOR = '=';
 
 type ResponseWithHeaders = { headers: Record<string, unknown> };
 
@@ -26,10 +35,16 @@ export const validRegistration = {
   password: 'Test1234!',
 };
 
-export function postAuth(app: NestExpressApplication, route: string) {
+// A POST without the CSRF header, for tests of the protection itself.
+export function rawPostAuth(app: NestExpressApplication, route: string) {
   return request(app.getHttpServer())
     .post(`${AUTH_URL}/${route}`)
     .set(CLIENT_IP_HEADER, nextClientIp());
+}
+
+// A POST as the real client sends it, with the CSRF header.
+export function postAuth(app: NestExpressApplication, route: string) {
+  return rawPostAuth(app, route).set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
 
 export function getAuth(app: NestExpressApplication, route: string) {
@@ -47,18 +62,47 @@ export function getSetCookies(response: ResponseWithHeaders): string[] {
     : [];
 }
 
-export function extractRefreshToken(response: ResponseWithHeaders): string {
-  const cookie = getSetCookies(response).find((item) => item.startsWith(`${REFRESH_COOKIE_NAME}=`));
+export function findSetCookie(response: ResponseWithHeaders, name: string): string | undefined {
+  return getSetCookies(response).find((item) =>
+    item.startsWith(`${name}${COOKIE_NAME_VALUE_SEPARATOR}`),
+  );
+}
 
-  if (!cookie) {
-    throw new Error('Refresh cookie was not set');
+// An empty value means the server cleared the cookie.
+export function extractCookieValue(response: ResponseWithHeaders, name: string): string {
+  const cookie = findSetCookie(response, name);
+
+  if (cookie === undefined) {
+    throw new Error(`Cookie ${name} was not set`);
   }
 
-  return cookie.split(COOKIE_ATTRIBUTES_SEPARATOR)[0].slice(COOKIE_VALUE_OFFSET);
+  const pair = cookie.split(COOKIE_ATTRIBUTES_SEPARATOR)[0];
+
+  return pair.slice(name.length + COOKIE_NAME_VALUE_SEPARATOR.length);
+}
+
+export function extractAccessToken(response: ResponseWithHeaders): string {
+  return extractCookieValue(response, ACCESS_COOKIE_NAME);
+}
+
+export function extractRefreshToken(response: ResponseWithHeaders): string {
+  return extractCookieValue(response, REFRESH_COOKIE_NAME);
 }
 
 export function refreshCookie(token: string): string {
-  return `${REFRESH_COOKIE_NAME}=${token}`;
+  return `${REFRESH_COOKIE_NAME}${COOKIE_NAME_VALUE_SEPARATOR}${token}`;
+}
+
+export function accessCookie(token: string): string {
+  return `${ACCESS_COOKIE_NAME}${COOKIE_NAME_VALUE_SEPARATOR}${token}`;
+}
+
+// What a browser would send back after a login: both session cookies in one header.
+export function sessionCookieHeader(response: ResponseWithHeaders): string {
+  return [
+    accessCookie(extractAccessToken(response)),
+    refreshCookie(extractRefreshToken(response)),
+  ].join(COOKIE_PAIR_SEPARATOR);
 }
 
 export async function registerUser(
@@ -69,7 +113,9 @@ export async function registerUser(
 
   return {
     body: response.body as AuthResponse,
+    accessToken: extractAccessToken(response),
     refreshToken: extractRefreshToken(response),
+    cookies: sessionCookieHeader(response),
   };
 }
 

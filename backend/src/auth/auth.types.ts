@@ -22,7 +22,8 @@ export type AuthResult = {
   refreshToken: string;
 };
 
-export type AuthResponse = Pick<AuthResult, 'user' | 'accessToken'>;
+// Tokens travel only in httpOnly cookies, so the response body carries just the user.
+export type AuthResponse = Pick<AuthResult, 'user'>;
 
 export type OAuthProfile = {
   provider: OAuthProvider;
