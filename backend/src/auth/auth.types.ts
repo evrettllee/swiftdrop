@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+import type { OAuthProvider } from '../common/enums/oauth-provider.enum';
 import type { RoleName } from '../common/enums/role.enum';
 
 export type AccessTokenPayload = {
@@ -21,3 +23,14 @@ export type AuthResult = {
 };
 
 export type AuthResponse = Pick<AuthResult, 'user' | 'accessToken'>;
+
+export type OAuthProfile = {
+  provider: OAuthProvider;
+  providerUserId: string;
+  email: string;
+  emailVerified: boolean;
+  firstName: string;
+  lastName: string;
+};
+
+export type OAuthRequest = Request & { user: OAuthProfile };

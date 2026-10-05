@@ -14,21 +14,20 @@ import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AuthCookiesService } from './auth-cookies.service';
-import { AUTH_ROUTES } from './auth-routes.constants';
-import { AUTH_THROTTLE } from './auth-throttle.constants';
+import { AUTH_ROUTES, AUTH_THROTTLE, OAUTH_SUCCESS_REDIRECT } from './auth.constants';
 import { AuthService } from './auth.service';
-import type { AuthResponse, AuthResult, AuthUser } from './auth.types';
+import type { AuthResponse, AuthResult, AuthUser, OAuthRequest } from './auth.types';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
 import { loginSchema, type LoginDto } from './dto/login.dto';
 import { registerSchema, type RegisterDto } from './dto/register.dto';
 import { OAuthFailureFilter } from './filters/oauth-failure.filter';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { GoogleCallbackGuard } from './guards/google-callback.guard';
-import { YandexAuthGuard } from './guards/yandex-auth.guard';
-import { YandexCallbackGuard } from './guards/yandex-callback.guard';
-import { OAUTH_SUCCESS_REDIRECT } from './oauth.constants';
-import type { OAuthRequest } from './oauth.types';
+import {
+  GoogleAuthGuard,
+  GoogleCallbackGuard,
+  YandexAuthGuard,
+  YandexCallbackGuard,
+} from './guards/oauth.guards';
 
 @Controller(AUTH_ROUTES.BASE)
 export class AuthController {

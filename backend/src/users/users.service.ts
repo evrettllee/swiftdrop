@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { and, eq, isNull, type SQL } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/query.constants';
+import { SINGLE_ROW_LIMIT } from '../common/common.constants';
 import { getUniqueViolationConstraint } from '../common/database/pg-errors';
 import type { RoleName } from '../common/enums/role.enum';
 import { DRIZZLE } from '../database/database.constants';

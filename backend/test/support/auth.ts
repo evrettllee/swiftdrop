@@ -1,11 +1,11 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import { AUTH_ROUTES } from '../src/auth/auth-routes.constants';
-import { REFRESH_COOKIE_NAME } from '../src/auth/auth-token.constants';
-import type { AuthResponse } from '../src/auth/auth.types';
-import { GLOBAL_PREFIX } from '../src/common/constants/app.constants';
-import { nextClientIp } from './client-ip';
-import { CLIENT_IP_HEADER } from './test.constants';
+import { AUTH_ROUTES, REFRESH_COOKIE_NAME } from '../../src/auth/auth.constants';
+import type { AuthResponse, OAuthProfile } from '../../src/auth/auth.types';
+import { GLOBAL_PREFIX } from '../../src/common/common.constants';
+import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
+import { nextClientIp } from './http';
+import { CLIENT_IP_HEADER } from './constants';
 
 export const AUTH_URL = `/${GLOBAL_PREFIX}/${AUTH_ROUTES.BASE}`;
 export const AUTHORIZATION_HEADER = 'Authorization';
@@ -70,5 +70,18 @@ export async function registerUser(
   return {
     body: response.body as AuthResponse,
     refreshToken: extractRefreshToken(response),
+  };
+}
+
+// The default email matches the user created by registerUser, so tests can claim or link that account.
+export function buildOAuthProfile(overrides: Partial<OAuthProfile> = {}): OAuthProfile {
+  return {
+    provider: OAUTH_PROVIDER.GOOGLE,
+    providerUserId: 'google-user-1',
+    email: validRegistration.email,
+    emailVerified: true,
+    firstName: validRegistration.firstName,
+    lastName: validRegistration.lastName,
+    ...overrides,
   };
 }

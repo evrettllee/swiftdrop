@@ -2,19 +2,30 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
+import { z } from 'zod';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
-import { NAME_MAX_LENGTH } from '../auth.constants';
-import { OAUTH_ERROR_MESSAGES } from '../oauth.constants';
-import type { OAuthProfile } from '../oauth.types';
 import {
+  NAME_MAX_LENGTH,
+  OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,
   YANDEX_AUTHORIZATION_URL,
   YANDEX_PROFILE_TIMEOUT_MS,
   YANDEX_PROFILE_URL,
   YANDEX_STRATEGY_NAME,
   YANDEX_TOKEN_URL,
-} from '../yandex.constants';
-import { yandexProfileSchema } from '../yandex-profile.schema';
+} from '../auth.constants';
+import type { OAuthProfile } from '../auth.types';
+
+const yandexProfileSchema = z.object({
+  id: z.string().min(1),
+  default_email: z.email().optional(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  display_name: z.string().optional(),
+  login: z.string().optional(),
+});
+
+export type YandexProfile = z.infer<typeof yandexProfileSchema>;
 
 @Injectable()
 export class YandexStrategy extends PassportStrategy(Strategy, YANDEX_STRATEGY_NAME) {

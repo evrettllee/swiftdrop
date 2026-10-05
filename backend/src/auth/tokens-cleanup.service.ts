@@ -4,7 +4,7 @@ import { lt } from 'drizzle-orm';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { refreshTokens } from '../db/schema';
-import { REFRESH_TOKEN_CLEANUP_CRON } from './auth-cleanup.constants';
+import { REFRESH_TOKEN_CLEANUP_CRON } from './auth.constants';
 
 @Injectable()
 export class TokensCleanupService {

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
-import { GLOBAL_PREFIX } from './common/constants/app.constants';
+import { GLOBAL_PREFIX } from './common/common.constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -3,8 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
-import { JWT_STRATEGY_NAME } from '../auth-metadata.constants';
-import { AUTH_ERROR_MESSAGES } from '../auth-errors.constants';
+import { JWT_STRATEGY_NAME, AUTH_ERROR_MESSAGES } from '../auth.constants';
 import { toAuthUser } from '../auth-user.mapper';
 import type { AccessTokenPayload, AuthUser } from '../auth.types';
 

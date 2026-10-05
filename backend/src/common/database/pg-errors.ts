@@ -1,5 +1,5 @@
 import { DatabaseError } from 'pg';
-import { PG_UNIQUE_VIOLATION_CODE } from '../constants/database-errors.constants';
+import { PG_UNIQUE_VIOLATION_CODE } from '../common.constants';
 
 export function getUniqueViolationConstraint(error: unknown): string | null {
   let current: unknown = error;

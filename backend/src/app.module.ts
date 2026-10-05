@@ -10,7 +10,7 @@ import {
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
-} from './common/constants/throttle.constants';
+} from './common/common.constants';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 
