@@ -94,7 +94,14 @@ export const MAP_ZOOM = {
   DEFAULT: 12,
   MIN: 9,
   MAX: 18,
+  FOCUS: 15,
+  FIT_MAX: 16,
 } as const;
+
+// Space between the points and the edge of the map when it is fitted to them: the tags and the
+// controls must not cover the points.
+export const MAP_FIT_PADDING = 64;
+export const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 // Mapbox raster tiles (Static Tiles API) of its light and dark styles, one for each theme.
 // A tile is 512px, so Leaflet has to shift the zoom by -1.

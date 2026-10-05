@@ -6,6 +6,7 @@ import type { GeoPoint } from '../../pricing/types';
 import { MAP_CENTER, MAP_CLASS, MAP_TEXTS, MAP_ZOOM, ROUTE_POINT } from '../constants';
 import { useExpandedMap } from '../lib/useExpandedMap';
 import type { RoutePointKind } from '../types';
+import { FitToPoints } from './FitToPoints';
 import { MapControls } from './MapControls';
 import { MapHint } from './MapHint';
 import { MapTiles } from './MapTiles';
@@ -70,6 +71,7 @@ export function RouteMap({
         >
           <MapTiles />
           <ClickHandler onPick={onPick} />
+          <FitToPoints pickup={pickup} delivery={delivery} />
           {pickup !== null && delivery !== null ? (
             <Polyline
               positions={[
