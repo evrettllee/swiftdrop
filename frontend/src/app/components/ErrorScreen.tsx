@@ -36,7 +36,7 @@ export function ErrorScreen({ icon: StateIcon, title, text, children }: ErrorScr
           />
           <h1 className="mt-4 text-heading-md font-semibold text-balance">{title}</h1>
           <p className="mt-1 max-w-90 text-pretty text-fg-secondary">{text}</p>
-          <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:[&>*]:min-w-40">
+          <div className="mt-6 flex w-full flex-col gap-3 lg:flex-row lg:flex-wrap lg:justify-center lg:[&>*]:min-w-40">
             {children}
           </div>
         </div>
