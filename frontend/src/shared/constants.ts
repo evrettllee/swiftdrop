@@ -48,6 +48,8 @@ export const HTTP_METHOD = {
 export const HTTP_STATUS = {
   NO_CONTENT: 204,
   UNAUTHORIZED: 401,
+  TOO_MANY_REQUESTS: 429,
+  SERVICE_UNAVAILABLE: 503,
 } as const;
 
 export const NETWORK_ERROR_STATUS = 0;
