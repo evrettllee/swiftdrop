@@ -1,6 +1,6 @@
 import { APP_ROUTES } from '../../shared/constants';
 import { AUTH_TAB, AUTH_TAB_QUERY_PARAM } from '../auth/constants';
-import type { FooterGroup } from './types';
+import type { FooterGroup, RoutePointKind } from './types';
 
 // Anchors of the landing sections: the header, the footer and the sections themselves use the same ids.
 export const LANDING_SECTION_ID = {
@@ -70,3 +70,58 @@ export const LANDING_MOBILE_MENU_ID = 'landing-mobile-menu';
 // The same single breakpoint as `lg` in index.css (1024px).
 export const LANDING_DESKTOP_MEDIA_QUERY = '(min-width: 64rem)';
 export const ESCAPE_KEY = 'Escape';
+
+// Route points
+export const ROUTE_POINT = {
+  PICKUP: 'pickup',
+  DELIVERY: 'delivery',
+} as const;
+
+export const ROUTE_POINT_LABELS: Record<RoutePointKind, string> = {
+  [ROUTE_POINT.PICKUP]: 'Откуда',
+  [ROUTE_POINT.DELIVERY]: 'Куда',
+};
+
+// Map: the city center and the zoom range (12 shows the whole city core)
+export const MAP_CENTER: [number, number] = [53.9006, 27.559];
+export const MAP_ZOOM = {
+  DEFAULT: 12,
+  MIN: 9,
+  MAX: 18,
+} as const;
+
+// Mapbox raster tiles (Static Tiles API) of its light and dark styles, one for each theme.
+// A tile is 512px, so Leaflet has to shift the zoom by -1.
+export const MAP_TILES = {
+  BASE_URL: 'https://api.mapbox.com/styles/v1',
+  LIGHT_STYLE: 'mapbox/light-v11',
+  DARK_STYLE: 'mapbox/dark-v11',
+  TILE_SIZE: 512,
+  ZOOM_OFFSET: -1,
+} as const;
+
+export const MAP_ATTRIBUTION =
+  '&copy; <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noreferrer">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>';
+
+// A marker is a 10px dot (design system, section 15) inside a 44px touch area.
+export const MAP_MARKER_HIT_SIZE = 44;
+// Distance from the marker center to the tag above it.
+export const MAP_MARKER_TAG_OFFSET = 14;
+
+// Class names used by route-map.css
+export const MAP_CLASS = {
+  MARKER: 'route-marker',
+  DOT: 'route-marker__dot',
+  DOT_PICKUP: 'route-marker__dot--pickup',
+  DOT_DELIVERY: 'route-marker__dot--delivery',
+  TAG: 'route-tag',
+  LINE: 'route-line',
+} as const;
+
+export const MAP_TEXTS = {
+  REGION_LABEL: 'Карта города: отметьте точки «Откуда» и «Куда»',
+  HINT_PICKUP: 'Нажмите на карту, чтобы поставить точку «Откуда»',
+  HINT_DELIVERY: 'Нажмите на карту, чтобы поставить точку «Куда»',
+  ZOOM_IN: 'Приблизить',
+  ZOOM_OUT: 'Отдалить',
+} as const;
