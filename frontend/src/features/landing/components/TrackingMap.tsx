@@ -143,7 +143,7 @@ export function TrackingMap() {
         />
       </svg>
       {/* The courier sits on the route: the point is the end of the passed way in both drawings. */}
-      <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 shadow-md lg:top-(--courier-y) lg:left-(--courier-x) lg:ps-2">
+      <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 shadow-md lg:top-(--courier-y) lg:left-(--courier-x) lg:ps-2">
         <span
           aria-hidden="true"
           className="hidden size-8 items-center justify-center rounded-full bg-primary text-on-primary lg:flex"
