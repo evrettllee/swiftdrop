@@ -1,5 +1,5 @@
 import type { KeyboardEvent, ReactNode } from 'react';
-import { ID_PART } from '../constants';
+import { COLOR_TRANSITION_CLASS, ID_PART } from '../constants';
 
 type TabItem<TId extends string> = { id: TId; label: string };
 
@@ -76,7 +76,7 @@ export function Tabs<TId extends string>({
             aria-controls={panelDomId(idPrefix, tab.id)}
             tabIndex={isActive ? 0 : -1}
             onClick={() => onChange(tab.id)}
-            className={`-mb-px h-11 flex-1 whitespace-nowrap border-b-2 px-2 text-center text-body transition-colors duration-150 ease-in-out motion-reduce:transition-none ${
+            className={`-mb-px h-11 flex-1 whitespace-nowrap border-b-2 px-2 text-center text-body ${COLOR_TRANSITION_CLASS} ${
               isActive
                 ? 'border-accent font-semibold text-accent'
                 : 'border-transparent text-fg-secondary hover:text-fg'

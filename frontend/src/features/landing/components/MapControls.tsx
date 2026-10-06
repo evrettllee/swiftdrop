@@ -6,12 +6,11 @@ import {
 } from '@phosphor-icons/react';
 import type { Map as LeafletMap } from 'leaflet';
 import type { RefObject } from 'react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
 import { MAP_TEXTS } from '../constants';
 import { usePrefersReducedMotion } from '../lib/useExpandedMap';
 
-const BUTTON_CLASS =
-  'flex size-11 items-center justify-center text-fg transition-colors duration-150 hover:bg-selected active:bg-border motion-reduce:transition-none';
+const BUTTON_CLASS = `flex size-11 items-center justify-center text-fg hover:bg-selected active:bg-border ${COLOR_TRANSITION_CLASS}`;
 
 type MapControlsProps = {
   map: LeafletMap | null;
@@ -20,7 +19,6 @@ type MapControlsProps = {
   expandButtonRef: RefObject<HTMLButtonElement | null>;
 };
 
-// Zoom in, zoom out and expand, drawn over the map in the style of the design system.
 export function MapControls({
   map,
   isExpanded,

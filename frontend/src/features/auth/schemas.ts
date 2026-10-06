@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CHECKBOX_CHECKED_VALUE } from '../../shared/constants';
 import {
+  AUTH_FIELD,
   EMAIL_MAX_LENGTH,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
@@ -58,31 +59,33 @@ const newPasswordSchema = z
   );
 
 export const loginFormSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(1, VALIDATION_MESSAGES.PASSWORD_REQUIRED),
+  [AUTH_FIELD.EMAIL]: emailSchema,
+  [AUTH_FIELD.PASSWORD]: z.string().min(1, VALIDATION_MESSAGES.PASSWORD_REQUIRED),
 });
 
 // The consent and the password repeat are checked on the client only; neither is sent to the backend.
 export const registerFormSchema = z
   .object({
-    firstName: buildNameSchema(
+    [AUTH_FIELD.FIRST_NAME]: buildNameSchema(
       VALIDATION_MESSAGES.FIRST_NAME_REQUIRED,
       VALIDATION_MESSAGES.FIRST_NAME_TOO_SHORT,
       VALIDATION_MESSAGES.FIRST_NAME_TOO_LONG,
     ),
-    lastName: buildNameSchema(
+    [AUTH_FIELD.LAST_NAME]: buildNameSchema(
       VALIDATION_MESSAGES.LAST_NAME_REQUIRED,
       VALIDATION_MESSAGES.LAST_NAME_TOO_SHORT,
       VALIDATION_MESSAGES.LAST_NAME_TOO_LONG,
     ),
-    email: emailSchema,
-    phone: phoneSchema,
-    password: newPasswordSchema,
-    confirmPassword: z.string().min(1, VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-    terms: z.literal(CHECKBOX_CHECKED_VALUE, { error: VALIDATION_MESSAGES.TERMS_REQUIRED }),
+    [AUTH_FIELD.EMAIL]: emailSchema,
+    [AUTH_FIELD.PHONE]: phoneSchema,
+    [AUTH_FIELD.PASSWORD]: newPasswordSchema,
+    [AUTH_FIELD.CONFIRM_PASSWORD]: z.string().min(1, VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+    [AUTH_FIELD.TERMS]: z.literal(CHECKBOX_CHECKED_VALUE, {
+      error: VALIDATION_MESSAGES.TERMS_REQUIRED,
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
+    path: [AUTH_FIELD.CONFIRM_PASSWORD],
     error: VALIDATION_MESSAGES.PASSWORDS_MISMATCH,
     // Zod skips object-level checks while any field is invalid; the repeat is compared anyway.
     when: () => true,

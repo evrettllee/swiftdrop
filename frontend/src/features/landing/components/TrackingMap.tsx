@@ -2,12 +2,10 @@ import { BicycleIcon } from '@phosphor-icons/react';
 import type { CSSProperties } from 'react';
 import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
 import { TRACKING } from '../constants';
+import { TrackingMapRoad } from './TrackingMapRoad';
+import { TrackingMapRoute } from './TrackingMapRoute';
 
 // The drawing of the schematic map: coordinates are in the units of the viewBox.
-const CASING_EXTRA = 2;
-const ROUTE_STROKE = 2;
-const ROUTE_DASH = '8 8';
-const MARKER_RADIUS = 6;
 const PERCENT = 100;
 
 const DESKTOP_SIZE = { WIDTH: 640, HEIGHT: 340 } as const;
@@ -50,53 +48,6 @@ const DESKTOP_VARIABLES = {
   '--courier-y': toPercent(DESKTOP_MAP.COURIER.y, DESKTOP_SIZE.HEIGHT),
 } as CSSProperties;
 
-// A road: the wider line of the casing below and the road itself above it.
-function Road({ d, width }: { d: string; width: number }) {
-  return (
-    <>
-      <path d={d} className="stroke-border" strokeWidth={width + CASING_EXTRA} />
-      <path d={d} className="stroke-surface-elevated" strokeWidth={width} />
-    </>
-  );
-}
-
-type RouteProps = {
-  passed: string;
-  remaining: string;
-  pickup: { readonly x: number; readonly y: number };
-  drop: { readonly x: number; readonly y: number };
-};
-
-// The passed way is a solid line, the remaining one is dashed; "from" is a ring, "to" is a dot.
-function Route({ passed, remaining, pickup, drop }: RouteProps) {
-  return (
-    <>
-      <polyline
-        points={remaining}
-        className="fill-none stroke-accent"
-        strokeWidth={ROUTE_STROKE}
-        strokeDasharray={ROUTE_DASH}
-        strokeLinejoin="round"
-      />
-      <polyline
-        points={passed}
-        className="fill-none stroke-accent"
-        strokeWidth={ROUTE_STROKE}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      <circle
-        cx={pickup.x}
-        cy={pickup.y}
-        r={MARKER_RADIUS}
-        className="fill-surface stroke-accent"
-        strokeWidth={ROUTE_STROKE}
-      />
-      <circle cx={drop.x} cy={drop.y} r={MARKER_RADIUS} className="fill-fg" />
-    </>
-  );
-}
-
 // An illustration of the tracking screen. It is drawn with the tokens of the design system, so it
 // follows the theme. Phone and desktop get their own drawings, as in the design.
 export function TrackingMap() {
@@ -114,10 +65,10 @@ export function TrackingMap() {
         <rect width="100%" height="100%" className="fill-field" />
         <path d={DESKTOP_MAP.WATER} className="fill-map-water" />
         <g fill="none" strokeLinecap="round">
-          <Road d={DESKTOP_MAP.STREETS} width={DESKTOP_MAP.STREET_WIDTH} />
-          <Road d={DESKTOP_MAP.AVENUE} width={DESKTOP_MAP.AVENUE_WIDTH} />
+          <TrackingMapRoad d={DESKTOP_MAP.STREETS} width={DESKTOP_MAP.STREET_WIDTH} />
+          <TrackingMapRoad d={DESKTOP_MAP.AVENUE} width={DESKTOP_MAP.AVENUE_WIDTH} />
         </g>
-        <Route
+        <TrackingMapRoute
           passed={DESKTOP_MAP.PASSED}
           remaining={DESKTOP_MAP.REMAINING}
           pickup={DESKTOP_MAP.PICKUP}
@@ -133,9 +84,9 @@ export function TrackingMap() {
       >
         <rect width="100%" height="100%" className="fill-field" />
         <g fill="none" strokeLinecap="round">
-          <Road d={MOBILE_MAP.STREETS} width={MOBILE_MAP.STREET_WIDTH} />
+          <TrackingMapRoad d={MOBILE_MAP.STREETS} width={MOBILE_MAP.STREET_WIDTH} />
         </g>
-        <Route
+        <TrackingMapRoute
           passed={MOBILE_MAP.PASSED}
           remaining={MOBILE_MAP.REMAINING}
           pickup={MOBILE_MAP.PICKUP}

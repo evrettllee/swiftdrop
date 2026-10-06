@@ -1,7 +1,13 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
-import { APP_ROUTES, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import {
+  APP_ROUTES,
+  ICON_SIZE,
+  ICON_WEIGHT,
+  MAIN_CONTENT_ID,
+  UI_TEXTS,
+} from '../../../shared/constants';
 import { LinkButton } from '../../../shared/ui/Button';
 import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Logo } from '../../../shared/ui/Logo';
@@ -64,7 +70,6 @@ type AuthPanelProps = {
   children: ReactNode;
 };
 
-// Content of one tab: title, provider error, the form, the divider and the provider buttons.
 function AuthPanel({ title, showConsent, children }: AuthPanelProps) {
   return (
     <>
@@ -92,12 +97,12 @@ export function AuthPage() {
           to={APP_ROUTES.HOME}
           icon={<ArrowLeftIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />}
         >
-          {AUTH_TEXTS.BACK_HOME}
+          {UI_TEXTS.BACK_HOME}
         </LinkButton>
         <ThemeToggle />
       </header>
       <main
-        id="main"
+        id={MAIN_CONTENT_ID}
         className="flex flex-1 flex-col items-center px-4 pt-8 pb-10 lg:px-12 lg:pt-12 lg:pb-16"
       >
         <div className="mb-6">

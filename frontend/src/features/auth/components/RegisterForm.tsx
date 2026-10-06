@@ -3,7 +3,7 @@ import { Button } from '../../../shared/ui/Button';
 import { Checkbox } from '../../../shared/ui/Checkbox';
 import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Input } from '../../../shared/ui/Input';
-import { AUTH_TEXTS, REGISTER_INITIAL_VALUES } from '../constants';
+import { AUTH_FIELD, AUTH_TEXTS, REGISTER_INITIAL_VALUES } from '../constants';
 import { registerFormSchema } from '../schemas';
 import { useAuthStore } from '../store';
 import { LegalLinks } from './LegalLinks';
@@ -27,13 +27,13 @@ export function RegisterForm() {
           label={AUTH_TEXTS.LABEL_FIRST_NAME}
           autoComplete="given-name"
           placeholder={AUTH_TEXTS.PLACEHOLDER_FIRST_NAME}
-          {...field('firstName')}
+          {...field(AUTH_FIELD.FIRST_NAME)}
         />
         <Input
           label={AUTH_TEXTS.LABEL_LAST_NAME}
           autoComplete="family-name"
           placeholder={AUTH_TEXTS.PLACEHOLDER_LAST_NAME}
-          {...field('lastName')}
+          {...field(AUTH_FIELD.LAST_NAME)}
         />
       </div>
       <Input
@@ -41,7 +41,7 @@ export function RegisterForm() {
         type="email"
         autoComplete="email"
         placeholder={AUTH_TEXTS.PLACEHOLDER_EMAIL}
-        {...field('email')}
+        {...field(AUTH_FIELD.EMAIL)}
       />
       <Input
         label={AUTH_TEXTS.LABEL_PHONE}
@@ -49,20 +49,20 @@ export function RegisterForm() {
         autoComplete="tel"
         placeholder={AUTH_TEXTS.PLACEHOLDER_PHONE}
         hint={AUTH_TEXTS.PHONE_HINT}
-        {...field('phone')}
+        {...field(AUTH_FIELD.PHONE)}
       />
       <div className="flex flex-col gap-2">
         <PasswordField
           label={AUTH_TEXTS.LABEL_PASSWORD}
           autoComplete="new-password"
-          {...field('password')}
+          {...field(AUTH_FIELD.PASSWORD)}
         />
-        <PasswordRequirements value={values.password ?? ''} />
+        <PasswordRequirements value={values[AUTH_FIELD.PASSWORD] ?? ''} />
       </div>
       <PasswordField
         label={AUTH_TEXTS.LABEL_CONFIRM_PASSWORD}
         autoComplete="new-password"
-        {...field('confirmPassword')}
+        {...field(AUTH_FIELD.CONFIRM_PASSWORD)}
       />
       <Checkbox
         label={
@@ -70,7 +70,7 @@ export function RegisterForm() {
             {AUTH_TEXTS.TERMS_ACCEPT} <LegalLinks />
           </>
         }
-        {...checkbox('terms')}
+        {...checkbox(AUTH_FIELD.TERMS)}
       />
       {formError === null ? null : <InlineAlert variant="error">{formError}</InlineAlert>}
       <div className="pt-2">

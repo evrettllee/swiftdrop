@@ -37,7 +37,7 @@ export function FaqItem({ question, answer, isOpen, onToggle }: FaqItemProps) {
         </button>
       </h3>
       <div id={panelId} role="region" aria-labelledby={buttonId} hidden={!isOpen}>
-        <p className="-mt-4 max-w-[65ch] pb-6 text-body text-fg-secondary">{answer}</p>
+        <p className="-mt-4 max-w-prose pb-6 text-body text-fg-secondary">{answer}</p>
       </div>
     </div>
   );

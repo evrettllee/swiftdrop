@@ -1,16 +1,10 @@
-import { useId, useState, type ChangeEvent, type KeyboardEvent } from 'react';
-import { ESCAPE_KEY } from '../../../shared/constants';
+import type { ChangeEvent } from 'react';
 import { Input } from '../../../shared/ui/Input';
 import { Spinner } from '../../../shared/ui/Spinner';
-import {
-  ADDRESS_FIELD_KEY,
-  ADDRESS_FIELD_TEXTS,
-  GEOCODING_MIN_QUERY_LENGTH,
-  NO_ACTIVE_INDEX,
-  SEARCH_STATUS,
-} from '../constants';
-import { useAddressSuggestions } from '../lib/useAddressSuggestions';
+import { NO_ACTIVE_INDEX, SEARCH_STATUS } from '../constants';
+import { useAddressCombobox } from '../lib/useAddressCombobox';
 import type { AddressSuggestion } from '../types';
+import { AddressSuggestions } from './AddressSuggestions';
 
 type AddressFieldProps = {
   label: string;
@@ -23,7 +17,6 @@ type AddressFieldProps = {
   onFocus?: () => void;
 };
 
-// An address input with a list of suggestions (the combobox pattern of ARIA).
 export function AddressField({
   label,
   value,
@@ -32,70 +25,12 @@ export function AddressField({
   onSelect,
   onFocus,
 }: AddressFieldProps) {
-  const listboxId = useId();
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX);
-  const { status, suggestions, message } = useAddressSuggestions(value, isOpen);
-
-  const isListShown = isOpen && suggestions.length > 0;
-  const isEmptyShown =
-    isOpen &&
-    status === SEARCH_STATUS.READY &&
-    suggestions.length === 0 &&
-    value.trim().length >= GEOCODING_MIN_QUERY_LENGTH;
-
-  function select(suggestion: AddressSuggestion): void {
-    onSelect(suggestion);
-    setIsOpen(false);
-    setActiveIndex(NO_ACTIVE_INDEX);
-  }
-
-  function moveActive(step: number): void {
-    if (suggestions.length === 0) {
-      return;
-    }
-
-    setActiveIndex((current) => {
-      if (current === NO_ACTIVE_INDEX) {
-        return step > 0 ? 0 : suggestions.length - 1;
-      }
-
-      return (current + step + suggestions.length) % suggestions.length;
-    });
-  }
+  const combobox = useAddressCombobox(value, onSelect);
+  const { status, activeIndex, isOpen, isListShown, isEmptyShown } = combobox;
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     onChange(event.target.value);
-    setIsOpen(true);
-    setActiveIndex(NO_ACTIVE_INDEX);
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
-    switch (event.key) {
-      case ADDRESS_FIELD_KEY.ARROW_DOWN:
-        event.preventDefault();
-        setIsOpen(true);
-        moveActive(1);
-        break;
-      case ADDRESS_FIELD_KEY.ARROW_UP:
-        event.preventDefault();
-        moveActive(-1);
-        break;
-      case ADDRESS_FIELD_KEY.ENTER: {
-        const chosen = activeIndex === NO_ACTIVE_INDEX ? undefined : suggestions[activeIndex];
-
-        if (isListShown && chosen !== undefined) {
-          event.preventDefault();
-          select(chosen);
-        }
-        break;
-      }
-      case ESCAPE_KEY:
-        setIsOpen(false);
-        break;
-      default:
-        break;
-    }
+    combobox.open();
   }
 
   return (
@@ -106,16 +41,18 @@ export function AddressField({
       autoComplete="off"
       role="combobox"
       aria-expanded={isListShown}
-      aria-controls={isListShown ? listboxId : undefined}
+      aria-controls={isListShown ? combobox.listboxId : undefined}
       aria-autocomplete="list"
       aria-activedescendant={
-        isListShown && activeIndex !== NO_ACTIVE_INDEX ? `${listboxId}-${activeIndex}` : undefined
+        isListShown && activeIndex !== NO_ACTIVE_INDEX
+          ? combobox.getOptionId(activeIndex)
+          : undefined
       }
-      hint={status === SEARCH_STATUS.ERROR ? (message ?? undefined) : undefined}
+      hint={status === SEARCH_STATUS.ERROR ? (combobox.message ?? undefined) : undefined}
       onChange={handleChange}
-      onKeyDown={handleKeyDown}
+      onKeyDown={combobox.handleKeyDown}
       onFocus={onFocus}
-      onBlur={() => setIsOpen(false)}
+      onBlur={combobox.close}
       endAdornment={
         <span className="flex items-center pe-3">
           {isOpen && status === SEARCH_STATUS.LOADING ? <Spinner /> : null}
@@ -123,36 +60,16 @@ export function AddressField({
       }
       popup={
         isListShown || isEmptyShown ? (
-          // The mouse must not take the focus from the field, or the list would close before the click.
-          <div
-            onMouseDown={(event) => event.preventDefault()}
-            className="absolute inset-x-0 top-full z-10 mt-1 max-h-72 overflow-auto rounded-md border border-border-elevated bg-surface-elevated py-1 shadow-lg"
-          >
-            {isListShown ? (
-              <ul id={listboxId} role="listbox" aria-label={label}>
-                {suggestions.map((suggestion, index) => (
-                  <li
-                    key={suggestion.id}
-                    id={`${listboxId}-${index}`}
-                    role="option"
-                    aria-selected={index === activeIndex}
-                    onClick={() => select(suggestion)}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    className={`flex min-h-11 cursor-pointer flex-col justify-center px-4 py-2 ${
-                      index === activeIndex ? 'bg-selected' : ''
-                    }`}
-                  >
-                    <span className="text-body">{suggestion.name}</span>
-                    <span className="text-small text-fg-secondary">{suggestion.details}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="px-4 py-3 text-small text-fg-secondary">
-                {ADDRESS_FIELD_TEXTS.NO_RESULTS}
-              </p>
-            )}
-          </div>
+          <AddressSuggestions
+            listboxId={combobox.listboxId}
+            label={label}
+            suggestions={combobox.suggestions}
+            activeIndex={activeIndex}
+            isListShown={isListShown}
+            getOptionId={combobox.getOptionId}
+            onSelect={combobox.select}
+            onActivate={combobox.setActiveIndex}
+          />
         ) : null
       }
     />

@@ -8,7 +8,7 @@ import {
 } from 'leaflet';
 import { useMemo } from 'react';
 import { Marker, Tooltip } from 'react-leaflet';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
 import type { GeoPoint } from '../../pricing/types';
 import {
   MAP_CLASS,
@@ -23,8 +23,7 @@ import type { RoutePointKind } from '../types';
 // The wrapper covers the padding of the tag, the button is larger than its icon for a finger and
 // does not make the tag taller (the negative margins).
 const TAG_CONTENT_CLASS = '-mx-4 -my-1 flex items-center gap-1 px-4 py-1';
-const REMOVE_BUTTON_CLASS =
-  '-my-1 -me-2 flex size-7 items-center justify-center rounded-sm text-fg-secondary transition-colors duration-150 hover:bg-selected hover:text-fg motion-reduce:transition-none';
+const REMOVE_BUTTON_CLASS = `-my-1 -me-2 flex size-7 items-center justify-center rounded-sm text-fg-secondary hover:bg-selected hover:text-fg ${COLOR_TRANSITION_CLASS}`;
 
 function createMarkerIcon(dotClass: string): DivIcon {
   return divIcon({
@@ -66,7 +65,7 @@ export function RouteMarker({ kind, point, onMove, onRemove }: RouteMarkerProps)
     }),
     [kind, onMove],
   );
-  const removeLabel = `${MAP_TEXTS.REMOVE_POINT} «${ROUTE_POINT_LABELS[kind]}»`;
+  const removeLabel = MAP_TEXTS.REMOVE_POINT(ROUTE_POINT_LABELS[kind]);
 
   return (
     <Marker

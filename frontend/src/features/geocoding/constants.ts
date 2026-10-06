@@ -1,9 +1,9 @@
-import { CITY_CENTER } from '../../shared/constants';
+import { CITY_CENTER, MAPBOX_API_ORIGIN } from '../../shared/constants';
 
 const [CITY_CENTER_LATITUDE, CITY_CENTER_LONGITUDE] = CITY_CENTER;
 
 // Mapbox Geocoding API v6: the same public token as for the map tiles.
-export const GEOCODING_BASE_URL = 'https://api.mapbox.com/search/geocode/v6';
+export const GEOCODING_BASE_URL = `${MAPBOX_API_ORIGIN}/search/geocode/v6`;
 
 export const GEOCODING_PATHS = {
   FORWARD: '/forward',

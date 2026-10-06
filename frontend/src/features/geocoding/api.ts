@@ -1,6 +1,6 @@
 import { ApiError } from '../../shared/api/http';
 import { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from '../../shared/config';
-import { NETWORK_ERROR_STATUS } from '../../shared/constants';
+import { MAPBOX_TOKEN_PARAM, NETWORK_ERROR_STATUS } from '../../shared/constants';
 import type { GeoPoint } from '../pricing/types';
 import {
   ABORT_ERROR_NAME,
@@ -26,7 +26,7 @@ async function requestSuggestions(
     throw new ApiError(NETWORK_ERROR_STATUS, GEOCODING_ERROR_MESSAGES.UNAVAILABLE);
   }
 
-  const query = new URLSearchParams({ ...params, access_token: MAPBOX_TOKEN });
+  const query = new URLSearchParams({ ...params, [MAPBOX_TOKEN_PARAM]: MAPBOX_TOKEN });
   let response: Response;
 
   try {
@@ -44,7 +44,6 @@ async function requestSuggestions(
   return geocodingResponseSchema.parse(await response.json()).features;
 }
 
-// Suggestions for the text typed into an address field.
 export async function searchAddresses(
   text: string,
   signal?: AbortSignal,

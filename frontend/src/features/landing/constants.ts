@@ -1,6 +1,12 @@
-import { APP_ROUTES } from '../../shared/constants';
+import { APP_ROUTES, MAPBOX_API_ORIGIN, UI_TEXTS } from '../../shared/constants';
 import { AUTH_TAB, AUTH_TAB_QUERY_PARAM } from '../auth/constants';
 import type { FooterGroup, RoutePointKind } from './types';
+
+// Layout: the width of the page grid, and the height of the sticky header together with the scroll
+// offset that stops a section right under it (the two must stay equal).
+export const LANDING_CONTAINER_CLASS = 'mx-auto max-w-7xl px-4 lg:px-12';
+export const LANDING_HEADER_HEIGHT_CLASS = 'h-14 lg:h-16';
+export const LANDING_SCROLL_OFFSET_CLASS = 'scroll-mt-14 lg:scroll-mt-16';
 
 // Anchors of the landing sections: the header, the footer and the sections themselves use the same ids.
 export const LANDING_SECTION_ID = {
@@ -13,19 +19,27 @@ export const LANDING_SECTION_ID = {
   CTA: 'cta',
 } as const;
 
+// The header, the mobile menu and the footer name the sections the same way.
+const SECTION_LABELS = {
+  CALCULATOR: 'Расчёт',
+  HOW_IT_WORKS: 'Как это работает',
+  TRACKING: 'Отслеживание',
+  FEATURES: 'Возможности',
+  FAQ: 'Вопросы',
+} as const;
+
 export const LANDING_NAV_ITEMS = [
-  { id: LANDING_SECTION_ID.CALCULATOR, label: 'Расчёт' },
-  { id: LANDING_SECTION_ID.HOW_IT_WORKS, label: 'Как это работает' },
-  { id: LANDING_SECTION_ID.TRACKING, label: 'Отслеживание' },
-  { id: LANDING_SECTION_ID.FEATURES, label: 'Возможности' },
-  { id: LANDING_SECTION_ID.FAQ, label: 'Вопросы' },
+  { id: LANDING_SECTION_ID.CALCULATOR, label: SECTION_LABELS.CALCULATOR },
+  { id: LANDING_SECTION_ID.HOW_IT_WORKS, label: SECTION_LABELS.HOW_IT_WORKS },
+  { id: LANDING_SECTION_ID.TRACKING, label: SECTION_LABELS.TRACKING },
+  { id: LANDING_SECTION_ID.FEATURES, label: SECTION_LABELS.FEATURES },
+  { id: LANDING_SECTION_ID.FAQ, label: SECTION_LABELS.FAQ },
 ] as const;
 
 // Sign-up opens the auth page on its registration tab.
 export const LANDING_SIGN_UP_ROUTE = `${APP_ROUTES.AUTH}?${AUTH_TAB_QUERY_PARAM}=${AUTH_TAB.REGISTER}`;
 
 export const LANDING_TEXTS = {
-  LOGO_LABEL: 'SwiftDrop, на главную',
   NAV_LABEL: 'Разделы страницы',
   SIGN_IN: 'Войти',
   SIGN_UP: 'Регистрация',
@@ -34,10 +48,11 @@ export const LANDING_TEXTS = {
   CLOSE_MENU: 'Закрыть меню',
   HERO_TITLE: 'Курьерская доставка по городу, которую видно на карте',
   FOOTER_TAGLINE: 'Курьерская доставка по городу с отслеживанием на карте.',
+  COPYRIGHT_SIGN: '©',
   COPYRIGHT_OWNER: 'SwiftDrop',
   HERO_LEAD: 'Укажите адреса на карте, узнайте цену заранее и следите за курьером до самой двери.',
   ORDER: 'Оформить заказ',
-  HOW_IT_WORKS: 'Как это работает',
+  HOW_IT_WORKS: SECTION_LABELS.HOW_IT_WORKS,
   CALC_TITLE: 'Рассчитайте стоимость',
   CALC_SUBTITLE: 'Результат обновляется по мере ввода.',
   CALC_CAPTION: 'Точную цену покажем перед оплатой.',
@@ -49,25 +64,29 @@ export const LANDING_FOOTER_GROUPS: readonly FooterGroup[] = [
     title: 'Сервис',
     links: [
       { label: 'Расчёт стоимости', anchor: LANDING_SECTION_ID.CALCULATOR, showOnMobile: true },
-      { label: 'Как это работает', anchor: LANDING_SECTION_ID.HOW_IT_WORKS, showOnMobile: true },
-      { label: 'Отслеживание', anchor: LANDING_SECTION_ID.TRACKING, showOnMobile: false },
-      { label: 'Возможности', anchor: LANDING_SECTION_ID.FEATURES, showOnMobile: false },
+      {
+        label: SECTION_LABELS.HOW_IT_WORKS,
+        anchor: LANDING_SECTION_ID.HOW_IT_WORKS,
+        showOnMobile: true,
+      },
+      { label: SECTION_LABELS.TRACKING, anchor: LANDING_SECTION_ID.TRACKING, showOnMobile: false },
+      { label: SECTION_LABELS.FEATURES, anchor: LANDING_SECTION_ID.FEATURES, showOnMobile: false },
     ],
   },
   {
     title: 'Аккаунт',
     links: [
-      { label: 'Войти', route: APP_ROUTES.AUTH, showOnMobile: false },
+      { label: LANDING_TEXTS.SIGN_IN, route: APP_ROUTES.AUTH, showOnMobile: false },
       // The page for creating an order does not exist yet, so for now the link leads to the sign-in.
-      { label: 'Оформить заказ', route: APP_ROUTES.AUTH, showOnMobile: false },
-      { label: 'Вопросы', anchor: LANDING_SECTION_ID.FAQ, showOnMobile: true },
+      { label: LANDING_TEXTS.ORDER, route: APP_ROUTES.AUTH, showOnMobile: false },
+      { label: SECTION_LABELS.FAQ, anchor: LANDING_SECTION_ID.FAQ, showOnMobile: true },
     ],
   },
   {
     title: 'Документы',
     links: [
-      { label: 'Условия использования', route: APP_ROUTES.TERMS, showOnMobile: true },
-      { label: 'Политика конфиденциальности', route: APP_ROUTES.PRIVACY, showOnMobile: true },
+      { label: UI_TEXTS.TERMS_TITLE, route: APP_ROUTES.TERMS, showOnMobile: true },
+      { label: UI_TEXTS.PRIVACY_TITLE, route: APP_ROUTES.PRIVACY, showOnMobile: true },
     ],
   },
 ];
@@ -105,7 +124,7 @@ export const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 // Mapbox raster tiles (Static Tiles API) of its light and dark styles, one for each theme.
 // A tile is 512px, so Leaflet has to shift the zoom by -1.
 export const MAP_TILES = {
-  BASE_URL: 'https://api.mapbox.com/styles/v1',
+  BASE_URL: `${MAPBOX_API_ORIGIN}/styles/v1`,
   LIGHT_STYLE: 'mapbox/light-v11',
   DARK_STYLE: 'mapbox/dark-v11',
   TILE_SIZE: 512,
@@ -115,7 +134,7 @@ export const MAP_TILES = {
 export const MAP_ATTRIBUTION =
   '&copy; <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noreferrer">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>';
 
-// A marker is a 10px dot (design system, section 15) inside a 44px touch area.
+// A marker is a 10px dot (route-map.css) inside a 44px touch area.
 export const MAP_MARKER_HIT_SIZE = 44;
 // Distance from the marker center to the tag above it.
 export const MAP_MARKER_TAG_OFFSET = 14;
@@ -142,7 +161,7 @@ export const MAP_TEXTS = {
   ZOOM_OUT: 'Отдалить',
   EXPAND: 'Развернуть карту',
   COLLAPSE: 'Свернуть карту',
-  REMOVE_POINT: 'Убрать точку',
+  REMOVE_POINT: (pointLabel: string) => `Убрать точку «${pointLabel}»`,
   UNAVAILABLE: 'Карта временно недоступна',
   // Shown to a developer only (the dev server), not to a visitor.
   UNAVAILABLE_DEV_HINT: 'Задайте VITE_MAPBOX_TOKEN в файле .env в корне репозитория.',
@@ -220,6 +239,10 @@ export const TRACKING = {
   },
 } as const;
 
+// The grade in the example of the rating card and the length of the scale.
+const DEMO_RATING = 4;
+const RATING_SCALE = 5;
+
 export const FEATURES = {
   TITLE: 'Что умеет сервис',
   LEAD: 'Проверка транспорта, код при вручении, чат и повтор заказа работают без настройки.',
@@ -259,9 +282,9 @@ export const FEATURES = {
   RATING: {
     TITLE: 'Оценка курьера',
     TEXT: 'После доставки поставьте оценку: она войдёт в рейтинг курьера.',
-    VALUE: 4,
-    MAX: 5,
-    LABEL: 'Оценка 4 из 5',
+    VALUE: DEMO_RATING,
+    MAX: RATING_SCALE,
+    LABEL: `Оценка ${DEMO_RATING} из ${RATING_SCALE}`,
   },
 } as const;
 
@@ -306,5 +329,5 @@ export const CTA_TEXTS = {
   TITLE: 'Оформите первый заказ',
   LEAD: 'Войдите через Google или Яндекс либо создайте аккаунт по почте.',
   LEAD_EXTRA: 'Адреса и посылку можно указать сразу после входа.',
-  BUTTON: 'Оформить заказ',
+  BUTTON: LANDING_TEXTS.ORDER,
 } as const;

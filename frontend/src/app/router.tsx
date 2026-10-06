@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router';
-import { APP_ROUTES } from '../shared/constants';
+import { APP_ROUTES, CATCH_ALL_ROUTE } from '../shared/constants';
 import { PageLoader } from '../shared/ui/PageLoader';
 import { GuestRoute } from './GuestRoute';
 import { PLACEHOLDER_TEXTS } from './constants';
@@ -67,7 +67,7 @@ export const router = createBrowserRouter([
         path: APP_ROUTES.PRIVACY,
         element: <PlaceholderPage title={PLACEHOLDER_TEXTS.PRIVACY_TITLE} />,
       },
-      { path: '*', element: <NotFoundPage /> },
+      { path: CATCH_ALL_ROUTE, element: <NotFoundPage /> },
     ],
   },
 ]);

@@ -1,12 +1,12 @@
 import { APP_ROUTES } from '../../../shared/constants';
 import { LinkButton } from '../../../shared/ui/Button';
-import { LANDING_SECTION_ID, LANDING_TEXTS } from '../constants';
+import { LANDING_SCROLL_OFFSET_CLASS, LANDING_SECTION_ID, LANDING_TEXTS } from '../constants';
 
 export function HeroSection() {
   return (
     <section
       id={LANDING_SECTION_ID.TOP}
-      className="flex scroll-mt-14 flex-col items-center gap-6 text-center lg:scroll-mt-16"
+      className={`${LANDING_SCROLL_OFFSET_CLASS} flex flex-col items-center gap-6 text-center`}
     >
       <h1 className="max-w-220 text-display-sm font-bold lg:text-display">
         {LANDING_TEXTS.HERO_TITLE}

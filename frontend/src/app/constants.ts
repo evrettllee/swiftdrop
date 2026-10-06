@@ -1,3 +1,5 @@
+import { UI_TEXTS } from '../shared/constants';
+
 // Interface texts of the general pages
 export const APP_TEXTS = {
   SIGN_IN: 'Войти',
@@ -7,18 +9,16 @@ export const APP_TEXTS = {
   PROFILE_ROLE: 'Роль',
   NOT_FOUND_TITLE: 'Страница не найдена',
   NOT_FOUND_HINT: 'Возможно, ссылка устарела или адрес введён с ошибкой',
-  BACK_HOME: 'На главную',
 } as const;
 
 export const PLACEHOLDER_TEXTS = {
   HINT: 'Страница появится позже',
   FORGOT_PASSWORD_TITLE: 'Восстановление пароля',
-  TERMS_TITLE: 'Условия использования',
-  PRIVACY_TITLE: 'Политика конфиденциальности',
+  TERMS_TITLE: UI_TEXTS.TERMS_TITLE,
+  PRIVACY_TITLE: UI_TEXTS.PRIVACY_TITLE,
 } as const;
 
 export const ERROR_TEXTS = {
-  LOGO_LABEL: 'SwiftDrop, на главную',
   FORBIDDEN_TITLE: 'Нет доступа',
   FORBIDDEN_HINT: 'У вашей учётной записи нет прав для просмотра этой страницы',
   GENERIC_TITLE: 'Что-то пошло не так',

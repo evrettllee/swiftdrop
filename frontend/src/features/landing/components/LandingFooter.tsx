@@ -1,6 +1,12 @@
 import { Link } from 'react-router';
+import { UI_TEXTS } from '../../../shared/constants';
 import { Logo } from '../../../shared/ui/Logo';
-import { LANDING_FOOTER_GROUPS, LANDING_SECTION_ID, LANDING_TEXTS } from '../constants';
+import {
+  LANDING_CONTAINER_CLASS,
+  LANDING_FOOTER_GROUPS,
+  LANDING_SECTION_ID,
+  LANDING_TEXTS,
+} from '../constants';
 
 const LINK_CLASS = 'text-fg-secondary transition-colors duration-150 hover:text-fg';
 const HIDDEN_ON_MOBILE_CLASS = 'hidden lg:block';
@@ -11,12 +17,14 @@ const CURRENT_YEAR = new Date().getFullYear();
 export function LandingFooter() {
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 text-small lg:gap-12 lg:px-12 lg:pt-12 lg:pb-8">
+      <div
+        className={`${LANDING_CONTAINER_CLASS} flex flex-col gap-6 py-8 text-small lg:gap-12 lg:pt-12 lg:pb-8`}
+      >
         <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:gap-x-6">
           <div className="flex flex-col gap-6 lg:col-span-5 lg:gap-4">
             <a
               href={`#${LANDING_SECTION_ID.TOP}`}
-              aria-label={LANDING_TEXTS.LOGO_LABEL}
+              aria-label={UI_TEXTS.LOGO_LABEL}
               className="self-start rounded-sm"
             >
               <Logo />
@@ -51,7 +59,7 @@ export function LandingFooter() {
           </div>
         </div>
         <p className="text-fg-secondary">
-          © {CURRENT_YEAR} {LANDING_TEXTS.COPYRIGHT_OWNER}
+          {LANDING_TEXTS.COPYRIGHT_SIGN} {CURRENT_YEAR} {LANDING_TEXTS.COPYRIGHT_OWNER}
         </p>
       </div>
     </footer>

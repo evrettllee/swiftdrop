@@ -4,7 +4,7 @@ import { Button } from '../../../shared/ui/Button';
 import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Input } from '../../../shared/ui/Input';
 import { TextLink } from '../../../shared/ui/TextLink';
-import { AUTH_TEXTS, LOGIN_INITIAL_VALUES } from '../constants';
+import { AUTH_FIELD, AUTH_TEXTS, LOGIN_INITIAL_VALUES } from '../constants';
 import { loginFormSchema } from '../schemas';
 import { useAuthStore } from '../store';
 import { PasswordField } from './PasswordField';
@@ -24,13 +24,13 @@ export function LoginForm() {
         type="email"
         autoComplete="username"
         placeholder={AUTH_TEXTS.PLACEHOLDER_EMAIL}
-        {...field('email')}
+        {...field(AUTH_FIELD.EMAIL)}
       />
       <div className="flex flex-col gap-2">
         <PasswordField
           label={AUTH_TEXTS.LABEL_PASSWORD}
           autoComplete="current-password"
-          {...field('password')}
+          {...field(AUTH_FIELD.PASSWORD)}
         />
         <div className="flex justify-end">
           <TextLink to={APP_ROUTES.FORGOT_PASSWORD} variant="standalone">

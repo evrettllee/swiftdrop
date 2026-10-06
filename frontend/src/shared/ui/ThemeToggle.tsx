@@ -2,6 +2,7 @@ import { MoonIcon, SunIcon } from '@phosphor-icons/react';
 import { ICON_SIZE, ICON_WEIGHT } from '../constants';
 import { THEME, THEME_TEXTS } from '../theme/constants';
 import { useThemeStore } from '../theme/store';
+import { IconButton } from './IconButton';
 
 export function ThemeToggle() {
   const theme = useThemeStore((state) => state.theme);
@@ -11,14 +12,8 @@ export function ThemeToggle() {
   const Icon = isDark ? SunIcon : MoonIcon;
 
   return (
-    <button
-      type="button"
-      onClick={toggleTheme}
-      aria-label={label}
-      title={label}
-      className="flex size-11 items-center justify-center rounded-md text-fg transition-colors duration-150 hover:bg-selected"
-    >
+    <IconButton onClick={toggleTheme} aria-label={label} title={label}>
       <Icon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-    </button>
+    </IconButton>
   );
 }
