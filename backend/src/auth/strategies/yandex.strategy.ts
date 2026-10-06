@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
 import { z } from 'zod';
+import { NAME_MAX_LENGTH } from '../../common/constants/person-validation';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
 import { ENV_KEYS } from '../../config/env.constants';
 import {
@@ -14,7 +15,6 @@ import {
   YANDEX_STRATEGY_NAME,
   YANDEX_TOKEN_URL,
 } from '../constants/oauth';
-import { NAME_MAX_LENGTH } from '../constants/validation';
 import type { OAuthProfile } from '../auth.types';
 
 const yandexProfileSchema = z.object({

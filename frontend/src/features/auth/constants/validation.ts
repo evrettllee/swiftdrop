@@ -1,4 +1,5 @@
 // Validation limits: must match backend/src/auth/constants/validation.ts
+// and backend/src/common/constants/person-validation.ts
 export const EMAIL_MAX_LENGTH = 255;
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 72;
@@ -12,7 +13,7 @@ export const PASSWORD_LOWERCASE_REGEX = /[a-zа-яё]/;
 export const PASSWORD_DIGIT_REGEX = /\d/;
 export const PASSWORD_SPECIAL_REGEX = /[^A-Za-zА-Яа-яЁё\d\s]/;
 // Letters of any alphabet with diacritics; parts are joined by one space, hyphen or apostrophe.
-// Same rule as NAME_PATTERN in backend/src/auth/constants/validation.ts: change both together.
+// Same rule as NAME_PATTERN in backend/src/common/constants/person-validation.ts: change both together.
 export const NAME_PATTERN = /^\p{L}[\p{L}\p{M}]*(?:[ '’-]\p{L}[\p{L}\p{M}]*)*$/u;
 export const PHONE_REGEX =new RegExp(`^\\+\\d{${PHONE_MIN_DIGITS},${PHONE_MAX_DIGITS}}$`);
 export const PHONE_SEPARATORS_REGEX = /[\s\-()]/g;
