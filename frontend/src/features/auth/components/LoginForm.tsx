@@ -22,7 +22,7 @@ export function LoginForm() {
       <Input
         label={AUTH_TEXTS.LABEL_EMAIL}
         type="email"
-        autoComplete="email"
+        autoComplete="username"
         placeholder={AUTH_TEXTS.PLACEHOLDER_EMAIL}
         {...field('email')}
       />
