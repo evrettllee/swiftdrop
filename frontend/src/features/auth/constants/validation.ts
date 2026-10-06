@@ -11,7 +11,10 @@ export const PASSWORD_UPPERCASE_REGEX = /[A-ZА-ЯЁ]/;
 export const PASSWORD_LOWERCASE_REGEX = /[a-zа-яё]/;
 export const PASSWORD_DIGIT_REGEX = /\d/;
 export const PASSWORD_SPECIAL_REGEX = /[^A-Za-zА-Яа-яЁё\d\s]/;
-export const PHONE_REGEX = new RegExp(`^\\+\\d{${PHONE_MIN_DIGITS},${PHONE_MAX_DIGITS}}$`);
+// Letters of any alphabet with diacritics; parts are joined by one space, hyphen or apostrophe.
+// Same rule as NAME_PATTERN in backend/src/auth/constants/validation.ts: change both together.
+export const NAME_PATTERN = /^\p{L}[\p{L}\p{M}]*(?:[ '’-]\p{L}[\p{L}\p{M}]*)*$/u;
+export const PHONE_REGEX =new RegExp(`^\\+\\d{${PHONE_MIN_DIGITS},${PHONE_MAX_DIGITS}}$`);
 export const PHONE_SEPARATORS_REGEX = /[\s\-()]/g;
 export const PHONE_SEPARATOR_REPLACEMENT = '';
 
@@ -25,9 +28,11 @@ export const VALIDATION_MESSAGES = {
   FIRST_NAME_REQUIRED: 'Введите имя',
   FIRST_NAME_TOO_SHORT: `Имя должно содержать минимум ${NAME_MIN_LENGTH} символа`,
   FIRST_NAME_TOO_LONG: `Имя должно содержать не больше ${NAME_MAX_LENGTH} символов`,
+  FIRST_NAME_INVALID: 'Имя может содержать только буквы, пробел, дефис и апостроф',
   LAST_NAME_REQUIRED: 'Введите фамилию',
   LAST_NAME_TOO_SHORT: `Фамилия должна содержать минимум ${NAME_MIN_LENGTH} символа`,
   LAST_NAME_TOO_LONG: `Фамилия должна содержать не больше ${NAME_MAX_LENGTH} символов`,
+  LAST_NAME_INVALID: 'Фамилия может содержать только буквы, пробел, дефис и апостроф',
   PHONE_REQUIRED: 'Введите телефон',
   PHONE_INVALID: `Введите номер полностью, например ${PHONE_EXAMPLE}`,
   PASSWORD_REQUIRED: 'Введите пароль',

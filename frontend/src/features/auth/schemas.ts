@@ -6,6 +6,7 @@ import {
   EMAIL_MAX_LENGTH,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
+  NAME_PATTERN,
   PASSWORD_MAX_LENGTH,
   PASSWORD_RULES,
   PHONE_REGEX,
@@ -38,8 +39,15 @@ const emailSchema = z
   .max(EMAIL_MAX_LENGTH, VALIDATION_MESSAGES.EMAIL_TOO_LONG)
   .pipe(z.email(VALIDATION_MESSAGES.EMAIL_INVALID));
 
-const buildNameSchema = (required: string, tooShort: string, tooLong: string) =>
-  z.string().trim().min(1, required).min(NAME_MIN_LENGTH, tooShort).max(NAME_MAX_LENGTH, tooLong);
+// The pattern is checked only after the length passes, so the field shows one clear message.
+const buildNameSchema = (required: string, tooShort: string, tooLong: string, invalid: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, required)
+    .min(NAME_MIN_LENGTH, tooShort)
+    .max(NAME_MAX_LENGTH, tooLong)
+    .pipe(z.string().regex(NAME_PATTERN, invalid));
 
 const phoneSchema = z
   .string()
@@ -70,11 +78,13 @@ export const registerFormSchema = z
       VALIDATION_MESSAGES.FIRST_NAME_REQUIRED,
       VALIDATION_MESSAGES.FIRST_NAME_TOO_SHORT,
       VALIDATION_MESSAGES.FIRST_NAME_TOO_LONG,
+      VALIDATION_MESSAGES.FIRST_NAME_INVALID,
     ),
     [AUTH_FIELD.LAST_NAME]: buildNameSchema(
       VALIDATION_MESSAGES.LAST_NAME_REQUIRED,
       VALIDATION_MESSAGES.LAST_NAME_TOO_SHORT,
       VALIDATION_MESSAGES.LAST_NAME_TOO_LONG,
+      VALIDATION_MESSAGES.LAST_NAME_INVALID,
     ),
     [AUTH_FIELD.EMAIL]: emailSchema,
     [AUTH_FIELD.PHONE]: phoneSchema,

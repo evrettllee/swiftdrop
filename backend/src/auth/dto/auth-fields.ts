@@ -4,6 +4,7 @@ import {
   EMAIL_MAX_LENGTH,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
+  NAME_PATTERN,
   PASSWORD_DIGIT_REGEX,
   PASSWORD_LOWERCASE_REGEX,
   PASSWORD_MAX_LENGTH,
@@ -15,8 +16,18 @@ import {
   PHONE_SEPARATORS_REGEX,
 } from '../constants/validation';
 
-export const buildNameSchema = (tooShortMessage: string, tooLongMessage: string) =>
-  z.string().trim().min(NAME_MIN_LENGTH, tooShortMessage).max(NAME_MAX_LENGTH, tooLongMessage);
+// The pattern is checked only after the length passes, so each field gets a single message.
+export const buildNameSchema = (
+  tooShortMessage: string,
+  tooLongMessage: string,
+  invalidMessage: string,
+) =>
+  z
+    .string()
+    .trim()
+    .min(NAME_MIN_LENGTH, tooShortMessage)
+    .max(NAME_MAX_LENGTH, tooLongMessage)
+    .pipe(z.string().regex(NAME_PATTERN, invalidMessage));
 
 export const emailSchema = z
   .string()
