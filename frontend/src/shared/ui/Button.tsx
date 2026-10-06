@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router';
 import { COLOR_TRANSITION_CLASS } from '../constants/styles';
+import { joinClassNames } from '../lib/classNames';
 import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'inverse';
@@ -25,14 +26,12 @@ type CommonProps = {
 };
 
 function buildClassName(variant: ButtonVariant, fullWidth: boolean, isLoading: boolean): string {
-  return [
+  return joinClassNames(
     BASE_CLASS,
     VARIANT_CLASSES[variant],
     fullWidth ? 'w-full' : '',
     isLoading ? 'pointer-events-none' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  );
 }
 
 type ButtonProps = CommonProps & { loading?: boolean } & Omit<

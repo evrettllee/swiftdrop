@@ -1,18 +1,15 @@
-import { latLngBounds, type LatLngTuple } from 'leaflet';
+import { latLngBounds } from 'leaflet';
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
-import type { GeoPoint } from '../../pricing/types';
+import type { GeoPoint } from '../../../shared/types';
 import { MAP_FIT_PADDING, MAP_ZOOM } from '../constants/map';
 import { usePrefersReducedMotion } from '../lib/useExpandedMap';
+import { toLatLng } from '../lib/latLng';
 
 type FitToPointsProps = {
   pickup: GeoPoint | null;
   delivery: GeoPoint | null;
 };
-
-function toLatLng(point: GeoPoint): LatLngTuple {
-  return [point.latitude, point.longitude];
-}
 
 // Moves the map to the points when they are not in view, for example after an address was chosen
 // in a field. Points that are visible never move the map, so clicks and drags do not make it jump.

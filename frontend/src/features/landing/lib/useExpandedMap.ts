@@ -1,16 +1,15 @@
 import type { Map as LeafletMap } from 'leaflet';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ESCAPE_KEY } from '../../../shared/constants/dom';
+import { matchesMediaQuery, subscribeToMediaQuery } from '../../../shared/lib/mediaQuery';
+import { useEscapeKey } from '../../../shared/lib/useEscapeKey';
 import { REDUCED_MOTION_QUERY } from '../constants/map';
 
 function subscribeToReducedMotion(onChange: () => void): () => void {
-  const query = window.matchMedia(REDUCED_MOTION_QUERY);
-  query.addEventListener('change', onChange);
-  return () => query.removeEventListener('change', onChange);
+  return subscribeToMediaQuery(REDUCED_MOTION_QUERY, onChange);
 }
 
 function readReducedMotion(): boolean {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+  return matchesMediaQuery(REDUCED_MOTION_QUERY);
 }
 
 // Leaflet animates zoom and moves in JavaScript, so the CSS `motion-reduce:` variant does not reach it.
@@ -30,25 +29,21 @@ export function useExpandedMap(map: LeafletMap | null) {
     map?.invalidateSize();
   }, [map, isExpanded]);
 
+  useEscapeKey(() => {
+    setIsExpanded(false);
+    toggleButtonRef.current?.focus();
+  }, isExpanded);
+
   useEffect(() => {
     if (!isExpanded) {
       return undefined;
     }
 
-    function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === ESCAPE_KEY) {
-        setIsExpanded(false);
-        toggleButtonRef.current?.focus();
-      }
-    }
-
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isExpanded]);
 

@@ -1,5 +1,6 @@
 import { MS_PER_MINUTE } from '../common/constants/time';
 import type { VehicleType } from '../common/enums/vehicle-type.enum';
+import { buildThrottleOverride } from '../common/utils/throttle';
 
 // Routes
 export const PRICING_ROUTES = {
@@ -60,6 +61,7 @@ export const PRICING_VALIDATION_MESSAGES = {
 export const PRICING_THROTTLE_LIMIT = 30;
 export const PRICING_THROTTLE_TTL_MS = MS_PER_MINUTE;
 
-export const PRICING_THROTTLE = {
-  default: { limit: PRICING_THROTTLE_LIMIT, ttl: PRICING_THROTTLE_TTL_MS },
-};
+export const PRICING_THROTTLE = buildThrottleOverride(
+  PRICING_THROTTLE_LIMIT,
+  PRICING_THROTTLE_TTL_MS,
+);

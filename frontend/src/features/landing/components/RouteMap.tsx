@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { MapContainer, Polyline, useMapEvents } from 'react-leaflet';
 import { IS_MAPBOX_CONFIGURED } from '../../../shared/config';
 import { CITY_CENTER } from '../../../shared/constants/map';
-import type { GeoPoint } from '../../pricing/types';
+import type { GeoPoint } from '../../../shared/types';
 import { MAP_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM } from '../constants/map';
 import { ROUTE_POINT } from '../constants/route-points';
+import { fromLatLng, toLatLng } from '../lib/latLng';
 import { useExpandedMap, usePrefersReducedMotion } from '../lib/useExpandedMap';
 import type { RoutePointKind } from '../types';
 import { FitToPoints } from './FitToPoints';
@@ -34,7 +35,7 @@ const MAP_EXPANDED_CLASS = 'fixed inset-0 z-50 bg-field';
 
 function ClickHandler({ onPick }: { onPick: (point: GeoPoint) => void }) {
   useMapEvents({
-    click: (event) => onPick({ latitude: event.latlng.lat, longitude: event.latlng.lng }),
+    click: (event) => onPick(fromLatLng(event.latlng)),
   });
 
   return null;
@@ -82,10 +83,7 @@ export function RouteMap({
           <FitToPoints pickup={pickup} delivery={delivery} />
           {pickup !== null && delivery !== null ? (
             <Polyline
-              positions={[
-                [pickup.latitude, pickup.longitude],
-                [delivery.latitude, delivery.longitude],
-              ]}
+              positions={[toLatLng(pickup), toLatLng(delivery)]}
               pathOptions={{ className: MAP_CLASS.LINE, interactive: false }}
             />
           ) : null}

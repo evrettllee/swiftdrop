@@ -27,6 +27,11 @@ export class ApiError extends Error {
   }
 }
 
+// An ApiError already carries a text for the user; anything else gets the caller's fallback.
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof ApiError ? error.message : fallback;
+}
+
 type RequestOptions = { method: string; body?: unknown };
 
 const errorBodySchema = z.object({

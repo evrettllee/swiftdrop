@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { matchesMediaQuery, subscribeToMediaQuery } from '../lib/mediaQuery';
 import { DARK_SCHEME_QUERY, THEME, THEME_STORAGE_KEY } from './constants';
 import type { Theme, ThemeState } from './types';
 
@@ -46,7 +47,7 @@ function readAppliedTheme(): Theme {
   if (isTheme(applied)) {
     theme = applied;
   } else {
-    theme = readStoredTheme() ?? themeFromScheme(window.matchMedia(DARK_SCHEME_QUERY).matches);
+    theme = readStoredTheme() ?? themeFromScheme(matchesMediaQuery(DARK_SCHEME_QUERY));
   }
 
   return theme;
@@ -66,12 +67,12 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 
 // Follows the system theme until the user makes an explicit choice.
 export function initTheme(): void {
-  window.matchMedia(DARK_SCHEME_QUERY).addEventListener('change', (event) => {
+  subscribeToMediaQuery(DARK_SCHEME_QUERY, (isDark) => {
     if (readStoredTheme() !== null) {
       return;
     }
 
-    const theme = themeFromScheme(event.matches);
+    const theme = themeFromScheme(isDark);
 
     applyTheme(theme);
     useThemeStore.setState({ theme });

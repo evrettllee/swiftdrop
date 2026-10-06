@@ -9,9 +9,10 @@ import {
 import { useMemo } from 'react';
 import { Marker, Tooltip } from 'react-leaflet';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
-import type { GeoPoint } from '../../pricing/types';
+import type { GeoPoint } from '../../../shared/types';
 import { MAP_CLASS, MAP_MARKER_HIT_SIZE, MAP_MARKER_TAG_OFFSET, MAP_TEXTS } from '../constants/map';
 import { ROUTE_POINT, ROUTE_POINT_LABELS } from '../constants/route-points';
+import { fromLatLng, toLatLng } from '../lib/latLng';
 import type { RoutePointKind } from '../types';
 
 // The wrapper covers the padding of the tag, the button is larger than its icon for a finger and
@@ -53,8 +54,7 @@ export function RouteMarker({ kind, point, onMove, onRemove }: RouteMarkerProps)
   const eventHandlers = useMemo(
     () => ({
       dragend: (event: LeafletEvent) => {
-        const { lat, lng } = (event.target as LeafletMarker).getLatLng();
-        onMove(kind, { latitude: lat, longitude: lng });
+        onMove(kind, fromLatLng((event.target as LeafletMarker).getLatLng()));
       },
     }),
     [kind, onMove],
@@ -63,7 +63,7 @@ export function RouteMarker({ kind, point, onMove, onRemove }: RouteMarkerProps)
 
   return (
     <Marker
-      position={[point.latitude, point.longitude]}
+      position={toLatLng(point)}
       icon={MARKER_ICONS[kind]}
       draggable
       // A marker cannot be moved or activated from the keyboard, so it is not a tab stop: the

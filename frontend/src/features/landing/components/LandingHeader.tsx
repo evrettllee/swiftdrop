@@ -1,8 +1,9 @@
 import { ListIcon, XIcon } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import { ESCAPE_KEY } from '../../../shared/constants/dom';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
 import { UI_TEXTS } from '../../../shared/constants/texts';
+import { subscribeToMediaQuery } from '../../../shared/lib/mediaQuery';
+import { useEscapeKey } from '../../../shared/lib/useEscapeKey';
 import { IconButton } from '../../../shared/ui/IconButton';
 import { Logo } from '../../../shared/ui/Logo';
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle';
@@ -19,30 +20,21 @@ import { MobileMenu } from './MobileMenu';
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const closeMenu = () => setIsMenuOpen(false);
 
   // The menu exists only on narrow screens, so it must not stay open after the window grows.
-  useEffect(() => {
-    const desktopQuery = window.matchMedia(LANDING_DESKTOP_MEDIA_QUERY);
-    const closeOnDesktop = (event: MediaQueryListEvent) => {
-      if (event.matches) {
-        setIsMenuOpen(false);
-      }
-    };
-    desktopQuery.addEventListener('change', closeOnDesktop);
-    return () => desktopQuery.removeEventListener('change', closeOnDesktop);
-  }, []);
+  useEffect(
+    () =>
+      subscribeToMediaQuery(LANDING_DESKTOP_MEDIA_QUERY, (isDesktop) => {
+        if (isDesktop) {
+          setIsMenuOpen(false);
+        }
+      }),
+    [],
+  );
 
-  useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === ESCAPE_KEY) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener('keydown', closeOnEscape);
-    return () => document.removeEventListener('keydown', closeOnEscape);
-  }, []);
+  useEscapeKey(closeMenu, isMenuOpen);
 
-  const closeMenu = () => setIsMenuOpen(false);
   const MenuIcon = isMenuOpen ? XIcon : ListIcon;
   const menuLabel = isMenuOpen ? LANDING_TEXTS.CLOSE_MENU : LANDING_TEXTS.OPEN_MENU;
 

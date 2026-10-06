@@ -1,12 +1,11 @@
 import { useForm } from '../../../shared/lib/useForm';
-import { Button } from '../../../shared/ui/Button';
 import { Checkbox } from '../../../shared/ui/Checkbox';
-import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Input } from '../../../shared/ui/Input';
 import { AUTH_FIELD, REGISTER_INITIAL_VALUES } from '../constants/forms';
 import { AUTH_TEXTS } from '../constants/texts';
 import { registerFormSchema } from '../schemas';
 import { useAuthStore } from '../store';
+import { FormFooter } from './FormFooter';
 import { LegalLinks } from './LegalLinks';
 import { PasswordField } from './PasswordField';
 import { PasswordRequirements } from './PasswordRequirements';
@@ -73,12 +72,12 @@ export function RegisterForm() {
         }
         {...checkbox(AUTH_FIELD.TERMS)}
       />
-      {formError === null ? null : <InlineAlert variant="error">{formError}</InlineAlert>}
-      <div className="pt-2">
-        <Button type="submit" fullWidth loading={isSubmitting}>
-          {isSubmitting ? AUTH_TEXTS.SUBMITTING_REGISTER : AUTH_TEXTS.SUBMIT_REGISTER}
-        </Button>
-      </div>
+      <FormFooter
+        formError={formError}
+        isSubmitting={isSubmitting}
+        submitLabel={AUTH_TEXTS.SUBMIT_REGISTER}
+        submittingLabel={AUTH_TEXTS.SUBMITTING_REGISTER}
+      />
     </form>
   );
 }

@@ -1,5 +1,6 @@
 import {
   DEFAULT_PORT,
+  ENV_KEYS,
   JWT_SECRET_MIN_LENGTH,
   MIN_REQUIRED_LENGTH,
   PORT_MAX,
@@ -21,24 +22,24 @@ function requireString(
 }
 
 export function validateEnv(config: Record<string, unknown>) {
-  const rawPort = config.PORT ?? DEFAULT_PORT;
+  const rawPort = config[ENV_KEYS.PORT] ?? DEFAULT_PORT;
   const port = Number(rawPort);
 
   if (!Number.isInteger(port) || port < PORT_MIN || port > PORT_MAX) {
     throw new Error(
-      `PORT must be an integer between ${PORT_MIN} and ${PORT_MAX}, got: ${JSON.stringify(rawPort)}`,
+      `${ENV_KEYS.PORT} must be an integer between ${PORT_MIN} and ${PORT_MAX}, got: ${JSON.stringify(rawPort)}`,
     );
   }
 
-  requireString(config, 'DATABASE_URL');
-  requireString(config, 'OSRM_URL');
-  requireString(config, 'JWT_ACCESS_SECRET', JWT_SECRET_MIN_LENGTH);
-  requireString(config, 'GOOGLE_CLIENT_ID');
-  requireString(config, 'GOOGLE_CLIENT_SECRET');
-  requireString(config, 'GOOGLE_CALLBACK_URL');
-  requireString(config, 'YANDEX_CLIENT_ID');
-  requireString(config, 'YANDEX_CLIENT_SECRET');
-  requireString(config, 'YANDEX_CALLBACK_URL');
+  requireString(config, ENV_KEYS.DATABASE_URL);
+  requireString(config, ENV_KEYS.OSRM_URL);
+  requireString(config, ENV_KEYS.JWT_ACCESS_SECRET, JWT_SECRET_MIN_LENGTH);
+  requireString(config, ENV_KEYS.GOOGLE_CLIENT_ID);
+  requireString(config, ENV_KEYS.GOOGLE_CLIENT_SECRET);
+  requireString(config, ENV_KEYS.GOOGLE_CALLBACK_URL);
+  requireString(config, ENV_KEYS.YANDEX_CLIENT_ID);
+  requireString(config, ENV_KEYS.YANDEX_CLIENT_SECRET);
+  requireString(config, ENV_KEYS.YANDEX_CALLBACK_URL);
 
-  return { ...config, PORT: port };
+  return { ...config, [ENV_KEYS.PORT]: port };
 }

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ENV_KEYS } from '../config/env.constants';
 import { UsersModule } from '../users/users.module';
 import { AuthCookiesService } from './auth-cookies.service';
 import { ACCESS_TOKEN_TTL_SECONDS } from './constants/tokens';
@@ -23,7 +24,7 @@ import { TokensService } from './tokens.service';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<string>('JWT_ACCESS_SECRET'),
+        secret: config.getOrThrow<string>(ENV_KEYS.JWT_ACCESS_SECRET),
         signOptions: { expiresIn: ACCESS_TOKEN_TTL_SECONDS },
       }),
     }),

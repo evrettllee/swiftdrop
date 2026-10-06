@@ -12,6 +12,7 @@ import {
   THROTTLE_ERROR_MESSAGE,
 } from './common/constants/http';
 import { CsrfGuard } from './common/guards/csrf.guard';
+import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { PricingModule } from './pricing/pricing.module';
@@ -21,7 +22,7 @@ import { ZonesModule } from './zones/zones.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['../.env'],
+      envFilePath: [ENV_FILE_PATH],
       validate: validateEnv,
     }),
     ScheduleModule.forRoot(),

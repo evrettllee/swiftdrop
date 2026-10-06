@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Request, Response } from 'express';
-import { NODE_ENV_PRODUCTION } from '../config/env.constants';
+import { ENV_KEYS, NODE_ENV_PRODUCTION } from '../config/env.constants';
 import type { OAuthProvider } from '../common/enums/oauth-provider.enum';
 import {
   OAUTH_STATE_COOKIE_BASE_PATH,
@@ -18,6 +18,13 @@ import {
   REFRESH_TOKEN_TTL_MS,
 } from './constants/tokens';
 import type { AuthResult } from './auth.types';
+
+// A plain function, so the JWT strategy can use it before `this` exists in its constructor.
+export function readCookie(request: Request, name: string): string | undefined {
+  const value: unknown = request.cookies?.[name];
+
+  return typeof value === 'string' ? value : undefined;
+}
 
 @Injectable()
 export class AuthCookiesService {
@@ -40,7 +47,7 @@ export class AuthCookiesService {
   }
 
   getRefreshToken(request: Request): string | undefined {
-    return this.readCookie(request, REFRESH_COOKIE_NAME);
+    return readCookie(request, REFRESH_COOKIE_NAME);
   }
 
   setOAuthState(response: Response, provider: OAuthProvider, state: string): void {
@@ -58,7 +65,7 @@ export class AuthCookiesService {
   }
 
   getOAuthState(request: Request, provider: OAuthProvider): string | undefined {
-    return this.readCookie(request, this.buildStateCookieName(provider));
+    return readCookie(request, this.buildStateCookieName(provider));
   }
 
   private buildStateCookieName(provider: OAuthProvider): string {
@@ -70,17 +77,11 @@ export class AuthCookiesService {
     return `${OAUTH_STATE_COOKIE_BASE_PATH}/${provider}`;
   }
 
-  private readCookie(request: Request, name: string): string | undefined {
-    const value: unknown = request.cookies?.[name];
-
-    return typeof value === 'string' ? value : undefined;
-  }
-
   // Options must match between set and clear, otherwise the browser keeps the cookie.
   private buildBaseOptions(path: string): CookieOptions {
     return {
       httpOnly: true,
-      secure: this.config.get<string>('NODE_ENV') === NODE_ENV_PRODUCTION,
+      secure: this.config.get<string>(ENV_KEYS.NODE_ENV) === NODE_ENV_PRODUCTION,
       sameSite: AUTH_COOKIE_SAME_SITE,
       path,
     };

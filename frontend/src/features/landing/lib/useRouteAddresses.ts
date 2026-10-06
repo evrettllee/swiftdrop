@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { GeoPoint } from '../../../shared/types';
 import { findAddressByPoint } from '../../geocoding/api';
 import type { AddressSuggestion } from '../../geocoding/types';
-import type { GeoPoint } from '../../pricing/types';
 import { POINT_ON_MAP_TEXT, ROUTE_POINT, ROUTE_POINT_ORDER } from '../constants/route-points';
 import type { RoutePointKind } from '../types';
 import { useRoutePoints } from './useRoutePoints';

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { type Profile, Strategy } from 'passport-google-oauth20';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
+import { ENV_KEYS } from '../../config/env.constants';
 import { GOOGLE_SCOPES, GOOGLE_STRATEGY_NAME, OAUTH_ERROR_MESSAGES } from '../constants/oauth';
 import { NAME_MAX_LENGTH } from '../constants/validation';
 import type { OAuthProfile } from '../auth.types';
@@ -11,9 +12,9 @@ import type { OAuthProfile } from '../auth.types';
 export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_STRATEGY_NAME) {
   constructor(config: ConfigService) {
     super({
-      clientID: config.getOrThrow<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: config.getOrThrow<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: config.getOrThrow<string>('GOOGLE_CALLBACK_URL'),
+      clientID: config.getOrThrow<string>(ENV_KEYS.GOOGLE_CLIENT_ID),
+      clientSecret: config.getOrThrow<string>(ENV_KEYS.GOOGLE_CLIENT_SECRET),
+      callbackURL: config.getOrThrow<string>(ENV_KEYS.GOOGLE_CALLBACK_URL),
       scope: GOOGLE_SCOPES,
     });
   }
