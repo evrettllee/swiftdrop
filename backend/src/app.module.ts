@@ -15,6 +15,7 @@ import { CsrfGuard } from './common/guards/csrf.guard';
 import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
+import { OrdersModule } from './orders/orders.module';
 import { PricingModule } from './pricing/pricing.module';
 import { ZonesModule } from './zones/zones.module';
 
@@ -34,6 +35,7 @@ import { ZonesModule } from './zones/zones.module';
     AuthModule,
     ZonesModule,
     PricingModule,
+    OrdersModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

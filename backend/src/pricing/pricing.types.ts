@@ -24,3 +24,9 @@ export type PriceEstimate = {
   estimatedMinutes: number;
   coefficient: number;
 };
+
+export type PriceQuote = {
+  estimate: PriceEstimate;
+  // The tariff of the pickup zone: an order keeps it, so its price stays explainable later.
+  tariffId: number;
+};

@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { buildNameSchema, phoneSchema } from '../../common/schemas/person-fields.schema';
 import { AUTH_VALIDATION_MESSAGES } from '../constants/validation';
-import { buildNameSchema, emailSchema, passwordSchema, phoneSchema } from './auth-fields';
+import { emailSchema, passwordSchema } from './auth-fields';
 
 export const registerSchema = z.object({
   firstName: buildNameSchema(
