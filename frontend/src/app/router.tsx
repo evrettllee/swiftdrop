@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router';
-import { APP_ROUTES, CATCH_ALL_ROUTE } from '../shared/constants';
+import { APP_ROUTES, CATCH_ALL_ROUTE } from '../shared/constants/routes';
 import { PageLoader } from '../shared/ui/PageLoader';
 import { GuestRoute } from './GuestRoute';
 import { PLACEHOLDER_TEXTS } from './constants';

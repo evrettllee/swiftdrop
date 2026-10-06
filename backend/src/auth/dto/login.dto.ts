@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AUTH_VALIDATION_MESSAGES, PASSWORD_LOGIN_MIN_LENGTH } from '../auth.constants';
+import { AUTH_VALIDATION_MESSAGES, PASSWORD_LOGIN_MIN_LENGTH } from '../constants/validation';
 import { emailSchema } from './auth-fields';
 
 export const loginSchema = z.object({

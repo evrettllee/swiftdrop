@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router';
-import { AUTH_STATUS } from '../features/auth/constants';
+import { AUTH_STATUS } from '../features/auth/constants/session';
 import { useAuthStore } from '../features/auth/store';
-import { APP_ROUTES } from '../shared/constants';
+import { APP_ROUTES } from '../shared/constants/routes';
 import { PageLoader } from '../shared/ui/PageLoader';
 
 // Pages for guests only (sign in, sign up): a signed-in user is sent home.

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type { OAuthProvider } from '../common/enums/oauth-provider.enum';
 import { AuthCookiesService } from './auth-cookies.service';
-import { OAUTH_STATE_BYTES, OAUTH_STATE_ENCODING } from './auth.constants';
+import { OAUTH_STATE_BYTES, OAUTH_STATE_ENCODING } from './constants/oauth';
 
 @Injectable()
 export class OAuthStateService {

@@ -10,7 +10,7 @@ import {
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
-} from './common/common.constants';
+} from './common/constants/http';
 import { CsrfGuard } from './common/guards/csrf.guard';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';

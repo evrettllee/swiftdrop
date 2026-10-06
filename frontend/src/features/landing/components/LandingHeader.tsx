@@ -1,12 +1,8 @@
 import { ListIcon, XIcon } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import {
-  COLOR_TRANSITION_CLASS,
-  ESCAPE_KEY,
-  ICON_SIZE,
-  ICON_WEIGHT,
-  UI_TEXTS,
-} from '../../../shared/constants';
+import { ESCAPE_KEY } from '../../../shared/constants/dom';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { UI_TEXTS } from '../../../shared/constants/texts';
 import { IconButton } from '../../../shared/ui/IconButton';
 import { Logo } from '../../../shared/ui/Logo';
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle';
@@ -15,10 +11,9 @@ import {
   LANDING_DESKTOP_MEDIA_QUERY,
   LANDING_HEADER_HEIGHT_CLASS,
   LANDING_MOBILE_MENU_ID,
-  LANDING_NAV_ITEMS,
-  LANDING_SECTION_ID,
-  LANDING_TEXTS,
-} from '../constants';
+} from '../constants/layout';
+import { LANDING_NAV_ITEMS, LANDING_SECTION_ID } from '../constants/navigation';
+import { LANDING_TEXTS } from '../constants/texts';
 import { AuthActions } from './AuthActions';
 import { MobileMenu } from './MobileMenu';
 

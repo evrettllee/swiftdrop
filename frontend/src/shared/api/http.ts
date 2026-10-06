@@ -11,7 +11,7 @@ import {
   NETWORK_ERROR_STATUS,
   NO_RETRY_PATHS,
   REFRESH_PATH,
-} from '../constants';
+} from '../constants/api';
 
 export type FieldError = { field: string; message: string };
 

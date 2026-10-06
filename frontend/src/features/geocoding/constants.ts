@@ -1,4 +1,4 @@
-import { CITY_CENTER, MAPBOX_API_ORIGIN } from '../../shared/constants';
+import { CITY_CENTER, MAPBOX_API_ORIGIN } from '../../shared/constants/map';
 
 const [CITY_CENTER_LATITUDE, CITY_CENTER_LONGITUDE] = CITY_CENTER;
 

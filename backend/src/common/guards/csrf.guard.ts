@@ -10,7 +10,7 @@ import {
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
   SAFE_HTTP_METHODS,
-} from '../common.constants';
+} from '../constants/csrf';
 
 // Browsers cannot add a custom header to a cross-site request without CORS approval,
 // and CORS is not enabled, so a forged request from another site never carries it.

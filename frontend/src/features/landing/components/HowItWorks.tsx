@@ -1,4 +1,5 @@
-import { HOW_IT_WORKS, LANDING_SECTION_ID } from '../constants';
+import { LANDING_SECTION_ID } from '../constants/navigation';
+import { HOW_IT_WORKS } from '../constants/sections';
 import { LandingSection } from './LandingSection';
 import { ResponsiveText } from './ResponsiveText';
 import { SectionHeading } from './SectionHeading';

@@ -1,6 +1,7 @@
 import { ChatCircleIcon, ClockIcon, MapPinIcon, type Icon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { LANDING_SECTION_ID, TRACKING } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { LANDING_SECTION_ID } from '../constants/navigation';
+import { TRACKING } from '../constants/sections';
 import { LandingSection } from './LandingSection';
 import { TrackingCard } from './TrackingCard';
 

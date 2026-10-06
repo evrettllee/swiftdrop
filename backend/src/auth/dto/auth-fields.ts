@@ -13,7 +13,7 @@ import {
   PHONE_REGEX,
   PHONE_SEPARATOR_REPLACEMENT,
   PHONE_SEPARATORS_REGEX,
-} from '../auth.constants';
+} from '../constants/validation';
 
 export const buildNameSchema = (tooShortMessage: string, tooLongMessage: string) =>
   z.string().trim().min(NAME_MIN_LENGTH, tooShortMessage).max(NAME_MAX_LENGTH, tooLongMessage);

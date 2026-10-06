@@ -1,5 +1,6 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
-import { COLOR_TRANSITION_CLASS, ID_PART } from '../constants';
+import { ID_PART } from '../constants/dom';
+import { COLOR_TRANSITION_CLASS } from '../constants/styles';
 import { FieldError } from './FieldError';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {

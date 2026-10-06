@@ -1,6 +1,6 @@
-import { APP_ROUTES } from '../../../shared/constants';
+import { APP_ROUTES } from '../../../shared/constants/routes';
 import { TextLink } from '../../../shared/ui/TextLink';
-import { AUTH_TEXTS } from '../constants';
+import { AUTH_TEXTS } from '../constants/texts';
 
 // "Terms of use and privacy policy": both open in a new tab, so a half-filled form is not lost.
 export function LegalLinks() {

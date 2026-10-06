@@ -1,9 +1,9 @@
 import {
-  CALCULATOR_TEXTS,
   DISTANCE_FRACTION_DIGITS,
   PRICE_FRACTION_DIGITS,
   PRICING_LOCALE,
-} from '../constants';
+} from '../constants/estimate';
+import { CALCULATOR_TEXTS } from '../constants/texts';
 
 const priceFormat = new Intl.NumberFormat(PRICING_LOCALE, {
   minimumFractionDigits: PRICE_FRACTION_DIGITS,

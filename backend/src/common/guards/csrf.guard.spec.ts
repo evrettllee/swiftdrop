@@ -4,7 +4,7 @@ import {
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
   SAFE_HTTP_METHODS,
-} from '../common.constants';
+} from '../constants/csrf';
 import { CsrfGuard } from './csrf.guard';
 
 const UNSAFE_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];

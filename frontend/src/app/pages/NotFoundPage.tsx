@@ -1,5 +1,6 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
-import { APP_ROUTES, UI_TEXTS } from '../../shared/constants';
+import { APP_ROUTES } from '../../shared/constants/routes';
+import { UI_TEXTS } from '../../shared/constants/texts';
 import { LinkButton } from '../../shared/ui/Button';
 import { ErrorScreen } from '../components/ErrorScreen';
 import { APP_TEXTS } from '../constants';

@@ -6,8 +6,8 @@ import {
 } from '@phosphor-icons/react';
 import type { Map as LeafletMap } from 'leaflet';
 import type { RefObject } from 'react';
-import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { MAP_TEXTS } from '../constants';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { MAP_TEXTS } from '../constants/map';
 import { usePrefersReducedMotion } from '../lib/useExpandedMap';
 
 const BUTTON_CLASS = `flex size-11 items-center justify-center text-fg hover:bg-selected active:bg-border ${COLOR_TRANSITION_CLASS}`;

@@ -1,4 +1,5 @@
-import { MAIN_CONTENT_ID, UI_TEXTS } from '../constants';
+import { MAIN_CONTENT_ID } from '../constants/dom';
+import { UI_TEXTS } from '../constants/texts';
 
 // The first focusable element of a page: hidden until it gets focus from the keyboard.
 export function SkipLink() {

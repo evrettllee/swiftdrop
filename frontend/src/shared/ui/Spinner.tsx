@@ -1,4 +1,4 @@
-import { UI_TEXTS } from '../constants';
+import { UI_TEXTS } from '../constants/texts';
 
 type SpinnerProps = {
   tone?: 'accent' | 'on-primary';

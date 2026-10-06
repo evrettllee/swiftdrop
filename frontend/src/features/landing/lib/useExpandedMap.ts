@@ -1,7 +1,7 @@
 import type { Map as LeafletMap } from 'leaflet';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ESCAPE_KEY } from '../../../shared/constants';
-import { REDUCED_MOTION_QUERY } from '../constants';
+import { ESCAPE_KEY } from '../../../shared/constants/dom';
+import { REDUCED_MOTION_QUERY } from '../constants/map';
 
 function subscribeToReducedMotion(onChange: () => void): () => void {
   const query = window.matchMedia(REDUCED_MOTION_QUERY);

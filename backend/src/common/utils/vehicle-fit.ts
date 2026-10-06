@@ -1,4 +1,4 @@
-import { VEHICLE_LIMITS } from '../common.constants';
+import { VEHICLE_LIMITS } from '../constants/vehicles';
 import type { PackageSpec } from '../common.types';
 import { VEHICLE_TYPE_VALUES } from '../enums/vehicle-type.enum';
 import type { VehicleType } from '../enums/vehicle-type.enum';

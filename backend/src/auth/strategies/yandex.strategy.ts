@@ -5,7 +5,6 @@ import { Strategy } from 'passport-oauth2';
 import { z } from 'zod';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
 import {
-  NAME_MAX_LENGTH,
   OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,
   YANDEX_AUTHORIZATION_URL,
@@ -13,7 +12,8 @@ import {
   YANDEX_PROFILE_URL,
   YANDEX_STRATEGY_NAME,
   YANDEX_TOKEN_URL,
-} from '../auth.constants';
+} from '../constants/oauth';
+import { NAME_MAX_LENGTH } from '../constants/validation';
 import type { OAuthProfile } from '../auth.types';
 
 const yandexProfileSchema = z.object({

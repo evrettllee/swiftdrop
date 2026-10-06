@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { CHECKBOX_CHECKED_VALUE } from '../../shared/constants';
+import { CHECKBOX_CHECKED_VALUE } from '../../shared/constants/forms';
+import { AUTH_FIELD } from './constants/forms';
+import { ROLE_VALUES } from './constants/session';
 import {
-  AUTH_FIELD,
   EMAIL_MAX_LENGTH,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
@@ -10,9 +11,8 @@ import {
   PHONE_REGEX,
   PHONE_SEPARATOR_REPLACEMENT,
   PHONE_SEPARATORS_REGEX,
-  ROLE_VALUES,
   VALIDATION_MESSAGES,
-} from './constants';
+} from './constants/validation';
 
 // Responses of the backend
 

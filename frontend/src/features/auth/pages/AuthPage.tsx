@@ -1,13 +1,10 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
-import {
-  APP_ROUTES,
-  ICON_SIZE,
-  ICON_WEIGHT,
-  MAIN_CONTENT_ID,
-  UI_TEXTS,
-} from '../../../shared/constants';
+import { MAIN_CONTENT_ID } from '../../../shared/constants/dom';
+import { APP_ROUTES } from '../../../shared/constants/routes';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { UI_TEXTS } from '../../../shared/constants/texts';
 import { LinkButton } from '../../../shared/ui/Button';
 import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Logo } from '../../../shared/ui/Logo';
@@ -24,8 +21,8 @@ import {
   AUTH_ID_PREFIX,
   AUTH_TAB,
   AUTH_TAB_QUERY_PARAM,
-  AUTH_TEXTS,
-} from '../constants';
+} from '../constants/page';
+import { AUTH_TEXTS } from '../constants/texts';
 import type { AuthTabId } from '../types';
 
 const TABS = [

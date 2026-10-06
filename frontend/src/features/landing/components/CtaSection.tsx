@@ -1,5 +1,6 @@
 import { LinkButton } from '../../../shared/ui/Button';
-import { CTA_TEXTS, LANDING_SECTION_ID, LANDING_SIGN_UP_ROUTE } from '../constants';
+import { LANDING_SECTION_ID, LANDING_SIGN_UP_ROUTE } from '../constants/navigation';
+import { CTA_TEXTS } from '../constants/sections';
 import { LandingSection } from './LandingSection';
 
 export function CtaSection() {

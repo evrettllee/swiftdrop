@@ -1,6 +1,7 @@
 import { CheckIcon } from '@phosphor-icons/react';
 import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
-import { ICON_SIZE, ICON_WEIGHT, ID_PART } from '../constants';
+import { ID_PART } from '../constants/dom';
+import { ICON_SIZE, ICON_WEIGHT } from '../constants/styles';
 import { FieldError } from './FieldError';
 
 export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'type'> & {

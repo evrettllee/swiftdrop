@@ -1,8 +1,9 @@
-import { APP_ROUTES } from '../../../shared/constants';
+import { APP_ROUTES } from '../../../shared/constants/routes';
 import { LinkButton } from '../../../shared/ui/Button';
-import { AUTH_STATUS } from '../../auth/constants';
+import { AUTH_STATUS } from '../../auth/constants/session';
 import { useAuthStore } from '../../auth/store';
-import { LANDING_SIGN_UP_ROUTE, LANDING_TEXTS } from '../constants';
+import { LANDING_SIGN_UP_ROUTE } from '../constants/navigation';
+import { LANDING_TEXTS } from '../constants/texts';
 
 type AuthActionsProps = {
   // In the mobile menu the buttons take the full width and the main action goes first.

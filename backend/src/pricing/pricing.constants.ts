@@ -1,4 +1,4 @@
-import { MS_PER_MINUTE } from '../common/common.constants';
+import { MS_PER_MINUTE } from '../common/constants/time';
 import type { VehicleType } from '../common/enums/vehicle-type.enum';
 
 // Routes

@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { useAuthStore } from '../../features/auth/store';
-import { APP_ROUTES, UI_TEXTS } from '../../shared/constants';
+import { APP_ROUTES } from '../../shared/constants/routes';
+import { UI_TEXTS } from '../../shared/constants/texts';
 import { APP_TEXTS } from '../constants';
 
 export function ProfilePage() {

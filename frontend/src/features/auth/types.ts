@@ -1,5 +1,6 @@
 import type { z } from 'zod';
-import type { AUTH_STATUS, AUTH_TAB, ROLE_VALUES } from './constants';
+import type { AUTH_TAB } from './constants/page';
+import type { AUTH_STATUS, ROLE_VALUES } from './constants/session';
 import type { authUserSchema } from './schemas';
 
 export type AuthUser = z.infer<typeof authUserSchema>;

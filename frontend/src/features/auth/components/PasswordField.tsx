@@ -1,8 +1,8 @@
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
 import { Input, type InputProps } from '../../../shared/ui/Input';
-import { AUTH_TEXTS } from '../constants';
+import { AUTH_TEXTS } from '../constants/texts';
 
 type PasswordFieldProps = Omit<InputProps, 'type' | 'endAdornment'>;
 

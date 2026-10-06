@@ -1,6 +1,6 @@
 import { ChatCircleIcon, ClockIcon, MapPinIcon, StarIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { TRACKING } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { TRACKING } from '../constants/sections';
 import { ButtonLookalike } from './ButtonLookalike';
 import { TrackingMap } from './TrackingMap';
 

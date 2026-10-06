@@ -1,4 +1,4 @@
-import { FEATURES } from '../constants';
+import { FEATURES } from '../constants/sections';
 import { ButtonLookalike } from './ButtonLookalike';
 import { FeatureCard } from './FeatureCard';
 

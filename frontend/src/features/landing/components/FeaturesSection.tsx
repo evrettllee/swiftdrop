@@ -1,4 +1,5 @@
-import { FEATURES, LANDING_SECTION_ID } from '../constants';
+import { LANDING_SECTION_ID } from '../constants/navigation';
+import { FEATURES } from '../constants/sections';
 import { ChatCard } from './ChatCard';
 import { CodeCard } from './CodeCard';
 import { LandingSection } from './LandingSection';

@@ -1,6 +1,7 @@
 import { Checkbox } from '../../../shared/ui/Checkbox';
 import { Input } from '../../../shared/ui/Input';
-import { CALCULATOR_TEXTS, PACKAGE_DIMENSIONS, PACKAGE_FIELD } from '../constants';
+import { PACKAGE_DIMENSIONS, PACKAGE_FIELD } from '../constants/package';
+import { CALCULATOR_TEXTS } from '../constants/texts';
 import type { PackageForm } from '../lib/usePackageForm';
 
 type PackageFieldsProps = {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FAQ, LANDING_SECTION_ID } from '../constants';
+import { LANDING_SECTION_ID } from '../constants/navigation';
+import { FAQ } from '../constants/sections';
 import { FaqItem } from './FaqItem';
 import { LandingSection } from './LandingSection';
 
