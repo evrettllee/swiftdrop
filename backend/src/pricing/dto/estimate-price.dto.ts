@@ -7,7 +7,7 @@ import {
   PRICING_VALIDATION_MESSAGES,
 } from '../pricing.constants';
 
-const pointSchema = z.object({
+export const geoPointSchema = z.object({
   latitude: z
     .number(PRICING_VALIDATION_MESSAGES.LATITUDE_INVALID)
     .min(LATITUDE_MIN, PRICING_VALIDATION_MESSAGES.LATITUDE_INVALID)
@@ -22,16 +22,18 @@ const packageValueSchema = z
   .number(PRICING_VALIDATION_MESSAGES.PACKAGE_VALUE_INVALID)
   .positive(PRICING_VALIDATION_MESSAGES.PACKAGE_VALUE_INVALID);
 
+export const packageSpecSchema = z.object({
+  weightKg: packageValueSchema,
+  lengthCm: packageValueSchema,
+  widthCm: packageValueSchema,
+  heightCm: packageValueSchema,
+  isFragile: z.boolean(PRICING_VALIDATION_MESSAGES.FRAGILE_INVALID).default(false),
+});
+
 export const estimatePriceSchema = z.object({
-  pickup: pointSchema,
-  delivery: pointSchema,
-  package: z.object({
-    weightKg: packageValueSchema,
-    lengthCm: packageValueSchema,
-    widthCm: packageValueSchema,
-    heightCm: packageValueSchema,
-    isFragile: z.boolean(PRICING_VALIDATION_MESSAGES.FRAGILE_INVALID).default(false),
-  }),
+  pickup: geoPointSchema,
+  delivery: geoPointSchema,
+  package: packageSpecSchema,
 });
 
 export type EstimatePriceDto = z.infer<typeof estimatePriceSchema>;

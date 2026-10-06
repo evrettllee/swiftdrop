@@ -23,7 +23,7 @@ import {
   PICKUP_BUFFER_MINUTES,
   PRICING_ERROR_MESSAGES,
 } from './pricing.constants';
-import type { PriceEstimate, TariffRates } from './pricing.types';
+import type { PriceEstimate, PriceQuote, TariffRates } from './pricing.types';
 
 @Injectable()
 export class PricingService {
@@ -36,6 +36,13 @@ export class PricingService {
   ) {}
 
   async estimate(dto: EstimatePriceDto): Promise<PriceEstimate> {
+    const { estimate } = await this.quote(dto);
+
+    return estimate;
+  }
+
+  // The estimate together with the tariff of the pickup zone, which an order stores with its price.
+  async quote(dto: EstimatePriceDto): Promise<PriceQuote> {
     const vehicleType = findLightestVehicle(dto.package);
 
     if (vehicleType === null) {
@@ -66,11 +73,14 @@ export class PricingService {
     const coefficient = NEUTRAL_COEFFICIENT;
 
     return {
-      price: calculatePrice({ distanceKm, spec: dto.package, vehicleType, rates, coefficient }),
-      currency: CURRENCY,
-      distanceKm,
-      estimatedMinutes: Math.ceil(route.durationSec / SECONDS_PER_MINUTE) + PICKUP_BUFFER_MINUTES,
-      coefficient,
+      tariffId: pickupZone.tariffId,
+      estimate: {
+        price: calculatePrice({ distanceKm, spec: dto.package, vehicleType, rates, coefficient }),
+        currency: CURRENCY,
+        distanceKm,
+        estimatedMinutes: Math.ceil(route.durationSec / SECONDS_PER_MINUTE) + PICKUP_BUFFER_MINUTES,
+        coefficient,
+      },
     };
   }
 
