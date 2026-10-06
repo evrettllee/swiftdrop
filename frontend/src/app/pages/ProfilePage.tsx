@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { useAuthStore } from '../../features/auth/store';
-import { APP_ROUTES } from '../../shared/constants';
+import { APP_ROUTES, UI_TEXTS } from '../../shared/constants';
 import { APP_TEXTS } from '../constants';
 
 export function ProfilePage() {
@@ -16,7 +16,7 @@ export function ProfilePage() {
         {APP_TEXTS.PROFILE_ROLE}: {user?.role}
       </p>
       <Link to={APP_ROUTES.HOME} className="text-accent underline">
-        {APP_TEXTS.BACK_HOME}
+        {UI_TEXTS.BACK_HOME}
       </Link>
     </main>
   );

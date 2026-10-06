@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { LANDING_CONTAINER_CLASS, LANDING_SCROLL_OFFSET_CLASS } from '../constants';
 
 type LandingSectionProps = {
   id: string;
@@ -8,8 +9,6 @@ type LandingSectionProps = {
   children: ReactNode;
 };
 
-// The scroll offset is the height of the sticky header, so a band stops right under it.
-const BASE_CLASS = 'scroll-mt-14 lg:scroll-mt-16';
 const TONE_CLASS = {
   page: '',
   surface: 'border-y border-border bg-surface',
@@ -20,8 +19,8 @@ const TONE_CLASS = {
 // and 96px above and below.
 export function LandingSection({ id, tone = 'page', children }: LandingSectionProps) {
   return (
-    <section id={id} className={`${BASE_CLASS} ${TONE_CLASS[tone]}`}>
-      <div className="mx-auto w-full max-w-7xl px-4 py-24 lg:px-12">{children}</div>
+    <section id={id} className={`${LANDING_SCROLL_OFFSET_CLASS} ${TONE_CLASS[tone]}`}>
+      <div className={`${LANDING_CONTAINER_CLASS} w-full py-24`}>{children}</div>
     </section>
   );
 }

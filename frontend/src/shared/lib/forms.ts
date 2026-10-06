@@ -1,3 +1,5 @@
+import { INVALID_FIELD_SELECTOR } from '../constants';
+
 type Issue = { path: PropertyKey[]; message: string };
 
 // Keeps the first message for each field.
@@ -16,5 +18,5 @@ export function collectFieldErrors(issues: ReadonlyArray<Issue>): Record<string,
 }
 
 export function focusFirstInvalid(form: HTMLFormElement | null): void {
-  form?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  form?.querySelector<HTMLElement>(INVALID_FIELD_SELECTOR)?.focus();
 }

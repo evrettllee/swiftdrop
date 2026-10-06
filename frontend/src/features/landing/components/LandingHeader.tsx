@@ -1,10 +1,19 @@
 import { ListIcon, XIcon } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import { ESCAPE_KEY, ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import {
+  COLOR_TRANSITION_CLASS,
+  ESCAPE_KEY,
+  ICON_SIZE,
+  ICON_WEIGHT,
+  UI_TEXTS,
+} from '../../../shared/constants';
+import { IconButton } from '../../../shared/ui/IconButton';
 import { Logo } from '../../../shared/ui/Logo';
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle';
 import {
+  LANDING_CONTAINER_CLASS,
   LANDING_DESKTOP_MEDIA_QUERY,
+  LANDING_HEADER_HEIGHT_CLASS,
   LANDING_MOBILE_MENU_ID,
   LANDING_NAV_ITEMS,
   LANDING_SECTION_ID,
@@ -53,10 +62,12 @@ export function LandingHeader() {
         />
       ) : null}
       <header className="sticky top-0 z-20 border-b border-border bg-surface">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-8 px-4 lg:h-16 lg:px-12">
+        <div
+          className={`${LANDING_CONTAINER_CLASS} ${LANDING_HEADER_HEIGHT_CLASS} flex items-center gap-8`}
+        >
           <a
             href={`#${LANDING_SECTION_ID.TOP}`}
-            aria-label={LANDING_TEXTS.LOGO_LABEL}
+            aria-label={UI_TEXTS.LOGO_LABEL}
             className="shrink-0 rounded-sm"
           >
             <Logo />
@@ -69,7 +80,7 @@ export function LandingHeader() {
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                className="rounded-md px-2 py-2.5 text-body whitespace-nowrap text-fg transition-colors duration-150 ease-in-out hover:bg-selected active:bg-border motion-reduce:transition-none"
+                className={`rounded-md px-2 py-2.5 text-body whitespace-nowrap text-fg hover:bg-selected active:bg-border ${COLOR_TRANSITION_CLASS}`}
               >
                 {item.label}
               </a>
@@ -80,16 +91,15 @@ export function LandingHeader() {
             <div className="hidden items-center gap-2 lg:flex">
               <AuthActions />
             </div>
-            <button
-              type="button"
+            <IconButton
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label={menuLabel}
               aria-expanded={isMenuOpen}
               aria-controls={isMenuOpen ? LANDING_MOBILE_MENU_ID : undefined}
-              className="flex size-11 items-center justify-center rounded-md text-fg transition-colors duration-150 hover:bg-selected lg:hidden"
+              className="lg:hidden"
             >
               <MenuIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-            </button>
+            </IconButton>
           </div>
         </div>
         {isMenuOpen ? <MobileMenu onNavigate={closeMenu} /> : null}

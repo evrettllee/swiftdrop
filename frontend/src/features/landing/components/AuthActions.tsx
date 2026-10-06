@@ -9,7 +9,6 @@ type AuthActionsProps = {
   stacked?: boolean;
 };
 
-// Buttons of the header: a guest signs in or registers, a signed-in user opens the profile.
 export function AuthActions({ stacked = false }: AuthActionsProps) {
   const user = useAuthStore((state) => state.user);
   const status = useAuthStore((state) => state.status);

@@ -1,11 +1,11 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router';
+import { COLOR_TRANSITION_CLASS } from '../constants';
 import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'inverse';
 
-const BASE_CLASS =
-  'inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-md px-4 py-2.5 text-body font-semibold transition-colors duration-150 ease-in-out motion-reduce:transition-none';
+const BASE_CLASS = `inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-md px-4 py-2.5 text-body font-semibold ${COLOR_TRANSITION_CLASS}`;
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:

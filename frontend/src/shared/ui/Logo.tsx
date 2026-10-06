@@ -1,4 +1,4 @@
-// SVG of the mark and colors of both themes come from the design system, section 16.
+// The mark is drawn with the color tokens of index.css, so it follows the theme.
 export function Logo() {
   return (
     <span className="inline-flex items-center gap-2 text-heading-md leading-none">

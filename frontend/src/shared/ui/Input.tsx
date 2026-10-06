@@ -1,5 +1,5 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
-import { ID_PART } from '../constants';
+import { COLOR_TRANSITION_CLASS, ID_PART } from '../constants';
 import { FieldError } from './FieldError';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
@@ -14,7 +14,7 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
 function getFieldClassName(hasError: boolean, hasAdornment: boolean): string {
   return [
     'h-11 w-full rounded-sm border bg-surface px-3 text-body text-fg shadow-sm placeholder:text-fg-muted',
-    'transition-colors duration-150 ease-in-out motion-reduce:transition-none',
+    COLOR_TRANSITION_CLASS,
     'disabled:bg-field disabled:text-fg-muted disabled:shadow-none',
     hasError ? 'border-danger' : 'border-border focus:border-accent',
     hasAdornment ? 'pe-11' : '',
@@ -23,7 +23,6 @@ function getFieldClassName(hasError: boolean, hasAdornment: boolean): string {
     .join(' ');
 }
 
-// Label above the field, hint or error below it; an error replaces the hint.
 export function Input({ label, error, hint, endAdornment, popup, ...inputProps }: InputProps) {
   const id = useId();
   const hintId = `${id}-${ID_PART.HINT}`;

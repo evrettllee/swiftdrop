@@ -1,8 +1,8 @@
 import { WarningCircleIcon } from '@phosphor-icons/react';
-import { APP_ROUTES } from '../../shared/constants';
+import { APP_ROUTES, UI_TEXTS } from '../../shared/constants';
 import { Button, LinkButton } from '../../shared/ui/Button';
 import { ErrorScreen } from '../components/ErrorScreen';
-import { APP_TEXTS, ERROR_TEXTS } from '../constants';
+import { ERROR_TEXTS } from '../constants';
 
 function reloadPage(): void {
   window.location.reload();
@@ -18,7 +18,7 @@ export function ErrorPage() {
     >
       <Button onClick={reloadPage}>{ERROR_TEXTS.RELOAD}</Button>
       <LinkButton variant="secondary" to={APP_ROUTES.HOME}>
-        {APP_TEXTS.BACK_HOME}
+        {UI_TEXTS.BACK_HOME}
       </LinkButton>
     </ErrorScreen>
   );

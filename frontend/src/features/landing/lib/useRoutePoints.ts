@@ -3,7 +3,6 @@ import type { GeoPoint } from '../../pricing/types';
 import { ROUTE_POINT } from '../constants';
 import type { RoutePointKind } from '../types';
 
-// The two points of the route and the point that the next click on the map sets.
 export function useRoutePoints() {
   const [pickup, setPickup] = useState<GeoPoint | null>(null);
   const [delivery, setDelivery] = useState<GeoPoint | null>(null);

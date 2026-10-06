@@ -1,3 +1,4 @@
+import { MAIN_CONTENT_ID } from '../../../shared/constants';
 import { SkipLink } from '../../../shared/ui/SkipLink';
 import { CalculatorCard } from '../components/CalculatorCard';
 import { CtaSection } from '../components/CtaSection';
@@ -8,14 +9,17 @@ import { HowItWorks } from '../components/HowItWorks';
 import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
 import { TrackingSection } from '../components/TrackingSection';
+import { LANDING_CONTAINER_CLASS } from '../constants';
 
 export function LandingPage() {
   return (
     <div className="flex min-h-dvh flex-col">
       <SkipLink />
       <LandingHeader />
-      <main id="main" className="flex-1">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 py-12 lg:gap-24 lg:px-12 lg:py-24">
+      <main id={MAIN_CONTENT_ID} className="flex-1">
+        <div
+          className={`${LANDING_CONTAINER_CLASS} flex w-full flex-col gap-12 py-12 lg:gap-24 lg:py-24`}
+        >
           <HeroSection />
           <CalculatorCard />
         </div>

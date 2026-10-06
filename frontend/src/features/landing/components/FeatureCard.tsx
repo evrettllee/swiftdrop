@@ -16,7 +16,6 @@ const TONE_CLASS = {
   primary: 'bg-primary text-on-primary',
 } as const;
 
-// The frame of a card of the features section: a title, a text and an illustration below them.
 export function FeatureCard({
   title,
   text,

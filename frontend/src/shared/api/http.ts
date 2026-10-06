@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   API_BASE_PATH,
   API_ERROR_MESSAGES,
+  CONTENT_TYPE_HEADER,
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
   HTTP_METHOD,
@@ -46,7 +47,7 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = { [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE };
 
   if (hasBody) {
-    headers['Content-Type'] = JSON_CONTENT_TYPE;
+    headers[CONTENT_TYPE_HEADER] = JSON_CONTENT_TYPE;
   }
 
   try {

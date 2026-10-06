@@ -1,6 +1,7 @@
 // API
 export const API_BASE_PATH = '/api';
 export const JSON_CONTENT_TYPE = 'application/json';
+export const CONTENT_TYPE_HEADER = 'Content-Type';
 
 export const AUTH_API_PATHS = {
   LOGIN: '/auth/login',
@@ -21,6 +22,9 @@ export const APP_ROUTES = {
   TERMS: '/terms',
   PRIVACY: '/privacy',
 } as const;
+
+// The router pattern for every address that matches no page.
+export const CATCH_ALL_ROUTE = '*';
 
 // CSRF protection: must match the header the backend requires on unsafe methods.
 export const CSRF_HEADER_NAME = 'X-Requested-With';
@@ -63,9 +67,20 @@ export const API_ERROR_MESSAGES = {
 export const UI_TEXTS = {
   LOADING: 'Загрузка',
   SKIP_TO_CONTENT: 'Перейти к основному содержимому',
+  LOGO_LABEL: 'SwiftDrop, на главную',
+  BACK_HOME: 'На главную',
+  TERMS_TITLE: 'Условия использования',
+  PRIVACY_TITLE: 'Политика конфиденциальности',
 } as const;
 
-// Icons: one set and one weight for the whole app, sizes from the design system, section 7.
+// The skip link of every page leads to the element with this id.
+export const MAIN_CONTENT_ID = 'main';
+
+// Hover and press colors of the controls: no animation when the user asks for less motion.
+export const COLOR_TRANSITION_CLASS =
+  'transition-colors duration-150 ease-in-out motion-reduce:transition-none';
+
+// Icons: one set and one weight for the whole app, so every icon size comes from this scale.
 export const ICON_WEIGHT = 'light' as const;
 export const ICON_SIZE = {
   SMALL: 16,
@@ -86,8 +101,15 @@ export const ID_PART = {
 // The map and the address search are centered on Minsk: [latitude, longitude].
 export const CITY_CENTER: [number, number] = [53.9006, 27.559];
 
+// Mapbox serves both the map tiles and the address search; the public token goes in the query.
+export const MAPBOX_API_ORIGIN = 'https://api.mapbox.com';
+export const MAPBOX_TOKEN_PARAM = 'access_token';
+
 export const ESCAPE_KEY = 'Escape';
 
 // Form values are kept as strings, a checkbox is one of these two.
 export const CHECKBOX_CHECKED_VALUE = 'true';
 export const CHECKBOX_UNCHECKED_VALUE = '';
+
+// After a failed submit the focus goes to the first field marked like this.
+export const INVALID_FIELD_SELECTOR = '[aria-invalid="true"]';
