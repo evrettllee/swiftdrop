@@ -6,8 +6,8 @@ import {
   TruckIcon,
   type Icon,
 } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { FEATURES } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { FEATURES } from '../constants/sections';
 import { FeatureCard } from './FeatureCard';
 import { ResponsiveText } from './ResponsiveText';
 

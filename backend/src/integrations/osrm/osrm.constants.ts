@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from '../../common/common.constants';
+import { MS_PER_SECOND } from '../../common/constants/time';
 import type { OsrmProfile } from './osrm.types';
 
 // Profiles

@@ -1,6 +1,7 @@
 import { ApiError } from '../../shared/api/http';
 import { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from '../../shared/config';
-import { MAPBOX_TOKEN_PARAM, NETWORK_ERROR_STATUS } from '../../shared/constants';
+import { NETWORK_ERROR_STATUS } from '../../shared/constants/api';
+import { MAPBOX_TOKEN_PARAM } from '../../shared/constants/map';
 import type { GeoPoint } from '../pricing/types';
 import {
   ABORT_ERROR_NAME,

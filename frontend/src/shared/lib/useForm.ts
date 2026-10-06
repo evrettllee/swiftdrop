@@ -1,7 +1,8 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { z } from 'zod';
 import { ApiError } from '../api/http';
-import { API_ERROR_MESSAGES, CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE } from '../constants';
+import { API_ERROR_MESSAGES } from '../constants/api';
+import { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE } from '../constants/forms';
 import { collectFieldErrors, focusFirstInvalid } from './forms';
 
 type FormValues = Record<string, string>;

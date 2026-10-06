@@ -1,13 +1,10 @@
 import type { Icon } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import {
-  APP_ROUTES,
-  ICON_SIZE,
-  ICON_WEIGHT,
-  MAIN_CONTENT_ID,
-  UI_TEXTS,
-} from '../../shared/constants';
+import { MAIN_CONTENT_ID } from '../../shared/constants/dom';
+import { APP_ROUTES } from '../../shared/constants/routes';
+import { ICON_SIZE, ICON_WEIGHT } from '../../shared/constants/styles';
+import { UI_TEXTS } from '../../shared/constants/texts';
 import { Logo } from '../../shared/ui/Logo';
 import { SkipLink } from '../../shared/ui/SkipLink';
 import { ThemeToggle } from '../../shared/ui/ThemeToggle';

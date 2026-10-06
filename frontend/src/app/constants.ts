@@ -1,4 +1,4 @@
-import { UI_TEXTS } from '../shared/constants';
+import { UI_TEXTS } from '../shared/constants/texts';
 
 // Interface texts of the general pages
 export const APP_TEXTS = {

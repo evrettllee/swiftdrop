@@ -1,6 +1,6 @@
 import { MapTrifoldIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { MAP_PLACED_CLASS, MAP_TEXTS } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { MAP_PLACED_CLASS, MAP_TEXTS } from '../constants/map';
 
 type MapUnavailableProps = {
   // The parent sets the size of the map, so the placeholder fills the same place.

@@ -1,12 +1,9 @@
 import { Link } from 'react-router';
-import { UI_TEXTS } from '../../../shared/constants';
+import { UI_TEXTS } from '../../../shared/constants/texts';
 import { Logo } from '../../../shared/ui/Logo';
-import {
-  LANDING_CONTAINER_CLASS,
-  LANDING_FOOTER_GROUPS,
-  LANDING_SECTION_ID,
-  LANDING_TEXTS,
-} from '../constants';
+import { LANDING_CONTAINER_CLASS } from '../constants/layout';
+import { LANDING_FOOTER_GROUPS, LANDING_SECTION_ID } from '../constants/navigation';
+import { LANDING_TEXTS } from '../constants/texts';
 
 const LINK_CLASS = 'text-fg-secondary transition-colors duration-150 hover:text-fg';
 const HIDDEN_ON_MOBILE_CLASS = 'hidden lg:block';

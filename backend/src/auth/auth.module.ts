@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 import { AuthCookiesService } from './auth-cookies.service';
-import { ACCESS_TOKEN_TTL_SECONDS } from './auth.constants';
+import { ACCESS_TOKEN_TTL_SECONDS } from './constants/tokens';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { OAuthService } from './oauth.service';

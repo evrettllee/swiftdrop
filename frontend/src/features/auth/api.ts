@@ -1,4 +1,4 @@
-import { AUTH_API_PATHS } from '../../shared/constants';
+import { AUTH_API_PATHS } from '../../shared/constants/api';
 import { http } from '../../shared/api/http';
 import { authResponseSchema, authUserSchema } from './schemas';
 import type { AuthUser, LoginInput, RegisterInput } from './types';

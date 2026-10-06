@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { setSessionExpiredHandler } from '../../shared/api/http';
 import { fetchCurrentUser, login, logout, register } from './api';
-import { AUTH_STATUS } from './constants';
+import { AUTH_STATUS } from './constants/session';
 import type { AuthStatus, AuthUser, LoginInput, RegisterInput } from './types';
 
 type AuthState = {

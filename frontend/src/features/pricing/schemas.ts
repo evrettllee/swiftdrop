@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CHECKBOX_CHECKED_VALUE } from '../../shared/constants';
+import { CHECKBOX_CHECKED_VALUE } from '../../shared/constants/forms';
 import {
   DECIMAL_COMMA,
   DECIMAL_PATTERN,
@@ -7,7 +7,7 @@ import {
   PACKAGE_ERRORS,
   PACKAGE_FIELD,
   WHOLE_PATTERN,
-} from './constants';
+} from './constants/package';
 
 // Response of POST /api/pricing/estimates
 export const priceEstimateSchema = z.object({

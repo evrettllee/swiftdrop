@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router';
-import { AUTH_STATUS } from '../features/auth/constants';
+import { AUTH_STATUS } from '../features/auth/constants/session';
 import { useAuthStore } from '../features/auth/store';
 import type { Role } from '../features/auth/types';
-import { APP_ROUTES } from '../shared/constants';
+import { APP_ROUTES } from '../shared/constants/routes';
 import { PageLoader } from '../shared/ui/PageLoader';
 import { ForbiddenPage } from './pages/ForbiddenPage';
 

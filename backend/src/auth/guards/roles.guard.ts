@@ -5,9 +5,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { FORBIDDEN_MESSAGE } from '../../common/common.constants';
 import type { RoleName } from '../../common/enums/role.enum';
-import { ROLES_KEY } from '../auth.constants';
+import { FORBIDDEN_MESSAGE, ROLES_KEY } from '../constants/access';
 import type { AuthUser } from '../auth.types';
 
 @Injectable()

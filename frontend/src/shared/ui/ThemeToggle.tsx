@@ -1,5 +1,5 @@
 import { MoonIcon, SunIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../constants/styles';
 import { THEME, THEME_TEXTS } from '../theme/constants';
 import { useThemeStore } from '../theme/store';
 import { IconButton } from './IconButton';

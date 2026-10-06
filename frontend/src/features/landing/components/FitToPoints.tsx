@@ -2,7 +2,7 @@ import { latLngBounds, type LatLngTuple } from 'leaflet';
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import type { GeoPoint } from '../../pricing/types';
-import { MAP_FIT_PADDING, MAP_ZOOM } from '../constants';
+import { MAP_FIT_PADDING, MAP_ZOOM } from '../constants/map';
 import { usePrefersReducedMotion } from '../lib/useExpandedMap';
 
 type FitToPointsProps = {

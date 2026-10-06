@@ -1,4 +1,4 @@
-import { INVALID_FIELD_SELECTOR } from '../constants';
+import { INVALID_FIELD_SELECTOR } from '../constants/forms';
 
 type Issue = { path: PropertyKey[]; message: string };
 

@@ -1,4 +1,4 @@
-import { FEATURES } from '../constants';
+import { FEATURES } from '../constants/sections';
 import { FeatureCard } from './FeatureCard';
 
 const { CHAT } = FEATURES;

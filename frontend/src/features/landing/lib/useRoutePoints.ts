@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { GeoPoint } from '../../pricing/types';
-import { ROUTE_POINT } from '../constants';
+import { ROUTE_POINT } from '../constants/route-points';
 import type { RoutePointKind } from '../types';
 
 export function useRoutePoints() {

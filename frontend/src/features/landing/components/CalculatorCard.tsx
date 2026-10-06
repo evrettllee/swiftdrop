@@ -1,19 +1,19 @@
 import { useId } from 'react';
-import { APP_ROUTES } from '../../../shared/constants';
+import { APP_ROUTES } from '../../../shared/constants/routes';
 import { LinkButton } from '../../../shared/ui/Button';
 import { AddressField } from '../../geocoding/components/AddressField';
 import { EstimateResult } from '../../pricing/components/EstimateResult';
 import { PackageFields } from '../../pricing/components/PackageFields';
 import { useEstimate } from '../../pricing/lib/useEstimate';
 import { usePackageForm } from '../../pricing/lib/usePackageForm';
+import { LANDING_SCROLL_OFFSET_CLASS } from '../constants/layout';
+import { LANDING_SECTION_ID } from '../constants/navigation';
 import {
   ADDRESS_PLACEHOLDER,
-  LANDING_SCROLL_OFFSET_CLASS,
-  LANDING_SECTION_ID,
-  LANDING_TEXTS,
   ROUTE_POINT_LABELS,
   ROUTE_POINT_ORDER,
-} from '../constants';
+} from '../constants/route-points';
+import { LANDING_TEXTS } from '../constants/texts';
 import { useRouteAddresses } from '../lib/useRouteAddresses';
 import { RouteMap } from './RouteMap';
 

@@ -1,6 +1,7 @@
 import { CursorIcon, HandTapIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { MAP_TEXTS, ROUTE_POINT } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { MAP_TEXTS } from '../constants/map';
+import { ROUTE_POINT } from '../constants/route-points';
 import type { RoutePointKind } from '../types';
 
 const HINTS: Record<RoutePointKind, string> = {

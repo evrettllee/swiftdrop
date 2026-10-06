@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ApiError } from '../../../shared/api/http';
-import { API_ERROR_MESSAGES } from '../../../shared/constants';
+import { API_ERROR_MESSAGES } from '../../../shared/constants/api';
 import { estimatePrice } from '../api';
-import { ESTIMATE_DEBOUNCE_MS, ESTIMATE_STATUS } from '../constants';
+import { ESTIMATE_DEBOUNCE_MS, ESTIMATE_STATUS } from '../constants/estimate';
 import type { EstimateInput, GeoPoint, PackageParams, PriceEstimate } from '../types';
 
 type PendingStatus =

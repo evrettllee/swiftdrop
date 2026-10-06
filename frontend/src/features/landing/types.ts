@@ -1,4 +1,4 @@
-import type { ROUTE_POINT } from './constants';
+import type { ROUTE_POINT } from './constants/route-points';
 
 // A footer link leads either to a section of the landing or to a page of the app.
 export type FooterLink = {

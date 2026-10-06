@@ -1,5 +1,5 @@
 import { useId, useState, type KeyboardEvent } from 'react';
-import { ESCAPE_KEY } from '../../../shared/constants';
+import { ESCAPE_KEY } from '../../../shared/constants/dom';
 import {
   ADDRESS_FIELD_KEY,
   GEOCODING_MIN_QUERY_LENGTH,

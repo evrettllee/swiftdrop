@@ -1,7 +1,8 @@
 import { CheckCircleIcon, CircleIcon } from '@phosphor-icons/react';
 import { useId } from 'react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { AUTH_TEXTS, PASSWORD_RULES, STRENGTH_LABELS } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { AUTH_TEXTS } from '../constants/texts';
+import { PASSWORD_RULES, STRENGTH_LABELS } from '../constants/validation';
 
 type PasswordRequirementsProps = {
   value: string;

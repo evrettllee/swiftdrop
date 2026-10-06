@@ -1,8 +1,9 @@
 import { CheckCircleIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
 import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Spinner } from '../../../shared/ui/Spinner';
-import { CALCULATOR_TEXTS, ESTIMATE_STATUS } from '../constants';
+import { ESTIMATE_STATUS } from '../constants/estimate';
+import { CALCULATOR_TEXTS } from '../constants/texts';
 import { formatDistance, formatDuration, formatPrice } from '../lib/format';
 import type { EstimateView } from '../lib/useEstimate';
 import type { PriceEstimate } from '../types';

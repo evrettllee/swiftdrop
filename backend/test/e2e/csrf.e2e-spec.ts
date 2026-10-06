@@ -1,7 +1,7 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ROUTES } from '../../src/auth/auth.constants';
-import { CSRF_ERROR_MESSAGE, CSRF_HEADER_NAME } from '../../src/common/common.constants';
+import { AUTH_ROUTES } from '../../src/auth/constants/routes';
+import { CSRF_ERROR_MESSAGE, CSRF_HEADER_NAME } from '../../src/common/constants/csrf';
 import { DRIZZLE } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';
 import { users } from '../../src/db/schema';

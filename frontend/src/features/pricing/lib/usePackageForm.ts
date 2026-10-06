@@ -1,5 +1,5 @@
 import { useForm } from '../../../shared/lib/useForm';
-import { PACKAGE_DEFAULTS } from '../constants';
+import { PACKAGE_DEFAULTS } from '../constants/package';
 import { packageFormSchema } from '../schemas';
 import type { PackageParams } from '../types';
 

@@ -4,7 +4,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
 import { Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
-import { ACCESS_COOKIE_NAME, AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../auth.constants';
+import { AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../constants/access';
+import { ACCESS_COOKIE_NAME } from '../constants/tokens';
 import { toAuthUser } from '../auth-user.mapper';
 import type { AccessTokenPayload, AuthUser } from '../auth.types';
 

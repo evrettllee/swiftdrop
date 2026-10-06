@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { LANDING_CONTAINER_CLASS, LANDING_SCROLL_OFFSET_CLASS } from '../constants';
+import { LANDING_CONTAINER_CLASS, LANDING_SCROLL_OFFSET_CLASS } from '../constants/layout';
 
 type LandingSectionProps = {
   id: string;

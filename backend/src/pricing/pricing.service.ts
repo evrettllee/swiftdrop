@@ -6,7 +6,8 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { SECONDS_PER_MINUTE, SINGLE_ROW_LIMIT } from '../common/common.constants';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SECONDS_PER_MINUTE } from '../common/constants/time';
 import { findLightestVehicle } from '../common/utils/vehicle-fit';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';

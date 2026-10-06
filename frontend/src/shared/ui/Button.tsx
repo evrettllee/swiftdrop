@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router';
-import { COLOR_TRANSITION_CLASS } from '../constants';
+import { COLOR_TRANSITION_CLASS } from '../constants/styles';
 import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'inverse';

@@ -1,5 +1,6 @@
 import type { KeyboardEvent, ReactNode } from 'react';
-import { COLOR_TRANSITION_CLASS, ID_PART } from '../constants';
+import { ID_PART } from '../constants/dom';
+import { COLOR_TRANSITION_CLASS } from '../constants/styles';
 
 type TabItem<TId extends string> = { id: TId; label: string };
 

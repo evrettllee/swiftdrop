@@ -1,6 +1,8 @@
 import { CaretRightIcon } from '@phosphor-icons/react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { LANDING_MOBILE_MENU_ID, LANDING_NAV_ITEMS, LANDING_TEXTS } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { LANDING_MOBILE_MENU_ID } from '../constants/layout';
+import { LANDING_NAV_ITEMS } from '../constants/navigation';
+import { LANDING_TEXTS } from '../constants/texts';
 import { AuthActions } from './AuthActions';
 
 type MobileMenuProps = {

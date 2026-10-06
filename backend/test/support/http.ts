@@ -1,10 +1,7 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import {
-  CSRF_HEADER_NAME,
-  CSRF_HEADER_VALUE,
-  GLOBAL_PREFIX,
-} from '../../src/common/common.constants';
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../../src/common/constants/csrf';
+import { GLOBAL_PREFIX } from '../../src/common/constants/http';
 import { CLIENT_IP_HEADER, TEST_IP_PREFIX } from './constants';
 
 let counter = 0;

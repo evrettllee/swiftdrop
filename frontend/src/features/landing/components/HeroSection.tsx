@@ -1,6 +1,8 @@
-import { APP_ROUTES } from '../../../shared/constants';
+import { APP_ROUTES } from '../../../shared/constants/routes';
 import { LinkButton } from '../../../shared/ui/Button';
-import { LANDING_SCROLL_OFFSET_CLASS, LANDING_SECTION_ID, LANDING_TEXTS } from '../constants';
+import { LANDING_SCROLL_OFFSET_CLASS } from '../constants/layout';
+import { LANDING_SECTION_ID } from '../constants/navigation';
+import { LANDING_TEXTS } from '../constants/texts';
 
 export function HeroSection() {
   return (

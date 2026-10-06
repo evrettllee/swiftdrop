@@ -1,10 +1,11 @@
-import { APP_ROUTES } from '../../../shared/constants';
+import { APP_ROUTES } from '../../../shared/constants/routes';
 import { useForm } from '../../../shared/lib/useForm';
 import { Button } from '../../../shared/ui/Button';
 import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Input } from '../../../shared/ui/Input';
 import { TextLink } from '../../../shared/ui/TextLink';
-import { AUTH_FIELD, AUTH_TEXTS, LOGIN_INITIAL_VALUES } from '../constants';
+import { AUTH_FIELD, LOGIN_INITIAL_VALUES } from '../constants/forms';
+import { AUTH_TEXTS } from '../constants/texts';
 import { loginFormSchema } from '../schemas';
 import { useAuthStore } from '../store';
 import { PasswordField } from './PasswordField';

@@ -1,6 +1,7 @@
 import { CaretDownIcon } from '@phosphor-icons/react';
 import { useId } from 'react';
-import { ICON_SIZE, ICON_WEIGHT, ID_PART } from '../../../shared/constants';
+import { ID_PART } from '../../../shared/constants/dom';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
 
 type FaqItemProps = {
   question: string;

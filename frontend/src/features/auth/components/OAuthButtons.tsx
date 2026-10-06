@@ -1,14 +1,14 @@
-import { ICON_SIZE } from '../../../shared/constants';
+import { ICON_SIZE } from '../../../shared/constants/styles';
 import { LinkButton } from '../../../shared/ui/Button';
 import { LegalLinks } from './LegalLinks';
 import {
-  AUTH_TEXTS,
   GOOGLE_BRAND_COLORS,
   OAUTH_START_URLS,
   YANDEX_BRAND_COLOR,
   YANDEX_MARK_LETTER,
   YANDEX_MARK_TEXT_COLOR,
-} from '../constants';
+} from '../constants/oauth';
+import { AUTH_TEXTS } from '../constants/texts';
 
 type OAuthButtonsProps = {
   // The consent note is shown on registration only.

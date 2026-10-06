@@ -1,7 +1,7 @@
 import { BicycleIcon } from '@phosphor-icons/react';
 import type { CSSProperties } from 'react';
-import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants';
-import { TRACKING } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
+import { TRACKING } from '../constants/sections';
 import { TrackingMapRoad } from './TrackingMapRoad';
 import { TrackingMapRoute } from './TrackingMapRoute';
 

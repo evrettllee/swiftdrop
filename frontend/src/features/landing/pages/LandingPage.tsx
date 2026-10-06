@@ -1,4 +1,4 @@
-import { MAIN_CONTENT_ID } from '../../../shared/constants';
+import { MAIN_CONTENT_ID } from '../../../shared/constants/dom';
 import { SkipLink } from '../../../shared/ui/SkipLink';
 import { CalculatorCard } from '../components/CalculatorCard';
 import { CtaSection } from '../components/CtaSection';
@@ -9,7 +9,7 @@ import { HowItWorks } from '../components/HowItWorks';
 import { LandingFooter } from '../components/LandingFooter';
 import { LandingHeader } from '../components/LandingHeader';
 import { TrackingSection } from '../components/TrackingSection';
-import { LANDING_CONTAINER_CLASS } from '../constants';
+import { LANDING_CONTAINER_CLASS } from '../constants/layout';
 
 export function LandingPage() {
   return (

@@ -1,4 +1,5 @@
-import { APP_ROUTES, UI_TEXTS } from '../../shared/constants';
+import { APP_ROUTES } from '../../shared/constants/routes';
+import { UI_TEXTS } from '../../shared/constants/texts';
 import { LinkButton } from '../../shared/ui/Button';
 import { PLACEHOLDER_TEXTS } from '../constants';
 

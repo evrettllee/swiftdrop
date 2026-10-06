@@ -1,3 +1,5 @@
+export const NODE_ENV_PRODUCTION = 'production';
+
 export const DEFAULT_PORT = '8080';
 export const PORT_MIN = 1;
 export const PORT_MAX = 65535;

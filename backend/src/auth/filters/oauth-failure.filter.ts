@@ -10,7 +10,7 @@ import {
   OAUTH_BLOCKED_REDIRECT,
   OAUTH_ERROR_MESSAGES,
   OAUTH_FAILURE_REDIRECT,
-} from '../auth.constants';
+} from '../constants/oauth';
 
 // Browser redirects cannot show JSON errors, so failures send the user back to the site instead.
 @Catch()

@@ -6,7 +6,7 @@ import {
   type Icon,
 } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import { ICON_SIZE, ICON_WEIGHT } from '../constants';
+import { ICON_SIZE, ICON_WEIGHT } from '../constants/styles';
 
 type AlertVariant = 'success' | 'error' | 'info' | 'warning';
 

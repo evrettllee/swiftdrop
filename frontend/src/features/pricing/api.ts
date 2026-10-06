@@ -1,5 +1,5 @@
 import { ApiError, http } from '../../shared/api/http';
-import { ESTIMATE_STATUS_MESSAGES, PRICING_API_PATHS } from './constants';
+import { ESTIMATE_STATUS_MESSAGES, PRICING_API_PATHS } from './constants/estimate';
 import { priceEstimateSchema } from './schemas';
 import type { EstimateInput, PriceEstimate } from './types';
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { hash, verify } from '@node-rs/argon2';
-import { TIMING_DUMMY_PASSWORD } from './auth.constants';
+import { TIMING_DUMMY_PASSWORD } from './constants/access';
 
 @Injectable()
 export class PasswordService {
