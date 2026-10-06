@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { z } from 'zod';
 import type { GeoPoint } from '../../common/common.types';
+import { ENV_KEYS } from '../../config/env.constants';
 import {
   COORDINATE_SEPARATOR,
   METERS_PER_KM,
@@ -35,7 +36,7 @@ export class OsrmService {
   private readonly baseUrl: string;
 
   constructor(config: ConfigService) {
-    this.baseUrl = config.getOrThrow<string>('OSRM_URL').replace(TRAILING_SLASHES, '');
+    this.baseUrl = config.getOrThrow<string>(ENV_KEYS.OSRM_URL).replace(TRAILING_SLASHES, '');
   }
 
   async getRoute(

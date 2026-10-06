@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
 import { z } from 'zod';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
+import { ENV_KEYS } from '../../config/env.constants';
 import {
   OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,
@@ -33,9 +34,9 @@ export class YandexStrategy extends PassportStrategy(Strategy, YANDEX_STRATEGY_N
     super({
       authorizationURL: YANDEX_AUTHORIZATION_URL,
       tokenURL: YANDEX_TOKEN_URL,
-      clientID: config.getOrThrow<string>('YANDEX_CLIENT_ID'),
-      clientSecret: config.getOrThrow<string>('YANDEX_CLIENT_SECRET'),
-      callbackURL: config.getOrThrow<string>('YANDEX_CALLBACK_URL'),
+      clientID: config.getOrThrow<string>(ENV_KEYS.YANDEX_CLIENT_ID),
+      clientSecret: config.getOrThrow<string>(ENV_KEYS.YANDEX_CLIENT_SECRET),
+      callbackURL: config.getOrThrow<string>(ENV_KEYS.YANDEX_CALLBACK_URL),
     });
   }
 

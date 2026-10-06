@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { GeoPoint } from '../../pricing/types';
+import type { GeoPoint } from '../../../shared/types';
 import { ROUTE_POINT } from '../constants/route-points';
 import type { RoutePointKind } from '../types';
 

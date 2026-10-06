@@ -2,8 +2,9 @@ import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/c
 import { ConfigService } from '@nestjs/config';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import { ENV_KEYS } from '../config/env.constants';
 import * as schema from '../db/schema';
-import { DRIZZLE, PG_POOL } from './database.constants';
+import { DB_CASING, DRIZZLE, PG_POOL } from './database.constants';
 
 export type Database = NodePgDatabase<typeof schema>;
 
@@ -15,7 +16,7 @@ export type Database = NodePgDatabase<typeof schema>;
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
         const pool = new Pool({
-          connectionString: config.getOrThrow<string>('DATABASE_URL'),
+          connectionString: config.getOrThrow<string>(ENV_KEYS.DATABASE_URL),
         });
         await pool.query('SELECT 1');
         Logger.log('Connected to PostgreSQL', 'Database');
@@ -25,7 +26,7 @@ export type Database = NodePgDatabase<typeof schema>;
     {
       provide: DRIZZLE,
       inject: [PG_POOL],
-      useFactory: (pool: Pool): Database => drizzle({ client: pool, schema, casing: 'snake_case' }),
+      useFactory: (pool: Pool): Database => drizzle({ client: pool, schema, casing: DB_CASING }),
     },
   ],
   exports: [DRIZZLE],

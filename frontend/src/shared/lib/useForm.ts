@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { z } from 'zod';
-import { ApiError } from '../api/http';
+import { ApiError, getApiErrorMessage } from '../api/http';
 import { API_ERROR_MESSAGES } from '../constants/api';
 import { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE } from '../constants/forms';
 import { collectFieldErrors, focusFirstInvalid } from './forms';
@@ -81,7 +81,7 @@ export function useForm<TSchema extends z.ZodType>({
         );
         requestAnimationFrame(() => focusFirstInvalid(formRef.current));
       } else {
-        setFormError(error instanceof ApiError ? error.message : API_ERROR_MESSAGES.GENERIC);
+        setFormError(getApiErrorMessage(error, API_ERROR_MESSAGES.GENERIC));
       }
     } finally {
       setIsSubmitting(false);

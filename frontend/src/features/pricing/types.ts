@@ -1,10 +1,6 @@
 import type { z } from 'zod';
+import type { GeoPoint } from '../../shared/types';
 import type { priceEstimateSchema } from './schemas';
-
-export type GeoPoint = {
-  latitude: number;
-  longitude: number;
-};
 
 export type PackageParams = {
   weightKg: number;

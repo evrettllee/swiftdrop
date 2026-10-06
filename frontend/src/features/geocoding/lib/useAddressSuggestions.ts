@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ApiError } from '../../../shared/api/http';
+import { getApiErrorMessage } from '../../../shared/api/http';
 import { searchAddresses } from '../api';
 import {
   GEOCODING_DEBOUNCE_MS,
@@ -40,8 +40,7 @@ export function useAddressSuggestions(text: string, isActive: boolean): Suggesti
           setState({
             status: SEARCH_STATUS.ERROR,
             suggestions: [],
-            message:
-              error instanceof ApiError ? error.message : GEOCODING_ERROR_MESSAGES.UNAVAILABLE,
+            message: getApiErrorMessage(error, GEOCODING_ERROR_MESSAGES.UNAVAILABLE),
           });
         }
       }

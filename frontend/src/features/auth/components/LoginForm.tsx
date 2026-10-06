@@ -1,13 +1,12 @@
 import { APP_ROUTES } from '../../../shared/constants/routes';
 import { useForm } from '../../../shared/lib/useForm';
-import { Button } from '../../../shared/ui/Button';
-import { InlineAlert } from '../../../shared/ui/InlineAlert';
 import { Input } from '../../../shared/ui/Input';
 import { TextLink } from '../../../shared/ui/TextLink';
 import { AUTH_FIELD, LOGIN_INITIAL_VALUES } from '../constants/forms';
 import { AUTH_TEXTS } from '../constants/texts';
 import { loginFormSchema } from '../schemas';
 import { useAuthStore } from '../store';
+import { FormFooter } from './FormFooter';
 import { PasswordField } from './PasswordField';
 
 export function LoginForm() {
@@ -39,12 +38,12 @@ export function LoginForm() {
           </TextLink>
         </div>
       </div>
-      {formError === null ? null : <InlineAlert variant="error">{formError}</InlineAlert>}
-      <div className="pt-2">
-        <Button type="submit" fullWidth loading={isSubmitting}>
-          {isSubmitting ? AUTH_TEXTS.SUBMITTING_LOGIN : AUTH_TEXTS.SUBMIT_LOGIN}
-        </Button>
-      </div>
+      <FormFooter
+        formError={formError}
+        isSubmitting={isSubmitting}
+        submitLabel={AUTH_TEXTS.SUBMIT_LOGIN}
+        submittingLabel={AUTH_TEXTS.SUBMITTING_LOGIN}
+      />
     </form>
   );
 }

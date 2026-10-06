@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ApiError } from '../../../shared/api/http';
+import { getApiErrorMessage } from '../../../shared/api/http';
 import { API_ERROR_MESSAGES } from '../../../shared/constants/api';
+import type { GeoPoint } from '../../../shared/types';
 import { estimatePrice } from '../api';
 import { ESTIMATE_DEBOUNCE_MS, ESTIMATE_STATUS } from '../constants/estimate';
-import type { EstimateInput, GeoPoint, PackageParams, PriceEstimate } from '../types';
+import type { EstimateInput, PackageParams, PriceEstimate } from '../types';
 
 type PendingStatus =
   | typeof ESTIMATE_STATUS.NEEDS_ADDRESSES
@@ -69,7 +70,7 @@ export function useEstimate(
         }
       } catch (error) {
         if (isCurrent) {
-          const message = error instanceof ApiError ? error.message : API_ERROR_MESSAGES.GENERIC;
+          const message = getApiErrorMessage(error, API_ERROR_MESSAGES.GENERIC);
           setSettled({ input: current, view: { status: ESTIMATE_STATUS.ERROR, message } });
         }
       }

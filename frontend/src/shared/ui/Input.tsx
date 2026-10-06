@@ -1,6 +1,7 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
 import { ID_PART } from '../constants/dom';
 import { COLOR_TRANSITION_CLASS } from '../constants/styles';
+import { joinClassNames } from '../lib/classNames';
 import { FieldError } from './FieldError';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
@@ -13,15 +14,13 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
 };
 
 function getFieldClassName(hasError: boolean, hasAdornment: boolean): string {
-  return [
+  return joinClassNames(
     'h-11 w-full rounded-sm border bg-surface px-3 text-body text-fg shadow-sm placeholder:text-fg-muted',
     COLOR_TRANSITION_CLASS,
     'disabled:bg-field disabled:text-fg-muted disabled:shadow-none',
     hasError ? 'border-danger' : 'border-border focus:border-accent',
     hasAdornment ? 'pe-11' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  );
 }
 
 export function Input({ label, error, hint, endAdornment, popup, ...inputProps }: InputProps) {

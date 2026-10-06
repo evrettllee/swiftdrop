@@ -1,4 +1,5 @@
 import { MS_PER_MINUTE } from '../../common/constants/time';
+import { buildThrottleOverride } from '../../common/utils/throttle';
 
 // Errors
 export const AUTH_ERROR_MESSAGES = {
@@ -14,9 +15,7 @@ export const FORBIDDEN_MESSAGE = 'Недостаточно прав';
 export const AUTH_THROTTLE_LIMIT = 10;
 export const AUTH_THROTTLE_TTL_MS = MS_PER_MINUTE;
 
-export const AUTH_THROTTLE = {
-  default: { limit: AUTH_THROTTLE_LIMIT, ttl: AUTH_THROTTLE_TTL_MS },
-};
+export const AUTH_THROTTLE = buildThrottleOverride(AUTH_THROTTLE_LIMIT, AUTH_THROTTLE_TTL_MS);
 
 // Metadata keys
 export const IS_PUBLIC_KEY = 'isPublic';
