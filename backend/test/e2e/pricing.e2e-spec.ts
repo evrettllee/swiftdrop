@@ -11,16 +11,10 @@ import {
 import { createTestApp } from '../support/app';
 import { CLIENT_IP_HEADER } from '../support/constants';
 import { resetTestData, seedServiceArea } from '../support/database';
+import { MINSK_DELIVERY, MINSK_PICKUP, MOSCOW, ROUTE, SMALL_PACKAGE } from '../support/fixtures';
 import { nextClientIp, postApi } from '../support/http';
 
 const ESTIMATES_PATH = `${PRICING_ROUTES.BASE}/${PRICING_ROUTES.ESTIMATES}`;
-
-const MINSK_PICKUP = { latitude: 53.9006, longitude: 27.559 };
-const MINSK_DELIVERY = { latitude: 53.9075, longitude: 27.457 };
-const MOSCOW = { latitude: 55.75, longitude: 37.61 };
-const SMALL_PACKAGE = { weightKg: 2.5, lengthCm: 30, widthCm: 20, heightCm: 10, isFragile: false };
-// 704.8 seconds is 12 minutes after rounding up, plus the 10 minute pickup buffer.
-const ROUTE = { distanceKm: 7.98, durationSec: 704.8 };
 
 const validEstimate = {
   pickup: MINSK_PICKUP,

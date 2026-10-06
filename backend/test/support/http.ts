@@ -21,6 +21,13 @@ export function postApi(app: NestExpressApplication, path: string) {
     .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
 
+// A GET under the API prefix with its own address, the CSRF header is not needed for reads.
+export function getApi(app: NestExpressApplication, path: string) {
+  return request(app.getHttpServer())
+    .get(`/${GLOBAL_PREFIX}/${path}`)
+    .set(CLIENT_IP_HEADER, nextClientIp());
+}
+
 type ResponseWithStatus = { status: number };
 
 export function sortedStatuses(responses: ResponseWithStatus[]): number[] {
