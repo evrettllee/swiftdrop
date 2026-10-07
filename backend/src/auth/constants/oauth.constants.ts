@@ -1,6 +1,7 @@
-import { GLOBAL_PREFIX } from '../../common/constants/http';
-import { MS_PER_MINUTE } from '../../common/constants/time';
-import { AUTH_ROUTES } from './routes';
+import { GLOBAL_PREFIX } from '../../common/constants/http.constants';
+import { MS_PER_MINUTE } from '../../common/constants/time.constants';
+import { AUTH_ROUTES } from './routes.constants';
+import { URL_SAFE_ENCODING } from './tokens.constants';
 
 // Google
 export const GOOGLE_STRATEGY_NAME = 'google';
@@ -10,7 +11,7 @@ export const GOOGLE_SCOPES = ['openid', 'email', 'profile'];
 export const OAUTH_STATE_COOKIE_PREFIX = 'oauth_state_';
 export const OAUTH_STATE_COOKIE_BASE_PATH = `/${GLOBAL_PREFIX}/${AUTH_ROUTES.BASE}`;
 export const OAUTH_STATE_BYTES = 16;
-export const OAUTH_STATE_ENCODING = 'base64url';
+export const OAUTH_STATE_ENCODING = URL_SAFE_ENCODING;
 export const OAUTH_STATE_TTL_MINUTES = 10;
 export const OAUTH_STATE_TTL_MS = OAUTH_STATE_TTL_MINUTES * MS_PER_MINUTE;
 

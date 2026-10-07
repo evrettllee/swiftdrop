@@ -5,7 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ENV_KEYS } from '../config/env.constants';
 import { UsersModule } from '../users/users.module';
 import { AuthCookiesService } from './auth-cookies.service';
-import { ACCESS_TOKEN_TTL_SECONDS } from './constants/tokens';
+import { ACCESS_TOKEN_TTL_SECONDS } from './constants/tokens.constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { OAuthService } from './oauth.service';

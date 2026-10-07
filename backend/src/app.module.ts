@@ -10,7 +10,7 @@ import {
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
-} from './common/constants/http';
+} from './common/constants/http.constants';
 import { CsrfGuard } from './common/guards/csrf.guard';
 import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';

@@ -6,7 +6,7 @@ import {
   CSRF_HEADER_VALUE,
   CSRF_SKIP_KEY,
   SAFE_HTTP_METHODS,
-} from '../constants/csrf';
+} from '../constants/csrf.constants';
 import { CsrfGuard } from './csrf.guard';
 
 const UNSAFE_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];

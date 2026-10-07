@@ -1,7 +1,6 @@
 import { useForm } from '../../../shared/lib/useForm';
 import { PACKAGE_DEFAULTS } from '../constants/package';
-import { packageFormSchema } from '../schemas';
-import type { PackageParams } from '../types';
+import { type PackageParams, packageFormSchema } from '../schemas';
 
 // The package form is never submitted: the estimate follows its values, so `onSubmit` does nothing.
 export function usePackageForm() {

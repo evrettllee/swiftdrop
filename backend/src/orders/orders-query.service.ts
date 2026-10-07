@@ -1,14 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, inArray, type SQL } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
+import { CURRENCY } from '../common/constants/money.constants';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { addresses, orders } from '../db/schema';
-import { CURRENCY } from '../pricing/pricing.constants';
 import type { ListOrdersDto } from './dto/list-orders.dto';
 import {
   ACTIVE_STATUSES,
   FINISHED_STATUSES,
+  ORDER_ADDRESS_ALIAS,
   ORDER_LIST_FILTER,
   ORDERS_FIRST_PAGE,
 } from './orders.constants';
@@ -20,8 +21,8 @@ export class OrdersQueryService {
 
   async list(clientId: number, query: ListOrdersDto): Promise<OrdersPage> {
     const where = this.buildFilter(clientId, query.filter);
-    const pickup = alias(addresses, 'pickup_address');
-    const delivery = alias(addresses, 'delivery_address');
+    const pickup = alias(addresses, ORDER_ADDRESS_ALIAS.PICKUP);
+    const delivery = alias(addresses, ORDER_ADDRESS_ALIAS.DELIVERY);
 
     const [rows, total] = await Promise.all([
       this.db

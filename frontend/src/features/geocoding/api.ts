@@ -10,9 +10,8 @@ import {
   GEOCODING_MIN_QUERY_LENGTH,
   GEOCODING_PARAMS,
   GEOCODING_PATHS,
-} from './constants';
-import { geocodingResponseSchema } from './schemas';
-import type { AddressSuggestion } from './types';
+} from './constants/search';
+import { type AddressSuggestion, geocodingResponseSchema } from './schemas';
 
 function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === ABORT_ERROR_NAME;

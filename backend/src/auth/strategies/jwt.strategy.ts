@@ -6,8 +6,8 @@ import { Strategy } from 'passport-jwt';
 import { ENV_KEYS } from '../../config/env.constants';
 import { UsersService } from '../../users/users.service';
 import { readCookie } from '../auth-cookies.service';
-import { AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../constants/access';
-import { ACCESS_COOKIE_NAME } from '../constants/tokens';
+import { AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../constants/access.constants';
+import { ACCESS_COOKIE_NAME } from '../constants/tokens.constants';
 import { toAuthUser } from '../auth-user.mapper';
 import type { AccessTokenPayload, AuthUser } from '../auth.types';
 

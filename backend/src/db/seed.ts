@@ -3,7 +3,7 @@ import { hash } from '@node-rs/argon2';
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { ROLE, ROLE_NAMES } from '../common/enums/role.enum';
 import { ENV_FILE_PATH, ENV_KEYS } from '../config/env.constants';
 import { DB_CASING } from '../database/database.constants';

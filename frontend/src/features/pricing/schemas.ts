@@ -19,6 +19,8 @@ export const priceEstimateSchema = z.object({
   coefficient: z.number(),
 });
 
+export type PriceEstimate = z.infer<typeof priceEstimateSchema>;
+
 function parseDecimal(text: string): number {
   return Number(text.replace(DECIMAL_COMMA, DECIMAL_POINT));
 }
@@ -49,3 +51,6 @@ export const packageFormSchema = z.object({
   [PACKAGE_FIELD.HEIGHT]: wholeSchema,
   [PACKAGE_FIELD.FRAGILE]: z.string().transform((value) => value === CHECKBOX_CHECKED_VALUE),
 });
+
+// The parsed form is the package of the estimate request.
+export type PackageParams = z.infer<typeof packageFormSchema>;

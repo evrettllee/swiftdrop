@@ -1,4 +1,4 @@
-import { CITY_CENTER, MAPBOX_API_ORIGIN } from '../../shared/constants/map';
+import { CITY_CENTER, MAPBOX_API_ORIGIN } from '../../../shared/constants/map';
 
 const [CITY_CENTER_LATITUDE, CITY_CENTER_LONGITUDE] = CITY_CENTER;
 
@@ -41,17 +41,4 @@ export const SEARCH_STATUS = {
   LOADING: 'loading',
   READY: 'ready',
   ERROR: 'error',
-} as const;
-
-// Address field
-export const ADDRESS_FIELD_KEY = {
-  ARROW_DOWN: 'ArrowDown',
-  ARROW_UP: 'ArrowUp',
-  ENTER: 'Enter',
-} as const;
-
-export const NO_ACTIVE_INDEX = -1;
-
-export const ADDRESS_FIELD_TEXTS = {
-  NO_RESULTS: 'Ничего не найдено. Уточните адрес или отметьте точку на карте',
 } as const;

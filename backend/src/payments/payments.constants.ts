@@ -12,10 +12,6 @@ export const PAYMENT_CURRENCY = 'usd';
 // caused by a small clock difference. An unpaid order is cancelled earlier, after 30 minutes.
 export const CHECKOUT_SESSION_TTL_MINUTES = 31;
 
-// Both rubles and dollars are counted in hundredths: kopecks and cents.
-export const MINOR_UNITS_PER_MAJOR = 100;
-export const AMOUNT_FRACTION_DIGITS = 2;
-
 // Stripe does not take a charge below 50 cents.
 export const MIN_CHARGE_MINOR = 50;
 

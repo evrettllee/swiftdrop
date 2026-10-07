@@ -1,4 +1,4 @@
-import { MS_PER_MINUTE } from './time';
+import { MS_PER_MINUTE } from './time.constants';
 
 // Application
 export const GLOBAL_PREFIX = 'api';

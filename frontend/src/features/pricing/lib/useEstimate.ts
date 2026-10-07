@@ -4,7 +4,8 @@ import { API_ERROR_MESSAGES } from '../../../shared/constants/api';
 import type { GeoPoint } from '../../../shared/types';
 import { estimatePrice } from '../api';
 import { ESTIMATE_DEBOUNCE_MS, ESTIMATE_STATUS } from '../constants/estimate';
-import type { EstimateInput, PackageParams, PriceEstimate } from '../types';
+import type { PackageParams, PriceEstimate } from '../schemas';
+import type { EstimateInput } from '../types';
 
 type PendingStatus =
   | typeof ESTIMATE_STATUS.NEEDS_ADDRESSES

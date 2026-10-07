@@ -6,8 +6,9 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
-import { SECONDS_PER_MINUTE } from '../common/constants/time';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
+import { CURRENCY } from '../common/constants/money.constants';
+import { SECONDS_PER_MINUTE } from '../common/constants/time.constants';
 import { findLightestVehicle } from '../common/utils/vehicle-fit';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
@@ -17,7 +18,6 @@ import { ZonesService } from '../zones/zones.service';
 import type { EstimatePriceDto } from './dto/estimate-price.dto';
 import { calculatePrice } from './pricing.calculator';
 import {
-  CURRENCY,
   DISTANCE_PRECISION_FACTOR,
   NEUTRAL_COEFFICIENT,
   PICKUP_BUFFER_MINUTES,

@@ -26,6 +26,8 @@ export const authUserSchema = z.object({
   role: z.enum(ROLE_VALUES),
 });
 
+export type AuthUser = z.infer<typeof authUserSchema>;
+
 // Login, registration and refresh answer with { user }; /me answers with the user itself.
 export const authResponseSchema = z.object({ user: authUserSchema });
 
@@ -71,6 +73,8 @@ export const loginFormSchema = z.object({
   [AUTH_FIELD.PASSWORD]: z.string().min(1, VALIDATION_MESSAGES.PASSWORD_REQUIRED),
 });
 
+export type LoginInput = z.infer<typeof loginFormSchema>;
+
 // The consent and the password repeat are checked on the client only; neither is sent to the backend.
 export const registerFormSchema = z
   .object({
@@ -100,3 +104,9 @@ export const registerFormSchema = z
     // Zod skips object-level checks while any field is invalid; the repeat is compared anyway.
     when: () => true,
   });
+
+// The body of the registration request: the form without the client-only fields.
+export type RegisterInput = Omit<
+  z.infer<typeof registerFormSchema>,
+  typeof AUTH_FIELD.CONFIRM_PASSWORD | typeof AUTH_FIELD.TERMS
+>;

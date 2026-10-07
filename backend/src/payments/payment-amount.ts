@@ -1,4 +1,4 @@
-import { AMOUNT_FRACTION_DIGITS, MINOR_UNITS_PER_MAJOR } from './payments.constants';
+import { MINOR_UNITS_PER_MAJOR, MONEY_FRACTION_DIGITS } from '../common/constants/money.constants';
 
 // US cents to charge for a price in BYN, the result is rounded up, so the shop never loses on rounding.
 export function convertBynToUsdMinor(amountByn: number, bynPerUsd: number): number {
@@ -9,5 +9,5 @@ export function convertBynToUsdMinor(amountByn: number, bynPerUsd: number): numb
 
 // An amount in hundredths as a decimal string, the way numeric columns take it.
 export function formatMinorAmount(minor: number): string {
-  return (minor / MINOR_UNITS_PER_MAJOR).toFixed(AMOUNT_FRACTION_DIGITS);
+  return (minor / MINOR_UNITS_PER_MAJOR).toFixed(MONEY_FRACTION_DIGITS);
 }

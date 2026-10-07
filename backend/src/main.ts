@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
-import { GLOBAL_PREFIX } from './common/constants/http';
+import { GLOBAL_PREFIX } from './common/constants/http.constants';
 import { ENV_KEYS } from './config/env.constants';
 
 async function bootstrap() {

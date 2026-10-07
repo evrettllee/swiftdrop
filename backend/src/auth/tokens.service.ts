@@ -2,7 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { and, eq, gt, isNotNull, isNull } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { refreshTokens } from '../db/schema';
@@ -12,7 +12,7 @@ import {
   REFRESH_TOKEN_TTL_MS,
   TOKEN_HASH_ALGORITHM,
   TOKEN_HASH_ENCODING,
-} from './constants/tokens';
+} from './constants/tokens.constants';
 import type { AccessTokenPayload } from './auth.types';
 
 @Injectable()

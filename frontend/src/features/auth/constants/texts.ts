@@ -1,12 +1,13 @@
+import { UI_TEXTS } from '../../../shared/constants/texts';
 import { EMAIL_EXAMPLE, PHONE_EXAMPLE } from './validation';
 
 export const AUTH_TEXTS = {
   TABS_LABEL: 'Вход или регистрация',
   TAB_LOGIN: 'Вход',
-  TAB_REGISTER: 'Регистрация',
+  TAB_REGISTER: UI_TEXTS.SIGN_UP,
   TITLE_LOGIN: 'Вход в аккаунт',
   TITLE_REGISTER: 'Создание аккаунта',
-  SUBMIT_LOGIN: 'Войти',
+  SUBMIT_LOGIN: UI_TEXTS.SIGN_IN,
   SUBMIT_REGISTER: 'Создать аккаунт',
   SUBMITTING_LOGIN: 'Входим',
   SUBMITTING_REGISTER: 'Создаём аккаунт',
@@ -14,7 +15,7 @@ export const AUTH_TEXTS = {
   OAUTH_GOOGLE: 'Продолжить через Google',
   OAUTH_YANDEX: 'Продолжить через Яндекс',
   OAUTH_CONSENT: 'Продолжая через сервис, вы принимаете',
-  LABEL_EMAIL: 'Email',
+  LABEL_EMAIL: UI_TEXTS.EMAIL,
   LABEL_PASSWORD: 'Пароль',
   LABEL_CONFIRM_PASSWORD: 'Повторите пароль',
   LABEL_FIRST_NAME: 'Имя',

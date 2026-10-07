@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, inArray } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { ORDER_STATUS } from '../common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../common/enums/payment-status.enum';
 import { DRIZZLE } from '../database/database.constants';
@@ -57,13 +57,11 @@ export class PaymentWebhookService {
           .returning({ orderId: orders.orderId });
 
         if (confirmed) {
-          await tx
-            .insert(orderStatusHistory)
-            .values({
-              orderId: confirmed.orderId,
-              status: ORDER_STATUS.CONFIRMED,
-              changedBy: null,
-            });
+          await tx.insert(orderStatusHistory).values({
+            orderId: confirmed.orderId,
+            status: ORDER_STATUS.CONFIRMED,
+            changedBy: null,
+          });
           this.logger.log(`Order ${confirmed.orderId} confirmed by payment`);
         }
       }

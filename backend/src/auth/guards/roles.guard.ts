@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { RoleName } from '../../common/enums/role.enum';
-import { FORBIDDEN_MESSAGE, ROLES_KEY } from '../constants/access';
+import { FORBIDDEN_MESSAGE, ROLES_KEY } from '../constants/access.constants';
 import type { AuthUser } from '../auth.types';
 
 @Injectable()

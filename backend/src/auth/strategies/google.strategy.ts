@@ -2,10 +2,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { type Profile, Strategy } from 'passport-google-oauth20';
-import { NAME_MAX_LENGTH } from '../../common/constants/person-validation';
+import { NAME_MAX_LENGTH } from '../../common/constants/person-validation.constants';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
 import { ENV_KEYS } from '../../config/env.constants';
-import { GOOGLE_SCOPES, GOOGLE_STRATEGY_NAME, OAUTH_ERROR_MESSAGES } from '../constants/oauth';
+import {
+  GOOGLE_SCOPES,
+  GOOGLE_STRATEGY_NAME,
+  OAUTH_ERROR_MESSAGES,
+} from '../constants/oauth.constants';
 import type { OAuthProfile } from '../auth.types';
 
 @Injectable()

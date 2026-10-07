@@ -1,13 +1,13 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { ROLE } from '../common/enums/role.enum';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { userOauthAccounts } from '../db/schema';
 import { UsersService } from '../users/users.service';
 import type { UserWithRole } from '../users/users.types';
-import { OAUTH_ERROR_MESSAGES } from './constants/oauth';
+import { OAUTH_ERROR_MESSAGES } from './constants/oauth.constants';
 import type { OAuthProfile } from './auth.types';
 import { TokensService } from './tokens.service';
 

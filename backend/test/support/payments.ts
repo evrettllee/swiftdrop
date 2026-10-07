@@ -2,10 +2,11 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { payments } from '../../src/db/schema';
 import type { Database } from '../../src/database/database.module';
 import { PAYMENTS_ROUTES } from '../../src/payments/payments.constants';
+import { COOKIE_HEADER } from './auth';
 import { postApi, nextClientIp } from './http';
 import type { Cookies } from './orders';
 import request from 'supertest';
-import { GLOBAL_PREFIX } from '../../src/common/constants/http';
+import { GLOBAL_PREFIX } from '../../src/common/constants/http.constants';
 import { WEBHOOK_SIGNATURE_HEADER } from '../../src/payments/payments.constants';
 import { CLIENT_IP_HEADER } from './constants';
 
@@ -56,7 +57,7 @@ export function postPayment(
   cookies: Cookies,
   body: Record<string, unknown>,
 ) {
-  return postApi(app, PAYMENTS_ROUTES.BASE).set('Cookie', cookies).send(body);
+  return postApi(app, PAYMENTS_ROUTES.BASE).set(COOKIE_HEADER, cookies).send(body);
 }
 
 let sessionCounter = 0;

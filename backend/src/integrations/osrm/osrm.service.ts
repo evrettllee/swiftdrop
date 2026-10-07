@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { z } from 'zod';
-import type { GeoPoint } from '../../common/common.types';
+import type { GeoPoint } from '../../common/schemas/geo-point.schema';
 import { ENV_KEYS } from '../../config/env.constants';
 import {
   COORDINATE_SEPARATOR,

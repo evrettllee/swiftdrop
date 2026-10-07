@@ -1,7 +1,7 @@
 import { ApiError, http } from '../../shared/api/http';
 import { ESTIMATE_STATUS_MESSAGES, PRICING_API_PATHS } from './constants/estimate';
-import { priceEstimateSchema } from './schemas';
-import type { EstimateInput, PriceEstimate } from './types';
+import { type PriceEstimate, priceEstimateSchema } from './schemas';
+import type { EstimateInput } from './types';
 
 // A failed request becomes an ApiError whose message can be shown to the user as it is.
 function toEstimateError(error: unknown): unknown {

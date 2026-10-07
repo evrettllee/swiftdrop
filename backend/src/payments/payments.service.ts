@@ -8,8 +8,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
-import { MS_PER_MINUTE } from '../common/constants/time';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
+import { ORDER_NOT_FOUND_MESSAGE } from '../common/constants/orders.constants';
+import { MS_PER_MINUTE } from '../common/constants/time.constants';
 import { ORDER_STATUS } from '../common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../common/enums/payment-status.enum';
 import { ENV_KEYS } from '../config/env.constants';
@@ -17,7 +18,6 @@ import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { orders, payments } from '../db/schema';
 import { NbrbService } from '../integrations/nbrb/nbrb.service';
-import { ORDERS_ERROR_MESSAGES } from '../orders/orders.constants';
 import { convertBynToUsdMinor, formatMinorAmount } from './payment-amount';
 import { buildOrderReturnUrl } from './payment-urls';
 import { PaymentGateway } from './payment.gateway';
@@ -89,7 +89,7 @@ export class PaymentsService {
       .limit(SINGLE_ROW_LIMIT);
 
     if (!order) {
-      throw new NotFoundException(ORDERS_ERROR_MESSAGES.NOT_FOUND);
+      throw new NotFoundException(ORDER_NOT_FOUND_MESSAGE);
     }
 
     if (order.status !== ORDER_STATUS.PENDING) {

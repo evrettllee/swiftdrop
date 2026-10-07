@@ -7,7 +7,7 @@ import {
   OAUTH_STATE_COOKIE_BASE_PATH,
   OAUTH_STATE_COOKIE_PREFIX,
   OAUTH_STATE_TTL_MS,
-} from './constants/oauth';
+} from './constants/oauth.constants';
 import {
   ACCESS_COOKIE_NAME,
   ACCESS_COOKIE_PATH,
@@ -16,7 +16,7 @@ import {
   REFRESH_COOKIE_NAME,
   REFRESH_COOKIE_PATH,
   REFRESH_TOKEN_TTL_MS,
-} from './constants/tokens';
+} from './constants/tokens.constants';
 import type { AuthResult } from './auth.types';
 
 // A plain function, so the JWT strategy can use it before `this` exists in its constructor.

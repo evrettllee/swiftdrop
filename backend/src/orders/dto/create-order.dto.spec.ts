@@ -1,5 +1,5 @@
-import { PHONE_INVALID_MESSAGE } from '../../common/constants/person-validation';
-import { PRICING_VALIDATION_MESSAGES } from '../../pricing/pricing.constants';
+import { PACKAGE_VALIDATION_MESSAGES } from '../../common/constants/package.constants';
+import { PHONE_INVALID_MESSAGE } from '../../common/constants/person-validation.constants';
 import { ORDERS_VALIDATION_MESSAGES } from '../orders.constants';
 import { createOrderSchema } from './create-order.dto';
 
@@ -59,6 +59,6 @@ describe('createOrderSchema', () => {
   it('should return the package message when the weight is zero', () => {
     const messages = messagesOf({ ...validOrder, package: { ...validOrder.package, weightKg: 0 } });
 
-    expect(messages).toEqual([PRICING_VALIDATION_MESSAGES.PACKAGE_VALUE_INVALID]);
+    expect(messages).toEqual([PACKAGE_VALIDATION_MESSAGES.PACKAGE_VALUE_INVALID]);
   });
 });

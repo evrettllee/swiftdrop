@@ -1,3 +1,5 @@
+import { UI_TEXTS } from '../../../shared/constants/texts';
+
 // The header, the mobile menu and the footer name the sections the same way.
 export const SECTION_LABELS = {
   CALCULATOR: 'Расчёт',
@@ -9,9 +11,9 @@ export const SECTION_LABELS = {
 
 export const LANDING_TEXTS = {
   NAV_LABEL: 'Разделы страницы',
-  SIGN_IN: 'Войти',
-  SIGN_UP: 'Регистрация',
-  PROFILE: 'Профиль',
+  SIGN_IN: UI_TEXTS.SIGN_IN,
+  SIGN_UP: UI_TEXTS.SIGN_UP,
+  PROFILE: UI_TEXTS.PROFILE,
   OPEN_MENU: 'Открыть меню',
   CLOSE_MENU: 'Закрыть меню',
   HERO_TITLE: 'Курьерская доставка по городу, которую видно на карте',

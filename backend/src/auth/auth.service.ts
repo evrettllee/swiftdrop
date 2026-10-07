@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import { ROLE, type RoleName } from '../common/enums/role.enum';
 import { UsersService } from '../users/users.service';
 import type { User, UserWithRole } from '../users/users.types';
-import { AUTH_ERROR_MESSAGES } from './constants/access';
+import { AUTH_ERROR_MESSAGES } from './constants/access.constants';
 import { toAuthUser } from './auth-user.mapper';
 import type { AuthResult, OAuthProfile } from './auth.types';
 import type { LoginDto } from './dto/login.dto';
