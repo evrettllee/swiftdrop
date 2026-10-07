@@ -1,4 +1,5 @@
 import type { OrderStatus } from '../common/enums/order-status.enum';
+import type { PaymentStatus } from '../common/enums/payment-status.enum';
 
 export type CreatedOrder = {
   orderId: number;
@@ -51,6 +52,11 @@ export type OrderHistoryEntry = {
   changedAt: Date;
 };
 
+export type OrderPaymentView = {
+  status: PaymentStatus;
+  amountUsd: number;
+};
+
 export type OrderDetails = {
   orderId: number;
   status: OrderStatus;
@@ -65,6 +71,7 @@ export type OrderDetails = {
   pickup: OrderPointView;
   delivery: OrderPointView;
   history: OrderHistoryEntry[];
+  payment: OrderPaymentView | null;
 };
 
 export type CancelledOrder = {
