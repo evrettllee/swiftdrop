@@ -1,6 +1,6 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDERS_ROUTES } from '../../src/orders/orders.constants';
-import { type registerUser, validRegistration } from './auth';
+import { COOKIE_HEADER, type registerUser, validRegistration } from './auth';
 import { VALID_ORDER } from './fixtures';
 import { postApi } from './http';
 
@@ -18,7 +18,7 @@ export function postOrder(
   cookies: Cookies,
   body: Record<string, unknown>,
 ) {
-  return postApi(app, ORDERS_ROUTES.BASE).set('Cookie', cookies).send(body);
+  return postApi(app, ORDERS_ROUTES.BASE).set(COOKIE_HEADER, cookies).send(body);
 }
 
 // Places orders one after another, so their creation order is the order of the returned ids.

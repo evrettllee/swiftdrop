@@ -1,7 +1,12 @@
 import { AUTH_API_PATHS } from '../../shared/constants/api';
 import { http } from '../../shared/api/http';
-import { authResponseSchema, authUserSchema } from './schemas';
-import type { AuthUser, LoginInput, RegisterInput } from './types';
+import {
+  type AuthUser,
+  authResponseSchema,
+  authUserSchema,
+  type LoginInput,
+  type RegisterInput,
+} from './schemas';
 
 export async function fetchCurrentUser(): Promise<AuthUser> {
   return authUserSchema.parse(await http.get(AUTH_API_PATHS.ME));

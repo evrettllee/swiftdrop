@@ -10,7 +10,7 @@ import { OsrmService } from '../../src/integrations/osrm/osrm.service';
 import { ORDERS_ROUTES } from '../../src/orders/orders.constants';
 import { PaymentGateway } from '../../src/payments/payment.gateway';
 import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
+import { COOKIE_HEADER, registerUser } from '../support/auth';
 import { resetTestData, seedServiceArea } from '../support/database';
 import { ROUTE } from '../support/fixtures';
 import { postApi } from '../support/http';
@@ -31,7 +31,7 @@ describe('Order cancellation with payments (e2e)', () => {
   const gateway = createGatewayMock();
 
   function cancelOrder() {
-    return postApi(app, `${ORDERS_ROUTES.BASE}/${orderId}/cancel`).set('Cookie', cookies);
+    return postApi(app, `${ORDERS_ROUTES.BASE}/${orderId}/cancel`).set(COOKIE_HEADER, cookies);
   }
 
   async function readPaymentStatus(paymentId: number): Promise<string> {

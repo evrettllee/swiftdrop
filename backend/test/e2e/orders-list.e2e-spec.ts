@@ -14,7 +14,7 @@ import {
   ORDERS_VALIDATION_MESSAGES,
 } from '../../src/orders/orders.constants';
 import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
+import { COOKIE_HEADER, registerUser } from '../support/auth';
 import { resetTestData, seedServiceArea } from '../support/database';
 import { ROUTE } from '../support/fixtures';
 import { getApi } from '../support/http';
@@ -48,7 +48,7 @@ describe('Orders list (e2e)', () => {
   });
 
   function getOrders(cookies: Cookies, params: Record<string, string | number> = {}) {
-    return getApi(app, ORDERS_ROUTES.BASE).set('Cookie', cookies).query(params);
+    return getApi(app, ORDERS_ROUTES.BASE).set(COOKIE_HEADER, cookies).query(params);
   }
 
   it('should return an empty first page when the client has no orders', async () => {

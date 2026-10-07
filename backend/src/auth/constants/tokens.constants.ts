@@ -1,9 +1,16 @@
 import { CronExpression } from '@nestjs/schedule';
-import { GLOBAL_PREFIX } from '../../common/constants/http';
-import { MS_PER_SECOND, SECONDS_PER_DAY, SECONDS_PER_MINUTE } from '../../common/constants/time';
-import { AUTH_ROUTES } from './routes';
+import { GLOBAL_PREFIX } from '../../common/constants/http.constants';
+import {
+  MS_PER_SECOND,
+  SECONDS_PER_DAY,
+  SECONDS_PER_MINUTE,
+} from '../../common/constants/time.constants';
+import { AUTH_ROUTES } from './routes.constants';
 
 // Tokens
+// Random tokens go into cookies and URLs, so they are encoded in a URL-safe way.
+export const URL_SAFE_ENCODING = 'base64url';
+
 export const ACCESS_TOKEN_TTL_MINUTES = 15;
 export const ACCESS_TOKEN_TTL_SECONDS = ACCESS_TOKEN_TTL_MINUTES * SECONDS_PER_MINUTE;
 export const ACCESS_TOKEN_TTL_MS = ACCESS_TOKEN_TTL_SECONDS * MS_PER_SECOND;
@@ -11,7 +18,7 @@ export const ACCESS_TOKEN_TTL_MS = ACCESS_TOKEN_TTL_SECONDS * MS_PER_SECOND;
 export const REFRESH_TOKEN_TTL_DAYS = 30;
 export const REFRESH_TOKEN_TTL_MS = REFRESH_TOKEN_TTL_DAYS * SECONDS_PER_DAY * MS_PER_SECOND;
 export const REFRESH_TOKEN_BYTES = 32;
-export const REFRESH_TOKEN_ENCODING = 'base64url';
+export const REFRESH_TOKEN_ENCODING = URL_SAFE_ENCODING;
 
 export const TOKEN_HASH_ALGORITHM = 'sha256';
 export const TOKEN_HASH_ENCODING = 'hex';

@@ -14,7 +14,7 @@ import {
   GOOGLE_STRATEGY_NAME,
   OAUTH_ERROR_MESSAGES,
   YANDEX_STRATEGY_NAME,
-} from '../constants/oauth';
+} from '../constants/oauth.constants';
 import { OAuthStateService } from '../oauth-state.service';
 
 // Starts the redirect to the provider and issues the state value that the callback will check.

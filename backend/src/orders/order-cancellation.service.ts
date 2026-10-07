@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { and, eq, inArray } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { ORDER_STATUS, type OrderStatus } from '../common/enums/order-status.enum';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';

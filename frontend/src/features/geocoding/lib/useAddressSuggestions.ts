@@ -6,7 +6,7 @@ import {
   GEOCODING_ERROR_MESSAGES,
   GEOCODING_MIN_QUERY_LENGTH,
   SEARCH_STATUS,
-} from '../constants';
+} from '../constants/search';
 import type { SuggestionsState } from '../types';
 
 const IDLE_STATE: SuggestionsState = {

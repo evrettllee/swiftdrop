@@ -1,5 +1,5 @@
+import { MINOR_UNITS_PER_MAJOR } from '../common/constants/money.constants';
 import {
-  CENTS_PER_UNIT,
   CLASS_MULTIPLIERS,
   COEFFICIENT_MAX,
   COEFFICIENT_MIN,
@@ -12,9 +12,9 @@ export function clampCoefficient(value: number): number {
 }
 
 function roundMoney(value: number): number {
-  const cents = Number((value * CENTS_PER_UNIT).toPrecision(MONEY_PRECISION_DIGITS));
+  const cents = Number((value * MINOR_UNITS_PER_MAJOR).toPrecision(MONEY_PRECISION_DIGITS));
 
-  return Math.round(cents) / CENTS_PER_UNIT;
+  return Math.round(cents) / MINOR_UNITS_PER_MAJOR;
 }
 
 export function calculatePrice(input: PriceInput): number {

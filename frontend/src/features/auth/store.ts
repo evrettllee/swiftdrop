@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { setSessionExpiredHandler } from '../../shared/api/http';
 import { fetchCurrentUser, login, logout, register } from './api';
 import { AUTH_STATUS } from './constants/session';
-import type { AuthStatus, AuthUser, LoginInput, RegisterInput } from './types';
+import type { AuthUser, LoginInput, RegisterInput } from './schemas';
+import type { AuthStatus } from './types';
 
 type AuthState = {
   user: AuthUser | null;

@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { geoPointSchema } from '../../common/schemas/geo-point.schema';
+import { packageSpecSchema } from '../../common/schemas/package-spec.schema';
 import { buildNameSchema, phoneSchema } from '../../common/schemas/person-fields.schema';
-import { geoPointSchema, packageSpecSchema } from '../../pricing/dto/estimate-price.dto';
 import {
   APARTMENT_MAX_LENGTH,
   CITY_MAX_LENGTH,

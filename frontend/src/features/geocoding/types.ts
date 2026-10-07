@@ -1,8 +1,6 @@
-import type { z } from 'zod';
-import type { SEARCH_STATUS } from './constants';
-import type { addressSuggestionSchema } from './schemas';
+import type { SEARCH_STATUS } from './constants/search';
+import type { AddressSuggestion } from './schemas';
 
-export type AddressSuggestion = z.infer<typeof addressSuggestionSchema>;
 export type SearchStatus = (typeof SEARCH_STATUS)[keyof typeof SEARCH_STATUS];
 
 export type SuggestionsState = {

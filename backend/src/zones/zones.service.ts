@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { and, eq } from 'drizzle-orm';
-import type { GeoPoint } from '../common/common.types';
+import type { GeoPoint } from '../common/schemas/geo-point.schema';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { serviceZones, tariffs } from '../db/schema';

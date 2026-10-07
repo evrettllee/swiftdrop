@@ -1,12 +1,12 @@
 import { UnauthorizedException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
-import { NAME_MAX_LENGTH } from '../../common/constants/person-validation';
+import { NAME_MAX_LENGTH } from '../../common/constants/person-validation.constants';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
 import {
   OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,
   YANDEX_PROFILE_URL,
-} from '../constants/oauth';
+} from '../constants/oauth.constants';
 import { YandexStrategy } from './yandex.strategy';
 
 const ACCESS_TOKEN = 'test-access-token';

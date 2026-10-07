@@ -1,5 +1,6 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { MS_PER_MINUTE } from '../common/constants/time';
+import { MONEY_FRACTION_DIGITS } from '../common/constants/money.constants';
+import { MS_PER_MINUTE } from '../common/constants/time.constants';
 import { ORDER_STATUS } from '../common/enums/order-status.enum';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
@@ -7,7 +8,7 @@ import { addresses, orders, orderStatusHistory, packages } from '../db/schema';
 import { PricingService } from '../pricing/pricing.service';
 import type { CreateOrderDto } from './dto/create-order.dto';
 import { toAddressRow, toPackageRow } from './order-rows.mapper';
-import { ORDERS_ERROR_MESSAGES, PRICE_FRACTION_DIGITS } from './orders.constants';
+import { ORDERS_ERROR_MESSAGES } from './orders.constants';
 import type { CreatedOrder } from './orders.types';
 
 @Injectable()
@@ -48,7 +49,7 @@ export class OrderPlacementService {
           status: ORDER_STATUS.PENDING,
           recipientName: dto.recipient.name,
           recipientPhone: dto.recipient.phone,
-          price: estimate.price.toFixed(PRICE_FRACTION_DIGITS),
+          price: estimate.price.toFixed(MONEY_FRACTION_DIGITS),
           priceCoefficient: estimate.coefficient,
           distanceKm: estimate.distanceKm,
           estimatedDeliveryAt,

@@ -1,5 +1,5 @@
-import { NAME_MAX_LENGTH } from '../../common/constants/person-validation';
-import { AUTH_VALIDATION_MESSAGES } from '../constants/validation';
+import { NAME_MAX_LENGTH } from '../../common/constants/person-validation.constants';
+import { AUTH_VALIDATION_MESSAGES } from '../constants/validation.constants';
 import { registerSchema } from './register.dto';
 
 const VALID_DATA = {

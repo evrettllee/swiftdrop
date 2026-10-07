@@ -22,6 +22,8 @@ export const addressSuggestionSchema = z
     },
   }));
 
+export type AddressSuggestion = z.infer<typeof addressSuggestionSchema>;
+
 export const geocodingResponseSchema = z.object({
   features: z.array(addressSuggestionSchema),
 });

@@ -10,7 +10,7 @@ import {
   ORDERS_VALIDATION_MESSAGES,
 } from '../../src/orders/orders.constants';
 import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
+import { COOKIE_HEADER, registerUser } from '../support/auth';
 import { resetTestData, seedServiceArea } from '../support/database';
 import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../support/fixtures';
 import { getApi } from '../support/http';
@@ -40,7 +40,7 @@ describe('Order details (e2e)', () => {
   });
 
   function getOrder(cookies: Cookies, orderId: number | string) {
-    return getApi(app, `${ORDERS_ROUTES.BASE}/${orderId}`).set('Cookie', cookies);
+    return getApi(app, `${ORDERS_ROUTES.BASE}/${orderId}`).set(COOKIE_HEADER, cookies);
   }
 
   it('should return the order with addresses, recipient, package and history when the client owns it', async () => {

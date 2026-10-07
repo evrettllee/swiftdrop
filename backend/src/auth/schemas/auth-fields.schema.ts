@@ -8,7 +8,7 @@ import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_SPECIAL_REGEX,
   PASSWORD_UPPERCASE_REGEX,
-} from '../constants/validation';
+} from '../constants/validation.constants';
 
 export const emailSchema = z
   .string()

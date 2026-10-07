@@ -1,7 +1,10 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ERROR_MESSAGES, AUTH_THROTTLE_LIMIT } from '../../src/auth/constants/access';
-import { AUTH_ROUTES } from '../../src/auth/constants/routes';
+import {
+  AUTH_ERROR_MESSAGES,
+  AUTH_THROTTLE_LIMIT,
+} from '../../src/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../src/auth/constants/routes.constants';
 import {
   ACCESS_COOKIE_NAME,
   ACCESS_COOKIE_PATH,
@@ -10,9 +13,9 @@ import {
   REFRESH_COOKIE_NAME,
   REFRESH_COOKIE_PATH,
   REFRESH_TOKEN_TTL_MS,
-} from '../../src/auth/constants/tokens';
-import { AUTH_VALIDATION_MESSAGES } from '../../src/auth/constants/validation';
-import { MS_PER_SECOND } from '../../src/common/constants/time';
+} from '../../src/auth/constants/tokens.constants';
+import { AUTH_VALIDATION_MESSAGES } from '../../src/auth/constants/validation.constants';
+import { MS_PER_SECOND } from '../../src/common/constants/time.constants';
 import { ROLE } from '../../src/common/enums/role.enum';
 import { DRIZZLE } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';

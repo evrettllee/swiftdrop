@@ -13,7 +13,7 @@ import {
   ORDERS_VALIDATION_MESSAGES,
 } from '../../src/orders/orders.constants';
 import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
+import { COOKIE_HEADER, registerUser } from '../support/auth';
 import { resetTestData, seedServiceArea } from '../support/database';
 import { ROUTE } from '../support/fixtures';
 import { postApi } from '../support/http';
@@ -46,7 +46,7 @@ describe('Order cancellation (e2e)', () => {
   function cancelOrder(cookies: Cookies, orderId: number | string) {
     const path = `${ORDERS_ROUTES.BASE}/${ORDERS_ROUTES.CANCEL.replace(':orderId', String(orderId))}`;
 
-    return postApi(app, path).set('Cookie', cookies);
+    return postApi(app, path).set(COOKIE_HEADER, cookies);
   }
 
   async function setStatus(orderId: number, status: OrderStatus): Promise<void> {

@@ -13,7 +13,9 @@ import {
   REFRESH_PATH,
 } from '../constants/api';
 
-export type FieldError = { field: string; message: string };
+const fieldErrorSchema = z.object({ field: z.string(), message: z.string() });
+
+export type FieldError = z.infer<typeof fieldErrorSchema>;
 
 export class ApiError extends Error {
   readonly status: number;
@@ -36,7 +38,7 @@ type RequestOptions = { method: string; body?: unknown };
 
 const errorBodySchema = z.object({
   message: z.string().optional(),
-  errors: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+  errors: z.array(fieldErrorSchema).optional(),
 });
 
 let sessionExpiredHandler: (() => void) | null = null;

@@ -1,4 +1,4 @@
-import { MS_PER_MINUTE, MS_PER_SECOND } from '../../common/constants/time';
+import { MS_PER_MINUTE, MS_PER_SECOND } from '../../common/constants/time.constants';
 
 // The official rate of one US dollar, parammode=2 means the currency is asked by its letter code.
 export const NBRB_USD_RATE_URL = 'https://api.nbrb.by/exrates/rates/USD?parammode=2';

@@ -1,7 +1,7 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { MS_PER_MINUTE } from '../../src/common/constants/time';
+import { MS_PER_MINUTE } from '../../src/common/constants/time.constants';
 import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../src/database/database.constants';

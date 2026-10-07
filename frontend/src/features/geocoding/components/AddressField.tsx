@@ -1,9 +1,10 @@
 import type { ChangeEvent } from 'react';
 import { Input } from '../../../shared/ui/Input';
 import { Spinner } from '../../../shared/ui/Spinner';
-import { NO_ACTIVE_INDEX, SEARCH_STATUS } from '../constants';
+import { NO_ACTIVE_INDEX } from '../constants/address-field';
+import { SEARCH_STATUS } from '../constants/search';
 import { useAddressCombobox } from '../lib/useAddressCombobox';
-import type { AddressSuggestion } from '../types';
+import type { AddressSuggestion } from '../schemas';
 import { AddressSuggestions } from './AddressSuggestions';
 
 type AddressFieldProps = {

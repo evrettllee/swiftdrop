@@ -1,4 +1,4 @@
-import { DEFAULT_THROTTLER_NAME } from '../constants/http';
+import { DEFAULT_THROTTLER_NAME } from '../constants/http.constants';
 
 // @Throttle overrides a throttler by name: the global one is registered without a name.
 export function buildThrottleOverride(limit: number, ttlMs: number) {

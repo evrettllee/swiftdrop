@@ -1,10 +1,10 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import { AUTH_ROUTES } from '../../src/auth/constants/routes';
-import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from '../../src/auth/constants/tokens';
+import { AUTH_ROUTES } from '../../src/auth/constants/routes.constants';
+import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from '../../src/auth/constants/tokens.constants';
 import type { AuthResponse, OAuthProfile } from '../../src/auth/auth.types';
-import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../../src/common/constants/csrf';
-import { GLOBAL_PREFIX } from '../../src/common/constants/http';
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../../src/common/constants/csrf.constants';
+import { GLOBAL_PREFIX } from '../../src/common/constants/http.constants';
 import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
 import { CLIENT_IP_HEADER } from './constants';
 import { nextClientIp } from './http';

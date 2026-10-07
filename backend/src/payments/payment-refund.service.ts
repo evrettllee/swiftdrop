@@ -1,6 +1,6 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { PAYMENT_STATUS } from '../common/enums/payment-status.enum';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';

@@ -1,12 +1,8 @@
 import { useId, useState, type KeyboardEvent } from 'react';
 import { ESCAPE_KEY } from '../../../shared/constants/dom';
-import {
-  ADDRESS_FIELD_KEY,
-  GEOCODING_MIN_QUERY_LENGTH,
-  NO_ACTIVE_INDEX,
-  SEARCH_STATUS,
-} from '../constants';
-import type { AddressSuggestion } from '../types';
+import { ADDRESS_FIELD_KEY, NO_ACTIVE_INDEX } from '../constants/address-field';
+import { GEOCODING_MIN_QUERY_LENGTH, SEARCH_STATUS } from '../constants/search';
+import type { AddressSuggestion } from '../schemas';
 import { useAddressSuggestions } from './useAddressSuggestions';
 
 // The state of the combobox pattern of ARIA: whether the list is open, which option is active

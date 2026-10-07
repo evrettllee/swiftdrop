@@ -5,7 +5,7 @@ import type { Database } from '../../src/database/database.module';
 import { OsrmService } from '../../src/integrations/osrm/osrm.service';
 import { ORDERS_ROUTES } from '../../src/orders/orders.constants';
 import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
+import { COOKIE_HEADER, registerUser } from '../support/auth';
 import { resetTestData, seedServiceArea } from '../support/database';
 import { ROUTE } from '../support/fixtures';
 import { getApi } from '../support/http';
@@ -20,7 +20,7 @@ describe('Order details payment (e2e)', () => {
   const getRoute = jest.fn();
 
   function getDetails() {
-    return getApi(app, `${ORDERS_ROUTES.BASE}/${orderId}`).set('Cookie', cookies);
+    return getApi(app, `${ORDERS_ROUTES.BASE}/${orderId}`).set(COOKIE_HEADER, cookies);
   }
 
   beforeAll(async () => {

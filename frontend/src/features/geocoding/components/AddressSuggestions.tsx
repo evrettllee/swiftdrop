@@ -1,5 +1,5 @@
-import { ADDRESS_FIELD_TEXTS } from '../constants';
-import type { AddressSuggestion } from '../types';
+import { ADDRESS_FIELD_TEXTS } from '../constants/address-field';
+import type { AddressSuggestion } from '../schemas';
 
 type AddressSuggestionsProps = {
   listboxId: string;

@@ -7,7 +7,7 @@ import {
   PHONE_REGEX,
   PHONE_SEPARATOR_REPLACEMENT,
   PHONE_SEPARATORS_REGEX,
-} from '../constants/person-validation';
+} from '../constants/person-validation.constants';
 
 // The pattern is checked only after the length passes, so each field gets a single message.
 export const buildNameSchema = (

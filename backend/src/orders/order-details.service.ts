@@ -1,12 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
+import { CURRENCY } from '../common/constants/money.constants';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { addresses, orders, orderStatusHistory, packages, payments } from '../db/schema';
-import { CURRENCY } from '../pricing/pricing.constants';
-import { ORDERS_ERROR_MESSAGES } from './orders.constants';
+import { ORDER_ADDRESS_ALIAS, ORDERS_ERROR_MESSAGES } from './orders.constants';
 import type { OrderDetails, OrderPaymentView } from './orders.types';
 
 @Injectable()
@@ -15,8 +15,8 @@ export class OrderDetailsService {
 
   // A foreign order looks the same as a missing one, so ids cannot be probed.
   async findOne(clientId: number, orderId: number): Promise<OrderDetails> {
-    const pickup = alias(addresses, 'pickup_address');
-    const delivery = alias(addresses, 'delivery_address');
+    const pickup = alias(addresses, ORDER_ADDRESS_ALIAS.PICKUP);
+    const delivery = alias(addresses, ORDER_ADDRESS_ALIAS.DELIVERY);
 
     const [row] = await this.db
       .select({

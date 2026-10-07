@@ -6,7 +6,7 @@ import { ESTIMATE_STATUS } from '../constants/estimate';
 import { CALCULATOR_TEXTS } from '../constants/texts';
 import { formatDistance, formatDuration, formatPrice } from '../lib/format';
 import type { EstimateView } from '../lib/useEstimate';
-import type { PriceEstimate } from '../types';
+import type { PriceEstimate } from '../schemas';
 
 function ReadyBody({ estimate }: { estimate: PriceEstimate }) {
   return (

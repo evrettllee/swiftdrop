@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { MS_PER_SECOND } from '../../common/constants/time';
+import { MS_PER_SECOND } from '../../common/constants/time.constants';
 import { ENV_KEYS } from '../../config/env.constants';
 import { PaymentGateway } from '../../payments/payment.gateway';
 import { PAYMENTS_ERROR_MESSAGES } from '../../payments/payments.constants';

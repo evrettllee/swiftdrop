@@ -2,10 +2,8 @@ import { UI_TEXTS } from '../shared/constants/texts';
 
 // Interface texts of the general pages
 export const APP_TEXTS = {
-  SIGN_IN: 'Войти',
-  SIGN_OUT: 'Выйти',
-  PROFILE: 'Профиль',
-  PROFILE_EMAIL: 'Email',
+  PROFILE: UI_TEXTS.PROFILE,
+  PROFILE_EMAIL: UI_TEXTS.EMAIL,
   PROFILE_ROLE: 'Роль',
   NOT_FOUND_TITLE: 'Страница не найдена',
   NOT_FOUND_HINT: 'Возможно, ссылка устарела или адрес введён с ошибкой',
