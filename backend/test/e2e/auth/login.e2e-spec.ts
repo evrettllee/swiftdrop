@@ -1,0 +1,102 @@
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import {
+  AUTH_ERROR_MESSAGES,
+  AUTH_THROTTLE_LIMIT,
+} from '../../../src/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { createTestApp } from '../../support/app';
+import {
+  extractAccessToken,
+  extractRefreshToken,
+  postAuth,
+  registerUser,
+  validRegistration,
+  WRONG_PASSWORD,
+} from '../../support/auth';
+import { CLIENT_IP_HEADER } from '../../support/constants';
+import { resetTestData } from '../../support/database';
+import { nextClientIp } from '../../support/http';
+import { blockUser } from '../../support/users';
+
+describe('Auth (e2e)', () => {
+  let app: NestExpressApplication;
+  let db: Database;
+
+  beforeAll(async () => {
+    app = await createTestApp();
+    db = app.get<Database>(DRIZZLE);
+  });
+
+  beforeEach(async () => {
+    await resetTestData(db);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('login', () => {
+    it('should return the user and set both session cookies when the credentials are valid', async () => {
+      await registerUser(app);
+
+      const response = await postAuth(app, AUTH_ROUTES.LOGIN)
+        .send({ email: validRegistration.email, password: validRegistration.password })
+        .expect(200);
+
+      expect(response.body.user.email).toBe(validRegistration.email);
+      expect(response.body).not.toHaveProperty('accessToken');
+      expect(extractAccessToken(response)).toEqual(expect.any(String));
+      expect(extractRefreshToken(response)).toEqual(expect.any(String));
+    });
+
+    it('should accept the email in any letter case when logging in', async () => {
+      await registerUser(app);
+
+      await postAuth(app, AUTH_ROUTES.LOGIN)
+        .send({ email: 'IVAN@Example.COM', password: validRegistration.password })
+        .expect(200);
+    });
+
+    it('should give the same answer when the password is wrong and when the email is unknown', async () => {
+      await registerUser(app);
+
+      const wrongPassword = await postAuth(app, AUTH_ROUTES.LOGIN)
+        .send({ email: validRegistration.email, password: WRONG_PASSWORD })
+        .expect(401);
+      const unknownEmail = await postAuth(app, AUTH_ROUTES.LOGIN)
+        .send({ email: 'nobody@example.com', password: validRegistration.password })
+        .expect(401);
+
+      expect(wrongPassword.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
+      expect(unknownEmail.body).toEqual(wrongPassword.body);
+    });
+
+    it('should return 403 when the account is blocked and the password is right', async () => {
+      await registerUser(app);
+      await blockUser(db, validRegistration.email);
+
+      const response = await postAuth(app, AUTH_ROUTES.LOGIN)
+        .send({ email: validRegistration.email, password: validRegistration.password })
+        .expect(403);
+
+      expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.ACCOUNT_BLOCKED);
+    });
+
+    it('should return 429 when login attempts from one address exceed the limit', async () => {
+      await registerUser(app);
+      const ip = nextClientIp();
+      const statuses: number[] = [];
+
+      for (let attempt = 0; attempt <= AUTH_THROTTLE_LIMIT; attempt += 1) {
+        const response = await postAuth(app, AUTH_ROUTES.LOGIN)
+          .set(CLIENT_IP_HEADER, ip)
+          .send({ email: validRegistration.email, password: WRONG_PASSWORD });
+        statuses.push(response.status);
+      }
+
+      expect(statuses).toEqual([...Array.from({ length: AUTH_THROTTLE_LIMIT }, () => 401), 429]);
+    });
+  });
+});

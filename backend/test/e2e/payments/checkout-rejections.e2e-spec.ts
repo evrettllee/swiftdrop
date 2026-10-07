@@ -1,22 +1,22 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { orders, payments } from '../../src/db/schema';
-import { NBRB_ERROR_MESSAGES } from '../../src/integrations/nbrb/nbrb.constants';
-import { NbrbService } from '../../src/integrations/nbrb/nbrb.service';
-import { OsrmService } from '../../src/integrations/osrm/osrm.service';
-import { ORDERS_ERROR_MESSAGES } from '../../src/orders/orders.constants';
-import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
-import { PAYMENTS_ERROR_MESSAGES } from '../../src/payments/payments.constants';
-import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
-import { resetTestData, seedServiceArea } from '../support/database';
-import { ROUTE } from '../support/fixtures';
-import { placeOrders, SECOND_CLIENT } from '../support/orders';
-import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../support/payments';
+import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { orders, payments } from '../../../src/db/schema';
+import { NBRB_ERROR_MESSAGES } from '../../../src/integrations/nbrb/nbrb.constants';
+import { NbrbService } from '../../../src/integrations/nbrb/nbrb.service';
+import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { ORDERS_ERROR_MESSAGES } from '../../../src/orders/orders.constants';
+import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { PAYMENTS_ERROR_MESSAGES } from '../../../src/payments/payments.constants';
+import { createTestApp } from '../../support/app';
+import { registerUser } from '../../support/auth';
+import { resetTestData, seedServiceArea } from '../../support/database';
+import { ROUTE } from '../../support/fixtures';
+import { placeOrders, SECOND_CLIENT } from '../../support/orders';
+import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../../support/payments';
 
 const MISSING_ORDER_ID = 999_999;
 // At this rate 9.23 BYN is one cent, below the 50 cents that Stripe accepts.

@@ -1,27 +1,27 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { MS_PER_MINUTE } from '../../src/common/constants/time.constants';
-import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { orders, orderStatusHistory, payments } from '../../src/db/schema';
-import { OsrmService } from '../../src/integrations/osrm/osrm.service';
-import { UNPAID_ORDER_TTL_MS } from '../../src/orders/orders.constants';
-import { UnpaidOrdersService } from '../../src/orders/services/unpaid-orders.service';
-import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
-import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
-import { resetTestData, seedServiceArea } from '../support/database';
-import { ROUTE } from '../support/fixtures';
-import { placeOrders } from '../support/orders';
+import { MS_PER_MINUTE } from '../../../src/common/constants/time.constants';
+import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
+import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { orders, orderStatusHistory, payments } from '../../../src/db/schema';
+import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { UNPAID_ORDER_TTL_MS } from '../../../src/orders/orders.constants';
+import { UnpaidOrdersService } from '../../../src/orders/services/unpaid-orders.service';
+import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { createTestApp } from '../../support/app';
+import { registerUser } from '../../support/auth';
+import { resetTestData, seedServiceArea } from '../../support/database';
+import { ROUTE } from '../../support/fixtures';
+import { placeOrders } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
   insertPayment,
   resetGatewayMock,
-} from '../support/payments';
+} from '../../support/payments';
 
 describe('Unpaid orders cancellation (e2e)', () => {
   let app: NestExpressApplication;

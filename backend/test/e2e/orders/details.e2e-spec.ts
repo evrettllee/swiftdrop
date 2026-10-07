@@ -1,20 +1,20 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { orderStatusHistory } from '../../src/db/schema';
-import { OsrmService } from '../../src/integrations/osrm/osrm.service';
+import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { orderStatusHistory } from '../../../src/db/schema';
+import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
 import {
   ORDERS_ERROR_MESSAGES,
   ORDERS_ROUTES,
   ORDERS_VALIDATION_MESSAGES,
-} from '../../src/orders/orders.constants';
-import { createTestApp } from '../support/app';
-import { COOKIE_HEADER, registerUser } from '../support/auth';
-import { resetTestData, seedServiceArea } from '../support/database';
-import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../support/fixtures';
-import { getApi } from '../support/http';
-import { type Cookies, placeOrders, SECOND_CLIENT } from '../support/orders';
+} from '../../../src/orders/orders.constants';
+import { createTestApp } from '../../support/app';
+import { COOKIE_HEADER, registerUser } from '../../support/auth';
+import { resetTestData, seedServiceArea } from '../../support/database';
+import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../../support/fixtures';
+import { getApi } from '../../support/http';
+import { type Cookies, placeOrders, SECOND_CLIENT } from '../../support/orders';
 
 const MISSING_ORDER_ID = 999_999;
 
