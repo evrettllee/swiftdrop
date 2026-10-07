@@ -7,10 +7,10 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { type CreateOrderDto, createOrderSchema } from './dto/create-order.dto';
 import { type ListOrdersDto, listOrdersSchema } from './dto/list-orders.dto';
 import { type OrderIdParamDto, orderIdParamSchema } from './dto/order-id-param.dto';
-import { OrderCancellationService } from './order-cancellation.service';
-import { OrderDetailsService } from './order-details.service';
-import { OrderPlacementService } from './order-placement.service';
-import { OrdersQueryService } from './orders-query.service';
+import { OrderCancellationService } from './services/order-cancellation.service';
+import { OrderDetailsService } from './services/order-details.service';
+import { OrderPlacementService } from './services/order-placement.service';
+import { OrdersQueryService } from './services/orders-query.service';
 import { ORDERS_ROUTES } from './orders.constants';
 import type { CancelledOrder, CreatedOrder, OrderDetails, OrdersPage } from './orders.types';
 

@@ -9,9 +9,9 @@ import { SkipCsrf } from '../common/decorators/skip-csrf.decorator';
 import { ROLE } from '../common/enums/role.enum';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { type CreatePaymentDto, createPaymentSchema } from './dto/create-payment.dto';
-import { PaymentWebhookService } from './payment-webhook.service';
+import { PaymentWebhookService } from './services/payment-webhook.service';
 import { PAYMENTS_ROUTES, WEBHOOK_SIGNATURE_HEADER } from './payments.constants';
-import { PaymentsService } from './payments.service';
+import { PaymentsService } from './services/payments.service';
 import type { StartedPayment } from './payments.types';
 
 @Controller(PAYMENTS_ROUTES.BASE)

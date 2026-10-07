@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { OsrmModule } from '../integrations/osrm/osrm.module';
 import { ZonesModule } from '../zones/zones.module';
 import { PricingController } from './pricing.controller';
-import { PricingService } from './pricing.service';
+import { PricingService } from './services/pricing.service';
 
 @Module({
   imports: [ZonesModule, OsrmModule],

@@ -9,7 +9,7 @@ import { NBRB_ERROR_MESSAGES } from '../../src/integrations/nbrb/nbrb.constants'
 import { NbrbService } from '../../src/integrations/nbrb/nbrb.service';
 import { OsrmService } from '../../src/integrations/osrm/osrm.service';
 import { ORDERS_ERROR_MESSAGES } from '../../src/orders/orders.constants';
-import { PaymentGateway } from '../../src/payments/payment.gateway';
+import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
 import { PAYMENTS_ERROR_MESSAGES } from '../../src/payments/payments.constants';
 import { createTestApp } from '../support/app';
 import { registerUser } from '../support/auth';

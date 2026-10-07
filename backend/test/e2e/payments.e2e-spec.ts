@@ -8,7 +8,7 @@ import { payments } from '../../src/db/schema';
 import { NbrbService } from '../../src/integrations/nbrb/nbrb.service';
 import { OsrmService } from '../../src/integrations/osrm/osrm.service';
 import { ORDERS_VALIDATION_MESSAGES } from '../../src/orders/orders.constants';
-import { PaymentGateway } from '../../src/payments/payment.gateway';
+import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
 import {
   PAYMENT_CURRENCY,
   PAYMENT_DESCRIPTION_PREFIX,

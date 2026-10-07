@@ -5,7 +5,7 @@ import { Spinner } from '../../../shared/ui/Spinner';
 import { ESTIMATE_STATUS } from '../constants/estimate';
 import { CALCULATOR_TEXTS } from '../constants/texts';
 import { formatDistance, formatDuration, formatPrice } from '../lib/format';
-import type { EstimateView } from '../lib/useEstimate';
+import type { EstimateView } from '../hooks/useEstimate';
 import type { PriceEstimate } from '../schemas';
 
 function ReadyBody({ estimate }: { estimate: PriceEstimate }) {

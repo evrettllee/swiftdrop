@@ -1,13 +1,13 @@
 import { MAIN_CONTENT_ID } from '../../../shared/constants/dom';
 import { SkipLink } from '../../../shared/ui/SkipLink';
-import { CalculatorCard } from '../components/CalculatorCard';
+import { CalculatorCard } from '../components/calculator-card/CalculatorCard';
 import { CtaSection } from '../components/CtaSection';
 import { FaqSection } from '../components/FaqSection';
-import { FeaturesSection } from '../components/FeaturesSection';
+import { FeaturesSection } from '../components/features-section/FeaturesSection';
 import { HeroSection } from '../components/HeroSection';
 import { HowItWorks } from '../components/HowItWorks';
 import { LandingFooter } from '../components/LandingFooter';
-import { LandingHeader } from '../components/LandingHeader';
+import { LandingHeader } from '../components/landing-header/LandingHeader';
 import { TrackingSection } from '../components/TrackingSection';
 import { LANDING_CONTAINER_CLASS } from '../constants/layout';
 

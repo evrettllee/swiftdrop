@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { PaymentsModule } from '../payments/payments.module';
 import { PricingModule } from '../pricing/pricing.module';
-import { OrderCancellationService } from './order-cancellation.service';
-import { OrderDetailsService } from './order-details.service';
-import { OrderPlacementService } from './order-placement.service';
+import { OrderCancellationService } from './services/order-cancellation.service';
+import { OrderDetailsService } from './services/order-details.service';
+import { OrderPlacementService } from './services/order-placement.service';
 import { OrdersController } from './orders.controller';
-import { OrdersQueryService } from './orders-query.service';
-import { UnpaidOrdersService } from './unpaid-orders.service';
+import { OrdersQueryService } from './services/orders-query.service';
+import { UnpaidOrdersService } from './services/unpaid-orders.service';
 
 @Module({
   imports: [PricingModule, PaymentsModule],

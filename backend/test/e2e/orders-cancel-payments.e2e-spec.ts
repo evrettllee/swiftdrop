@@ -8,7 +8,7 @@ import type { Database } from '../../src/database/database.module';
 import { orders, payments } from '../../src/db/schema';
 import { OsrmService } from '../../src/integrations/osrm/osrm.service';
 import { ORDERS_ROUTES } from '../../src/orders/orders.constants';
-import { PaymentGateway } from '../../src/payments/payment.gateway';
+import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
 import { createTestApp } from '../support/app';
 import { COOKIE_HEADER, registerUser } from '../support/auth';
 import { resetTestData, seedServiceArea } from '../support/database';
