@@ -37,6 +37,7 @@ jobs:
           --health-retries 10
     env:
       TEST_DATABASE_URL: postgresql://swiftdrop:swiftdrop@localhost:5432/swiftdrop_test
+      APP_URL: http://localhost:5173
       OSRM_URL: http://localhost:5000
       JWT_ACCESS_SECRET: ci-only-jwt-secret-not-used-anywhere-else
       GOOGLE_CLIENT_ID: ci-google-client-id
@@ -45,6 +46,8 @@ jobs:
       YANDEX_CLIENT_ID: ci-yandex-client-id
       YANDEX_CLIENT_SECRET: ci-yandex-client-secret
       YANDEX_CALLBACK_URL: http://localhost:5173/api/auth/yandex/callback
+      STRIPE_SECRET_KEY: sk_test_ci_only_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_ci_only_placeholder
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
