@@ -7,7 +7,8 @@ import { GLOBAL_PREFIX } from './common/constants/http';
 import { ENV_KEYS } from './config/env.constants';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // The raw body is kept for checking the signature of payment notifications.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const config = app.get(ConfigService);
 
   configureApp(app);

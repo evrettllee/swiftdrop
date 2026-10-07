@@ -1,8 +1,10 @@
 import { type ExecutionContext, ForbiddenException } from '@nestjs/common';
+import type { Reflector } from '@nestjs/core';
 import {
   CSRF_ERROR_MESSAGE,
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
+  CSRF_SKIP_KEY,
   SAFE_HTTP_METHODS,
 } from '../constants/csrf';
 import { CsrfGuard } from './csrf.guard';
@@ -24,12 +26,20 @@ function createContext(
 
   return {
     getType: () => contextType,
+    getHandler: () => createContext,
+    getClass: () => CsrfGuard,
     switchToHttp: () => ({ getRequest: () => request }),
   } as unknown as ExecutionContext;
 }
 
 describe('CsrfGuard', () => {
-  const guard = new CsrfGuard();
+  const reflector = { getAllAndOverride: jest.fn() };
+  const guard = new CsrfGuard(reflector as unknown as Reflector);
+
+  beforeEach(() => {
+    reflector.getAllAndOverride.mockReset();
+    reflector.getAllAndOverride.mockReturnValue(undefined);
+  });
 
   it.each(SAFE_HTTP_METHODS)('should allow a %s request when the header is missing', (method) => {
     expect(guard.canActivate(createContext(method))).toBe(true);
@@ -53,5 +63,21 @@ describe('CsrfGuard', () => {
 
   it('should allow the request when the context is not http', () => {
     expect(guard.canActivate(createContext('POST', undefined, WS_CONTEXT_TYPE))).toBe(true);
+  });
+
+  it('should allow an unsafe request without the header when the handler is marked to skip the check', () => {
+    reflector.getAllAndOverride.mockReturnValue(true);
+
+    expect(guard.canActivate(createContext('POST'))).toBe(true);
+    expect(reflector.getAllAndOverride).toHaveBeenCalledWith(CSRF_SKIP_KEY, [
+      expect.any(Function),
+      expect.any(Function),
+    ]);
+  });
+
+  it('should still reject an unsafe request without the header when the mark is not set', () => {
+    reflector.getAllAndOverride.mockReturnValue(false);
+
+    expect(() => guard.canActivate(createContext('POST'))).toThrow(ForbiddenException);
   });
 });
