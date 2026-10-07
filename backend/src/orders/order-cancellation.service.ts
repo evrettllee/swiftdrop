@@ -12,6 +12,7 @@ import { ORDER_STATUS, type OrderStatus } from '../common/enums/order-status.enu
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
 import { orders, orderStatusHistory } from '../db/schema';
+import { PaymentCancellationService } from '../payments/payment-cancellation.service';
 import { CANCELLABLE_STATUSES, FINISHED_STATUSES, ORDERS_ERROR_MESSAGES } from './orders.constants';
 import type { CancelledOrder } from './orders.types';
 
@@ -19,7 +20,10 @@ import type { CancelledOrder } from './orders.types';
 export class OrderCancellationService {
   private readonly logger = new Logger(OrderCancellationService.name);
 
-  constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: Database,
+    private readonly paymentCancellation: PaymentCancellationService,
+  ) {}
 
   async cancel(clientId: number, orderId: number): Promise<CancelledOrder> {
     const cancelled = await this.db.transaction(async (tx) => {
@@ -40,6 +44,8 @@ export class OrderCancellationService {
         await tx
           .insert(orderStatusHistory)
           .values({ orderId, status: ORDER_STATUS.CANCELLED, changedBy: clientId });
+        // A failed refund throws and rolls the cancellation back, so the client can simply try again.
+        await this.paymentCancellation.releaseOrderPayments(orderId);
       }
 
       return updated;

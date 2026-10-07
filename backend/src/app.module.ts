@@ -16,6 +16,7 @@ import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PricingModule } from './pricing/pricing.module';
 import { ZonesModule } from './zones/zones.module';
 
@@ -36,6 +37,7 @@ import { ZonesModule } from './zones/zones.module';
     ZonesModule,
     PricingModule,
     OrdersModule,
+    PaymentsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

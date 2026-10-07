@@ -81,6 +81,7 @@ describe('Order details (e2e)', () => {
         ...MINSK_DELIVERY,
       },
       history: [{ status: ORDER_STATUS.PENDING, changedAt: expect.any(String) }],
+      payment: null,
     });
   });
 

@@ -2,6 +2,7 @@ import { NAME_MAX_LENGTH, NAME_MIN_LENGTH } from '../common/constants/person-val
 import { MS_PER_MINUTE } from '../common/constants/time';
 import { ORDER_STATUS } from '../common/enums/order-status.enum';
 import type { OrderStatus } from '../common/enums/order-status.enum';
+import { CronExpression } from '@nestjs/schedule';
 
 // Routes
 export const ORDERS_ROUTES = {
@@ -50,6 +51,8 @@ export const ORDERS_PAGE_SIZE_MAX = 50;
 // An unpaid order is cancelled after this time (a Stripe Checkout Session lives 30 minutes at least).
 export const UNPAID_ORDER_TTL_MINUTES = 30;
 export const UNPAID_ORDER_TTL_MS = UNPAID_ORDER_TTL_MINUTES * MS_PER_MINUTE;
+export const UNPAID_ORDERS_CRON = CronExpression.EVERY_MINUTE;
+export const UNPAID_ORDERS_BATCH_SIZE = 50;
 
 // Address limits: match the columns of the addresses table.
 export const CITY_MAX_LENGTH = 100;

@@ -1,13 +1,13 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { SINGLE_ROW_LIMIT } from '../common/constants/database';
 import { DRIZZLE } from '../database/database.constants';
 import type { Database } from '../database/database.module';
-import { addresses, orders, orderStatusHistory, packages } from '../db/schema';
+import { addresses, orders, orderStatusHistory, packages, payments } from '../db/schema';
 import { CURRENCY } from '../pricing/pricing.constants';
 import { ORDERS_ERROR_MESSAGES } from './orders.constants';
-import type { OrderDetails } from './orders.types';
+import type { OrderDetails, OrderPaymentView } from './orders.types';
 
 @Injectable()
 export class OrderDetailsService {
@@ -70,6 +70,7 @@ export class OrderDetailsService {
       .where(eq(orderStatusHistory.orderId, orderId))
       .orderBy(asc(orderStatusHistory.changedAt), asc(orderStatusHistory.statusHistoryId));
 
+    const payment = await this.findLatestPayment(orderId);
     const { recipientName, recipientPhone, price, ...rest } = row;
 
     return {
@@ -78,6 +79,19 @@ export class OrderDetailsService {
       currency: CURRENCY,
       recipient: { name: recipientName, phone: recipientPhone },
       history,
+      payment,
     };
+  }
+
+  // The newest attempt shows the current state, older failed attempts are not interesting to the client.
+  private async findLatestPayment(orderId: number): Promise<OrderPaymentView | null> {
+    const [latest] = await this.db
+      .select({ status: payments.status, amountUsd: payments.amountUsd })
+      .from(payments)
+      .where(eq(payments.orderId, orderId))
+      .orderBy(desc(payments.createdAt), desc(payments.paymentId))
+      .limit(SINGLE_ROW_LIMIT);
+
+    return latest ? { status: latest.status, amountUsd: Number(latest.amountUsd) } : null;
   }
 }
