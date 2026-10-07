@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { AUTH_ERROR_MESSAGES } from '../../src/auth/constants/access.constants';
 import { OAUTH_ERROR_MESSAGES } from '../../src/auth/constants/oauth.constants';
 import { AUTH_ROUTES } from '../../src/auth/constants/routes.constants';
-import { AuthService } from '../../src/auth/auth.service';
+import { AuthService } from '../../src/auth/services/auth.service';
 import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
 import { ROLE } from '../../src/common/enums/role.enum';
 import { DRIZZLE } from '../../src/database/database.constants';

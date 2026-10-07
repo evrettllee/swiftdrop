@@ -7,7 +7,7 @@ import { DRIZZLE } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';
 import { orders, orderStatusHistory, payments } from '../../src/db/schema';
 import { OsrmService } from '../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../src/payments/payment.gateway';
+import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
 import { PAYMENT_EVENT } from '../../src/payments/payments.constants';
 import { createTestApp } from '../support/app';
 import { registerUser } from '../support/auth';

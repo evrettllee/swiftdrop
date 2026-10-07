@@ -2,7 +2,7 @@ import { ChatCircleIcon, ClockIcon, MapPinIcon, StarIcon } from '@phosphor-icons
 import { ICON_SIZE, ICON_WEIGHT } from '../../../shared/constants/styles';
 import { TRACKING } from '../constants/sections';
 import { ButtonLookalike } from './ButtonLookalike';
-import { TrackingMap } from './TrackingMap';
+import { TrackingMap } from './tracking-map/TrackingMap';
 
 const { DEMO } = TRACKING;
 

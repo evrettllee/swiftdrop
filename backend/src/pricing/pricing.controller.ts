@@ -4,7 +4,7 @@ import { Public } from '../auth/decorators/public.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { type EstimatePriceDto, estimatePriceSchema } from './dto/estimate-price.dto';
 import { PRICING_ROUTES, PRICING_THROTTLE } from './pricing.constants';
-import { PricingService } from './pricing.service';
+import { PricingService } from './services/pricing.service';
 import type { PriceEstimate } from './pricing.types';
 
 @Controller(PRICING_ROUTES.BASE)
