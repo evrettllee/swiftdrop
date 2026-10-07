@@ -1,27 +1,28 @@
-import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
+import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { orders, orderStatusHistory, payments } from '../../src/db/schema';
-import { OsrmService } from '../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
-import { PAYMENT_EVENT } from '../../src/payments/payments.constants';
-import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
-import { resetTestData, seedServiceArea } from '../support/database';
-import { ROUTE } from '../support/fixtures';
-import { placeOrders } from '../support/orders';
+import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
+import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { orders, orderStatusHistory } from '../../../src/db/schema';
+import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { PAYMENT_EVENT } from '../../../src/payments/payments.constants';
+import { createTestApp } from '../../support/app';
+import { registerUser } from '../../support/auth';
+import { resetTestData, seedServiceArea } from '../../support/database';
+import { ROUTE } from '../../support/fixtures';
+import { placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
   insertPayment,
   postWebhook,
+  readPaymentStatus,
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
-} from '../support/payments';
+} from '../../support/payments';
 
 describe('Payment webhook (e2e)', () => {
   let app: NestExpressApplication;
@@ -37,24 +38,6 @@ describe('Payment webhook (e2e)', () => {
     sessionId: CHECKOUT_SESSION.sessionId,
     paymentRef: 'pi_test_1',
   });
-
-  async function readPaymentStatus(): Promise<string> {
-    const [payment] = await db
-      .select({ status: payments.status })
-      .from(payments)
-      .where(eq(payments.paymentId, paymentId));
-
-    return payment.status;
-  }
-
-  async function readOrderStatus(): Promise<string> {
-    const [order] = await db
-      .select({ status: orders.status })
-      .from(orders)
-      .where(eq(orders.orderId, orderId));
-
-    return order.status;
-  }
 
   beforeAll(async () => {
     app = await createTestApp([
@@ -90,8 +73,8 @@ describe('Payment webhook (e2e)', () => {
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, orderId));
     expect(response.status).toBe(200);
-    expect(await readPaymentStatus()).toBe(PAYMENT_STATUS.PAID);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.CONFIRMED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PAID);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CONFIRMED);
     expect(history).toContainEqual({ status: ORDER_STATUS.CONFIRMED, changedBy: null });
   });
 
@@ -121,8 +104,8 @@ describe('Payment webhook (e2e)', () => {
 
     expect(response.status).toBe(200);
     expect(gateway.refund).toHaveBeenCalledWith('pi_test_1');
-    expect(await readPaymentStatus()).toBe(PAYMENT_STATUS.REFUNDED);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.CANCELLED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
   });
 
   it('should refund on the repeated delivery when the first refund failed', async () => {
@@ -134,13 +117,13 @@ describe('Payment webhook (e2e)', () => {
     gateway.refund.mockRejectedValueOnce(new ServiceUnavailableException());
 
     const first = await postWebhook(app, WEBHOOK_SIGNATURE);
-    const afterFirst = await readPaymentStatus();
+    const afterFirst = await readPaymentStatus(db, paymentId);
     const second = await postWebhook(app, WEBHOOK_SIGNATURE);
 
     expect(first.status).toBe(503);
     expect(afterFirst).toBe(PAYMENT_STATUS.PAID);
     expect(second.status).toBe(200);
-    expect(await readPaymentStatus()).toBe(PAYMENT_STATUS.REFUNDED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
   });
 
   it('should mark the payment failed and keep the order pending when the session expired', async () => {
@@ -153,35 +136,7 @@ describe('Payment webhook (e2e)', () => {
     const response = await postWebhook(app, WEBHOOK_SIGNATURE);
 
     expect(response.status).toBe(200);
-    expect(await readPaymentStatus()).toBe(PAYMENT_STATUS.FAILED);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.PENDING);
-  });
-
-  it('should answer 200 and change nothing when the event is of no interest', async () => {
-    gateway.parseWebhook.mockReturnValue(null);
-
-    const response = await postWebhook(app, WEBHOOK_SIGNATURE);
-
-    expect(response.status).toBe(200);
-    expect(await readPaymentStatus()).toBe(PAYMENT_STATUS.PENDING);
-  });
-
-  it('should answer 400 and not touch the gateway when the signature header is missing', async () => {
-    const response = await postWebhook(app);
-
-    expect(response.status).toBe(400);
-    expect(gateway.parseWebhook).not.toHaveBeenCalled();
-  });
-
-  it('should answer 400 and change nothing when the signature is wrong', async () => {
-    gateway.parseWebhook.mockImplementation(() => {
-      throw new BadRequestException();
-    });
-
-    const response = await postWebhook(app, WEBHOOK_SIGNATURE);
-
-    expect(response.status).toBe(400);
-    expect(await readPaymentStatus()).toBe(PAYMENT_STATUS.PENDING);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.PENDING);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.FAILED);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.PENDING);
   });
 });

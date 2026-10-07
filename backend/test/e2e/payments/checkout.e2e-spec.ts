@@ -1,32 +1,32 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { asc } from 'drizzle-orm';
-import { PAYMENT_STATUS } from '../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { payments } from '../../src/db/schema';
-import { NbrbService } from '../../src/integrations/nbrb/nbrb.service';
-import { OsrmService } from '../../src/integrations/osrm/osrm.service';
-import { ORDERS_VALIDATION_MESSAGES } from '../../src/orders/orders.constants';
-import { PaymentGateway } from '../../src/payments/gateway/payment.gateway';
+import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { payments } from '../../../src/db/schema';
+import { NbrbService } from '../../../src/integrations/nbrb/nbrb.service';
+import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { ORDERS_VALIDATION_MESSAGES } from '../../../src/orders/orders.constants';
+import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
 import {
   PAYMENT_CURRENCY,
   PAYMENT_DESCRIPTION_PREFIX,
   PAYMENTS_ROUTES,
-} from '../../src/payments/payments.constants';
-import { createTestApp } from '../support/app';
-import { registerUser } from '../support/auth';
-import { resetTestData, seedServiceArea } from '../support/database';
-import { ROUTE } from '../support/fixtures';
-import { postApi } from '../support/http';
-import { placeOrders } from '../support/orders';
+} from '../../../src/payments/payments.constants';
+import { createTestApp } from '../../support/app';
+import { registerUser } from '../../support/auth';
+import { resetTestData, seedServiceArea } from '../../support/database';
+import { ROUTE } from '../../support/fixtures';
+import { postApi } from '../../support/http';
+import { placeOrders } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
   postPayment,
   resetGatewayMock,
   USD_RATE,
-} from '../support/payments';
+} from '../../support/payments';
 
 describe('Payments (e2e)', () => {
   let app: NestExpressApplication;

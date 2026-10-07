@@ -1,16 +1,16 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { PAYMENT_STATUS } from '../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { OsrmService } from '../../src/integrations/osrm/osrm.service';
-import { ORDERS_ROUTES } from '../../src/orders/orders.constants';
-import { createTestApp } from '../support/app';
-import { COOKIE_HEADER, registerUser } from '../support/auth';
-import { resetTestData, seedServiceArea } from '../support/database';
-import { ROUTE } from '../support/fixtures';
-import { getApi } from '../support/http';
-import { type Cookies, placeOrders } from '../support/orders';
-import { insertPayment } from '../support/payments';
+import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { ORDERS_ROUTES } from '../../../src/orders/orders.constants';
+import { createTestApp } from '../../support/app';
+import { COOKIE_HEADER, registerUser } from '../../support/auth';
+import { resetTestData, seedServiceArea } from '../../support/database';
+import { ROUTE } from '../../support/fixtures';
+import { getApi } from '../../support/http';
+import { type Cookies, placeOrders } from '../../support/orders';
+import { insertPayment } from '../../support/payments';
 
 describe('Order details payment (e2e)', () => {
   let app: NestExpressApplication;

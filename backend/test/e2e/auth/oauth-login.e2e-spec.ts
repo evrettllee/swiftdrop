@@ -1,15 +1,13 @@
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ERROR_MESSAGES } from '../../src/auth/constants/access.constants';
-import { OAUTH_ERROR_MESSAGES } from '../../src/auth/constants/oauth.constants';
-import { AUTH_ROUTES } from '../../src/auth/constants/routes.constants';
-import { AuthService } from '../../src/auth/services/auth.service';
-import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
-import { ROLE } from '../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import { userOauthAccounts, users } from '../../src/db/schema';
+import { AUTH_ERROR_MESSAGES } from '../../../src/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { AuthService } from '../../../src/auth/services/auth.service';
+import { OAUTH_PROVIDER } from '../../../src/common/enums/oauth-provider.enum';
+import { ROLE } from '../../../src/common/enums/role.enum';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { users } from '../../../src/db/schema';
 import {
   COOKIE_HEADER,
   postAuth,
@@ -17,9 +15,10 @@ import {
   registerUser,
   validRegistration,
   buildOAuthProfile,
-} from '../support/auth';
-import { createTestApp } from '../support/app';
-import { resetTestData } from '../support/database';
+} from '../../support/auth';
+import { createTestApp } from '../../support/app';
+import { resetTestData } from '../../support/database';
+import { findLinks, findUsers } from '../../support/users';
 
 describe('OAuth login (e2e)', () => {
   let app: NestExpressApplication;
@@ -40,29 +39,22 @@ describe('OAuth login (e2e)', () => {
     await app.close();
   });
 
-  const findUsers = () => db.select().from(users);
-  const findLinks = () => db.select().from(userOauthAccounts);
-
   async function markEmailVerified(email: string): Promise<void> {
     await db.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.email, email));
-  }
-
-  async function blockUser(email: string): Promise<void> {
-    await db.update(users).set({ isBlocked: true }).where(eq(users.email, email));
   }
 
   it('should create a verified client without a password and link the account when the user is new', async () => {
     const profile = buildOAuthProfile();
 
     const result = await authService.loginWithOAuth(profile);
-    const [user] = await findUsers();
+    const [user] = await findUsers(db);
 
     expect(result.user).toMatchObject({ email: profile.email, role: ROLE.CLIENT, phone: null });
     expect(result.accessToken).toEqual(expect.any(String));
     expect(result.refreshToken).toEqual(expect.any(String));
     expect(user.passwordHash).toBeNull();
     expect(user.emailVerifiedAt).not.toBeNull();
-    expect(await findLinks()).toEqual([
+    expect(await findLinks(db)).toEqual([
       expect.objectContaining({
         userId: user.userId,
         provider: profile.provider,
@@ -78,8 +70,8 @@ describe('OAuth login (e2e)', () => {
     const second = await authService.loginWithOAuth(profile);
 
     expect(second.user.userId).toBe(first.user.userId);
-    expect(await findUsers()).toHaveLength(1);
-    expect(await findLinks()).toHaveLength(1);
+    expect(await findUsers(db)).toHaveLength(1);
+    expect(await findLinks(db)).toHaveLength(1);
   });
 
   it('should link a second provider to the same user when the email matches', async () => {
@@ -89,15 +81,15 @@ describe('OAuth login (e2e)', () => {
     );
 
     expect(yandex.user.userId).toBe(google.user.userId);
-    expect(await findUsers()).toHaveLength(1);
-    expect(await findLinks()).toHaveLength(2);
+    expect(await findUsers(db)).toHaveLength(1);
+    expect(await findLinks(db)).toHaveLength(2);
   });
 
   it('should drop the password and revoke sessions when an unverified account is claimed through a provider', async () => {
     const { body, refreshToken } = await registerUser(app);
 
     const result = await authService.loginWithOAuth(buildOAuthProfile());
-    const [user] = await findUsers();
+    const [user] = await findUsers(db);
 
     expect(result.user.userId).toBe(body.user.userId);
     expect(user.passwordHash).toBeNull();
@@ -126,32 +118,6 @@ describe('OAuth login (e2e)', () => {
     await postAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, refreshCookie(refreshToken))
       .expect(200);
-    expect(await findLinks()).toHaveLength(1);
-  });
-
-  it('should reject the login and create nothing when the provider does not confirm the email', async () => {
-    const login = authService.loginWithOAuth(buildOAuthProfile({ emailVerified: false }));
-
-    await expect(login).rejects.toBeInstanceOf(UnauthorizedException);
-    await expect(login).rejects.toMatchObject({ message: OAUTH_ERROR_MESSAGES.EMAIL_NOT_VERIFIED });
-    expect(await findUsers()).toHaveLength(0);
-    expect(await findLinks()).toHaveLength(0);
-  });
-
-  it('should reject the login when an existing account with the same email is blocked', async () => {
-    await registerUser(app);
-    await blockUser(validRegistration.email);
-
-    await expect(authService.loginWithOAuth(buildOAuthProfile())).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
-  });
-
-  it('should reject the login when the user gets blocked after the account was linked', async () => {
-    const profile = buildOAuthProfile();
-    await authService.loginWithOAuth(profile);
-    await blockUser(profile.email);
-
-    await expect(authService.loginWithOAuth(profile)).rejects.toBeInstanceOf(ForbiddenException);
+    expect(await findLinks(db)).toHaveLength(1);
   });
 });

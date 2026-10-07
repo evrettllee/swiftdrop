@@ -1,4 +1,5 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { eq } from 'drizzle-orm';
 import { payments } from '../../src/db/schema';
 import type { Database } from '../../src/database/database.module';
 import { PAYMENTS_ROUTES } from '../../src/payments/payments.constants';
@@ -83,4 +84,13 @@ export async function insertPayment(
     .returning({ paymentId: payments.paymentId });
 
   return payment.paymentId;
+}
+
+export async function readPaymentStatus(db: Database, paymentId: number): Promise<string> {
+  const [payment] = await db
+    .select({ status: payments.status })
+    .from(payments)
+    .where(eq(payments.paymentId, paymentId));
+
+  return payment.status;
 }
