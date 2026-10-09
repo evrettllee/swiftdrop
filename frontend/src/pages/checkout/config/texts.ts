@@ -1,5 +1,5 @@
 import { NAME_MAX_LENGTH, NAME_MIN_LENGTH, PHONE_EXAMPLE } from '@/shared/lib/person-validation';
-import { APARTMENT_MAX_LENGTH } from './checkout-form';
+import { APARTMENT_MAX_LENGTH } from '@/shared/config';
 
 export const CHECKOUT_TEXTS = {
   PAGE_TITLE: 'Новый заказ',
@@ -7,6 +7,7 @@ export const CHECKOUT_TEXTS = {
   SECTION_RECIPIENT: 'Получатель',
   SECTION_PACKAGE: 'Посылка',
   SECTION_SUMMARY: 'Стоимость',
+  ADDRESS: 'Адрес',
   APARTMENT: 'Квартира или офис',
   APARTMENT_PLACEHOLDER: 'Необязательно',
   RECIPIENT_NAME: 'Имя и фамилия',

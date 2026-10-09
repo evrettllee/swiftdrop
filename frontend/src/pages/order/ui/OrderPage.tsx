@@ -65,8 +65,9 @@ export function OrderPage() {
       </div>
     );
   } else if (details.status === LIST_STATUS.LOADING) {
+    // Fills the main area of the client layout (a column) and stands in its center.
     content = (
-      <div className="flex justify-center py-12">
+      <div className="grid flex-1 place-items-center">
         <Spinner />
       </div>
     );

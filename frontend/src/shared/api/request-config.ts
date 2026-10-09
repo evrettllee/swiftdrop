@@ -6,6 +6,9 @@ export const CONTENT_TYPE_HEADER = 'Content-Type';
 export const CSRF_HEADER_NAME = 'X-Requested-With';
 export const CSRF_HEADER_VALUE = 'swiftdrop';
 
+// The Web Lock that lets one tab of the browser refresh the session at a time.
+export const REFRESH_LOCK_NAME = 'swiftdrop-session-refresh';
+
 // HTTP
 export const HTTP_METHOD = {
   GET: 'GET',

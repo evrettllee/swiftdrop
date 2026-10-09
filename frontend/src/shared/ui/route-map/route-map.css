@@ -44,6 +44,17 @@
   opacity: 1;
 }
 
+/* The tag takes the color of its point: the accent for the pickup, the text color for the delivery. */
+.route-tag--pickup.leaflet-tooltip {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.route-tag--delivery.leaflet-tooltip {
+  color: var(--color-fg);
+  border-color: var(--color-fg);
+}
+
 .route-tag.leaflet-tooltip::before {
   display: none;
 }

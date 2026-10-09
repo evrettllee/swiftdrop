@@ -79,7 +79,7 @@ export function CheckoutSummary({
     body = <InlineAlert variant="error">{estimate.message}</InlineAlert>;
   } else if (estimate.status === ESTIMATE_STATUS.LOADING) {
     body = (
-      <div className="flex items-center gap-3 text-small text-fg-secondary">
+      <div className="flex items-center justify-center gap-2 text-small text-fg-secondary">
         <Spinner />
         <span>{ESTIMATE_TEXTS.LOADING}</span>
       </div>

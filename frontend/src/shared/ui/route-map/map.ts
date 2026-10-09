@@ -47,6 +47,8 @@ export const MAP_CLASS = {
   DOT_PICKUP: 'route-marker__dot--pickup',
   DOT_DELIVERY: 'route-marker__dot--delivery',
   TAG: 'route-tag',
+  TAG_PICKUP: 'route-tag--pickup',
+  TAG_DELIVERY: 'route-tag--delivery',
   LINE: 'route-line',
   VIEW: 'route-map-view',
   VIEW_STATIC: 'route-map-view--static',

@@ -17,10 +17,12 @@ export function ClientLayout() {
       <ClientSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <ClientMobileHeader />
-        <main id={MAIN_CONTENT_ID} className="flex-1 px-4 pt-4 pb-24 lg:p-12">
+        {/* A column, so that a loader of a page can fill the space between the header and the
+            bottom navigation (flex-1) and stand in its center. */}
+        <main id={MAIN_CONTENT_ID} className="flex flex-1 flex-col px-4 pt-4 pb-24 lg:p-12">
           <Suspense
             fallback={
-              <div className="flex justify-center py-12">
+              <div className="grid flex-1 place-items-center">
                 <Spinner />
               </div>
             }

@@ -20,7 +20,8 @@ function stateOf(index: number, reached: number): ProgressState {
 }
 
 // The steps of "Ход заказа" with the time each one was reached (the first time, from the history).
-// A cancelled or rejected order shows the steps it passed and ends with its stop step.
+// A cancelled or rejected order shows only the steps it passed (those with a time) and ends with
+// its stop step; the rest are not shown.
 export function buildProgress(order: OrderDetails): ProgressStep[] {
   const times = new Map<OrderStatus, Date>();
 
@@ -47,7 +48,10 @@ export function buildProgress(order: OrderDetails): ProgressStep[] {
   return stopLabel === undefined
     ? steps
     : [
-        ...steps.slice(0, reached + 1).map((step) => ({ ...step, state: PROGRESS_STATE.DONE })),
+        ...steps
+          .slice(0, reached + 1)
+          .filter((step) => step.time !== null)
+          .map((step) => ({ ...step, state: PROGRESS_STATE.DONE })),
         {
           key: order.status,
           label: stopLabel,

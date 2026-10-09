@@ -12,8 +12,8 @@ export const ORDERS_TEXTS = {
   shown: (shown: number, total: number) => `Показано ${shown} из ${total}`,
   // Couriers are not assigned yet: the name comes with the courier slice.
   COURIER_NOT_ASSIGNED: 'Не назначен',
+  // Not used yet: the "track" action of a card comes with the tracking slice.
   ACTION_TRACK: 'Отследить',
-  ACTION_REPEAT: 'Повторить',
 } as const;
 
 export const ORDER_TAB_LABELS = {

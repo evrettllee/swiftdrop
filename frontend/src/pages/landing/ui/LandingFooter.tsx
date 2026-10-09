@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { UI_TEXTS } from '@/shared/config';
 import { Logo } from '@/shared/ui/logo';
 import { LANDING_CONTAINER_CLASS } from '../config/layout';
 import { LANDING_FOOTER_GROUPS, LANDING_SECTION_ID } from '../config/navigation';
 import { LANDING_TEXTS } from '../config/texts';
+import { useOrderLink } from '../model/useOrderLink';
 
 const LINK_CLASS = 'text-fg-secondary transition-colors duration-150 hover:text-fg';
 const HIDDEN_ON_MOBILE_CLASS = 'hidden lg:block';
@@ -12,6 +14,8 @@ const HIDDEN_ON_MOBILE_CLASS = 'hidden lg:block';
 const CURRENT_YEAR = new Date().getFullYear();
 
 export function LandingFooter() {
+  const orderLink = useOrderLink();
+
   return (
     <footer className="border-t border-border bg-surface">
       <div
@@ -40,16 +44,34 @@ export function LandingFooter() {
                   const className = link.showOnMobile
                     ? LINK_CLASS
                     : `${HIDDEN_ON_MOBILE_CLASS} ${LINK_CLASS}`;
+                  let item: ReactNode;
 
-                  return link.anchor === undefined ? (
-                    <Link key={link.label} to={link.route} className={className}>
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a key={link.label} href={`#${link.anchor}`} className={className}>
-                      {link.label}
-                    </a>
-                  );
+                  if (link.startsOrder === true) {
+                    item = (
+                      <Link
+                        key={link.label}
+                        to={orderLink.to}
+                        onClick={() => orderLink.startOrder()}
+                        className={className}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  } else if (link.anchor === undefined) {
+                    item = (
+                      <Link key={link.label} to={link.route} className={className}>
+                        {link.label}
+                      </Link>
+                    );
+                  } else {
+                    item = (
+                      <a key={link.label} href={`#${link.anchor}`} className={className}>
+                        {link.label}
+                      </a>
+                    );
+                  }
+
+                  return item;
                 })}
               </div>
             ))}

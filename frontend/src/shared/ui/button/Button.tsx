@@ -73,17 +73,23 @@ export function Button({
   );
 }
 
-type LinkButtonProps = CommonProps & ({ href: string; to?: never } | { to: string; href?: never });
+type LinkButtonProps = CommonProps & {
+  // Runs before the navigation, for example to remember what the next page needs.
+  onClick?: () => void;
+} & ({ href: string; to?: never } | { to: string; href?: never });
 
 // A link that looks like a button: `to` for pages of the app, `href` for full-page navigation.
 export function LinkButton({
   variant = 'primary',
   fullWidth = false,
   icon,
+  onClick,
   children,
   ...target
 }: LinkButtonProps) {
   const className = buildClassName(variant, fullWidth, false);
+  // The click event is not passed on: the handler takes no arguments.
+  const handleClick = onClick === undefined ? undefined : () => onClick();
   const content = (
     <>
       {icon}
@@ -92,11 +98,11 @@ export function LinkButton({
   );
 
   return target.to === undefined ? (
-    <a href={target.href} className={className}>
+    <a href={target.href} className={className} onClick={handleClick}>
       {content}
     </a>
   ) : (
-    <Link to={target.to} className={className}>
+    <Link to={target.to} className={className} onClick={handleClick}>
       {content}
     </Link>
   );

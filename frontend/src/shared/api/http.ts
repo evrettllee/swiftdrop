@@ -10,6 +10,7 @@ import {
   HTTP_STATUS,
   JSON_CONTENT_TYPE,
   NETWORK_ERROR_STATUS,
+  REFRESH_LOCK_NAME,
 } from './request-config';
 
 const fieldErrorSchema = z.object({ field: z.string(), message: z.string() });
@@ -83,11 +84,20 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, body?.message ?? API_ERROR_MESSAGES.GENERIC, body?.errors);
 }
 
+// The tabs of one browser share the session cookies, so they refresh one at a time: a tab that waited
+// for the lock sends the refresh cookie the tab before it has just rotated, not the spent one.
+// Without the Web Locks API (an old browser) every tab refreshes on its own, as before.
+function withRefreshLock(refresh: () => Promise<boolean>): Promise<boolean> {
+  return 'locks' in navigator ? navigator.locks.request(REFRESH_LOCK_NAME, refresh) : refresh();
+}
+
 async function performRefresh(): Promise<boolean> {
   try {
-    const response = await send(REFRESH_PATH, { method: HTTP_METHOD.POST });
+    return await withRefreshLock(async () => {
+      const response = await send(REFRESH_PATH, { method: HTTP_METHOD.POST });
 
-    return response.ok;
+      return response.ok;
+    });
   } catch {
     return false;
   } finally {
@@ -95,8 +105,8 @@ async function performRefresh(): Promise<boolean> {
   }
 }
 
-// Concurrent callers share one refresh: the refresh token rotates, so a second parallel call
-// would reuse a spent token and make the backend revoke every session of the user.
+// Concurrent callers of one tab share one refresh: the refresh token rotates, so a second parallel
+// call would reuse a spent token.
 function refreshSession(): Promise<boolean> {
   refreshInFlight ??= performRefresh();
 

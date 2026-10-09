@@ -6,3 +6,4 @@ export {
   ORDER_ID_PARAM,
 } from './app-routes';
 export { AUTH_TAB, AUTH_TAB_QUERY_PARAM } from './auth-tab';
+export { ROLE_HOME_ROUTE } from './role-home';

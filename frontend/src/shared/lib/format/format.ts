@@ -9,19 +9,6 @@ const moneyFormat = new Intl.NumberFormat(APP_LOCALE, {
   maximumFractionDigits: MONEY_FRACTION_DIGITS,
 });
 
-const dateFormat = new Intl.DateTimeFormat(APP_LOCALE, {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-});
-
-const dateTimeFormat = new Intl.DateTimeFormat(APP_LOCALE, {
-  day: 'numeric',
-  month: 'long',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
 const dayMonthFormat = new Intl.DateTimeFormat(APP_LOCALE, { day: 'numeric', month: 'long' });
 
 const shortDateFormat = new Intl.DateTimeFormat(APP_LOCALE, { day: 'numeric', month: 'short' });
@@ -31,16 +18,6 @@ const timeFormat = new Intl.DateTimeFormat(APP_LOCALE, { hour: '2-digit', minute
 // An exact amount, unlike the estimate in the calculator, which starts with "≈".
 export function formatMoney(amount: number, currency: string): string {
   return `${moneyFormat.format(amount)} ${currency}`;
-}
-
-// For example "5 октября 2026 г."
-export function formatDate(date: Date): string {
-  return dateFormat.format(date);
-}
-
-// For example "5 октября, 14:02"
-export function formatDateTime(date: Date): string {
-  return dateTimeFormat.format(date);
 }
 
 // For example "6 октября 2026, 14:20": the date of an order on its page.

@@ -6,10 +6,12 @@ import {
   COLOR_TRANSITION_CLASS,
   ICON_SIZE,
   ICON_WEIGHT,
+  ROUTE_POINT,
   ROUTE_POINT_LABELS,
   type RoutePointKind,
 } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
+import { RoutePointMark } from '@/shared/ui/route-point-mark';
 import { fromLatLng, toLatLng } from './lat-lng';
 import { MAP_CLASS, MAP_TEXTS } from './map';
 import { MARKER_ICONS } from './marker-icons';
@@ -17,6 +19,11 @@ import { MARKER_ICONS } from './marker-icons';
 // The wrapper covers the padding of the tag, the button is larger than its icon for a finger and
 // does not make the tag taller (the negative margins).
 const TAG_CONTENT_CLASS = '-mx-4 -my-1 flex items-center gap-1 px-4 py-1';
+// The tag of a point is outlined and written in the color of its mark (route-map.css).
+const TAG_KIND_CLASS: Record<RoutePointKind, string> = {
+  [ROUTE_POINT.PICKUP]: MAP_CLASS.TAG_PICKUP,
+  [ROUTE_POINT.DELIVERY]: MAP_CLASS.TAG_DELIVERY,
+};
 const REMOVE_BUTTON_CLASS = `-my-1 -me-2 flex size-7 items-center justify-center rounded-sm text-fg-secondary hover:bg-selected hover:text-fg ${COLOR_TRANSITION_CLASS}`;
 
 // Leaflet turns a click on its tooltip into a click on the map, which would place a new point.
@@ -55,9 +62,12 @@ export function RouteMarker({ kind, point, onMove, onRemove }: RouteMarkerProps)
       keyboard={false}
       eventHandlers={eventHandlers}
     >
-      <Tooltip permanent interactive direction="top" className={MAP_CLASS.TAG}>
+      <Tooltip permanent interactive direction="top" className={`${MAP_CLASS.TAG} ${TAG_KIND_CLASS[kind]}`}>
         <span ref={disableMapClicks} className={TAG_CONTENT_CLASS}>
-          {ROUTE_POINT_LABELS[kind]}
+          <span className="flex items-center gap-2">
+            <RoutePointMark kind={kind} />
+            {ROUTE_POINT_LABELS[kind]}
+          </span>
           <button
             type="button"
             aria-label={removeLabel}

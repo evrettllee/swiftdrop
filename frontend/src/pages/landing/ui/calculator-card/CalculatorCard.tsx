@@ -2,14 +2,19 @@ import { useId } from 'react';
 import { useEstimate } from '@/features/estimate-price';
 import { PackageFields, usePackageForm } from '@/features/package-form';
 import { useRouteAddresses } from '@/features/route-picker';
-import { ADDRESS_PLACEHOLDER, ROUTE_POINT_LABELS, ROUTE_POINT_ORDER } from '@/shared/config';
-import { APP_ROUTES } from '@/shared/routes';
+import {
+  ADDRESS_PLACEHOLDER,
+  ROUTE_POINT,
+  ROUTE_POINT_LABELS,
+  ROUTE_POINT_ORDER,
+} from '@/shared/config';
 import { AddressField } from '@/shared/ui/address-field';
 import { LinkButton } from '@/shared/ui/button';
 import { RouteMap } from '@/shared/ui/route-map';
 import { LANDING_SCROLL_OFFSET_CLASS } from '../../config/layout';
 import { LANDING_SECTION_ID } from '../../config/navigation';
 import { LANDING_TEXTS } from '../../config/texts';
+import { useOrderLink } from '../../model/useOrderLink';
 import { EstimateResult } from './EstimateResult';
 
 // The map on the left, the form with the price on the right; on a phone the map goes first.
@@ -20,6 +25,7 @@ export function CalculatorCard() {
     delivery,
     hint,
     texts,
+    parts,
     lookingUp,
     setTarget,
     changeText,
@@ -29,6 +35,26 @@ export function CalculatorCard() {
   } = useRouteAddresses();
   const packageForm = usePackageForm();
   const estimate = useEstimate(pickup, delivery, packageForm.params);
+  const orderLink = useOrderLink();
+
+  // The order form starts from what is entered here, even if it is unfinished.
+  function handleOrder(): void {
+    orderLink.startOrder({
+      route: {
+        [ROUTE_POINT.PICKUP]: {
+          point: pickup,
+          text: texts[ROUTE_POINT.PICKUP],
+          parts: parts[ROUTE_POINT.PICKUP],
+        },
+        [ROUTE_POINT.DELIVERY]: {
+          point: delivery,
+          text: texts[ROUTE_POINT.DELIVERY],
+          parts: parts[ROUTE_POINT.DELIVERY],
+        },
+      },
+      package: packageForm.values,
+    });
+  }
 
   return (
     <section
@@ -70,7 +96,7 @@ export function CalculatorCard() {
           <PackageFields form={packageForm} />
           <EstimateResult view={estimate} />
           <div className="flex flex-col gap-2">
-            <LinkButton to={APP_ROUTES.AUTH} fullWidth>
+            <LinkButton to={orderLink.to} onClick={handleOrder} fullWidth>
               {LANDING_TEXTS.ORDER}
             </LinkButton>
             <p className="text-center text-caption text-fg-secondary">

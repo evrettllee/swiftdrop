@@ -21,6 +21,12 @@ export function getPaidAt(order: OrderDetails): Date | null {
   return order.history.find((entry) => entry.status === ORDER_STATUS.CONFIRMED)?.changedAt ?? null;
 }
 
+// The time the order reached its current status: for a cancelled order, the time of the cancel,
+// when the money was sent back.
+export function getStatusReachedAt(order: OrderDetails): Date | null {
+  return order.history.find((entry) => entry.status === order.status)?.changedAt ?? null;
+}
+
 // The minutes of the trip given at the order: the expected delivery minus the creation time.
 export function getTravelMinutes(order: OrderDetails): number | null {
   return order.estimatedDeliveryAt === null

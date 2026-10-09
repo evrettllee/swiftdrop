@@ -1,5 +1,6 @@
 import type { ChangeEvent, ReactNode } from 'react';
 import type { AddressSuggestion } from '@/shared/api';
+import { ADDRESS_TEXT_MAX_LENGTH } from '@/shared/config';
 import { Input } from '@/shared/ui/input';
 import { Spinner } from '@/shared/ui/spinner';
 import { NO_ACTIVE_INDEX } from './address-field';
@@ -49,6 +50,7 @@ export function AddressField({
       labelAdornment={labelAdornment}
       value={value}
       placeholder={placeholder}
+      maxLength={ADDRESS_TEXT_MAX_LENGTH}
       autoComplete="off"
       role="combobox"
       aria-expanded={isListShown}

@@ -28,14 +28,40 @@ const NO_LOOKUPS: LookupFlags = {
   [ROUTE_POINT.DELIVERY]: false,
 };
 
+// The starting value of one field, for example from a draft of the order.
+type RouteAddressValue = {
+  point: GeoPoint | null;
+  text: string;
+  parts: AddressParts | null;
+};
+
+type RouteAddressesInitial = Record<RoutePointKind, RouteAddressValue>;
+
+function pickFrom<T>(
+  initial: RouteAddressesInitial,
+  read: (value: RouteAddressValue) => T,
+): Record<RoutePointKind, T> {
+  return {
+    [ROUTE_POINT.PICKUP]: read(initial[ROUTE_POINT.PICKUP]),
+    [ROUTE_POINT.DELIVERY]: read(initial[ROUTE_POINT.DELIVERY]),
+  };
+}
+
 // The route points together with the address text of each: the text and the point of a field
 // always change together, and an unfinished address lookup is cancelled by any newer change.
 // `parts` keeps the city, the street and the house of an address found by Mapbox (an order needs
 // them); a typed text has no parts until a suggestion is chosen.
-export function useRouteAddresses() {
-  const { pickup, delivery, target, setTarget, setPoint } = useRoutePoints();
-  const [texts, setTexts] = useState<AddressTexts>(EMPTY_TEXTS);
-  const [parts, setParts] = useState<AddressPartsByPoint>(NO_PARTS);
+// `initial` fills the fields on the first render; without it they start empty.
+export function useRouteAddresses(initial?: RouteAddressesInitial) {
+  const { pickup, delivery, target, setTarget, setPoint } = useRoutePoints(
+    initial === undefined ? undefined : pickFrom(initial, (value) => value.point),
+  );
+  const [texts, setTexts] = useState<AddressTexts>(() =>
+    initial === undefined ? EMPTY_TEXTS : pickFrom(initial, (value) => value.text),
+  );
+  const [parts, setParts] = useState<AddressPartsByPoint>(() =>
+    initial === undefined ? NO_PARTS : pickFrom(initial, (value) => value.parts),
+  );
   const [lookingUp, setLookingUp] = useState<LookupFlags>(NO_LOOKUPS);
   const lookups = useRef<Partial<Record<RoutePointKind, AbortController>>>({});
 

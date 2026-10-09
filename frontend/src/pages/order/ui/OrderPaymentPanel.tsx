@@ -1,21 +1,30 @@
 import {
   ArrowClockwiseIcon,
-  ArrowCounterClockwiseIcon,
+  ArrowsClockwiseIcon,
   CheckCircleIcon,
   ClockIcon,
 } from '@phosphor-icons/react';
 import { useId } from 'react';
 import { formatCoefficient, formatDistanceKm, PRICE_TEXTS } from '@/entities/price';
+import { saveOrderDraft } from '@/features/order-draft';
 import { ORDER_STATUS, type OrderDetails } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { formatMoney, formatShortDateTime } from '@/shared/lib/format';
-import { Button } from '@/shared/ui/button';
+import { APP_ROUTES } from '@/shared/routes';
+import { Button, LinkButton } from '@/shared/ui/button';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { PriceRow } from '@/shared/ui/price-row';
 import { PAYMENT_VIEW } from '../config/payment';
 import { PAYMENT_TEXTS } from '../config/texts';
-import { getPaidAt, getPaymentView, getPriceBreakdown, getTravelMinutes } from '../lib/payment';
-import { CANCELLABLE_STATUSES } from '../model/order-status-groups';
+import {
+  getPaidAt,
+  getPaymentView,
+  getPriceBreakdown,
+  getStatusReachedAt,
+  getTravelMinutes,
+} from '../lib/payment';
+import { buildRepeatDraft } from '../lib/repeat-order';
+import { CANCELLABLE_STATUSES, FINISHED_STATUSES } from '../model/order-status-groups';
 import { useOrderPayment } from '../model/useOrderPayment';
 
 const DIVIDER = <hr className="border-border" />;
@@ -39,6 +48,12 @@ export function OrderPaymentPanel({ order, isPayFailed, onCancel }: OrderPayment
   const total = formatMoney(order.price, order.currency);
   const isPending = order.status === ORDER_STATUS.PENDING;
   const isCancellable = CANCELLABLE_STATUSES.includes(order.status) && onCancel !== undefined;
+  const isFinished = FINISHED_STATUSES.includes(order.status);
+
+  // The client is signed in already, so the order form is not awaited after a sign-in.
+  function handleRepeat(): void {
+    saveOrderDraft(buildRepeatDraft(order), { pendingCheckout: false });
+  }
 
   let statusRow = (
     <div className="flex items-center gap-2">
@@ -60,10 +75,18 @@ export function OrderPaymentPanel({ order, isPayFailed, onCancel }: OrderPayment
       </div>
     );
   } else if (view === PAYMENT_VIEW.REFUNDED) {
+    // The money goes back when the order is cancelled.
+    const refundedAt = getStatusReachedAt(order);
+
     statusRow = (
       <div className="flex items-center gap-2">
-        <ArrowCounterClockwiseIcon {...ICON_PROPS} className="shrink-0 text-fg-secondary" />
+        <ArrowsClockwiseIcon {...ICON_PROPS} className="shrink-0 text-fg-secondary" />
         <span className="font-semibold">{PAYMENT_TEXTS.REFUNDED}</span>
+        {refundedAt === null ? null : (
+          <span className="ms-auto text-small text-fg-secondary tabular-nums">
+            {formatShortDateTime(refundedAt)}
+          </span>
+        )}
       </div>
     );
   }
@@ -126,6 +149,20 @@ export function OrderPaymentPanel({ order, isPayFailed, onCancel }: OrderPayment
               {PAYMENT_TEXTS.CANCEL_HINT}
             </p>
           ) : null}
+        </>
+      ) : null}
+      {isFinished ? (
+        <>
+          {DIVIDER}
+          <LinkButton
+            to={APP_ROUTES.ORDER_NEW}
+            onClick={handleRepeat}
+            fullWidth
+            icon={<ArrowsClockwiseIcon {...ICON_PROPS} className="shrink-0" />}
+          >
+            {PAYMENT_TEXTS.REPEAT}
+          </LinkButton>
+          <p className="text-caption text-pretty text-fg-secondary">{PAYMENT_TEXTS.REPEAT_HINT}</p>
         </>
       ) : null}
     </aside>

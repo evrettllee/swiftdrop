@@ -1,10 +1,12 @@
-import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
 import { LANDING_SCROLL_OFFSET_CLASS } from '../config/layout';
 import { LANDING_SECTION_ID } from '../config/navigation';
 import { LANDING_TEXTS } from '../config/texts';
+import { useOrderLink } from '../model/useOrderLink';
 
 export function HeroSection() {
+  const orderLink = useOrderLink();
+
   return (
     <section
       id={LANDING_SECTION_ID.TOP}
@@ -18,8 +20,9 @@ export function HeroSection() {
       </p>
       {/* In a column the buttons stretch to the full width by themselves. */}
       <div className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row">
-        {/* Until the order page exists, ordering starts from the sign-in page, as in the footer. */}
-        <LinkButton to={APP_ROUTES.AUTH}>{LANDING_TEXTS.ORDER}</LinkButton>
+        <LinkButton to={orderLink.to} onClick={orderLink.startOrder}>
+          {LANDING_TEXTS.ORDER}
+        </LinkButton>
         <LinkButton variant="secondary" href={`#${LANDING_SECTION_ID.HOW_IT_WORKS}`}>
           {LANDING_TEXTS.HOW_IT_WORKS}
         </LinkButton>

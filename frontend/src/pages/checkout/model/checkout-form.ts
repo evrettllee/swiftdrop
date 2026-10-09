@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { APARTMENT_MAX_LENGTH } from '@/shared/config';
 import { buildNameSchema, buildPhoneSchema } from '@/shared/lib/person-validation';
-import { APARTMENT_MAX_LENGTH, CHECKOUT_FIELD } from '../config/checkout-form';
+import { CHECKOUT_FIELD } from '../config/checkout-form';
 import { CHECKOUT_VALIDATION_MESSAGES } from '../config/texts';
 
 const apartmentSchema = z

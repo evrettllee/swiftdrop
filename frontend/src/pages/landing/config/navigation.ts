@@ -44,8 +44,7 @@ export const LANDING_FOOTER_GROUPS: readonly FooterGroup[] = [
     title: 'Аккаунт',
     links: [
       { label: LANDING_TEXTS.SIGN_IN, route: APP_ROUTES.AUTH, showOnMobile: false },
-      // The page for creating an order does not exist yet, so for now the link leads to the sign-in.
-      { label: LANDING_TEXTS.ORDER, route: APP_ROUTES.AUTH, showOnMobile: false },
+      { label: LANDING_TEXTS.ORDER, startsOrder: true, showOnMobile: false },
       { label: SECTION_LABELS.FAQ, anchor: LANDING_SECTION_ID.FAQ, showOnMobile: true },
     ],
   },

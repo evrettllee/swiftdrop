@@ -1,3 +1,4 @@
+import { PACKAGE_VALUE_MAX_LENGTH } from '@/shared/config';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Input } from '@/shared/ui/input';
 import { PACKAGE_DIMENSIONS, PACKAGE_FIELD } from '../config/package';
@@ -37,6 +38,7 @@ export function PackageFields({ form, layout = 'stacked' }: PackageFieldsProps) 
           <Input
             label={PACKAGE_TEXTS.WEIGHT}
             inputMode="decimal"
+            maxLength={PACKAGE_VALUE_MAX_LENGTH}
             autoComplete="off"
             endAdornment={<Unit>{PACKAGE_TEXTS.UNIT_KG}</Unit>}
             {...field(PACKAGE_FIELD.WEIGHT)}
@@ -47,6 +49,7 @@ export function PackageFields({ form, layout = 'stacked' }: PackageFieldsProps) 
             key={name}
             label={label}
             inputMode="numeric"
+            maxLength={PACKAGE_VALUE_MAX_LENGTH}
             autoComplete="off"
             endAdornment={<Unit>{PACKAGE_TEXTS.UNIT_CM}</Unit>}
             {...field(name)}
