@@ -57,6 +57,7 @@ SwiftDrop: веб-приложение и информационная сист�
 
 | Переменная              | Назначение                                                               | Пример                                                           |
 | ----------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `NODE_ENV`              | Окружение: `development`, `test` или `production`                        | `development`                                                    |
 | `PORT`                  | Порт backend                                                             | `8080`                                                           |
 | `APP_URL`               | Публичный адрес frontend, на него Stripe возвращает клиента после оплаты | `http://localhost:5173`                                          |
 | `POSTGRES_USER`         | Пользователь PostgreSQL в docker compose                                 | `swiftdrop`                                                      |
@@ -87,7 +88,8 @@ SwiftDrop: веб-приложение и информационная сист�
 
 - `OSRM_URL` обязателен: backend не стартует без него, и через него считается маршрут для расчёта стоимости.
 - `VITE_MAPBOX_TOKEN` нужен для карты и поиска адресов; без него вместо карты показывается заглушка. Токен вшивается в сборку frontend на этапе `npm run build`, поэтому в CI и Docker его нужно передавать при сборке, а не при запуске.
-- Backend при старте проверяет `APP_URL`, `DATABASE_URL`, `OSRM_URL`, `JWT_ACCESS_SECRET`, `STRIPE_*` и все `GOOGLE_*`, `YANDEX_*`: без них он не запустится. Ключ Stripe должен начинаться с `sk_`, секрет вебхука с `whsec_`.
+- `NODE_ENV` обязателен: в `production` cookie сессии получают флаг `Secure`. Тесты Jest задают `test` сами.
+- Backend при старте проверяет `NODE_ENV`, `APP_URL`, `DATABASE_URL`, `OSRM_URL`, `JWT_ACCESS_SECRET`, `STRIPE_*` и все `GOOGLE_*`, `YANDEX_*`: без них он не запустится. Ключ Stripe должен начинаться с `sk_`, секрет вебхука с `whsec_`.
 
 ## Платежи (Stripe, тестовый режим)
 
@@ -152,12 +154,39 @@ E2e-тесты работают с отдельной базой `swiftdrop_test
 docker exec swiftdrop-postgres createdb -U swiftdrop swiftdrop_test
 ```
 
+## Frontend
+
+Код в `frontend/src` разложен по слоям Feature-Sliced Design, сверху вниз:
+
+| Слой        | Что лежит                                                             |
+| ----------- | --------------------------------------------------------------------- |
+| `app/`      | точка входа, роутер, макеты, глобальные стили и подписки              |
+| `pages/`    | страницы, их логика и UI                                              |
+| `features/` | действия пользователя, которые нужны нескольким страницам             |
+| `entities/` | доменные модели, которые нужны нескольким срезам                      |
+| `shared/`   | инфраструктура без бизнес-логики: UI-кит, API-клиент, сессия, утилиты |
+
+Правила:
+
+- Импорт только вниз: слой берёт код лишь из слоёв ниже себя, срезы одного слоя друг друга не импортируют.
+- Срез отдаёт наружу только то, что экспортирует его `index.ts` (в `shared` свой `index.ts` у каждого сегмента); импорт внутренних файлов чужого среза запрещён.
+- Импорты идут через алиасы `@/app`, `@/pages`, `@/features`, `@/entities`, `@/shared`.
+
+Проверки (из `frontend`):
+
+```bash
+npm run lint       # oxlint
+npm run lint:fsd   # Steiger, правила FSD
+npm run build      # проверка типов и сборка
+npm run test:e2e   # сквозные тесты Playwright: нужны поднятый в Docker PostgreSQL, миграции и db:seed
+```
+
 ## Структура репозитория
 
 ```text
 backend/                 API на NestJS, Drizzle ORM, миграции в backend/drizzle, тесты в backend/test
-frontend/                SPA на React, Vite и Tailwind CSS, код по фичам в frontend/src/features
-.github/workflows/ci.yml CI: lint, build и тесты backend, lint и build frontend
+frontend/                SPA на React, Vite и Tailwind CSS, слои FSD в frontend/src (см. раздел «Frontend»)
+.github/workflows/ci.yml CI: lint, build и тесты backend, lint, lint:fsd и build frontend
 docker-compose.dev.yml   PostgreSQL и S3-хранилище для разработки
 .env.example             шаблон единого .env
 .nvmrc                   версия Node.js
