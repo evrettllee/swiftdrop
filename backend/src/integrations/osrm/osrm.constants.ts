@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from '../../common/common.constants';
+import { MS_PER_SECOND } from '../../common/constants/time.constants';
 import type { OsrmProfile } from './osrm.types';
 
 // Profiles
@@ -6,7 +6,7 @@ export const OSRM_PROFILE = {
   CAR: 'car',
   BIKE: 'bike',
   FOOT: 'foot',
-} as const satisfies Record<string, OsrmProfile>;
+} as const;
 
 // On routing.openstreetmap.de the profile is a path prefix, not part of the route path.
 // A self-hosted OSRM serves one profile per instance, so only this map changes.

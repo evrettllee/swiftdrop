@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
@@ -10,10 +10,14 @@ import {
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
-} from './common/common.constants';
+} from './common/constants/http.constants';
+import { InternalErrorFilter } from './common/filters/internal-error.filter';
 import { CsrfGuard } from './common/guards/csrf.guard';
+import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
+import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PricingModule } from './pricing/pricing.module';
 import { ZonesModule } from './zones/zones.module';
 
@@ -21,7 +25,7 @@ import { ZonesModule } from './zones/zones.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['../.env'],
+      envFilePath: [ENV_FILE_PATH],
       validate: validateEnv,
     }),
     ScheduleModule.forRoot(),
@@ -33,12 +37,15 @@ import { ZonesModule } from './zones/zones.module';
     AuthModule,
     ZonesModule,
     PricingModule,
+    OrdersModule,
+    PaymentsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: CsrfGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_FILTER, useClass: InternalErrorFilter },
   ],
 })
 export class AppModule {}

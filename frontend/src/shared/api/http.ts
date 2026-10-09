@@ -1,18 +1,21 @@
 import { z } from 'zod';
+import { NO_RETRY_PATHS, REFRESH_PATH } from './endpoints/auth';
 import {
   API_BASE_PATH,
   API_ERROR_MESSAGES,
+  CONTENT_TYPE_HEADER,
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
   HTTP_METHOD,
   HTTP_STATUS,
   JSON_CONTENT_TYPE,
   NETWORK_ERROR_STATUS,
-  NO_RETRY_PATHS,
-  REFRESH_PATH,
-} from '../constants';
+  REFRESH_LOCK_NAME,
+} from './request-config';
 
-export type FieldError = { field: string; message: string };
+const fieldErrorSchema = z.object({ field: z.string(), message: z.string() });
+
+export type FieldError = z.infer<typeof fieldErrorSchema>;
 
 export class ApiError extends Error {
   readonly status: number;
@@ -26,11 +29,16 @@ export class ApiError extends Error {
   }
 }
 
+// An ApiError already carries a text for the user; anything else gets the caller's fallback.
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof ApiError ? error.message : fallback;
+}
+
 type RequestOptions = { method: string; body?: unknown };
 
 const errorBodySchema = z.object({
   message: z.string().optional(),
-  errors: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+  errors: z.array(fieldErrorSchema).optional(),
 });
 
 let sessionExpiredHandler: (() => void) | null = null;
@@ -46,7 +54,7 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = { [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE };
 
   if (hasBody) {
-    headers['Content-Type'] = JSON_CONTENT_TYPE;
+    headers[CONTENT_TYPE_HEADER] = JSON_CONTENT_TYPE;
   }
 
   try {
@@ -76,11 +84,20 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, body?.message ?? API_ERROR_MESSAGES.GENERIC, body?.errors);
 }
 
+// The tabs of one browser share the session cookies, so they refresh one at a time: a tab that waited
+// for the lock sends the refresh cookie the tab before it has just rotated, not the spent one.
+// Without the Web Locks API (an old browser) every tab refreshes on its own, as before.
+function withRefreshLock(refresh: () => Promise<boolean>): Promise<boolean> {
+  return 'locks' in navigator ? navigator.locks.request(REFRESH_LOCK_NAME, refresh) : refresh();
+}
+
 async function performRefresh(): Promise<boolean> {
   try {
-    const response = await send(REFRESH_PATH, { method: HTTP_METHOD.POST });
+    return await withRefreshLock(async () => {
+      const response = await send(REFRESH_PATH, { method: HTTP_METHOD.POST });
 
-    return response.ok;
+      return response.ok;
+    });
   } catch {
     return false;
   } finally {
@@ -88,8 +105,8 @@ async function performRefresh(): Promise<boolean> {
   }
 }
 
-// Concurrent callers share one refresh: the refresh token rotates, so a second parallel call
-// would reuse a spent token and make the backend revoke every session of the user.
+// Concurrent callers of one tab share one refresh: the refresh token rotates, so a second parallel
+// call would reuse a spent token.
 function refreshSession(): Promise<boolean> {
   refreshInFlight ??= performRefresh();
 

@@ -13,9 +13,11 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { AuthCookiesService } from './auth-cookies.service';
-import { AUTH_ROUTES, AUTH_THROTTLE, OAUTH_SUCCESS_REDIRECT } from './auth.constants';
-import { AuthService } from './auth.service';
+import { AuthCookiesService } from './services/auth-cookies.service';
+import { AUTH_THROTTLE } from './constants/access.constants';
+import { OAUTH_SUCCESS_REDIRECT } from './constants/oauth.constants';
+import { AUTH_ROUTES } from './constants/routes.constants';
+import { AuthService } from './services/auth.service';
 import type { AuthResponse, AuthResult, AuthUser, OAuthRequest } from './auth.types';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';

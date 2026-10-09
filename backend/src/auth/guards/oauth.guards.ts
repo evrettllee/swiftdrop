@@ -14,8 +14,8 @@ import {
   GOOGLE_STRATEGY_NAME,
   OAUTH_ERROR_MESSAGES,
   YANDEX_STRATEGY_NAME,
-} from '../auth.constants';
-import { OAuthStateService } from '../oauth-state.service';
+} from '../constants/oauth.constants';
+import { OAuthStateService } from '../services/oauth-state.service';
 
 // Starts the redirect to the provider and issues the state value that the callback will check.
 export function createOAuthInitiateGuard(

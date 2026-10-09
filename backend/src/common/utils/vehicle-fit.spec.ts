@@ -1,4 +1,4 @@
-import type { PackageSpec } from '../common.types';
+import type { PackageSpec } from '../schemas/package-spec.schema';
 import { canVehicleCarry, findLightestVehicle } from './vehicle-fit';
 
 function buildPackage(overrides: Partial<PackageSpec> = {}): PackageSpec {

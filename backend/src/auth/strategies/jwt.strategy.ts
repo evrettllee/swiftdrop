@@ -3,17 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import type { Request } from 'express';
 import { Strategy } from 'passport-jwt';
+import { ENV_KEYS } from '../../config/env.constants';
 import { UsersService } from '../../users/users.service';
-import { ACCESS_COOKIE_NAME, AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../auth.constants';
+import { readCookie } from '../services/auth-cookies.service';
+import { AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../constants/access.constants';
+import { ACCESS_COOKIE_NAME } from '../constants/tokens.constants';
 import { toAuthUser } from '../auth-user.mapper';
 import type { AccessTokenPayload, AuthUser } from '../auth.types';
-
-// A plain function, because it is needed before `this` exists in the constructor.
-function extractAccessToken(request: Request): string | null {
-  const value: unknown = request.cookies?.[ACCESS_COOKIE_NAME];
-
-  return typeof value === 'string' ? value : null;
-}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
@@ -22,9 +18,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
     private readonly usersService: UsersService,
   ) {
     super({
-      jwtFromRequest: extractAccessToken,
+      // passport-jwt treats null as "no token", so the missing cookie is reported as null.
+      jwtFromRequest: (request: Request) => readCookie(request, ACCESS_COOKIE_NAME) ?? null,
       ignoreExpiration: false,
-      secretOrKey: config.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      secretOrKey: config.getOrThrow<string>(ENV_KEYS.JWT_ACCESS_SECRET),
     });
   }
 

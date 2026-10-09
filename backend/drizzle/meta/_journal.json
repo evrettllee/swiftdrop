@@ -8,6 +8,27 @@
       "when": 1791067520312,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791383898402,
+      "tag": "0001_talented_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791571567063,
+      "tag": "0002_add_refresh_token_rotated_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791571576279,
+      "tag": "0003_add_payments_one_pending_per_order",
+      "breakpoints": true
     }
   ]
 }

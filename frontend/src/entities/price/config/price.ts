@@ -1,0 +1,3 @@
+export const DISTANCE_FRACTION_DIGITS = 2;
+export const COEFFICIENT_FRACTION_DIGITS = 2;
+export const MONEY_ROUNDING = 100;

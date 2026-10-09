@@ -1,10 +1,7 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import {
-  CSRF_HEADER_NAME,
-  CSRF_HEADER_VALUE,
-  GLOBAL_PREFIX,
-} from '../../src/common/common.constants';
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../../src/common/constants/csrf.constants';
+import { GLOBAL_PREFIX } from '../../src/common/constants/http.constants';
 import { CLIENT_IP_HEADER, TEST_IP_PREFIX } from './constants';
 
 let counter = 0;
@@ -22,6 +19,13 @@ export function postApi(app: NestExpressApplication, path: string) {
     .post(`/${GLOBAL_PREFIX}/${path}`)
     .set(CLIENT_IP_HEADER, nextClientIp())
     .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
+}
+
+// A GET under the API prefix with its own address, the CSRF header is not needed for reads.
+export function getApi(app: NestExpressApplication, path: string) {
+  return request(app.getHttpServer())
+    .get(`/${GLOBAL_PREFIX}/${path}`)
+    .set(CLIENT_IP_HEADER, nextClientIp());
 }
 
 type ResponseWithStatus = { status: number };

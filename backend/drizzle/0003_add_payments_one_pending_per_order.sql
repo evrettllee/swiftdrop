@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "payments_one_pending_per_order_uidx" ON "payments" USING btree ("order_id") WHERE "payments"."status" = 'pending';

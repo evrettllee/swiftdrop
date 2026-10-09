@@ -1,20 +1,11 @@
 import { index, integer, numeric, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { ORDER_STATUS, ORDER_STATUS_VALUES } from '../../common/enums/order-status.enum';
 import { addresses } from './addresses';
 import { courierProfiles } from './courier-profiles';
 import { tariffs } from './tariffs';
 import { users } from './users';
 
-export const orderStatusEnum = pgEnum('order_status', [
-  'pending',
-  'confirmed',
-  'awaiting_manual_assignment',
-  'courier_assigned',
-  'picked_up',
-  'in_transit',
-  'delivered',
-  'cancelled',
-  'rejected',
-]);
+export const orderStatusEnum = pgEnum('order_status', ORDER_STATUS_VALUES);
 
 export const orders = pgTable(
   'orders',
@@ -33,7 +24,7 @@ export const orders = pgTable(
     deliveryAddressId: integer()
       .notNull()
       .references(() => addresses.addressId),
-    status: orderStatusEnum().notNull().default('pending'),
+    status: orderStatusEnum().notNull().default(ORDER_STATUS.PENDING),
     recipientName: varchar({ length: 150 }).notNull(),
     recipientPhone: varchar({ length: 32 }).notNull(),
     price: numeric({ precision: 10, scale: 2 }).notNull(),

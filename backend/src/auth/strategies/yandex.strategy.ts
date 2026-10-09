@@ -3,9 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
 import { z } from 'zod';
+import { NAME_MAX_LENGTH } from '../../common/constants/person-validation.constants';
 import { OAUTH_PROVIDER } from '../../common/enums/oauth-provider.enum';
+import { ENV_KEYS } from '../../config/env.constants';
 import {
-  NAME_MAX_LENGTH,
   OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,
   YANDEX_AUTHORIZATION_URL,
@@ -13,7 +14,7 @@ import {
   YANDEX_PROFILE_URL,
   YANDEX_STRATEGY_NAME,
   YANDEX_TOKEN_URL,
-} from '../auth.constants';
+} from '../constants/oauth.constants';
 import type { OAuthProfile } from '../auth.types';
 
 const yandexProfileSchema = z.object({
@@ -33,9 +34,9 @@ export class YandexStrategy extends PassportStrategy(Strategy, YANDEX_STRATEGY_N
     super({
       authorizationURL: YANDEX_AUTHORIZATION_URL,
       tokenURL: YANDEX_TOKEN_URL,
-      clientID: config.getOrThrow<string>('YANDEX_CLIENT_ID'),
-      clientSecret: config.getOrThrow<string>('YANDEX_CLIENT_SECRET'),
-      callbackURL: config.getOrThrow<string>('YANDEX_CALLBACK_URL'),
+      clientID: config.getOrThrow<string>(ENV_KEYS.YANDEX_CLIENT_ID),
+      clientSecret: config.getOrThrow<string>(ENV_KEYS.YANDEX_CLIENT_SECRET),
+      callbackURL: config.getOrThrow<string>(ENV_KEYS.YANDEX_CALLBACK_URL),
     });
   }
 

@@ -1,4 +1,4 @@
-import type { PackageSpec } from '../common/common.types';
+import type { PackageSpec } from '../common/schemas/package-spec.schema';
 import type { VehicleType } from '../common/enums/vehicle-type.enum';
 
 export type TariffRates = {
@@ -23,4 +23,10 @@ export type PriceEstimate = {
   distanceKm: number;
   estimatedMinutes: number;
   coefficient: number;
+};
+
+export type PriceQuote = {
+  estimate: PriceEstimate;
+  // The tariff of the pickup zone: an order keeps it, so its price stays explainable later.
+  tariffId: number;
 };

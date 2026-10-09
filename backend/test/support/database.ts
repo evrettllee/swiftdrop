@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 import { ROLE_NAMES } from '../../src/common/enums/role.enum';
+import { DB_CASING } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';
 import * as schema from '../../src/db/schema';
 import {
@@ -15,7 +16,7 @@ import {
 
 export async function prepareTestDatabase(): Promise<void> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  const db = drizzle({ client: pool, schema, casing: 'snake_case' });
+  const db = drizzle({ client: pool, schema, casing: DB_CASING });
 
   try {
     await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });

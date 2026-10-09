@@ -3,12 +3,14 @@ import { hash } from '@node-rs/argon2';
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { SINGLE_ROW_LIMIT } from '../common/common.constants';
+import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
 import { ROLE, ROLE_NAMES } from '../common/enums/role.enum';
+import { ENV_FILE_PATH, ENV_KEYS } from '../config/env.constants';
+import { DB_CASING } from '../database/database.constants';
 import * as schema from './schema';
 
-if (existsSync('../.env')) {
-  process.loadEnvFile('../.env');
+if (existsSync(ENV_FILE_PATH)) {
+  process.loadEnvFile(ENV_FILE_PATH);
 }
 
 const DEFAULT_TARIFF = {
@@ -52,12 +54,12 @@ function requireEnv(name: string): string {
 }
 
 async function main() {
-  const databaseUrl = requireEnv('DATABASE_URL');
+  const databaseUrl = requireEnv(ENV_KEYS.DATABASE_URL);
   const adminEmail = requireEnv('SEED_ADMIN_EMAIL').trim().toLowerCase();
   const adminPassword = requireEnv('SEED_ADMIN_PASSWORD');
 
   const pool = new Pool({ connectionString: databaseUrl });
-  const db = drizzle({ client: pool, schema, casing: 'snake_case' });
+  const db = drizzle({ client: pool, schema, casing: DB_CASING });
 
   try {
     await db
