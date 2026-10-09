@@ -98,4 +98,6 @@ export const ORDERS_ERROR_MESSAGES = {
   CANNOT_CANCEL: 'Заказ уже нельзя отменить: курьер забрал посылку',
   CREATE_FAILED: 'Не удалось оформить заказ',
   ALREADY_FINISHED: 'Заказ уже завершён или отменён',
+  // The order row is held by another operation (a payment being started or settled).
+  BUSY: 'Заказ сейчас обрабатывается. Попробуйте ещё раз через минуту',
 } as const;

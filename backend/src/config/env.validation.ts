@@ -3,6 +3,7 @@ import {
   ENV_KEYS,
   JWT_SECRET_MIN_LENGTH,
   MIN_REQUIRED_LENGTH,
+  NODE_ENV_VALUES,
   PORT_MAX,
   PORT_MIN,
   STRIPE_SECRET_KEY_PREFIX,
@@ -33,6 +34,20 @@ function requireWithPrefix(config: Record<string, unknown>, name: string, prefix
   return value;
 }
 
+function requireOneOf(
+  config: Record<string, unknown>,
+  name: string,
+  allowed: readonly string[],
+): string {
+  const value = config[name];
+
+  if (typeof value !== 'string' || !allowed.includes(value)) {
+    throw new Error(`${name} is required and must be one of: ${allowed.join(', ')}`);
+  }
+
+  return value;
+}
+
 function requireUrl(config: Record<string, unknown>, name: string): string {
   const value = requireString(config, name);
 
@@ -53,6 +68,7 @@ export function validateEnv(config: Record<string, unknown>) {
     );
   }
 
+  requireOneOf(config, ENV_KEYS.NODE_ENV, NODE_ENV_VALUES);
   requireUrl(config, ENV_KEYS.APP_URL);
   requireString(config, ENV_KEYS.DATABASE_URL);
   requireString(config, ENV_KEYS.OSRM_URL);

@@ -1,5 +1,16 @@
-import { index, integer, numeric, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import {
+  index,
+  integer,
+  numeric,
+  pgEnum,
+  pgTable,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { PAYMENT_STATUS, PAYMENT_STATUS_VALUES } from '../../common/enums/payment-status.enum';
+import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '../../common/constants/database.constants';
 import { orders } from './orders';
 
 export const paymentStatusEnum = pgEnum('payment_status', PAYMENT_STATUS_VALUES);
@@ -23,5 +34,11 @@ export const payments = pgTable(
     stripePaymentId: varchar({ length: 255 }).unique(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index('payments_order_id_idx').on(table.orderId)],
+  (table) => [
+    index('payments_order_id_idx').on(table.orderId),
+    // An order has at most one open attempt, so it cannot be paid twice through two sessions.
+    uniqueIndex(PAYMENTS_ONE_PENDING_PER_ORDER_INDEX)
+      .on(table.orderId)
+      .where(sql`${table.status} = ${sql.raw(`'${PAYMENT_STATUS.PENDING}'`)}`),
+  ],
 );

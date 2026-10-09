@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   Logger,
   ServiceUnavailableException,
@@ -9,13 +10,18 @@ import Stripe from 'stripe';
 import { MS_PER_SECOND } from '../../common/constants/time.constants';
 import { ENV_KEYS } from '../../config/env.constants';
 import { PaymentGateway } from '../../payments/gateway/payment.gateway';
-import { PAYMENTS_ERROR_MESSAGES } from '../../payments/payments.constants';
+import {
+  PAYMENTS_ERROR_MESSAGES,
+  SESSION_EXPIRE_RESULT,
+} from '../../payments/payments.constants';
 import type {
   CheckoutSession,
   CheckoutSessionInput,
+  CheckoutSessionState,
   PaymentEvent,
+  SessionExpireResult,
 } from '../../payments/payments.types';
-import { mapStripeEvent } from './stripe-event.mapper';
+import { mapStripeEvent, mapStripeSession } from './stripe-event.mapper';
 import {
   SINGLE_ITEM_QUANTITY,
   STRIPE_CHECKOUT_MODE,
@@ -68,8 +74,26 @@ export class StripePaymentGateway extends PaymentGateway {
     return { sessionId: session.id, url: session.url };
   }
 
-  async expireCheckoutSession(sessionId: string): Promise<void> {
-    await this.call(() => this.stripe.checkout.sessions.expire(sessionId));
+  async expireCheckoutSession(sessionId: string): Promise<SessionExpireResult> {
+    let result: SessionExpireResult = SESSION_EXPIRE_RESULT.EXPIRED;
+
+    try {
+      await this.stripe.checkout.sessions.expire(sessionId);
+    } catch (error) {
+      if (!isNotOpenSessionError(error)) {
+        throw this.unavailable(error);
+      }
+
+      result = SESSION_EXPIRE_RESULT.NOT_OPEN;
+    }
+
+    return result;
+  }
+
+  async getCheckoutSession(sessionId: string): Promise<CheckoutSessionState> {
+    const session = await this.call(() => this.stripe.checkout.sessions.retrieve(sessionId));
+
+    return mapStripeSession(session);
   }
 
   async refund(paymentRef: string): Promise<void> {
@@ -94,15 +118,29 @@ export class StripePaymentGateway extends PaymentGateway {
     return mapStripeEvent(event);
   }
 
-  // Any failure of Stripe becomes one clear answer for the client, details go to the log.
   private async call<T>(request: () => Promise<T>): Promise<T> {
     try {
       return await request();
     } catch (error) {
-      this.logger.error(
-        `Stripe request failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      throw new ServiceUnavailableException(PAYMENTS_ERROR_MESSAGES.GATEWAY_UNAVAILABLE);
+      throw this.unavailable(error);
     }
   }
+
+  // Any unexpected failure of Stripe becomes one clear answer for the client, details go to the log.
+  private unavailable(error: unknown): ServiceUnavailableException {
+    this.logger.error(
+      `Stripe request failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+
+    return new ServiceUnavailableException(PAYMENTS_ERROR_MESSAGES.GATEWAY_UNAVAILABLE);
+  }
+}
+
+// Stripe refuses to close a session that is not open (paid or expired) with an invalid request of
+// status 400. A missing session is 404 and stays an unexpected failure.
+function isNotOpenSessionError(error: unknown): boolean {
+  return (
+    error instanceof Stripe.errors.StripeInvalidRequestError &&
+    error.statusCode === HttpStatus.BAD_REQUEST
+  );
 }

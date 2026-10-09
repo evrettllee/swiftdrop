@@ -6,7 +6,7 @@ import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders, orderStatusHistory, payments } from '../../../src/db/schema';
+import { orders, orderStatusHistory } from '../../../src/db/schema';
 import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
 import { UNPAID_ORDER_TTL_MS } from '../../../src/orders/orders.constants';
 import { UnpaidOrdersService } from '../../../src/orders/services/unpaid-orders.service';
@@ -15,11 +15,12 @@ import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
 import { ROUTE } from '../../support/fixtures';
-import { placeOrders } from '../../support/orders';
+import { placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
   insertPayment,
+  readPaymentStatus,
   resetGatewayMock,
 } from '../../support/payments';
 
@@ -35,15 +36,6 @@ describe('Unpaid orders cancellation (e2e)', () => {
     const createdAt = new Date(Date.now() - UNPAID_ORDER_TTL_MS - MS_PER_MINUTE);
 
     await db.update(orders).set({ createdAt }).where(eq(orders.orderId, orderId));
-  }
-
-  async function readOrderStatus(orderId: number): Promise<string> {
-    const [order] = await db
-      .select({ status: orders.status })
-      .from(orders)
-      .where(eq(orders.orderId, orderId));
-
-    return order.status;
   }
 
   beforeAll(async () => {
@@ -81,7 +73,7 @@ describe('Unpaid orders cancellation (e2e)', () => {
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, orderId));
     expect(count).toBe(1);
-    expect(await readOrderStatus(orderId)).toBe(ORDER_STATUS.CANCELLED);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
     expect(history).toContainEqual({ status: ORDER_STATUS.CANCELLED, changedBy: null });
   });
 
@@ -94,12 +86,8 @@ describe('Unpaid orders cancellation (e2e)', () => {
 
     await unpaidOrders.cancelExpired();
 
-    const [payment] = await db
-      .select({ status: payments.status })
-      .from(payments)
-      .where(eq(payments.paymentId, paymentId));
     expect(gateway.expireCheckoutSession).toHaveBeenCalledWith(CHECKOUT_SESSION.sessionId);
-    expect(payment.status).toBe(PAYMENT_STATUS.FAILED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.FAILED);
   });
 
   it('should leave a fresh order alone when the time has not passed yet', async () => {
@@ -108,7 +96,7 @@ describe('Unpaid orders cancellation (e2e)', () => {
     const count = await unpaidOrders.cancelExpired();
 
     expect(count).toBe(0);
-    expect(await readOrderStatus(orderId)).toBe(ORDER_STATUS.PENDING);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.PENDING);
   });
 
   it('should leave an old order alone when it is already confirmed', async () => {
@@ -122,7 +110,7 @@ describe('Unpaid orders cancellation (e2e)', () => {
     const count = await unpaidOrders.cancelExpired();
 
     expect(count).toBe(0);
-    expect(await readOrderStatus(orderId)).toBe(ORDER_STATUS.CONFIRMED);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CONFIRMED);
   });
 
   it('should cancel the other orders when one of them fails', async () => {
@@ -138,7 +126,7 @@ describe('Unpaid orders cancellation (e2e)', () => {
     const count = await unpaidOrders.cancelExpired();
 
     expect(count).toBe(1);
-    expect(await readOrderStatus(failingId)).toBe(ORDER_STATUS.PENDING);
-    expect(await readOrderStatus(healthyId)).toBe(ORDER_STATUS.CANCELLED);
+    expect(await readOrderStatus(db, failingId)).toBe(ORDER_STATUS.PENDING);
+    expect(await readOrderStatus(db, healthyId)).toBe(ORDER_STATUS.CANCELLED);
   });
 });

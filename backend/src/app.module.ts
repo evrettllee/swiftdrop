@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
@@ -11,6 +11,7 @@ import {
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
 } from './common/constants/http.constants';
+import { InternalErrorFilter } from './common/filters/internal-error.filter';
 import { CsrfGuard } from './common/guards/csrf.guard';
 import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';
@@ -44,6 +45,7 @@ import { ZonesModule } from './zones/zones.module';
     { provide: APP_GUARD, useClass: CsrfGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_FILTER, useClass: InternalErrorFilter },
   ],
 })
 export class AppModule {}

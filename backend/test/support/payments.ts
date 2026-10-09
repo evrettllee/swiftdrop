@@ -2,7 +2,12 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { payments } from '../../src/db/schema';
 import type { Database } from '../../src/database/database.module';
-import { PAYMENTS_ROUTES } from '../../src/payments/payments.constants';
+import {
+  CHECKOUT_SESSION_STATUS,
+  PAYMENTS_ROUTES,
+  SESSION_EXPIRE_RESULT,
+} from '../../src/payments/payments.constants';
+import type { CheckoutSessionState } from '../../src/payments/payments.types';
 import { COOKIE_HEADER } from './auth';
 import { postApi, nextClientIp } from './http';
 import type { Cookies } from './orders';
@@ -36,11 +41,19 @@ export const CHECKOUT_SESSION = {
   url: 'https://checkout.stripe.test/pay/cs_test_1',
 };
 
+// A session nobody has paid yet, as the payment system reports it.
+export const OPEN_SESSION_STATE: CheckoutSessionState = {
+  status: CHECKOUT_SESSION_STATUS.OPEN,
+  isPaid: false,
+  paymentRef: null,
+};
+
 // A replacement of the payment system, the tests never call Stripe.
 export function createGatewayMock() {
   return {
     createCheckoutSession: jest.fn(),
     expireCheckoutSession: jest.fn(),
+    getCheckoutSession: jest.fn(),
     refund: jest.fn(),
     parseWebhook: jest.fn(),
   };
@@ -49,7 +62,8 @@ export function createGatewayMock() {
 export function resetGatewayMock(gateway: ReturnType<typeof createGatewayMock>): void {
   Object.values(gateway).forEach((method) => method.mockReset());
   gateway.createCheckoutSession.mockResolvedValue(CHECKOUT_SESSION);
-  gateway.expireCheckoutSession.mockResolvedValue(undefined);
+  gateway.expireCheckoutSession.mockResolvedValue(SESSION_EXPIRE_RESULT.EXPIRED);
+  gateway.getCheckoutSession.mockResolvedValue(OPEN_SESSION_STATE);
   gateway.refund.mockResolvedValue(undefined);
 }
 

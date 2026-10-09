@@ -4,9 +4,11 @@ import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { ENV_KEYS } from '../config/env.constants';
 import * as schema from '../db/schema';
-import { DB_CASING, DRIZZLE, PG_POOL } from './database.constants';
+import { DB_CASING, DB_CONNECTION_OPTIONS, DRIZZLE, PG_POOL } from './database.constants';
 
 export type Database = NodePgDatabase<typeof schema>;
+// The handle a callback of db.transaction gets.
+export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 @Global()
 @Module({
@@ -17,6 +19,7 @@ export type Database = NodePgDatabase<typeof schema>;
       useFactory: async (config: ConfigService) => {
         const pool = new Pool({
           connectionString: config.getOrThrow<string>(ENV_KEYS.DATABASE_URL),
+          options: DB_CONNECTION_OPTIONS,
         });
         await pool.query('SELECT 1');
         Logger.log('Connected to PostgreSQL', 'Database');

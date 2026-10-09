@@ -1,6 +1,12 @@
 import type Stripe from 'stripe';
-import { PAYMENT_EVENT } from '../../payments/payments.constants';
-import type { ExpiredEvent, PaidEvent, PaymentEvent } from '../../payments/payments.types';
+import { CHECKOUT_SESSION_STATUS, PAYMENT_EVENT } from '../../payments/payments.constants';
+import type {
+  CheckoutSessionState,
+  CheckoutSessionStatus,
+  ExpiredEvent,
+  PaidEvent,
+  PaymentEvent,
+} from '../../payments/payments.types';
 import {
   STRIPE_EVENT,
   STRIPE_METADATA_ORDER_ID_KEY,
@@ -41,6 +47,27 @@ function toExpiredEvent(session: Stripe.Checkout.Session): ExpiredEvent | null {
   }
 
   return event;
+}
+
+// A status Stripe may add later counts as open: such a payment is left to the webhook.
+function toSessionStatus(status: Stripe.Checkout.Session.Status | null): CheckoutSessionStatus {
+  let result: CheckoutSessionStatus = CHECKOUT_SESSION_STATUS.OPEN;
+
+  if (status === CHECKOUT_SESSION_STATUS.COMPLETE) {
+    result = CHECKOUT_SESSION_STATUS.COMPLETE;
+  } else if (status === CHECKOUT_SESSION_STATUS.EXPIRED) {
+    result = CHECKOUT_SESSION_STATUS.EXPIRED;
+  }
+
+  return result;
+}
+
+export function mapStripeSession(session: Stripe.Checkout.Session): CheckoutSessionState {
+  return {
+    status: toSessionStatus(session.status),
+    isPaid: session.payment_status === STRIPE_PAYMENT_STATUS_PAID,
+    paymentRef: readPaymentRef(session),
+  };
 }
 
 // Converts a Stripe notification to ours, notifications that are not needed give null.
