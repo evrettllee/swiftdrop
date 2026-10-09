@@ -1,0 +1,91 @@
+/* Leaflet is restyled with the design system tokens, so both themes follow the app theme. */
+
+.leaflet-container {
+  font-family: inherit;
+  background: var(--field);
+}
+
+/* Route points: an empty ring for the pickup, a solid dot for the delivery. */
+.route-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+}
+
+.route-marker__dot {
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+}
+
+.route-marker__dot--pickup {
+  background: var(--surface);
+  border: 2px solid var(--accent);
+}
+
+.route-marker__dot--delivery {
+  background: var(--fg);
+}
+
+/* The tag above a point; Leaflet makes tooltips 90% opaque by default, the tag must be solid. */
+.route-tag.leaflet-tooltip {
+  padding: 4px 16px;
+  color: var(--fg);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  opacity: 1;
+}
+
+.route-tag.leaflet-tooltip::before {
+  display: none;
+}
+
+/* A straight dashed line until the real route is available. */
+.route-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2px;
+  stroke-dasharray: 8 8;
+  stroke-linecap: round;
+}
+
+/* The attribution is required by the licenses of the data and the tiles, so it is only restyled. */
+.leaflet-container .leaflet-control.leaflet-control-attribution {
+  margin: 0 16px 16px 0;
+  padding: 4px 8px;
+  color: var(--fg-secondary);
+  font-size: var(--text-caption);
+  line-height: 1.5;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+}
+
+.leaflet-control-attribution a {
+  color: inherit;
+}
+
+.leaflet-control-attribution a:hover {
+  text-decoration: underline;
+}
+
+.route-tag.leaflet-interactive {
+  cursor: default;
+}
+
+/* The map of an order (RouteMapView): the attribution sits on the left with a small margin. */
+.route-map-view .leaflet-control.leaflet-control-attribution {
+  margin: 0 0 8px 8px;
+}
+
+/* The map of an order does not move in the page, so it shows no grab cursor until it is expanded. */
+.route-map-view--static .leaflet-container {
+  cursor: default;
+}

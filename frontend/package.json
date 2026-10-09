@@ -11,6 +11,7 @@
     "build": "tsc -b && vite build",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" vite.config.ts",
     "lint": "oxlint --type-aware src/",
+    "lint:fsd": "steiger ./src",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -27,6 +28,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@feature-sliced/steiger-plugin": "^0.8.0",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
@@ -35,6 +37,7 @@
     "oxlint": "^1.81.0",
     "oxlint-tsgolint": "^7.0.2003",
     "prettier": "^3.9.9",
+    "steiger": "^0.7.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
   }

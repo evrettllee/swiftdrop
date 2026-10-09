@@ -1,0 +1,83 @@
+import { useForm } from '@/shared/lib/forms';
+import { useAuthStore } from '@/shared/session';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Input } from '@/shared/ui/input';
+import { AUTH_FIELD, REGISTER_INITIAL_VALUES } from '../config/forms';
+import { AUTH_TEXTS } from '../config/texts';
+import { registerFormSchema } from '../model/auth-forms';
+import { FormFooter } from './FormFooter';
+import { LegalLinks } from './LegalLinks';
+import { PasswordField } from './PasswordField';
+import { PasswordRequirements } from './PasswordRequirements';
+
+export function RegisterForm() {
+  const signUp = useAuthStore((state) => state.signUp);
+  const { formRef, values, field, checkbox, formError, isSubmitting, handleSubmit } = useForm({
+    initialValues: REGISTER_INITIAL_VALUES,
+    schema: registerFormSchema,
+    // The password repeat and the consent (terms) are checked in the form and not sent to the backend.
+    onSubmit: ({ firstName, lastName, email, phone, password }) =>
+      signUp({ firstName, lastName, email, phone, password }),
+  });
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Input
+          label={AUTH_TEXTS.LABEL_FIRST_NAME}
+          autoComplete="given-name"
+          placeholder={AUTH_TEXTS.PLACEHOLDER_FIRST_NAME}
+          {...field(AUTH_FIELD.FIRST_NAME)}
+        />
+        <Input
+          label={AUTH_TEXTS.LABEL_LAST_NAME}
+          autoComplete="family-name"
+          placeholder={AUTH_TEXTS.PLACEHOLDER_LAST_NAME}
+          {...field(AUTH_FIELD.LAST_NAME)}
+        />
+      </div>
+      <Input
+        label={AUTH_TEXTS.LABEL_EMAIL}
+        type="email"
+        autoComplete="email"
+        placeholder={AUTH_TEXTS.PLACEHOLDER_EMAIL}
+        {...field(AUTH_FIELD.EMAIL)}
+      />
+      <Input
+        label={AUTH_TEXTS.LABEL_PHONE}
+        type="tel"
+        autoComplete="tel"
+        placeholder={AUTH_TEXTS.PLACEHOLDER_PHONE}
+        hint={AUTH_TEXTS.PHONE_HINT}
+        {...field(AUTH_FIELD.PHONE)}
+      />
+      <div className="flex flex-col gap-2">
+        <PasswordField
+          label={AUTH_TEXTS.LABEL_PASSWORD}
+          autoComplete="new-password"
+          {...field(AUTH_FIELD.PASSWORD)}
+        />
+        <PasswordRequirements value={values[AUTH_FIELD.PASSWORD] ?? ''} />
+      </div>
+      <PasswordField
+        label={AUTH_TEXTS.LABEL_CONFIRM_PASSWORD}
+        autoComplete="new-password"
+        {...field(AUTH_FIELD.CONFIRM_PASSWORD)}
+      />
+      <Checkbox
+        label={
+          <>
+            {AUTH_TEXTS.TERMS_ACCEPT} <LegalLinks />
+          </>
+        }
+        {...checkbox(AUTH_FIELD.TERMS)}
+      />
+      <FormFooter
+        formError={formError}
+        isSubmitting={isSubmitting}
+        submitLabel={AUTH_TEXTS.SUBMIT_REGISTER}
+        submittingLabel={AUTH_TEXTS.SUBMITTING_REGISTER}
+      />
+    </form>
+  );
+}

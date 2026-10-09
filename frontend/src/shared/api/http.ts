@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NO_RETRY_PATHS, REFRESH_PATH } from './endpoints/auth';
 import {
   API_BASE_PATH,
   API_ERROR_MESSAGES,
@@ -9,9 +10,7 @@ import {
   HTTP_STATUS,
   JSON_CONTENT_TYPE,
   NETWORK_ERROR_STATUS,
-  NO_RETRY_PATHS,
-  REFRESH_PATH,
-} from '../constants/api';
+} from './request-config';
 
 const fieldErrorSchema = z.object({ field: z.string(), message: z.string() });
 
