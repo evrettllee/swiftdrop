@@ -28,6 +28,8 @@ CLAUDE.local.md
 .cursorrules
 .cursorignore
 .cursorindexingignore
+.agents/
+skills-lock.json
 
 coverage/
 playwright-report/

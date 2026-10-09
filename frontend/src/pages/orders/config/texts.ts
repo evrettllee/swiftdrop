@@ -1,0 +1,39 @@
+import { ORDER_LIST_FILTER } from './list';
+
+export const ORDERS_TEXTS = {
+  PAGE_TITLE: 'Мои заказы',
+  NEW_ORDER: 'Новый заказ',
+  TABS_LABEL: 'Фильтр заказов',
+  LIST_FAILED: 'Не удалось загрузить заказы. Попробуйте ещё раз',
+  LIST_FAILED_TITLE: 'Не удалось загрузить заказы',
+  LIST_LOADING: 'Загрузка заказов',
+  RETRY: 'Повторить',
+  SHOW_MORE: 'Показать ещё',
+  shown: (shown: number, total: number) => `Показано ${shown} из ${total}`,
+  // Couriers are not assigned yet: the name comes with the courier slice.
+  COURIER_NOT_ASSIGNED: 'Не назначен',
+  ACTION_TRACK: 'Отследить',
+  ACTION_REPEAT: 'Повторить',
+} as const;
+
+export const ORDER_TAB_LABELS = {
+  [ORDER_LIST_FILTER.ALL]: 'Все',
+  [ORDER_LIST_FILTER.ACTIVE]: 'Активные',
+  [ORDER_LIST_FILTER.FINISHED]: 'Завершённые',
+} as const;
+
+// "All" is the empty state of the mockup; the other two are for an empty tab (without a button).
+export const ORDERS_EMPTY_TEXTS = {
+  [ORDER_LIST_FILTER.ALL]: {
+    title: 'Заказов пока нет',
+    text: 'Укажите адреса и посылку, и мы сразу посчитаем стоимость доставки.',
+  },
+  [ORDER_LIST_FILTER.ACTIVE]: {
+    title: 'Активных заказов нет',
+    text: 'Здесь появятся заказы, которые ещё в работе.',
+  },
+  [ORDER_LIST_FILTER.FINISHED]: {
+    title: 'Завершённых заказов нет',
+    text: 'Здесь появятся доставленные и отменённые заказы.',
+  },
+} as const;
