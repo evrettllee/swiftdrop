@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '../../common/constants/database.constants';
 import { ORDER_STATUS } from '../../common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../common/enums/payment-status.enum';
@@ -8,8 +8,12 @@ import type { Database } from '../../database/database.module';
 import { orders, orderStatusHistory, payments } from '../../db/schema';
 import { PaymentGateway } from '../gateway/payment.gateway';
 import { PaymentRefundService } from './payment-refund.service';
+import { PaymentSettlementService } from './payment-settlement.service';
 import { PAYMENT_EVENT, PAYMENTS_ERROR_MESSAGES } from '../payments.constants';
-import type { ExpiredEvent, PaidEvent } from '../payments.types';
+import type { PaidEvent } from '../payments.types';
+
+// An order is paid once: the earliest of its paid payments is kept, the others are refunded.
+const KEPT_PAID_PAYMENTS = 1;
 
 @Injectable()
 export class PaymentWebhookService {
@@ -19,6 +23,7 @@ export class PaymentWebhookService {
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly gateway: PaymentGateway,
     private readonly refunds: PaymentRefundService,
+    private readonly settlement: PaymentSettlementService,
   ) {}
 
   async process(rawBody: Buffer | undefined, signature: string | undefined): Promise<void> {
@@ -31,23 +36,14 @@ export class PaymentWebhookService {
     if (event?.type === PAYMENT_EVENT.PAID) {
       await this.settlePaid(event);
     } else if (event?.type === PAYMENT_EVENT.EXPIRED) {
-      await this.failExpired(event);
+      await this.settlement.markFailed(event.sessionId);
     }
   }
 
   // Every step is safe to repeat, because the payment system resends an event until it gets a success.
   private async settlePaid(event: PaidEvent): Promise<void> {
     await this.db.transaction(async (tx) => {
-      const [payment] = await tx
-        .update(payments)
-        .set({ status: PAYMENT_STATUS.PAID, stripePaymentId: event.paymentRef })
-        .where(
-          and(
-            eq(payments.checkoutSessionId, event.sessionId),
-            inArray(payments.status, [PAYMENT_STATUS.PENDING, PAYMENT_STATUS.FAILED]),
-          ),
-        )
-        .returning({ orderId: payments.orderId });
+      const payment = await this.settlement.markPaid(event.sessionId, event.paymentRef, tx);
 
       if (payment) {
         const [confirmed] = await tx
@@ -67,14 +63,18 @@ export class PaymentWebhookService {
       }
     });
 
-    await this.refundIfOrderCancelled(event.sessionId);
+    await this.refundIfNotNeeded(event.sessionId);
   }
 
-  // Money that arrived for a cancelled order goes back to the client.
-  private async refundIfOrderCancelled(sessionId: string): Promise<void> {
+  // Money the order does not need goes back to the client: a payment for a cancelled order, and a
+  // second payment of an order already paid. Of the paid payments of an order the earliest one is
+  // kept, so a resent event makes the same choice; the refund itself has an idempotency key in the
+  // payment system and changes only a paid payment, so it never happens twice.
+  private async refundIfNotNeeded(sessionId: string): Promise<void> {
     const [row] = await this.db
       .select({
         paymentId: payments.paymentId,
+        orderId: payments.orderId,
         paymentStatus: payments.status,
         orderStatus: orders.status,
       })
@@ -85,24 +85,27 @@ export class PaymentWebhookService {
 
     if (!row) {
       this.logger.warn(`Payment event for an unknown session ${sessionId}`);
-    } else if (
-      row.paymentStatus === PAYMENT_STATUS.PAID &&
-      row.orderStatus === ORDER_STATUS.CANCELLED
-    ) {
-      this.logger.warn(`Payment ${row.paymentId} arrived for a cancelled order, refunding`);
-      await this.refunds.refundPayment(row.paymentId);
+    } else if (row.paymentStatus === PAYMENT_STATUS.PAID) {
+      if (row.orderStatus === ORDER_STATUS.CANCELLED) {
+        this.logger.warn(`Payment ${row.paymentId} arrived for a cancelled order, refunding`);
+        await this.refunds.refundPayment(row.paymentId);
+      } else {
+        await this.refundExtraPayments(row.orderId);
+      }
     }
   }
 
-  private async failExpired(event: ExpiredEvent): Promise<void> {
-    await this.db
-      .update(payments)
-      .set({ status: PAYMENT_STATUS.FAILED })
-      .where(
-        and(
-          eq(payments.checkoutSessionId, event.sessionId),
-          eq(payments.status, PAYMENT_STATUS.PENDING),
-        ),
-      );
+  // Every paid payment of the order but the earliest one goes back.
+  private async refundExtraPayments(orderId: number): Promise<void> {
+    const paid = await this.db
+      .select({ paymentId: payments.paymentId })
+      .from(payments)
+      .where(and(eq(payments.orderId, orderId), eq(payments.status, PAYMENT_STATUS.PAID)))
+      .orderBy(asc(payments.paymentId));
+
+    for (const { paymentId } of paid.slice(KEPT_PAID_PAYMENTS)) {
+      this.logger.warn(`Payment ${paymentId} is a second payment of order ${orderId}, refunding`);
+      await this.refunds.refundPayment(paymentId);
+    }
   }
 }

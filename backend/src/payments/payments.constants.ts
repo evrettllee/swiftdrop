@@ -20,6 +20,26 @@ export const PAYMENT_EVENT = {
   EXPIRED: 'expired',
 } as const;
 
+// What the payment system answered to closing a session: closed now, or it was no longer open
+// (already paid or already expired) and could not be closed.
+export const SESSION_EXPIRE_RESULT = {
+  EXPIRED: 'expired',
+  NOT_OPEN: 'not_open',
+} as const;
+
+export const CHECKOUT_SESSION_STATUS = {
+  OPEN: 'open',
+  COMPLETE: 'complete',
+  EXPIRED: 'expired',
+} as const;
+
+// What happened to a pending payment of a cancelled order after its session was checked.
+export const PENDING_PAYMENT_OUTCOME = {
+  FAILED: 'failed',
+  REFUNDED: 'refunded',
+  LEFT_PENDING: 'left_pending',
+} as const;
+
 // After the payment page the client comes back to the page of the order with this parameter.
 export const ORDER_PAGE_PATH = '/orders';
 export const PAYMENT_RETURN_PARAM = 'payment';
@@ -35,6 +55,7 @@ export const PAYMENTS_ERROR_MESSAGES = {
   GATEWAY_UNAVAILABLE: 'Платёжная система временно недоступна, попробуйте позже',
   INVALID_SIGNATURE: 'Недействительная подпись уведомления',
   ORDER_NOT_PAYABLE: 'Заказ нельзя оплатить: он уже оплачен или отменён',
+  PAYMENT_ALREADY_STARTED: 'Оплата этого заказа уже начата. Обновите страницу заказа',
   AMOUNT_TOO_SMALL: 'Сумма заказа слишком мала для оплаты картой',
   START_FAILED: 'Не удалось начать оплату',
   REFUND_FAILED: 'Не удалось вернуть деньги, попробуйте позже',

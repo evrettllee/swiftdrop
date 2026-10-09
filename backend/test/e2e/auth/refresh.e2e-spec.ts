@@ -6,6 +6,7 @@ import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';
 import {
   COOKIE_HEADER,
+  endRefreshGraceWindow,
   extractAccessToken,
   extractRefreshToken,
   postAuth,
@@ -14,7 +15,6 @@ import {
   validRegistration,
 } from '../../support/auth';
 import { resetTestData } from '../../support/database';
-import { sortedStatuses } from '../../support/http';
 
 describe('Auth (e2e)', () => {
   let app: NestExpressApplication;
@@ -34,7 +34,7 @@ describe('Auth (e2e)', () => {
   });
 
   describe('refresh', () => {
-    it('should issue a new refresh token and reject the old one when rotating', async () => {
+    it('should issue a new refresh token and reject the old one once the grace window is over', async () => {
       const { refreshToken } = await registerUser(app);
 
       const first = await postAuth(app, AUTH_ROUTES.REFRESH)
@@ -44,6 +44,7 @@ describe('Auth (e2e)', () => {
 
       expect(newToken).not.toBe(refreshToken);
 
+      await endRefreshGraceWindow(db);
       await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
         .expect(401);
@@ -67,6 +68,7 @@ describe('Auth (e2e)', () => {
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
         .expect(200);
       const newToken = extractRefreshToken(first);
+      await endRefreshGraceWindow(db);
 
       await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
@@ -84,15 +86,5 @@ describe('Auth (e2e)', () => {
       expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_SESSION);
     });
 
-    it('should let only one request win when the same token is used twice at once', async () => {
-      const { refreshToken } = await registerUser(app);
-
-      const responses = await Promise.all([
-        postAuth(app, AUTH_ROUTES.REFRESH).set(COOKIE_HEADER, refreshCookie(refreshToken)),
-        postAuth(app, AUTH_ROUTES.REFRESH).set(COOKIE_HEADER, refreshCookie(refreshToken)),
-      ]);
-
-      expect(sortedStatuses(responses)).toEqual([200, 401]);
-    });
   });
 });

@@ -20,6 +20,11 @@ export const REFRESH_TOKEN_TTL_MS = REFRESH_TOKEN_TTL_DAYS * SECONDS_PER_DAY * M
 export const REFRESH_TOKEN_BYTES = 32;
 export const REFRESH_TOKEN_ENCODING = URL_SAFE_ENCODING;
 
+// A token replaced by a rotation this short while ago is accepted once more: two tabs refreshed
+// at the same moment. Later, its reuse is taken for a theft.
+export const REFRESH_REUSE_GRACE_SECONDS = 30;
+export const REFRESH_REUSE_GRACE_MS = REFRESH_REUSE_GRACE_SECONDS * MS_PER_SECOND;
+
 export const TOKEN_HASH_ALGORITHM = 'sha256';
 export const TOKEN_HASH_ENCODING = 'hex';
 

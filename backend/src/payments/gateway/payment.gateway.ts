@@ -1,4 +1,10 @@
-import type { CheckoutSession, CheckoutSessionInput, PaymentEvent } from '../payments.types';
+import type {
+  CheckoutSession,
+  CheckoutSessionInput,
+  CheckoutSessionState,
+  PaymentEvent,
+  SessionExpireResult,
+} from '../payments.types';
 
 // The contract of a payment system. Other code depends on it, not on Stripe,
 // so the system can be replaced and mocked in tests.
@@ -6,7 +12,10 @@ export abstract class PaymentGateway {
   abstract createCheckoutSession(input: CheckoutSessionInput): Promise<CheckoutSession>;
 
   // Closes an unpaid session, so a cancelled or timed out order can no longer be paid.
-  abstract expireCheckoutSession(sessionId: string): Promise<void>;
+  // A session that is no longer open is an answer, not a failure; a failure throws.
+  abstract expireCheckoutSession(sessionId: string): Promise<SessionExpireResult>;
+
+  abstract getCheckoutSession(sessionId: string): Promise<CheckoutSessionState>;
 
   abstract refund(paymentRef: string): Promise<void>;
 

@@ -1,6 +1,6 @@
 import type Stripe from 'stripe';
-import { PAYMENT_EVENT } from '../../payments/payments.constants';
-import { mapStripeEvent } from './stripe-event.mapper';
+import { CHECKOUT_SESSION_STATUS, PAYMENT_EVENT } from '../../payments/payments.constants';
+import { mapStripeEvent, mapStripeSession } from './stripe-event.mapper';
 import { STRIPE_EVENT } from './stripe.constants';
 
 function buildEvent(type: string, session: Record<string, unknown>): Stripe.Event {
@@ -52,5 +52,35 @@ describe('mapStripeEvent', () => {
 
   it('should return null when the event type is not needed', () => {
     expect(mapStripeEvent(buildEvent('charge.refunded', PAID_SESSION))).toBeNull();
+  });
+});
+
+function buildSession(session: Record<string, unknown>): Stripe.Checkout.Session {
+  return session as unknown as Stripe.Checkout.Session;
+}
+
+describe('mapStripeSession', () => {
+  it('should return the status, the payment and its reference of a paid session', () => {
+    expect(mapStripeSession(buildSession({ ...PAID_SESSION, status: 'complete' }))).toEqual({
+      status: CHECKOUT_SESSION_STATUS.COMPLETE,
+      isPaid: true,
+      paymentRef: 'pi_test_1',
+    });
+  });
+
+  it('should return an expired unpaid session without a payment reference', () => {
+    const session = { status: 'expired', payment_status: 'unpaid', payment_intent: null };
+
+    expect(mapStripeSession(buildSession(session))).toEqual({
+      status: CHECKOUT_SESSION_STATUS.EXPIRED,
+      isPaid: false,
+      paymentRef: null,
+    });
+  });
+
+  it('should take a status it does not know for an open session', () => {
+    const session = { status: 'unknown', payment_status: 'unpaid', payment_intent: null };
+
+    expect(mapStripeSession(buildSession(session)).status).toBe(CHECKOUT_SESSION_STATUS.OPEN);
   });
 });

@@ -19,6 +19,8 @@ export const ENV_KEYS = {
 } as const;
 
 export const NODE_ENV_PRODUCTION = 'production';
+// Required, so production cannot start without it and lose the Secure flag of the session cookies.
+export const NODE_ENV_VALUES = ['development', 'test', NODE_ENV_PRODUCTION] as const;
 
 export const DEFAULT_PORT = '8080';
 export const PORT_MIN = 1;

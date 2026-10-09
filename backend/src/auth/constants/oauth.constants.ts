@@ -16,7 +16,9 @@ export const OAUTH_STATE_TTL_MINUTES = 10;
 export const OAUTH_STATE_TTL_MS = OAUTH_STATE_TTL_MINUTES * MS_PER_MINUTE;
 
 // Redirects
-export const OAUTH_SUCCESS_REDIRECT = '/';
+// The auth page of the frontend sends a signed-in user on to the home page of their role, the same
+// way as after the email login.
+export const OAUTH_SUCCESS_REDIRECT = '/auth';
 export const OAUTH_FAILURE_REDIRECT = '/auth?error=oauth_failed';
 export const OAUTH_BLOCKED_REDIRECT = '/auth?error=account_blocked';
 

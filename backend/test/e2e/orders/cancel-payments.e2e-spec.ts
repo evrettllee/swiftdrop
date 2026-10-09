@@ -5,7 +5,7 @@ import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders, payments } from '../../../src/db/schema';
+import { orders } from '../../../src/db/schema';
 import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
 import { ORDERS_ROUTES } from '../../../src/orders/orders.constants';
 import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
@@ -14,11 +14,12 @@ import { COOKIE_HEADER, registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
 import { ROUTE } from '../../support/fixtures';
 import { postApi } from '../../support/http';
-import { type Cookies, placeOrders } from '../../support/orders';
+import { type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
   insertPayment,
+  readPaymentStatus,
   resetGatewayMock,
 } from '../../support/payments';
 
@@ -32,24 +33,6 @@ describe('Order cancellation with payments (e2e)', () => {
 
   function cancelOrder() {
     return postApi(app, `${ORDERS_ROUTES.BASE}/${orderId}/cancel`).set(COOKIE_HEADER, cookies);
-  }
-
-  async function readPaymentStatus(paymentId: number): Promise<string> {
-    const [payment] = await db
-      .select({ status: payments.status })
-      .from(payments)
-      .where(eq(payments.paymentId, paymentId));
-
-    return payment.status;
-  }
-
-  async function readOrderStatus(): Promise<string> {
-    const [order] = await db
-      .select({ status: orders.status })
-      .from(orders)
-      .where(eq(orders.orderId, orderId));
-
-    return order.status;
   }
 
   beforeAll(async () => {
@@ -84,8 +67,8 @@ describe('Order cancellation with payments (e2e)', () => {
 
     expect(response.status).toBe(200);
     expect(gateway.expireCheckoutSession).toHaveBeenCalledWith(CHECKOUT_SESSION.sessionId);
-    expect(await readPaymentStatus(paymentId)).toBe(PAYMENT_STATUS.FAILED);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.CANCELLED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.FAILED);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
   });
 
   it('should refund the payment when a paid order is cancelled', async () => {
@@ -102,8 +85,8 @@ describe('Order cancellation with payments (e2e)', () => {
 
     expect(response.status).toBe(200);
     expect(gateway.refund).toHaveBeenCalledWith('pi_test_1');
-    expect(await readPaymentStatus(paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.CANCELLED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
   });
 
   it('should keep the order and the payment as they were when the refund fails', async () => {
@@ -120,8 +103,8 @@ describe('Order cancellation with payments (e2e)', () => {
     const response = await cancelOrder();
 
     expect(response.status).toBe(503);
-    expect(await readPaymentStatus(paymentId)).toBe(PAYMENT_STATUS.PAID);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.CONFIRMED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PAID);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CONFIRMED);
   });
 
   it('should still cancel the order and leave the payment pending when the session cannot be closed', async () => {
@@ -131,8 +114,8 @@ describe('Order cancellation with payments (e2e)', () => {
     const response = await cancelOrder();
 
     expect(response.status).toBe(200);
-    expect(await readPaymentStatus(paymentId)).toBe(PAYMENT_STATUS.PENDING);
-    expect(await readOrderStatus()).toBe(ORDER_STATUS.CANCELLED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PENDING);
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
   });
 
   it('should not call the gateway when the order has no payments', async () => {

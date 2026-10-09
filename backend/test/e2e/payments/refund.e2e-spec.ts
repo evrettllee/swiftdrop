@@ -1,10 +1,8 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { eq } from 'drizzle-orm';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { payments } from '../../../src/db/schema';
 import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
 import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
 import { PaymentRefundService } from '../../../src/payments/services/payment-refund.service';
@@ -13,7 +11,12 @@ import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
 import { ROUTE } from '../../support/fixtures';
 import { placeOrders } from '../../support/orders';
-import { createGatewayMock, insertPayment, resetGatewayMock } from '../../support/payments';
+import {
+  createGatewayMock,
+  insertPayment,
+  readPaymentStatus,
+  resetGatewayMock,
+} from '../../support/payments';
 
 describe('Payment refund (e2e)', () => {
   let app: NestExpressApplication;
@@ -22,15 +25,6 @@ describe('Payment refund (e2e)', () => {
   let orderId: number;
   const getRoute = jest.fn();
   const gateway = createGatewayMock();
-
-  async function readStatus(paymentId: number): Promise<string> {
-    const [payment] = await db
-      .select({ status: payments.status })
-      .from(payments)
-      .where(eq(payments.paymentId, paymentId));
-
-    return payment.status;
-  }
 
   beforeAll(async () => {
     app = await createTestApp([
@@ -66,7 +60,7 @@ describe('Payment refund (e2e)', () => {
 
     expect(result).toBe(true);
     expect(gateway.refund).toHaveBeenCalledWith('pi_test_1');
-    expect(await readStatus(paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
   });
 
   it('should do nothing when the payment is still pending', async () => {
@@ -76,7 +70,7 @@ describe('Payment refund (e2e)', () => {
 
     expect(result).toBe(false);
     expect(gateway.refund).not.toHaveBeenCalled();
-    expect(await readStatus(paymentId)).toBe(PAYMENT_STATUS.PENDING);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PENDING);
   });
 
   it('should refund once when the refund is requested twice', async () => {
@@ -100,7 +94,7 @@ describe('Payment refund (e2e)', () => {
     gateway.refund.mockRejectedValue(new ServiceUnavailableException());
 
     await expect(refunds.refundPayment(paymentId)).rejects.toThrow(ServiceUnavailableException);
-    expect(await readStatus(paymentId)).toBe(PAYMENT_STATUS.PAID);
+    expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PAID);
   });
 
   it('should refund every paid payment of the order and skip the others when an order is refunded', async () => {
@@ -117,8 +111,8 @@ describe('Payment refund (e2e)', () => {
     const count = await refunds.refundOrderPayments(orderId);
 
     expect(count).toBe(2);
-    expect(await readStatus(firstPaid)).toBe(PAYMENT_STATUS.REFUNDED);
-    expect(await readStatus(secondPaid)).toBe(PAYMENT_STATUS.REFUNDED);
-    expect(await readStatus(failed)).toBe(PAYMENT_STATUS.FAILED);
+    expect(await readPaymentStatus(db, firstPaid)).toBe(PAYMENT_STATUS.REFUNDED);
+    expect(await readPaymentStatus(db, secondPaid)).toBe(PAYMENT_STATUS.REFUNDED);
+    expect(await readPaymentStatus(db, failed)).toBe(PAYMENT_STATUS.FAILED);
   });
 });

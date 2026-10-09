@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { and, eq, lt } from 'drizzle-orm';
+import { isLockTimeout } from '../../common/database/pg-errors';
 import { ORDER_STATUS } from '../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../database/database.constants';
 import type { Database } from '../../database/database.module';
@@ -86,9 +87,15 @@ export class UnpaidOrdersService {
         return Boolean(updated);
       });
     } catch (error) {
-      this.logger.error(
-        `Order ${orderId} was not cancelled: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      if (isLockTimeout(error)) {
+        // Another operation holds the order (a payment being started or settled): nothing is
+        // wrong, the order is looked at again on the next run.
+        this.logger.warn(`Order ${orderId} is busy, it is left for the next run`);
+      } else {
+        this.logger.error(
+          `Order ${orderId} was not cancelled: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     }
 
     return isCancelled;
