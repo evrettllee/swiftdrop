@@ -1,19 +1,21 @@
 import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { and, asc, eq } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
+import { transitionOrderStatus } from '../../../common/database/order-status-transition';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory, payments } from '../../../database/schema';
+import { orders, payments } from '../../../database/schema';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
 import { PaymentRefundService } from './payment-refund.service';
 import { PaymentSettlementService } from './payment-settlement.service';
-import { PAYMENT_EVENT, PAYMENTS_ERROR_MESSAGES } from '../constants/payments.constants';
+import {
+  KEPT_PAID_PAYMENTS,
+  PAYMENT_EVENT,
+  PAYMENTS_ERROR_MESSAGES,
+} from '../constants/payments.constants';
 import type { PaidEvent } from '../types/payments.types';
-
-// An order is paid once: the earliest of its paid payments is kept, the others are refunded.
-const KEPT_PAID_PAYMENTS = 1;
 
 @Injectable()
 export class PaymentWebhookService {
@@ -46,18 +48,14 @@ export class PaymentWebhookService {
       const payment = await this.settlement.markPaid(event.sessionId, event.paymentRef, tx);
 
       if (payment) {
-        const [confirmed] = await tx
-          .update(orders)
-          .set({ status: ORDER_STATUS.CONFIRMED })
-          .where(and(eq(orders.orderId, payment.orderId), eq(orders.status, ORDER_STATUS.PENDING)))
-          .returning({ orderId: orders.orderId });
+        const confirmed = await transitionOrderStatus(tx, {
+          orderId: payment.orderId,
+          from: ORDER_STATUS.PENDING,
+          to: ORDER_STATUS.CONFIRMED,
+          changedBy: null,
+        });
 
         if (confirmed) {
-          await tx.insert(orderStatusHistory).values({
-            orderId: confirmed.orderId,
-            status: ORDER_STATUS.CONFIRMED,
-            changedBy: null,
-          });
           this.logger.log(`Order ${confirmed.orderId} confirmed by payment`);
         }
       }

@@ -1,4 +1,4 @@
-import { selectZoneForPoint } from './zones.service';
+import { selectZoneForPoint } from './zone-selection';
 import type { ZoneCandidate } from '../types/zones.types';
 
 const SMALL_SQUARE: number[][][] = [

@@ -1,7 +1,7 @@
 import { z } from 'zod';
+import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
 import {
   AUTH_VALIDATION_MESSAGES,
-  EMAIL_MAX_LENGTH,
   PASSWORD_DIGIT_REGEX,
   PASSWORD_LOWERCASE_REGEX,
   PASSWORD_MAX_LENGTH,
@@ -14,7 +14,7 @@ export const emailSchema = z
   .string()
   .trim()
   .toLowerCase()
-  .max(EMAIL_MAX_LENGTH, AUTH_VALIDATION_MESSAGES.EMAIL_TOO_LONG)
+  .max(PERSON_FIELD_LENGTH.EMAIL, AUTH_VALIDATION_MESSAGES.EMAIL_TOO_LONG)
   .pipe(z.email(AUTH_VALIDATION_MESSAGES.EMAIL_INVALID));
 
 export const passwordSchema = z

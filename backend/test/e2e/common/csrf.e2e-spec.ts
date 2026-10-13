@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
@@ -41,13 +42,15 @@ describe('CSRF protection (e2e)', () => {
 
     const response = await rawPostAuth(app, AUTH_ROUTES.LOGIN)
       .send({ email: validRegistration.email, password: validRegistration.password })
-      .expect(403);
+      .expect(HttpStatus.FORBIDDEN);
 
     expect(response.body.message).toBe(CSRF_ERROR_MESSAGE);
   });
 
   it('should reject a registration without the header and create no user', async () => {
-    await rawPostAuth(app, AUTH_ROUTES.REGISTER).send(validRegistration).expect(403);
+    await rawPostAuth(app, AUTH_ROUTES.REGISTER)
+      .send(validRegistration)
+      .expect(HttpStatus.FORBIDDEN);
 
     expect(
       await db.select().from(users).where(eq(users.email, validRegistration.email)),
@@ -59,31 +62,33 @@ describe('CSRF protection (e2e)', () => {
 
     await rawPostAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, refreshCookie(refreshToken))
-      .expect(403);
+      .expect(HttpStatus.FORBIDDEN);
     await postAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, refreshCookie(refreshToken))
-      .expect(200);
+      .expect(HttpStatus.OK);
   });
 
   it('should reject a logout without the header and keep the session alive', async () => {
     const { cookies, refreshToken } = await registerUser(app);
 
-    await rawPostAuth(app, AUTH_ROUTES.LOGOUT).set(COOKIE_HEADER, cookies).expect(403);
+    await rawPostAuth(app, AUTH_ROUTES.LOGOUT)
+      .set(COOKIE_HEADER, cookies)
+      .expect(HttpStatus.FORBIDDEN);
     await postAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, refreshCookie(refreshToken))
-      .expect(200);
+      .expect(HttpStatus.OK);
   });
 
   it('should reject a request whose header has a wrong value', async () => {
     await rawPostAuth(app, AUTH_ROUTES.LOGIN)
       .set(CSRF_HEADER_NAME, WRONG_HEADER_VALUE)
       .send({ email: validRegistration.email, password: validRegistration.password })
-      .expect(403);
+      .expect(HttpStatus.FORBIDDEN);
   });
 
   it('should not require the header for a safe GET request', async () => {
     const { cookies } = await registerUser(app);
 
-    await getAuth(app, AUTH_ROUTES.ME).set(COOKIE_HEADER, cookies).expect(200);
+    await getAuth(app, AUTH_ROUTES.ME).set(COOKIE_HEADER, cookies).expect(HttpStatus.OK);
   });
 });

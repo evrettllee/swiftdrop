@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import { performance } from 'node:perf_hooks';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
@@ -5,16 +6,20 @@ import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constant
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';
-import { postAuth, registerUser, validRegistration, WRONG_PASSWORD } from '../../support/auth';
+import {
+  postAuth,
+  registerUser,
+  validRegistration,
+  WRONG_PASSWORD,
+  UNKNOWN_EMAIL,
+} from '../../support/auth';
 import { resetTestData } from '../../support/database';
 
-const UNKNOWN_EMAIL = 'nobody@example.com';
 const ROUNDS = 5;
 // An unknown email still costs a full password check, so it takes about as long as a wrong
 // password; without the check it would answer many times faster. The margin keeps the test steady.
 const MIN_TIME_RATIO = 0.5;
 const MAX_TIME_RATIO = 2;
-const HTTP_UNAUTHORIZED = 401;
 
 function median(values: number[]): number {
   const sorted = [...values].sort((left, right) => left - right);
@@ -43,7 +48,7 @@ describe('Login timing (e2e)', () => {
     const started = performance.now();
     const response = await postAuth(app, AUTH_ROUTES.LOGIN)
       .send({ email, password })
-      .expect(HTTP_UNAUTHORIZED);
+      .expect(HttpStatus.UNAUTHORIZED);
 
     expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
 

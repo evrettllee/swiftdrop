@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, HttpCode, Post, Req } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
 import type { Request } from 'express';
 import type { AuthUser } from '../../auth/types/auth.types';
@@ -35,7 +35,7 @@ export class PaymentsController {
   @Post(PAYMENTS_ROUTES.WEBHOOK)
   @Public()
   @SkipCsrf()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   receiveWebhook(
     @Req() request: RawBodyRequest<Request>,
     @Headers(WEBHOOK_SIGNATURE_HEADER) signature: string | undefined,

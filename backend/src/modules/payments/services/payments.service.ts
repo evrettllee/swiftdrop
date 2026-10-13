@@ -2,27 +2,23 @@ import {
   ConflictException,
   Inject,
   Injectable,
-  InternalServerErrorException,
-  Logger,
   NotFoundException,
-  ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { and, eq } from 'drizzle-orm';
 import {
-  PAYMENTS_ONE_PENDING_PER_ORDER_INDEX,
+  ROW_LOCK_NO_KEY_UPDATE,
   SINGLE_ROW_LIMIT,
 } from '../../../common/constants/database.constants';
-import { getUniqueViolationConstraint, isLockTimeout } from '../../../common/database/pg-errors';
+import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_NOT_FOUND_MESSAGE } from '../../../common/constants/orders.constants';
 import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
-import { orders, payments } from '../../../database/schema';
+import { orders } from '../../../database/schema';
 import { NbrbService } from '../../../integrations/nbrb/services/nbrb.service';
 import { convertBynToUsdMinor, formatMinorAmount } from '../utils/payment-amount';
 import { buildOrderReturnUrl } from '../utils/payment-urls';
@@ -34,19 +30,18 @@ import {
   PAYMENT_DESCRIPTION_PREFIX,
   PAYMENT_RETURN_RESULT,
   PAYMENTS_ERROR_MESSAGES,
-  SESSION_EXPIRE_RESULT,
 } from '../constants/payments.constants';
 import type { StartedPayment } from '../types/payments.types';
+import { PaymentAttemptsService } from './payment-attempts.service';
 
 @Injectable()
 export class PaymentsService {
-  private readonly logger = new Logger(PaymentsService.name);
-
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly gateway: PaymentGateway,
     private readonly nbrb: NbrbService,
     private readonly config: ConfigService,
+    private readonly attempts: PaymentAttemptsService,
   ) {}
 
   // The order row stays locked from the check to the saved attempt, so two starts of one order run
@@ -55,7 +50,7 @@ export class PaymentsService {
   async start(clientId: number, orderId: number): Promise<StartedPayment> {
     return this.db.transaction(async (tx) => {
       const order = await this.lockPayableOrder(tx, clientId, orderId);
-      await this.closePendingAttempts(tx, orderId);
+      await this.attempts.closePending(tx, orderId);
 
       const rate = await this.nbrb.getUsdRate();
       const amountMinor = convertBynToUsdMinor(Number(order.price), rate);
@@ -75,7 +70,7 @@ export class PaymentsService {
         expiresAt: new Date(Date.now() + CHECKOUT_SESSION_TTL_MINUTES * MS_PER_MINUTE),
       });
 
-      const paymentId = await this.saveAttempt(
+      const paymentId = await this.attempts.save(
         tx,
         {
           orderId,
@@ -89,53 +84,6 @@ export class PaymentsService {
 
       return { paymentId, checkoutUrl: session.url };
     });
-  }
-
-  // The unique index of the open attempt is the last guard: if another open attempt of the order
-  // got saved anyway, the session just created is closed, so nobody can pay through it.
-  private async saveAttempt(
-    tx: Transaction,
-    values: typeof payments.$inferInsert,
-    sessionId: string,
-  ): Promise<number> {
-    let saved: { paymentId: number }[];
-
-    try {
-      saved = await tx.insert(payments).values(values).returning({ paymentId: payments.paymentId });
-    } catch (error) {
-      if (getUniqueViolationConstraint(error) !== PAYMENTS_ONE_PENDING_PER_ORDER_INDEX) {
-        throw error;
-      }
-
-      await this.closeUnsavedSession(sessionId);
-      throw new ConflictException(PAYMENTS_ERROR_MESSAGES.PAYMENT_ALREADY_STARTED);
-    }
-
-    const [payment] = saved;
-
-    if (!payment) {
-      throw new InternalServerErrorException(PAYMENTS_ERROR_MESSAGES.START_FAILED);
-    }
-
-    return payment.paymentId;
-  }
-
-  // A session without a saved attempt would be unknown to the webhook, so a failure to close it is
-  // logged with the session id for a manual check.
-  private async closeUnsavedSession(sessionId: string): Promise<void> {
-    try {
-      const result = await this.gateway.expireCheckoutSession(sessionId);
-
-      if (result === SESSION_EXPIRE_RESULT.NOT_OPEN) {
-        this.logger.warn(`Session ${sessionId} of a refused payment attempt is no longer open`);
-      }
-    } catch (error) {
-      this.logger.error(
-        `Session ${sessionId} of a refused payment attempt was not closed: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-    }
   }
 
   // A foreign order looks the same as a missing one, so ids cannot be probed. A row held longer
@@ -155,7 +103,7 @@ export class PaymentsService {
         .limit(SINGLE_ROW_LIMIT)
         // Enough to queue the starts of one order; unlike FOR UPDATE it does not block the rows
         // that only refer to the order (a new payment, an entry of the history).
-        .for('no key update');
+        .for(ROW_LOCK_NO_KEY_UPDATE);
     } catch (error) {
       if (isLockTimeout(error)) {
         throw new ConflictException(PAYMENTS_ERROR_MESSAGES.PAYMENT_ALREADY_STARTED);
@@ -173,30 +121,5 @@ export class PaymentsService {
     }
 
     return order;
-  }
-
-  // A repeated click on "Pay" replaces the earlier attempt. An error of closing is not swallowed:
-  // a session that cannot be closed may be already paid, and a second payment would charge twice.
-  private async closePendingAttempts(tx: Transaction, orderId: number): Promise<void> {
-    const pending = await tx
-      .select({ paymentId: payments.paymentId, sessionId: payments.checkoutSessionId })
-      .from(payments)
-      .where(and(eq(payments.orderId, orderId), eq(payments.status, PAYMENT_STATUS.PENDING)));
-
-    for (const attempt of pending) {
-      const result = await this.gateway.expireCheckoutSession(attempt.sessionId);
-
-      if (result === SESSION_EXPIRE_RESULT.NOT_OPEN) {
-        this.logger.warn(
-          `Session of payment ${attempt.paymentId} is no longer open, a new payment is refused`,
-        );
-        throw new ServiceUnavailableException(PAYMENTS_ERROR_MESSAGES.GATEWAY_UNAVAILABLE);
-      }
-
-      await tx
-        .update(payments)
-        .set({ status: PAYMENT_STATUS.FAILED })
-        .where(eq(payments.paymentId, attempt.paymentId));
-    }
   }
 }

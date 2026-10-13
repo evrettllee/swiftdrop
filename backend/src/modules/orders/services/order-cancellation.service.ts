@@ -6,13 +6,14 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
+import { transitionOrderStatus } from '../../../common/database/order-status-transition';
 import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory } from '../../../database/schema';
+import { orders } from '../../../database/schema';
 import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
 import {
   CANCELLABLE_STATUSES,
@@ -63,22 +64,15 @@ export class OrderCancellationService {
   private runCancellation(clientId: number, orderId: number): Promise<CancelledRow> {
     return this.db.transaction(async (tx) => {
       // The status check is part of the update, so a pickup that happens in between is never overwritten.
-      const [updated] = await tx
-        .update(orders)
-        .set({ status: ORDER_STATUS.CANCELLED })
-        .where(
-          and(
-            eq(orders.orderId, orderId),
-            eq(orders.clientId, clientId),
-            inArray(orders.status, [...CANCELLABLE_STATUSES]),
-          ),
-        )
-        .returning({ orderId: orders.orderId });
+      const updated = await transitionOrderStatus(tx, {
+        orderId,
+        clientId,
+        from: CANCELLABLE_STATUSES,
+        to: ORDER_STATUS.CANCELLED,
+        changedBy: clientId,
+      });
 
       if (updated) {
-        await tx
-          .insert(orderStatusHistory)
-          .values({ orderId, status: ORDER_STATUS.CANCELLED, changedBy: clientId });
         // A failed refund throws and rolls the cancellation back, so the client can simply try again.
         await this.paymentCancellation.releaseOrderPayments(orderId);
       }

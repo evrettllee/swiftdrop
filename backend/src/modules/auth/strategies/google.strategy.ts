@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { type Profile, Strategy } from 'passport-google-oauth20';
-import { NAME_MAX_LENGTH } from '../../../common/constants/person-validation.constants';
+import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
 import { OAUTH_PROVIDER } from '../../../common/enums/oauth-provider.enum';
 import { ENV_KEYS } from '../../../config/env.constants';
 import {
@@ -37,8 +37,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, GOOGLE_STRATEGY_N
       providerUserId: profile.id,
       email: email.toLowerCase(),
       emailVerified: rawProfile.email_verified === true,
-      firstName: (profile.name?.givenName ?? profile.displayName).slice(0, NAME_MAX_LENGTH),
-      lastName: (profile.name?.familyName ?? '').slice(0, NAME_MAX_LENGTH),
+      firstName: (profile.name?.givenName ?? profile.displayName).slice(
+        0,
+        PERSON_FIELD_LENGTH.NAME,
+      ),
+      lastName: (profile.name?.familyName ?? '').slice(0, PERSON_FIELD_LENGTH.NAME),
     };
   }
 }

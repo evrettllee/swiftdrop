@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
@@ -12,9 +13,9 @@ import {
 } from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
+import { VALID_ORDER_PRICE } from '../../support/fixtures';
 import { getOrders, placeOrders, SECOND_CLIENT } from '../../support/orders';
+import { resetServiceArea } from '../../support/pricing';
 
 type ListBody = { items: { orderId: number }[] };
 
@@ -33,10 +34,7 @@ describe('Orders list (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
   });
 
   afterAll(async () => {
@@ -46,7 +44,7 @@ describe('Orders list (e2e)', () => {
   it('should return an empty first page when the client has no orders', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await getOrders(app, cookies).expect(200);
+    const response = await getOrders(app, cookies).expect(HttpStatus.OK);
 
     expect(response.body).toEqual({
       items: [],
@@ -62,7 +60,7 @@ describe('Orders list (e2e)', () => {
     const ownIds = await placeOrders(app, cookies, 2);
     await placeOrders(app, otherCookies, 1);
 
-    const response = await getOrders(app, cookies).expect(200);
+    const response = await getOrders(app, cookies).expect(HttpStatus.OK);
 
     expect(response.body.total).toBe(2);
     expect(idsOf(response.body)).toEqual([...ownIds].reverse());
@@ -72,7 +70,7 @@ describe('Orders list (e2e)', () => {
     const { cookies } = await registerUser(app);
     const ids = await placeOrders(app, cookies, 3);
 
-    const response = await getOrders(app, cookies).expect(200);
+    const response = await getOrders(app, cookies).expect(HttpStatus.OK);
 
     expect(idsOf(response.body)).toEqual([...ids].reverse());
   });
@@ -81,7 +79,7 @@ describe('Orders list (e2e)', () => {
     const { cookies } = await registerUser(app);
     const ids = await placeOrders(app, cookies, 3);
 
-    const response = await getOrders(app, cookies, { page: 2, limit: 2 }).expect(200);
+    const response = await getOrders(app, cookies, { page: 2, limit: 2 }).expect(HttpStatus.OK);
 
     expect(response.body).toMatchObject({ total: 3, page: 2, limit: 2 });
     expect(idsOf(response.body)).toEqual([ids[0]]);
@@ -96,9 +94,11 @@ describe('Orders list (e2e)', () => {
       .where(eq(orders.orderId, finishedId));
 
     const finished = await getOrders(app, cookies, { filter: ORDER_LIST_FILTER.FINISHED }).expect(
-      200,
+      HttpStatus.OK,
     );
-    const active = await getOrders(app, cookies, { filter: ORDER_LIST_FILTER.ACTIVE }).expect(200);
+    const active = await getOrders(app, cookies, { filter: ORDER_LIST_FILTER.ACTIVE }).expect(
+      HttpStatus.OK,
+    );
 
     expect(idsOf(finished.body)).toEqual([finishedId]);
     expect(idsOf(active.body)).toEqual([activeId]);
@@ -108,11 +108,11 @@ describe('Orders list (e2e)', () => {
     const { cookies } = await registerUser(app);
     await placeOrders(app, cookies, 1);
 
-    const response = await getOrders(app, cookies).expect(200);
+    const response = await getOrders(app, cookies).expect(HttpStatus.OK);
 
     expect(response.body.items[0]).toMatchObject({
       status: ORDER_STATUS.PENDING,
-      price: 9.23,
+      price: VALID_ORDER_PRICE,
       currency: 'BYN',
       pickup: { city: 'Минск', street: 'ул. Свердлова', house: '13а', apartment: null },
       delivery: { city: 'Минск', street: 'пр-т Притыцкого', house: '83', apartment: '47' },

@@ -3,6 +3,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
+import { TRUST_PROXY_SETTING } from './constants';
 
 // A token is a class, an abstract one is allowed, for example the payment gateway.
 export type ProviderOverride = { token: Type<unknown> | Abstract<unknown>; useValue: unknown };
@@ -31,7 +32,7 @@ export async function createTestApp(
 
   configureApp(app);
   // Lets tests set the client address through X-Forwarded-For.
-  app.set('trust proxy', true);
+  app.set(TRUST_PROXY_SETTING, true);
   await app.init();
 
   return app;

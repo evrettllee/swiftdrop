@@ -15,6 +15,9 @@ export const CHECKOUT_SESSION_TTL_MINUTES = 31;
 // Stripe does not take a charge below 50 cents.
 export const MIN_CHARGE_MINOR = 50;
 
+// An order is paid once: the earliest of its paid payments is kept, the others are refunded.
+export const KEPT_PAID_PAYMENTS = 1;
+
 export const PAYMENT_EVENT = {
   PAID: 'paid',
   EXPIRED: 'expired',

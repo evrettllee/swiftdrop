@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import type { AuthUser } from '../../auth/types/auth.types';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -49,7 +49,7 @@ export class OrdersController {
   }
 
   @Post(ORDERS_ROUTES.CANCEL)
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   cancel(
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,

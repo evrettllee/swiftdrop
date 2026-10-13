@@ -5,8 +5,8 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { z } from 'zod';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import { describeError } from '../../../common/utils/describe-error';
 import { ENV_KEYS } from '../../../config/env.constants';
 import {
   COORDINATE_SEPARATOR,
@@ -23,12 +23,8 @@ import {
   POINT_SEPARATOR,
   TRAILING_SLASHES,
 } from '../constants/osrm.constants';
+import { osrmResponseSchema } from '../schemas/osrm-response.schema';
 import type { OsrmProfile, OsrmRoute } from '../types/osrm.types';
-
-const osrmResponseSchema = z.object({
-  code: z.string(),
-  routes: z.array(z.object({ distance: z.number(), duration: z.number() })).optional(),
-});
 
 @Injectable()
 export class OsrmService {
@@ -84,9 +80,7 @@ export class OsrmService {
 
       return await response.json();
     } catch (error) {
-      this.logger.error(
-        `OSRM request failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      this.logger.error(`OSRM request failed: ${describeError(error)}`);
       throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
     }
   }

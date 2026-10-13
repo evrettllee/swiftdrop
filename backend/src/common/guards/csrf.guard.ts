@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+import { HTTP_CONTEXT_TYPE } from '../constants/http.constants';
 import {
   CSRF_ERROR_MESSAGE,
   CSRF_HEADER_NAME,
@@ -22,7 +23,7 @@ export class CsrfGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const isAllowed =
-      context.getType() !== 'http' ||
+      context.getType() !== HTTP_CONTEXT_TYPE ||
       this.isSkipped(context) ||
       this.isRequestAllowed(context.switchToHttp().getRequest());
 

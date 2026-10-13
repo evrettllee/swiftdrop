@@ -1,5 +1,6 @@
 import { index, integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { users } from './users';
+import { TOKEN_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
 
 export const refreshTokens = pgTable(
   'refresh_tokens',
@@ -8,7 +9,7 @@ export const refreshTokens = pgTable(
     userId: integer()
       .notNull()
       .references(() => users.userId),
-    tokenHash: varchar({ length: 64 }).notNull().unique(),
+    tokenHash: varchar({ length: TOKEN_FIELD_LENGTH.HASH }).notNull().unique(),
     expiresAt: timestamp({ withTimezone: true }).notNull(),
     revokedAt: timestamp({ withTimezone: true }),
     // Set when the token was replaced by a rotation, not when a logout or a theft revoked it: for a

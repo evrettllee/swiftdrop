@@ -1,6 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
-import { NAME_MAX_LENGTH } from '../../../common/constants/person-validation.constants';
+import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
 import { OAUTH_PROVIDER } from '../../../common/enums/oauth-provider.enum';
 import {
   OAUTH_ERROR_MESSAGES,
@@ -72,11 +72,11 @@ describe('YandexStrategy', () => {
   });
 
   it('should cut names to the column limit when they are too long', async () => {
-    mockProfileResponse({ ...fullProfile, first_name: 'а'.repeat(NAME_MAX_LENGTH + 50) });
+    mockProfileResponse({ ...fullProfile, first_name: 'а'.repeat(PERSON_FIELD_LENGTH.NAME + 50) });
 
     const profile = await strategy.validate(ACCESS_TOKEN);
 
-    expect(profile.firstName).toHaveLength(NAME_MAX_LENGTH);
+    expect(profile.firstName).toHaveLength(PERSON_FIELD_LENGTH.NAME);
   });
 
   it('should reject the login when Yandex does not return an email', async () => {

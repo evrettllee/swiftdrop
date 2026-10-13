@@ -13,12 +13,17 @@ export function nextClientIp(): string {
   return `${TEST_IP_PREFIX}${counter}`;
 }
 
-// A POST as the real client sends it: under the API prefix, with the CSRF header and its own address.
-export function postApi(app: NestExpressApplication, path: string) {
+// A POST under the API prefix with its own address and without the CSRF header: the way another
+// server calls the API, and the way to test the protection itself.
+export function rawPostApi(app: NestExpressApplication, path: string) {
   return request(app.getHttpServer())
     .post(`/${GLOBAL_PREFIX}/${path}`)
-    .set(CLIENT_IP_HEADER, nextClientIp())
-    .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
+    .set(CLIENT_IP_HEADER, nextClientIp());
+}
+
+// A POST as the real client sends it, with the CSRF header.
+export function postApi(app: NestExpressApplication, path: string) {
+  return rawPostApi(app, path).set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
 
 // A GET under the API prefix with its own address, the CSRF header is not needed for reads.

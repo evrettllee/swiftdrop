@@ -2,8 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
-import { z } from 'zod';
-import { NAME_MAX_LENGTH } from '../../../common/constants/person-validation.constants';
+import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
 import { OAUTH_PROVIDER } from '../../../common/enums/oauth-provider.enum';
 import { ENV_KEYS } from '../../../config/env.constants';
 import {
@@ -15,18 +14,8 @@ import {
   YANDEX_STRATEGY_NAME,
   YANDEX_TOKEN_URL,
 } from '../constants/oauth.constants';
+import { yandexProfileSchema } from '../schemas/yandex-profile.schema';
 import type { OAuthProfile } from '../types/auth.types';
-
-const yandexProfileSchema = z.object({
-  id: z.string().min(1),
-  default_email: z.email().optional(),
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  display_name: z.string().optional(),
-  login: z.string().optional(),
-});
-
-export type YandexProfile = z.infer<typeof yandexProfileSchema>;
 
 @Injectable()
 export class YandexStrategy extends PassportStrategy(Strategy, YANDEX_STRATEGY_NAME) {
@@ -61,8 +50,8 @@ export class YandexStrategy extends PassportStrategy(Strategy, YANDEX_STRATEGY_N
       email: profile.default_email.toLowerCase(),
       // Yandex does not report verification status: the address of a Yandex account is Yandex's own.
       emailVerified: true,
-      firstName: firstName.slice(0, NAME_MAX_LENGTH),
-      lastName: (profile.last_name ?? '').slice(0, NAME_MAX_LENGTH),
+      firstName: firstName.slice(0, PERSON_FIELD_LENGTH.NAME),
+      lastName: (profile.last_name ?? '').slice(0, PERSON_FIELD_LENGTH.NAME),
     };
   }
 

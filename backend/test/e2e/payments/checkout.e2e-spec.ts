@@ -1,4 +1,4 @@
-import { ServiceUnavailableException } from '@nestjs/common';
+import { ServiceUnavailableException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { asc } from 'drizzle-orm';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
@@ -16,8 +16,7 @@ import {
 } from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
+import { VALID_ORDER_PRICE_TEXT } from '../../support/fixtures';
 import { postApi } from '../../support/http';
 import { placeOrders } from '../../support/orders';
 import {
@@ -26,7 +25,9 @@ import {
   postPayment,
   resetGatewayMock,
   USD_RATE,
+  VALID_ORDER_AMOUNT_USD_TEXT,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Payments (e2e)', () => {
   let app: NestExpressApplication;
@@ -45,10 +46,7 @@ describe('Payments (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     getUsdRate.mockReset();
     getUsdRate.mockResolvedValue(USD_RATE);
     resetGatewayMock(gateway);
@@ -62,7 +60,7 @@ describe('Payments (e2e)', () => {
     const { cookies } = await registerUser(app);
     const [orderId] = await placeOrders(app, cookies, 1);
 
-    const response = await postPayment(app, cookies, { orderId }).expect(201);
+    const response = await postPayment(app, cookies, { orderId }).expect(HttpStatus.CREATED);
 
     expect(response.body).toEqual({
       paymentId: expect.any(Number),
@@ -83,8 +81,8 @@ describe('Payments (e2e)', () => {
 
     expect(payment).toMatchObject({
       orderId,
-      amount: '9.23',
-      amountUsd: '3.04',
+      amount: VALID_ORDER_PRICE_TEXT,
+      amountUsd: VALID_ORDER_AMOUNT_USD_TEXT,
       exchangeRate: USD_RATE,
       status: PAYMENT_STATUS.PENDING,
       checkoutSessionId: CHECKOUT_SESSION.sessionId,
@@ -101,8 +99,8 @@ describe('Payments (e2e)', () => {
         url: 'https://checkout.stripe.test/second',
       });
 
-    await postPayment(app, cookies, { orderId }).expect(201);
-    await postPayment(app, cookies, { orderId }).expect(201);
+    await postPayment(app, cookies, { orderId }).expect(HttpStatus.CREATED);
+    await postPayment(app, cookies, { orderId }).expect(HttpStatus.CREATED);
 
     const rows = await db.select().from(payments).orderBy(asc(payments.paymentId));
 
@@ -116,10 +114,10 @@ describe('Payments (e2e)', () => {
   it('should answer 503 and open no new session when the earlier session cannot be closed', async () => {
     const { cookies } = await registerUser(app);
     const [orderId] = await placeOrders(app, cookies, 1);
-    await postPayment(app, cookies, { orderId }).expect(201);
+    await postPayment(app, cookies, { orderId }).expect(HttpStatus.CREATED);
     gateway.expireCheckoutSession.mockRejectedValue(new ServiceUnavailableException());
 
-    await postPayment(app, cookies, { orderId }).expect(503);
+    await postPayment(app, cookies, { orderId }).expect(HttpStatus.SERVICE_UNAVAILABLE);
 
     const rows = await db.select().from(payments);
 
@@ -130,7 +128,9 @@ describe('Payments (e2e)', () => {
   it('should return 400 with a field error when the order id is not a number', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await postPayment(app, cookies, { orderId: 'abc' }).expect(400);
+    const response = await postPayment(app, cookies, { orderId: 'abc' }).expect(
+      HttpStatus.BAD_REQUEST,
+    );
 
     expect(response.body.errors).toEqual(
       expect.arrayContaining([
@@ -143,6 +143,6 @@ describe('Payments (e2e)', () => {
   });
 
   it('should return 401 when the request has no authentication', async () => {
-    await postApi(app, PAYMENTS_ROUTES.BASE).send({ orderId: 1 }).expect(401);
+    await postApi(app, PAYMENTS_ROUTES.BASE).send({ orderId: 1 }).expect(HttpStatus.UNAUTHORIZED);
   });
 });

@@ -1,10 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, lt } from 'drizzle-orm';
+import { transitionOrderStatus } from '../../../common/database/order-status-transition';
 import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
+import { describeError } from '../../../common/utils/describe-error';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory } from '../../../database/schema';
+import { orders } from '../../../database/schema';
 import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
 import { UNPAID_ORDER_TTL_MS, UNPAID_ORDERS_BATCH_SIZE } from '../constants/orders.constants';
 
@@ -48,16 +50,14 @@ export class UnpaidOrdersService {
     try {
       isCancelled = await this.db.transaction(async (tx) => {
         // The status check is part of the update, so an order paid at this moment is never cancelled.
-        const [updated] = await tx
-          .update(orders)
-          .set({ status: ORDER_STATUS.CANCELLED })
-          .where(and(eq(orders.orderId, orderId), eq(orders.status, ORDER_STATUS.PENDING)))
-          .returning({ orderId: orders.orderId });
+        const updated = await transitionOrderStatus(tx, {
+          orderId,
+          from: ORDER_STATUS.PENDING,
+          to: ORDER_STATUS.CANCELLED,
+          changedBy: null,
+        });
 
         if (updated) {
-          await tx
-            .insert(orderStatusHistory)
-            .values({ orderId, status: ORDER_STATUS.CANCELLED, changedBy: null });
           await this.paymentCancellation.releaseOrderPayments(orderId);
         }
 
@@ -69,9 +69,7 @@ export class UnpaidOrdersService {
         // wrong, the order is looked at again on the next run.
         this.logger.warn(`Order ${orderId} is busy, it is left for the next run`);
       } else {
-        this.logger.error(
-          `Order ${orderId} was not cancelled: ${error instanceof Error ? error.message : String(error)}`,
-        );
+        this.logger.error(`Order ${orderId} was not cancelled: ${describeError(error)}`);
       }
     }
 

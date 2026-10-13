@@ -1,4 +1,4 @@
-import { ServiceUnavailableException } from '@nestjs/common';
+import { ServiceUnavailableException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
@@ -11,8 +11,6 @@ import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-
 import { PAYMENT_EVENT } from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
@@ -22,7 +20,9 @@ import {
   readPaymentStatus,
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
+  PAYMENT_REF,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Payment webhook (e2e)', () => {
   let app: NestExpressApplication;
@@ -36,7 +36,7 @@ describe('Payment webhook (e2e)', () => {
     type: PAYMENT_EVENT.PAID,
     orderId,
     sessionId: CHECKOUT_SESSION.sessionId,
-    paymentRef: 'pi_test_1',
+    paymentRef: PAYMENT_REF,
   });
 
   beforeAll(async () => {
@@ -48,10 +48,7 @@ describe('Payment webhook (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     resetGatewayMock(gateway);
 
     const { cookies } = await registerUser(app);
@@ -72,7 +69,7 @@ describe('Payment webhook (e2e)', () => {
       .select({ status: orderStatusHistory.status, changedBy: orderStatusHistory.changedBy })
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, orderId));
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatus.OK);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PAID);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CONFIRMED);
     expect(history).toContainEqual({ status: ORDER_STATUS.CONFIRMED, changedBy: null });
@@ -88,7 +85,7 @@ describe('Payment webhook (e2e)', () => {
       .select({ status: orderStatusHistory.status })
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, orderId));
-    expect(second.status).toBe(200);
+    expect(second.status).toBe(HttpStatus.OK);
     expect(history.filter((row) => row.status === ORDER_STATUS.CONFIRMED)).toHaveLength(1);
     expect(gateway.refund).not.toHaveBeenCalled();
   });
@@ -102,8 +99,8 @@ describe('Payment webhook (e2e)', () => {
 
     const response = await postWebhook(app, WEBHOOK_SIGNATURE);
 
-    expect(response.status).toBe(200);
-    expect(gateway.refund).toHaveBeenCalledWith('pi_test_1');
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(gateway.refund).toHaveBeenCalledWith(PAYMENT_REF);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
   });
@@ -120,9 +117,9 @@ describe('Payment webhook (e2e)', () => {
     const afterFirst = await readPaymentStatus(db, paymentId);
     const second = await postWebhook(app, WEBHOOK_SIGNATURE);
 
-    expect(first.status).toBe(503);
+    expect(first.status).toBe(HttpStatus.SERVICE_UNAVAILABLE);
     expect(afterFirst).toBe(PAYMENT_STATUS.PAID);
-    expect(second.status).toBe(200);
+    expect(second.status).toBe(HttpStatus.OK);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
   });
 
@@ -135,7 +132,7 @@ describe('Payment webhook (e2e)', () => {
 
     const response = await postWebhook(app, WEBHOOK_SIGNATURE);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatus.OK);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.FAILED);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.PENDING);
   });

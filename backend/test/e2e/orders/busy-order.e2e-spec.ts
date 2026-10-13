@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
@@ -11,14 +12,12 @@ import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-
 import { PAYMENTS_ERROR_MESSAGES } from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
+import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
 import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
 import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
-const HTTP_CONFLICT = 409;
 // Each test waits for the lock timeout itself, so it gets this much more than the timeout.
-const LOCK_TEST_MARGIN_MS = 10_000;
 
 describe('Order held by another operation (e2e)', () => {
   let app: NestExpressApplication;
@@ -39,10 +38,7 @@ describe('Order held by another operation (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     getUsdRate.mockReset();
     getUsdRate.mockResolvedValue(USD_RATE);
     resetGatewayMock(gateway);
@@ -81,7 +77,7 @@ describe('Order held by another operation (e2e)', () => {
     async () => {
       const response = await whileOrderIsHeld(() => postPayment(app, cookies, { orderId }));
 
-      expect(response.status).toBe(HTTP_CONFLICT);
+      expect(response.status).toBe(HttpStatus.CONFLICT);
       expect(response.body.message).toBe(PAYMENTS_ERROR_MESSAGES.PAYMENT_ALREADY_STARTED);
       expect(gateway.createCheckoutSession).not.toHaveBeenCalled();
     },
@@ -93,7 +89,7 @@ describe('Order held by another operation (e2e)', () => {
     async () => {
       const response = await whileOrderIsHeld(() => cancelOrder(app, cookies, orderId));
 
-      expect(response.status).toBe(HTTP_CONFLICT);
+      expect(response.status).toBe(HttpStatus.CONFLICT);
       expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.BUSY);
       expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.PENDING);
     },

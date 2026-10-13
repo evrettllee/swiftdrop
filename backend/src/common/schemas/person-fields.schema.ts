@@ -1,6 +1,6 @@
 import { z } from 'zod';
+import { PERSON_FIELD_LENGTH } from '../constants/field-lengths.constants';
 import {
-  NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
   NAME_PATTERN,
   PHONE_INVALID_MESSAGE,
@@ -19,7 +19,7 @@ export const buildNameSchema = (
     .string()
     .trim()
     .min(NAME_MIN_LENGTH, tooShortMessage)
-    .max(NAME_MAX_LENGTH, tooLongMessage)
+    .max(PERSON_FIELD_LENGTH.NAME, tooLongMessage)
     .pipe(z.string().regex(NAME_PATTERN, invalidMessage));
 
 export const phoneSchema = z
