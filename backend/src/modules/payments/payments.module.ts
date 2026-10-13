@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { NbrbModule } from '../../integrations/nbrb/nbrb.module';
 import { StripeModule } from '../../integrations/stripe/stripe.module';
+import { PaymentAttemptsService } from './services/payment-attempts.service';
 import { PaymentCancellationService } from './services/payment-cancellation.service';
 import { PaymentReconciliationService } from './services/payment-reconciliation.service';
 import { PaymentRefundService } from './services/payment-refund.service';
@@ -14,6 +15,7 @@ import { PaymentsService } from './services/payments.service';
   controllers: [PaymentsController],
   providers: [
     PaymentsService,
+    PaymentAttemptsService,
     PaymentRefundService,
     PaymentSettlementService,
     PaymentWebhookService,

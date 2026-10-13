@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
@@ -11,8 +12,7 @@ import {
 } from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
+import { MISSING_ORDER_ID } from '../../support/constants';
 import { postApi } from '../../support/http';
 import {
   cancelOrder,
@@ -21,8 +21,8 @@ import {
   SECOND_CLIENT,
   setOrderStatus,
 } from '../../support/orders';
+import { resetServiceArea } from '../../support/pricing';
 
-const MISSING_ORDER_ID = 999_999;
 const PICKED_UP_STATUSES = [ORDER_STATUS.PICKED_UP, ORDER_STATUS.IN_TRANSIT];
 
 describe('Order cancellation (e2e)', () => {
@@ -36,10 +36,7 @@ describe('Order cancellation (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
   });
 
   afterAll(async () => {
@@ -53,7 +50,7 @@ describe('Order cancellation (e2e)', () => {
       const [orderId] = await placeOrders(app, cookies, 1);
       await setOrderStatus(db, orderId, status);
 
-      const response = await cancelOrder(app, cookies, orderId).expect(409);
+      const response = await cancelOrder(app, cookies, orderId).expect(HttpStatus.CONFLICT);
 
       expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.CANNOT_CANCEL);
       expect(await readOrderStatus(db, orderId)).toBe(status);
@@ -67,7 +64,7 @@ describe('Order cancellation (e2e)', () => {
       const [orderId] = await placeOrders(app, cookies, 1);
       await setOrderStatus(db, orderId, status);
 
-      const response = await cancelOrder(app, cookies, orderId).expect(409);
+      const response = await cancelOrder(app, cookies, orderId).expect(HttpStatus.CONFLICT);
 
       expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.ALREADY_FINISHED);
     },
@@ -78,7 +75,7 @@ describe('Order cancellation (e2e)', () => {
     const { cookies: otherCookies } = await registerUser(app, SECOND_CLIENT);
     const [orderId] = await placeOrders(app, cookies, 1);
 
-    const response = await cancelOrder(app, otherCookies, orderId).expect(404);
+    const response = await cancelOrder(app, otherCookies, orderId).expect(HttpStatus.NOT_FOUND);
 
     expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.NOT_FOUND);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.PENDING);
@@ -87,7 +84,7 @@ describe('Order cancellation (e2e)', () => {
   it('should return 404 when the order does not exist', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await cancelOrder(app, cookies, MISSING_ORDER_ID).expect(404);
+    const response = await cancelOrder(app, cookies, MISSING_ORDER_ID).expect(HttpStatus.NOT_FOUND);
 
     expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.NOT_FOUND);
   });
@@ -95,7 +92,7 @@ describe('Order cancellation (e2e)', () => {
   it('should return 400 with a field error when the order id is not a number', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await cancelOrder(app, cookies, 'abc').expect(400);
+    const response = await cancelOrder(app, cookies, 'abc').expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body.errors).toEqual(
       expect.arrayContaining([
@@ -110,6 +107,6 @@ describe('Order cancellation (e2e)', () => {
   it('should return 401 when the request has no authentication', async () => {
     const path = `${ORDERS_ROUTES.BASE}/${ORDERS_ROUTES.CANCEL.replace(':orderId', '1')}`;
 
-    await postApi(app, path).expect(401);
+    await postApi(app, path).expect(HttpStatus.UNAUTHORIZED);
   });
 });

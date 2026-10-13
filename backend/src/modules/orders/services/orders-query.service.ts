@@ -1,19 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, inArray, type SQL } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
 import { CURRENCY } from '../../../common/constants/money.constants';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { addresses, orders } from '../../../database/schema';
+import { orders } from '../../../database/schema';
 import type { ListOrdersDto } from '../dto/list-orders.dto';
 import {
   ACTIVE_STATUSES,
   FINISHED_STATUSES,
-  ORDER_ADDRESS_ALIAS,
   ORDER_LIST_FILTER,
   ORDERS_FIRST_PAGE,
 } from '../constants/orders.constants';
 import type { OrdersPage } from '../types/orders.types';
+import { addressViewColumns, aliasOrderAddresses } from '../utils/order-address-columns';
 
 @Injectable()
 export class OrdersQueryService {
@@ -21,8 +20,7 @@ export class OrdersQueryService {
 
   async list(clientId: number, query: ListOrdersDto): Promise<OrdersPage> {
     const where = this.buildFilter(clientId, query.filter);
-    const pickup = alias(addresses, ORDER_ADDRESS_ALIAS.PICKUP);
-    const delivery = alias(addresses, ORDER_ADDRESS_ALIAS.DELIVERY);
+    const { pickup, delivery } = aliasOrderAddresses();
 
     const [rows, total] = await Promise.all([
       this.db
@@ -32,18 +30,8 @@ export class OrdersQueryService {
           price: orders.price,
           createdAt: orders.createdAt,
           estimatedDeliveryAt: orders.estimatedDeliveryAt,
-          pickup: {
-            city: pickup.city,
-            street: pickup.street,
-            house: pickup.house,
-            apartment: pickup.apartment,
-          },
-          delivery: {
-            city: delivery.city,
-            street: delivery.street,
-            house: delivery.house,
-            apartment: delivery.apartment,
-          },
+          pickup: addressViewColumns(pickup),
+          delivery: addressViewColumns(delivery),
         })
         .from(orders)
         .innerJoin(pickup, eq(orders.pickupAddressId, pickup.addressId))

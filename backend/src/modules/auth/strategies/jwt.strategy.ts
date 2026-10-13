@@ -5,11 +5,11 @@ import type { Request } from 'express';
 import { Strategy } from 'passport-jwt';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { UsersService } from '../../users/services/users.service';
-import { readCookie } from '../services/auth-cookies.service';
 import { AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../constants/access.constants';
 import { ACCESS_COOKIE_NAME } from '../constants/tokens.constants';
 import { toAuthUser } from '../mappers/auth-user.mapper';
 import type { AccessTokenPayload, AuthUser } from '../types/auth.types';
+import { readCookie } from '../utils/request-cookies';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {

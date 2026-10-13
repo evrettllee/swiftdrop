@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
@@ -9,10 +10,9 @@ import {
 } from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { getApi } from '../../support/http';
 import { getOrders } from '../../support/orders';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Orders list (e2e)', () => {
   let app: NestExpressApplication;
@@ -25,10 +25,7 @@ describe('Orders list (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
   });
 
   afterAll(async () => {
@@ -38,7 +35,9 @@ describe('Orders list (e2e)', () => {
   it('should return 400 with a field error when the page size is above the maximum', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await getOrders(app, cookies, { limit: ORDERS_PAGE_SIZE_MAX + 1 }).expect(400);
+    const response = await getOrders(app, cookies, { limit: ORDERS_PAGE_SIZE_MAX + 1 }).expect(
+      HttpStatus.BAD_REQUEST,
+    );
 
     expect(response.body.errors).toEqual(
       expect.arrayContaining([
@@ -53,7 +52,9 @@ describe('Orders list (e2e)', () => {
   it('should return 400 with a field error when the filter is unknown', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await getOrders(app, cookies, { filter: 'archived' }).expect(400);
+    const response = await getOrders(app, cookies, { filter: 'archived' }).expect(
+      HttpStatus.BAD_REQUEST,
+    );
 
     expect(response.body.errors).toEqual(
       expect.arrayContaining([
@@ -66,6 +67,6 @@ describe('Orders list (e2e)', () => {
   });
 
   it('should return 401 when the request has no authentication', async () => {
-    await getApi(app, ORDERS_ROUTES.BASE).expect(401);
+    await getApi(app, ORDERS_ROUTES.BASE).expect(HttpStatus.UNAUTHORIZED);
   });
 });

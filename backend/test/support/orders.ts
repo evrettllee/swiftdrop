@@ -1,9 +1,13 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { OrderStatus } from '../../src/common/enums/order-status.enum';
 import type { Database } from '../../src/database/database.module';
 import { orders } from '../../src/database/schema';
-import { ORDERS_ROUTES } from '../../src/modules/orders/constants/orders.constants';
+import {
+  ORDER_ID_ROUTE_PARAM,
+  ORDERS_ROUTES,
+} from '../../src/modules/orders/constants/orders.constants';
 import { COOKIE_HEADER, type registerUser, validRegistration } from './auth';
 import { VALID_ORDER } from './fixtures';
 import { getApi, postApi } from './http';
@@ -34,7 +38,7 @@ export async function placeOrders(
   const ids: number[] = [];
 
   for (let index = 0; index < count; index += 1) {
-    const response = await postOrder(app, cookies, VALID_ORDER).expect(201);
+    const response = await postOrder(app, cookies, VALID_ORDER).expect(HttpStatus.CREATED);
     ids.push(response.body.orderId);
   }
 
@@ -54,7 +58,7 @@ export function cancelOrder(
   cookies: Cookies,
   orderId: number | string,
 ) {
-  const path = `${ORDERS_ROUTES.BASE}/${ORDERS_ROUTES.CANCEL.replace(':orderId', String(orderId))}`;
+  const path = `${ORDERS_ROUTES.BASE}/${ORDERS_ROUTES.CANCEL.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
 
   return postApi(app, path).set(COOKIE_HEADER, cookies);
 }

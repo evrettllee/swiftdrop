@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { MS_PER_SECOND } from '../../../common/constants/time.constants';
+import { describeError } from '../../../common/utils/describe-error';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { PaymentGateway } from '../../../modules/payments/contracts/payment-gateway.contract';
 import {
@@ -128,9 +129,7 @@ export class StripePaymentAdapter extends PaymentGateway {
 
   // Any unexpected failure of Stripe becomes one clear answer for the client, details go to the log.
   private unavailable(error: unknown): ServiceUnavailableException {
-    this.logger.error(
-      `Stripe request failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    this.logger.error(`Stripe request failed: ${describeError(error)}`);
 
     return new ServiceUnavailableException(PAYMENTS_ERROR_MESSAGES.GATEWAY_UNAVAILABLE);
   }

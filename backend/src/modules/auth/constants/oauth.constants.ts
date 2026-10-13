@@ -1,5 +1,5 @@
 import { GLOBAL_PREFIX } from '../../../common/constants/http.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
+import { MS_PER_MINUTE, MS_PER_SECOND } from '../../../common/constants/time.constants';
 import { AUTH_ROUTES } from './routes.constants';
 import { URL_SAFE_ENCODING } from './tokens.constants';
 
@@ -37,4 +37,5 @@ export const YANDEX_AUTHORIZATION_URL = 'https://oauth.yandex.ru/authorize';
 export const YANDEX_TOKEN_URL = 'https://oauth.yandex.ru/token';
 export const YANDEX_PROFILE_URL = 'https://login.yandex.ru/info?format=json';
 export const YANDEX_AUTH_HEADER_SCHEME = 'OAuth';
-export const YANDEX_PROFILE_TIMEOUT_MS = 5000;
+export const YANDEX_PROFILE_TIMEOUT_MS = 5 * MS_PER_SECOND;
+export const YANDEX_USER_ID_MIN_LENGTH = 1;

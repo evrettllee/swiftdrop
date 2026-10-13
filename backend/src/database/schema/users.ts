@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { boolean, integer, pgTable, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { roles } from './roles';
+import { PERSON_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
 
 export const users = pgTable(
   'users',
@@ -9,11 +10,11 @@ export const users = pgTable(
     roleId: integer()
       .notNull()
       .references(() => roles.roleId),
-    firstName: varchar({ length: 100 }).notNull(),
-    lastName: varchar({ length: 100 }).notNull(),
-    email: varchar({ length: 255 }).notNull(),
-    passwordHash: varchar({ length: 255 }),
-    phone: varchar({ length: 32 }).unique(),
+    firstName: varchar({ length: PERSON_FIELD_LENGTH.NAME }).notNull(),
+    lastName: varchar({ length: PERSON_FIELD_LENGTH.NAME }).notNull(),
+    email: varchar({ length: PERSON_FIELD_LENGTH.EMAIL }).notNull(),
+    passwordHash: varchar({ length: PERSON_FIELD_LENGTH.PASSWORD_HASH }),
+    phone: varchar({ length: PERSON_FIELD_LENGTH.PHONE }).unique(),
     isBlocked: boolean().notNull().default(false),
     emailVerifiedAt: timestamp({ withTimezone: true }),
     deletedAt: timestamp({ withTimezone: true }),

@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
@@ -97,12 +98,12 @@ describe('OAuth login (e2e)', () => {
 
     const passwordLogin = await postAuth(app, AUTH_ROUTES.LOGIN)
       .send({ email: validRegistration.email, password: validRegistration.password })
-      .expect(401);
+      .expect(HttpStatus.UNAUTHORIZED);
 
     expect(passwordLogin.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
     await postAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, refreshCookie(refreshToken))
-      .expect(401);
+      .expect(HttpStatus.UNAUTHORIZED);
   });
 
   it('should keep the password and sessions when a verified account gets linked', async () => {
@@ -114,10 +115,10 @@ describe('OAuth login (e2e)', () => {
     expect(result.user.userId).toBe(body.user.userId);
     await postAuth(app, AUTH_ROUTES.LOGIN)
       .send({ email: validRegistration.email, password: validRegistration.password })
-      .expect(200);
+      .expect(HttpStatus.OK);
     await postAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, refreshCookie(refreshToken))
-      .expect(200);
+      .expect(HttpStatus.OK);
     expect(await findLinks(db)).toHaveLength(1);
   });
 });

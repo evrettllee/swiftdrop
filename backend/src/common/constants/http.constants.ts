@@ -2,6 +2,8 @@ import { MS_PER_MINUTE } from './time.constants';
 
 // Application
 export const GLOBAL_PREFIX = 'api';
+// What ExecutionContext.getType() returns for an HTTP request.
+export const HTTP_CONTEXT_TYPE = 'http';
 
 // Throttling
 // The name that @nestjs/throttler gives to a throttler registered without one.

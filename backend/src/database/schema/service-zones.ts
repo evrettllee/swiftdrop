@@ -1,9 +1,10 @@
 import { boolean, integer, jsonb, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { tariffs } from './tariffs';
+import { SERVICE_ZONE_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
 
 export const serviceZones = pgTable('service_zones', {
   zoneId: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 100 }).notNull(),
+  name: varchar({ length: SERVICE_ZONE_FIELD_LENGTH.NAME }).notNull(),
   polygon: jsonb().$type<number[][][]>().notNull(),
   tariffId: integer()
     .notNull()

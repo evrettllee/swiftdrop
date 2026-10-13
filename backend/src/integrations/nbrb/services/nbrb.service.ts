@@ -1,4 +1,5 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { describeError } from '../../../common/utils/describe-error';
 import { nbrbRateSchema } from '../schemas/nbrb-rate.schema';
 import {
   NBRB_CACHE_TTL_MS,
@@ -34,9 +35,7 @@ export class NbrbService {
       this.cachedRate = rate;
       this.refreshAfter = now + NBRB_CACHE_TTL_MS;
     } catch (error) {
-      this.logger.warn(
-        `NBRB rate request failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      this.logger.warn(`NBRB rate request failed: ${describeError(error)}`);
       // The last known rate is better than no payments at all.
       rate = this.cachedRate;
       this.refreshAfter = now + NBRB_RETRY_DELAY_MS;

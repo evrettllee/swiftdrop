@@ -2,6 +2,8 @@ export const PG_UNIQUE_VIOLATION_CODE = '23505';
 // lock_not_available: the lock was not taken within lock_timeout.
 export const PG_LOCK_NOT_AVAILABLE_CODE = '55P03';
 export const SINGLE_ROW_LIMIT = 1;
+// FOR NO KEY UPDATE: the row is locked for changes, rows that only refer to it are not blocked.
+export const ROW_LOCK_NO_KEY_UPDATE = 'no key update';
 
 // The partial unique index of the open payment attempt of an order.
 export const PAYMENTS_ONE_PENDING_PER_ORDER_INDEX = 'payments_one_pending_per_order_uidx';

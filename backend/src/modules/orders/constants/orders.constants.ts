@@ -1,10 +1,13 @@
 import {
+  ADDRESS_FIELD_LENGTH,
+  PERSON_FIELD_LENGTH,
+} from '../../../common/constants/field-lengths.constants';
+import {
   ORDER_ID_INVALID_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
 } from '../../../common/constants/orders.constants';
 import {
   NAME_ALLOWED_CHARACTERS,
-  NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
 } from '../../../common/constants/person-validation.constants';
 import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
@@ -13,10 +16,12 @@ import type { OrderStatus } from '../../../common/enums/order-status.enum';
 import { CronExpression } from '@nestjs/schedule';
 
 // Routes
+export const ORDER_ID_ROUTE_PARAM = ':orderId';
+
 export const ORDERS_ROUTES = {
   BASE: 'orders',
-  BY_ID: ':orderId',
-  CANCEL: ':orderId/cancel',
+  BY_ID: ORDER_ID_ROUTE_PARAM,
+  CANCEL: `${ORDER_ID_ROUTE_PARAM}/cancel`,
 } as const;
 
 // Statuses
@@ -49,9 +54,14 @@ export const ORDER_LIST_FILTER = {
   FINISHED: 'finished',
 } as const;
 
-export const ORDER_LIST_FILTER_VALUES = ['all', 'active', 'finished'] as const;
+export const ORDER_LIST_FILTER_VALUES = [
+  ORDER_LIST_FILTER.ALL,
+  ORDER_LIST_FILTER.ACTIVE,
+  ORDER_LIST_FILTER.FINISHED,
+] as const;
 
 export const ORDERS_FIRST_PAGE = 1;
+export const ORDERS_PAGE_SIZE_MIN = 1;
 export const ORDERS_PAGE_SIZE_DEFAULT = 5;
 export const ORDERS_PAGE_SIZE_MAX = 50;
 
@@ -68,26 +78,23 @@ export const ORDER_ADDRESS_ALIAS = {
   DELIVERY: 'delivery_address',
 } as const;
 
-// Address limits: match the columns of the addresses table.
-export const CITY_MAX_LENGTH = 100;
-export const STREET_MAX_LENGTH = 150;
-export const HOUSE_MAX_LENGTH = 20;
-export const APARTMENT_MAX_LENGTH = 20;
+// Address limits: the upper ones are the column lengths in ADDRESS_FIELD_LENGTH.
+export const REQUIRED_TEXT_MIN_LENGTH = 1;
 
 // Validation
 export const ORDERS_VALIDATION_MESSAGES = {
   CITY_REQUIRED: 'Укажите город',
-  CITY_TOO_LONG: `Город должен содержать не больше ${CITY_MAX_LENGTH} символов`,
+  CITY_TOO_LONG: `Город должен содержать не больше ${ADDRESS_FIELD_LENGTH.CITY} символов`,
   STREET_REQUIRED: 'Укажите улицу',
-  STREET_TOO_LONG: `Улица должна содержать не больше ${STREET_MAX_LENGTH} символов`,
+  STREET_TOO_LONG: `Улица должна содержать не больше ${ADDRESS_FIELD_LENGTH.STREET} символов`,
   HOUSE_REQUIRED: 'Укажите номер дома',
-  HOUSE_TOO_LONG: `Номер дома должен содержать не больше ${HOUSE_MAX_LENGTH} символов`,
-  APARTMENT_TOO_LONG: `Квартира должна содержать не больше ${APARTMENT_MAX_LENGTH} символов`,
+  HOUSE_TOO_LONG: `Номер дома должен содержать не больше ${ADDRESS_FIELD_LENGTH.HOUSE} символов`,
+  APARTMENT_TOO_LONG: `Квартира должна содержать не больше ${ADDRESS_FIELD_LENGTH.APARTMENT} символов`,
   RECIPIENT_NAME_TOO_SHORT: `Имя получателя должно содержать минимум ${NAME_MIN_LENGTH} символа`,
-  RECIPIENT_NAME_TOO_LONG: `Имя получателя должно содержать не больше ${NAME_MAX_LENGTH} символов`,
+  RECIPIENT_NAME_TOO_LONG: `Имя получателя должно содержать не больше ${PERSON_FIELD_LENGTH.NAME} символов`,
   RECIPIENT_NAME_INVALID: `Имя получателя может содержать ${NAME_ALLOWED_CHARACTERS}`,
   PAGE_INVALID: 'Некорректный номер страницы',
-  LIMIT_INVALID: `Размер страницы: от 1 до ${ORDERS_PAGE_SIZE_MAX}`,
+  LIMIT_INVALID: `Размер страницы: от ${ORDERS_PAGE_SIZE_MIN} до ${ORDERS_PAGE_SIZE_MAX}`,
   FILTER_INVALID: 'Неизвестный фильтр заказов',
   ORDER_ID_INVALID: ORDER_ID_INVALID_MESSAGE,
 } as const;

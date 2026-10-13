@@ -4,8 +4,27 @@
     "typescript/no-explicit-any": "off",
     "typescript/no-floating-promises": "error",
     "typescript/await-thenable": "error",
-    "typescript/no-misused-promises": "error"
+    "typescript/no-misused-promises": "error",
+    "eslint/max-lines": ["error", { "max": 150, "skipBlankLines": true, "skipComments": true }],
+    "eslint/max-lines-per-function": [
+      "error",
+      { "max": 50, "skipBlankLines": true, "skipComments": true }
+    ]
   },
+  "overrides": [
+    {
+      "files": ["**/dto/**", "**/schemas/**", "src/database/schema/**"],
+      "rules": {
+        "eslint/max-lines": "off"
+      }
+    },
+    {
+      "files": ["**/*.spec.ts", "test/**"],
+      "rules": {
+        "eslint/max-lines-per-function": "off"
+      }
+    }
+  ],
   "env": {
     "node": true
   }

@@ -1,4 +1,4 @@
-import { NAME_MAX_LENGTH } from '../../../common/constants/person-validation.constants';
+import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
 import { AUTH_VALIDATION_MESSAGES } from '../constants/validation.constants';
 import { registerSchema } from './register.dto';
 
@@ -70,7 +70,9 @@ describe('registerSchema names', () => {
 
   it('should give only the length message when the name is too long', () => {
     expect(
-      nameIssues('lastName', 'Я'.repeat(NAME_MAX_LENGTH + 1)).map((issue) => issue.message),
+      nameIssues('lastName', 'Я'.repeat(PERSON_FIELD_LENGTH.NAME + 1)).map(
+        (issue) => issue.message,
+      ),
     ).toEqual([AUTH_VALIDATION_MESSAGES.LAST_NAME_TOO_LONG]);
   });
 });

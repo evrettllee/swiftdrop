@@ -1,13 +1,12 @@
 import { index, integer, pgEnum, pgTable, timestamp } from 'drizzle-orm/pg-core';
+import {
+  ORDER_OFFER_STATUS,
+  ORDER_OFFER_STATUS_VALUES,
+} from '../../common/enums/order-offer-status.enum';
 import { courierProfiles } from './courier-profiles';
 import { orders } from './orders';
 
-export const orderOfferStatusEnum = pgEnum('order_offer_status', [
-  'pending',
-  'accepted',
-  'declined',
-  'expired',
-]);
+export const orderOfferStatusEnum = pgEnum('order_offer_status', ORDER_OFFER_STATUS_VALUES);
 
 export const orderOffers = pgTable(
   'order_offers',
@@ -19,7 +18,7 @@ export const orderOffers = pgTable(
     courierId: integer()
       .notNull()
       .references(() => courierProfiles.courierProfileId),
-    status: orderOfferStatusEnum().notNull().default('pending'),
+    status: orderOfferStatusEnum().notNull().default(ORDER_OFFER_STATUS.PENDING),
     offeredAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp({ withTimezone: true }).notNull(),
     respondedAt: timestamp({ withTimezone: true }),

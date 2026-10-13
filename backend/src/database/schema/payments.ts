@@ -12,6 +12,7 @@ import {
 import { PAYMENT_STATUS, PAYMENT_STATUS_VALUES } from '../../common/enums/payment-status.enum';
 import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '../../common/constants/database.constants';
 import { orders } from './orders';
+import { PAYMENT_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
 
 export const paymentStatusEnum = pgEnum('payment_status', PAYMENT_STATUS_VALUES);
 
@@ -29,9 +30,11 @@ export const payments = pgTable(
     amountUsd: numeric({ precision: 10, scale: 2 }).notNull(),
     exchangeRate: numeric({ precision: 10, scale: 4, mode: 'number' }).notNull(),
     status: paymentStatusEnum().notNull().default(PAYMENT_STATUS.PENDING),
-    checkoutSessionId: varchar({ length: 255 }).notNull().unique(),
+    checkoutSessionId: varchar({ length: PAYMENT_FIELD_LENGTH.CHECKOUT_SESSION_ID })
+      .notNull()
+      .unique(),
     // The reference of the payment in Stripe, it is known after the payment and used for a refund.
-    stripePaymentId: varchar({ length: 255 }).unique(),
+    stripePaymentId: varchar({ length: PAYMENT_FIELD_LENGTH.STRIPE_PAYMENT_ID }).unique(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
