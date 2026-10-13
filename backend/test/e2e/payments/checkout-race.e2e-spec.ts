@@ -5,11 +5,14 @@ import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { payments } from '../../../src/db/schema';
-import { NbrbService } from '../../../src/integrations/nbrb/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
-import { PAYMENT_EVENT, PAYMENTS_ERROR_MESSAGES } from '../../../src/payments/payments.constants';
+import { payments } from '../../../src/database/schema';
+import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
+import {
+  PAYMENT_EVENT,
+  PAYMENTS_ERROR_MESSAGES,
+} from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
@@ -95,7 +98,6 @@ describe('Parallel payments of one order (e2e)', () => {
       Array.from({ length: PARALLEL_ATTEMPTS }, () => postPayment(app, cookies, { orderId })),
     );
   }
-
 
   // Two attempts of the order, both paid in Stripe: the earlier one was closed (failed) but its
   // page was still open. The events come in the given order of the attempts.

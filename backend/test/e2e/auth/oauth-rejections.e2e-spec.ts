@@ -1,7 +1,7 @@
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { OAUTH_ERROR_MESSAGES } from '../../../src/auth/constants/oauth.constants';
-import { AuthService } from '../../../src/auth/services/auth.service';
+import { OAUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/oauth.constants';
+import { AuthService } from '../../../src/modules/auth/services/auth.service';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { registerUser, validRegistration, buildOAuthProfile } from '../../support/auth';

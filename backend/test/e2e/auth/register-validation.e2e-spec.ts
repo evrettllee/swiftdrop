@@ -1,10 +1,10 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
-import { AUTH_VALIDATION_MESSAGES } from '../../../src/auth/constants/validation.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
+import { AUTH_VALIDATION_MESSAGES } from '../../../src/modules/auth/constants/validation.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/db/schema';
+import { users } from '../../../src/database/schema';
 import { createTestApp } from '../../support/app';
 import { postAuth, validRegistration } from '../../support/auth';
 import { resetTestData } from '../../support/database';

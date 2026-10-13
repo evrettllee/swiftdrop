@@ -1,12 +1,12 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { serviceZones, tariffs } from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { serviceZones, tariffs } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import {
   PRICING_ERROR_MESSAGES,
   PRICING_THROTTLE_LIMIT,
-} from '../../../src/pricing/pricing.constants';
+} from '../../../src/modules/pricing/constants/pricing.constants';
 import { createTestApp } from '../../support/app';
 import { CLIENT_IP_HEADER } from '../../support/constants';
 import { resetTestData, seedServiceArea } from '../../support/database';

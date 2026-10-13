@@ -1,13 +1,13 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ERROR_MESSAGES } from '../../../src/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
-import { AuthService } from '../../../src/auth/services/auth.service';
+import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
+import { AuthService } from '../../../src/modules/auth/services/auth.service';
 import { OAUTH_PROVIDER } from '../../../src/common/enums/oauth-provider.enum';
 import { ROLE } from '../../../src/common/enums/role.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/db/schema';
+import { users } from '../../../src/database/schema';
 import {
   COOKIE_HEADER,
   postAuth,

@@ -1,9 +1,9 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
 import {
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
-} from '../../../src/auth/constants/tokens.constants';
+} from '../../../src/modules/auth/constants/tokens.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';

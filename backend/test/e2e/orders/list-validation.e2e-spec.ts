@@ -1,12 +1,12 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import {
   ORDERS_PAGE_SIZE_MAX,
   ORDERS_ROUTES,
   ORDERS_VALIDATION_MESSAGES,
-} from '../../../src/orders/orders.constants';
+} from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';

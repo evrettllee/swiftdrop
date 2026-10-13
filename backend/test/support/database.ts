@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 import { ROLE_NAMES } from '../../src/common/enums/role.enum';
 import { DB_CASING } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';
-import * as schema from '../../src/db/schema';
+import * as schema from '../../src/database/schema';
 import {
   MIGRATIONS_FOLDER,
   TEST_DB_NAME_SUFFIX,

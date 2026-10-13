@@ -4,16 +4,16 @@ import { asc } from 'drizzle-orm';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { payments } from '../../../src/db/schema';
-import { NbrbService } from '../../../src/integrations/nbrb/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { ORDERS_VALIDATION_MESSAGES } from '../../../src/orders/orders.constants';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { payments } from '../../../src/database/schema';
+import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDERS_VALIDATION_MESSAGES } from '../../../src/modules/orders/constants/orders.constants';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
 import {
   PAYMENT_CURRENCY,
   PAYMENT_DESCRIPTION_PREFIX,
   PAYMENTS_ROUTES,
-} from '../../../src/payments/payments.constants';
+} from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';

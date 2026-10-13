@@ -11,10 +11,10 @@ import {
   packages,
   roles,
   users,
-} from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { ORDERS_ROUTES } from '../../../src/orders/orders.constants';
-import { PRICING_ERROR_MESSAGES } from '../../../src/pricing/pricing.constants';
+} from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDERS_ROUTES } from '../../../src/modules/orders/constants/orders.constants';
+import { PRICING_ERROR_MESSAGES } from '../../../src/modules/pricing/constants/pricing.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
