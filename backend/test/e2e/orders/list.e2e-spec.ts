@@ -3,13 +3,13 @@ import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { orders } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import {
   ORDER_LIST_FILTER,
   ORDERS_FIRST_PAGE,
   ORDERS_PAGE_SIZE_DEFAULT,
-} from '../../../src/orders/orders.constants';
+} from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';

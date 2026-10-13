@@ -1,7 +1,7 @@
 import { performance } from 'node:perf_hooks';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ERROR_MESSAGES } from '../../../src/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';

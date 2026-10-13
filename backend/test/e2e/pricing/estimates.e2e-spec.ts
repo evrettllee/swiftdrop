@@ -1,7 +1,7 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import { createTestApp } from '../../support/app';
 import { resetTestData, seedServiceArea } from '../../support/database';
 import { ROUTE, SMALL_PACKAGE } from '../../support/fixtures';

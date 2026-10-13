@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { Database } from '../../src/database/database.module';
-import { userOauthAccounts, users } from '../../src/db/schema';
+import { userOauthAccounts, users } from '../../src/database/schema';
 
 export function findUsers(db: Database) {
   return db.select().from(users);

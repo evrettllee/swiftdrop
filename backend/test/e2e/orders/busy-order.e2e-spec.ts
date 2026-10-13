@@ -3,23 +3,18 @@ import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/db/schema';
-import { NbrbService } from '../../../src/integrations/nbrb/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { ORDERS_ERROR_MESSAGES } from '../../../src/orders/orders.constants';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
-import { PAYMENTS_ERROR_MESSAGES } from '../../../src/payments/payments.constants';
+import { orders } from '../../../src/database/schema';
+import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDERS_ERROR_MESSAGES } from '../../../src/modules/orders/constants/orders.constants';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENTS_ERROR_MESSAGES } from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
 import { ROUTE } from '../../support/fixtures';
 import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
-import {
-  createGatewayMock,
-  postPayment,
-  resetGatewayMock,
-  USD_RATE,
-} from '../../support/payments';
+import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../../support/payments';
 
 const HTTP_CONFLICT = 409;
 // Each test waits for the lock timeout itself, so it gets this much more than the timeout.

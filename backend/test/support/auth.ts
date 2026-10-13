@@ -1,19 +1,19 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { isNotNull } from 'drizzle-orm';
 import request from 'supertest';
-import { AUTH_ROUTES } from '../../src/auth/constants/routes.constants';
+import { AUTH_ROUTES } from '../../src/modules/auth/constants/routes.constants';
 import {
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
   REFRESH_REUSE_GRACE_MS,
-} from '../../src/auth/constants/tokens.constants';
-import type { AuthResponse, OAuthProfile } from '../../src/auth/auth.types';
+} from '../../src/modules/auth/constants/tokens.constants';
+import type { AuthResponse, OAuthProfile } from '../../src/modules/auth/types/auth.types';
 import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../../src/common/constants/csrf.constants';
 import { GLOBAL_PREFIX } from '../../src/common/constants/http.constants';
 import { MS_PER_SECOND } from '../../src/common/constants/time.constants';
 import { OAUTH_PROVIDER } from '../../src/common/enums/oauth-provider.enum';
 import type { Database } from '../../src/database/database.module';
-import { refreshTokens } from '../../src/db/schema';
+import { refreshTokens } from '../../src/database/schema';
 import { CLIENT_IP_HEADER } from './constants';
 import { nextClientIp } from './http';
 

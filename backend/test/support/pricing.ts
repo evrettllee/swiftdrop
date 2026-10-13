@@ -1,5 +1,5 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { PRICING_ROUTES } from '../../src/pricing/pricing.constants';
+import { PRICING_ROUTES } from '../../src/modules/pricing/constants/pricing.constants';
 import { MINSK_DELIVERY, MINSK_PICKUP, SMALL_PACKAGE } from './fixtures';
 import { postApi } from './http';
 

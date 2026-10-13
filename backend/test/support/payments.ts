@@ -1,19 +1,19 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { payments } from '../../src/db/schema';
+import { payments } from '../../src/database/schema';
 import type { Database } from '../../src/database/database.module';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENTS_ROUTES,
   SESSION_EXPIRE_RESULT,
-} from '../../src/payments/payments.constants';
-import type { CheckoutSessionState } from '../../src/payments/payments.types';
+} from '../../src/modules/payments/constants/payments.constants';
+import type { CheckoutSessionState } from '../../src/modules/payments/types/payments.types';
 import { COOKIE_HEADER } from './auth';
 import { postApi, nextClientIp } from './http';
 import type { Cookies } from './orders';
 import request from 'supertest';
 import { GLOBAL_PREFIX } from '../../src/common/constants/http.constants';
-import { WEBHOOK_SIGNATURE_HEADER } from '../../src/payments/payments.constants';
+import { WEBHOOK_SIGNATURE_HEADER } from '../../src/modules/payments/constants/payments.constants';
 import { CLIENT_IP_HEADER } from './constants';
 
 export const WEBHOOK_SIGNATURE = 't=1,v1=test';

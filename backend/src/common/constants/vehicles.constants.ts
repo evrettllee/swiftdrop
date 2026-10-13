@@ -1,4 +1,4 @@
-import type { VehicleLimit } from '../common.types';
+import type { VehicleLimit } from '../types/vehicle.types';
 import type { VehicleType } from '../enums/vehicle-type.enum';
 
 export const VEHICLE_LIMITS: Record<VehicleType, VehicleLimit> = {

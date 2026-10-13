@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PaymentGateway } from '../../payments/gateway/payment.gateway';
-import { StripePaymentGateway } from './stripe-payment.gateway';
+import { PaymentGateway } from '../../modules/payments/contracts/payment-gateway.contract';
+import { StripePaymentAdapter } from './adapters/stripe-payment.adapter';
 
 @Module({
-  providers: [{ provide: PaymentGateway, useClass: StripePaymentGateway }],
+  providers: [{ provide: PaymentGateway, useClass: StripePaymentAdapter }],
   exports: [PaymentGateway],
 })
 export class StripeModule {}

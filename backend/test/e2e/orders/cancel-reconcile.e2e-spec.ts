@@ -4,13 +4,13 @@ import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENT_EVENT,
   SESSION_EXPIRE_RESULT,
-} from '../../../src/payments/payments.constants';
+} from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
 import { resetTestData, seedServiceArea } from '../../support/database';
