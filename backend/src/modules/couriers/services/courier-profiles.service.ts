@@ -7,7 +7,7 @@ import type { Database, Transaction } from '../../../database/database.module';
 import { courierProfiles, orders, vehicles } from '../../../database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import { toCourierMe } from '../mappers/courier-profile.mapper';
-import type { CourierMe, CourierProfileRow } from '../types/couriers.types';
+import type { CourierMe } from '../types/couriers.types';
 
 @Injectable()
 export class CourierProfilesService {
@@ -19,6 +19,22 @@ export class CourierProfilesService {
       .insert(courierProfiles)
       .values({ userId })
       .onConflictDoNothing({ target: courierProfiles.userId });
+  }
+
+  async getProfileId(userId: number): Promise<number> {
+    await this.ensureProfile(userId);
+
+    const [profile] = await this.db
+      .select({ courierProfileId: courierProfiles.courierProfileId })
+      .from(courierProfiles)
+      .where(eq(courierProfiles.userId, userId))
+      .limit(SINGLE_ROW_LIMIT);
+
+    if (!profile) {
+      throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
+    }
+
+    return profile.courierProfileId;
   }
 
   async getMe(userId: number): Promise<CourierMe> {
@@ -42,10 +58,7 @@ export class CourierProfilesService {
       throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
     }
 
-    return toCourierMe(
-      row satisfies CourierProfileRow,
-      await this.findActiveOrderId(row.courierProfileId),
-    );
+    return toCourierMe(row, await this.findActiveOrderId(row.courierProfileId));
   }
 
   // The order the courier carries now, at most one by the unique index of the orders table.
