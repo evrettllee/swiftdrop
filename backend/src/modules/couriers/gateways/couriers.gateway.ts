@@ -12,7 +12,7 @@ import {
 import type { Namespace, Socket } from 'socket.io';
 import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ROLE } from '../../../common/enums/role.enum';
-import { geoPointSchema } from '../../../common/schemas/geo-point.schema';
+import { type GeoPoint, geoPointSchema } from '../../../common/schemas/geo-point.schema';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.constants';
 import { SocketAuthService } from '../../realtime/services/socket-auth.service';
@@ -33,6 +33,7 @@ import { rejectLocationUpdate } from '../utils/location-update';
 export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
   private readonly logger = new Logger(CouriersGateway.name);
   private readonly appOrigin: string;
+  private namespace: Namespace | null = null;
 
   constructor(
     private readonly socketAuth: SocketAuthService,
@@ -45,6 +46,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
 
   // Checks run in the handshake, so a refused client never gets a connection at all.
   afterInit(namespace: Namespace): void {
+    this.namespace = namespace;
     namespace.use((socket, next) => {
       this.admit(socket).then(
         () => next(),
@@ -59,6 +61,11 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
 
     await socket.join(courierRoom(data.courierProfileId));
     this.logger.log(`Courier ${data.courierProfileId} connected`);
+  }
+
+  // Sends an event to every open tab of the courier; nothing happens when none is open.
+  emitToCourier(courierProfileId: number, event: string, payload: unknown): void {
+    this.namespace?.to(courierRoom(courierProfileId)).emit(event, payload);
   }
 
   @SubscribeMessage(COURIER_SOCKET_EVENTS.LOCATION_UPDATE)
@@ -86,7 +93,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
 
   private async savePosition(
     courierProfileId: number,
-    point: { latitude: number; longitude: number },
+    point: GeoPoint,
     at: Date,
   ): Promise<LocationAck> {
     let ack: LocationAck = { ok: true };

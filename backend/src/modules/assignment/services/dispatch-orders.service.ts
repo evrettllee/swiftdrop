@@ -6,6 +6,7 @@ import type { Database } from '../../../database/database.module';
 import { orders, packages } from '../../../database/schema';
 import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
 import type { DispatchOrder } from '../types/assignment.types';
+import { parcelColumns } from '../utils/parcel-columns';
 
 @Injectable()
 export class DispatchOrdersService {
@@ -19,13 +20,7 @@ export class DispatchOrdersService {
         orderId: orders.orderId,
         pickup: { latitude: pickup.latitude, longitude: pickup.longitude },
         delivery: { latitude: delivery.latitude, longitude: delivery.longitude },
-        parcel: {
-          weightKg: packages.weight,
-          lengthCm: packages.length,
-          widthCm: packages.width,
-          heightCm: packages.height,
-          isFragile: packages.isFragile,
-        },
+        parcel: parcelColumns(),
       })
       .from(orders)
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))

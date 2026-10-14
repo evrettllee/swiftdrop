@@ -17,6 +17,6 @@ import { CourierVehiclesService } from './services/courier-vehicles.service';
     CourierLocationService,
     CouriersGateway,
   ],
-  exports: [CourierProfilesService],
+  exports: [CourierProfilesService, CouriersGateway],
 })
 export class CouriersModule {}

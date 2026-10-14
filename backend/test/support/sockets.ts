@@ -11,6 +11,8 @@ const ORIGIN_HEADER = 'Origin';
 const WEBSOCKET_TRANSPORT = 'websocket';
 const CONNECT_EVENT = 'connect';
 const CONNECT_ERROR_EVENT = 'connect_error';
+// How long a test waits for an acknowledgement or an event from the server.
+const SOCKET_WAIT_MS = 5000;
 
 // Sockets need a real port: supertest alone never opens one.
 export async function listenTestApp(app: NestExpressApplication): Promise<string> {
@@ -53,9 +55,19 @@ export function connectCourierSocket(
   });
 }
 
-const ACK_TIMEOUT_MS = 5000;
-
 // Sends an event and waits for the server's acknowledgement.
 export function emitWithAck<TAck>(socket: Socket, event: string, body: unknown): Promise<TAck> {
-  return socket.timeout(ACK_TIMEOUT_MS).emitWithAck(event, body) as Promise<TAck>;
+  return socket.timeout(SOCKET_WAIT_MS).emitWithAck(event, body) as Promise<TAck>;
+}
+
+// Resolves with the payload of the next event of this name, rejects when none comes in time.
+export function waitForEvent<TPayload>(socket: Socket, event: string): Promise<TPayload> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`No ${event} event came`)), SOCKET_WAIT_MS);
+
+    socket.once(event, (payload: TPayload) => {
+      clearTimeout(timer);
+      resolve(payload);
+    });
+  });
 }

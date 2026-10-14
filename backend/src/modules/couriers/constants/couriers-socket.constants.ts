@@ -13,6 +13,7 @@ export function courierRoom(courierProfileId: number): string {
 // Events
 export const COURIER_SOCKET_EVENTS = {
   LOCATION_UPDATE: 'location:update',
+  OFFER_NEW: 'offer:new',
 } as const;
 
 // Location
