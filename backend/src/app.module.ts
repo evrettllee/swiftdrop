@@ -18,6 +18,7 @@ import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { AssignmentModule } from './modules/assignment/assignment.module';
 import { CouriersModule } from './modules/couriers/couriers.module';
+import { DeliveriesModule } from './modules/deliveries/deliveries.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { PricingModule } from './modules/pricing/pricing.module';
@@ -43,6 +44,7 @@ import { ZonesModule } from './modules/zones/zones.module';
     PaymentsModule,
     CouriersModule,
     AssignmentModule,
+    DeliveriesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
