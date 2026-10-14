@@ -17,3 +17,17 @@ export type CourierCandidate = {
   position: GeoPoint;
   distanceKm: number;
 };
+
+// A candidate with the time the route to the pickup point takes.
+export type CandidatePickup = {
+  candidate: CourierCandidate;
+  etaSec: number;
+};
+
+// The courier chosen for an offer and the times shown in it.
+export type OfferPlan = {
+  courierProfileId: number;
+  pickupEtaSec: number;
+  // From now to the delivery: the way to the pickup point and then to the recipient.
+  totalEtaSec: number;
+};
