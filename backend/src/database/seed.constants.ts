@@ -1,7 +1,9 @@
-// Variables the seed reads besides the ones of the app.
+// Variables the seed reads besides the ones of the app. The courier ones are optional.
 export const SEED_ENV_KEYS = {
   ADMIN_EMAIL: 'SEED_ADMIN_EMAIL',
   ADMIN_PASSWORD: 'SEED_ADMIN_PASSWORD',
+  COURIER_EMAIL: 'SEED_COURIER_EMAIL',
+  COURIER_PASSWORD: 'SEED_COURIER_PASSWORD',
 } as const;
 
 export const DEFAULT_TARIFF = {
@@ -35,3 +37,6 @@ export const DEFAULT_ZONE_POLYGON: number[][][] = [
 
 export const ADMIN_FIRST_NAME = 'Администратор';
 export const ADMIN_LAST_NAME = 'SwiftDrop';
+
+export const COURIER_FIRST_NAME = 'Дмитрий';
+export const COURIER_LAST_NAME = 'Соколов';
