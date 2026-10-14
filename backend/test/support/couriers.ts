@@ -4,6 +4,7 @@ import { hash } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';
 import { ROLE } from '../../src/common/enums/role.enum';
 import { VEHICLE_TYPE } from '../../src/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '../../src/common/schemas/geo-point.schema';
 import type { Database } from '../../src/database/database.module';
 import { courierProfiles, orders, roles, users } from '../../src/database/schema';
 import { AUTH_ROUTES } from '../../src/modules/auth/constants/routes.constants';
@@ -19,12 +20,23 @@ export const COURIER_ACCOUNT = {
   password: validRegistration.password,
 };
 
+// A second courier, for tests that choose between two.
+export const SECOND_COURIER_ACCOUNT = {
+  firstName: 'Олег',
+  lastName: 'Новик',
+  email: 'courier2@example.com',
+  phone: '+375334445566',
+  password: validRegistration.password,
+};
+
 export const CAR = {
   type: VEHICLE_TYPE.CAR,
   brand: 'Skoda',
   model: 'Octavia',
   licensePlate: '1234 AB-7',
 };
+
+export const ON_FOOT = { type: VEHICLE_TYPE.FOOT };
 
 // Couriers are not registered through the API, so the account is written straight to the database.
 export async function createCourier(
@@ -73,6 +85,19 @@ export async function assignOrder(
     .update(orders)
     .set({ courierId: courierProfileId, status })
     .where(eq(orders.orderId, orderId));
+}
+
+// Puts the courier at a point, past the socket and its rate limit.
+export async function placeCourierAt(
+  db: Database,
+  courierProfileId: number,
+  point: GeoPoint,
+  at: Date = new Date(),
+): Promise<void> {
+  await db
+    .update(courierProfiles)
+    .set({ currentLat: point.latitude, currentLng: point.longitude, locationUpdatedAt: at })
+    .where(eq(courierProfiles.courierProfileId, courierProfileId));
 }
 
 export function getCourierMe(app: NestExpressApplication, cookies: string) {
