@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CouriersModule } from '../couriers/couriers.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { PricingModule } from '../pricing/pricing.module';
 import { OrderCancellationService } from './services/order-cancellation.service';
@@ -10,7 +11,7 @@ import { UnpaidOrdersJob } from './jobs/unpaid-orders.job';
 import { UnpaidOrdersService } from './services/unpaid-orders.service';
 
 @Module({
-  imports: [PricingModule, PaymentsModule],
+  imports: [PricingModule, PaymentsModule, CouriersModule],
   controllers: [OrdersController],
   providers: [
     OrderPlacementService,

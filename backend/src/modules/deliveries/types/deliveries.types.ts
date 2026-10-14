@@ -1,5 +1,6 @@
 import type { OrderTransitionChanges } from '../../../common/database/order-status-transition';
 import type { OrderStatus } from '../../../common/enums/order-status.enum';
+import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
 import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
 import type { HANDOVER_OUTCOME } from '../constants/deliveries.constants';
@@ -48,3 +49,30 @@ export type HandoverOutcome =
   | { kind: typeof HANDOVER_OUTCOME.WRONG_STEP }
   | { kind: typeof HANDOVER_OUTCOME.LOCKED; lockedUntil: Date }
   | { kind: typeof HANDOVER_OUTCOME.WRONG_CODE; attemptsLeft: number };
+
+// An order with its courier as the query returns it: the courier columns are null when there is none.
+export type ClientOrderCourierRow = {
+  status: OrderStatus;
+  courierId: number | null;
+  otpCode: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  vehicleType: VehicleType | null;
+  brand: string | null;
+  model: string | null;
+  licensePlate: string | null;
+};
+
+type ClientCourierVehicle = {
+  type: VehicleType;
+  brand: string | null;
+  model: string | null;
+  licensePlate: string | null;
+};
+
+// What the client sees about the courier of an order.
+export type ClientOrderCourier = {
+  courier: (Contact & { vehicle: ClientCourierVehicle | null }) | null;
+  deliveryCode: string | null;
+};

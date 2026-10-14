@@ -1,5 +1,6 @@
 import { ORDER_NOT_FOUND_MESSAGE } from '../../../common/constants/orders.constants';
 import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
+import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
 import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
 
 // Routes
@@ -9,6 +10,12 @@ export const COURIER_ORDERS_ROUTES = {
   PICKUP: `${ORDER_ID_ROUTE_PARAM}/pickup`,
   DEPART: `${ORDER_ID_ROUTE_PARAM}/depart`,
   DELIVER: `${ORDER_ID_ROUTE_PARAM}/deliver`,
+} as const;
+
+// The client's side of the delivery lives under the orders of the client.
+export const CLIENT_ORDER_COURIER_ROUTES = {
+  BASE: 'orders',
+  COURIER: `${ORDER_ID_ROUTE_PARAM}/courier`,
 } as const;
 
 // Delivery code
@@ -30,6 +37,24 @@ export const HANDOVER_OUTCOME = {
   LOCKED: 'locked',
   WRONG_CODE: 'wrong_code',
 } as const;
+
+// Client view
+// The client sees the courier while the order is with them and after the delivery.
+export const COURIER_VISIBLE_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
+  ORDER_STATUS.DELIVERED,
+];
+
+// The code is shown only once the parcel is picked up, when the order can no longer be cancelled.
+export const DELIVERY_CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
+];
+
+// The courier's last name is cut to its first letter and this mark.
+export const LAST_NAME_INITIAL_MARK = '.';
 
 // Validation
 export const DELIVERIES_VALIDATION_MESSAGES = {
