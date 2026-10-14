@@ -1,10 +1,7 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import {
-  ROW_LOCK_NO_KEY_UPDATE,
-  SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { isLockTimeout } from '../../../common/database/pg-errors';
+import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
+import { withLockConflict } from '../../../common/database/lock-conflict';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
 import { courierProfiles, vehicles } from '../../../database/schema';
@@ -22,16 +19,12 @@ export class CourierAvailabilityService {
   ) {}
 
   async set(userId: number, isAvailable: boolean): Promise<CourierMe> {
-    try {
-      await this.db.transaction((tx) => this.applyAvailability(tx, userId, isAvailable));
-    } catch (error) {
-      if (isLockTimeout(error)) {
-        this.logger.warn(`Courier profile of user ${userId} is busy, availability change refused`);
-        throw new ConflictException(COURIERS_ERROR_MESSAGES.BUSY);
-      }
-
-      throw error;
-    }
+    await withLockConflict(
+      () => this.db.transaction((tx) => this.applyAvailability(tx, userId, isAvailable)),
+      COURIERS_ERROR_MESSAGES.BUSY,
+      () =>
+        this.logger.warn(`Courier profile of user ${userId} is busy, availability change refused`),
+    );
 
     return this.profiles.getMe(userId);
   }
@@ -43,18 +36,7 @@ export class CourierAvailabilityService {
     userId: number,
     isAvailable: boolean,
   ): Promise<void> {
-    await this.profiles.ensureProfile(userId, tx);
-
-    const [profile] = await tx
-      .select({ courierProfileId: courierProfiles.courierProfileId })
-      .from(courierProfiles)
-      .where(eq(courierProfiles.userId, userId))
-      .limit(SINGLE_ROW_LIMIT)
-      .for(ROW_LOCK_NO_KEY_UPDATE);
-
-    if (!profile) {
-      throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
-    }
+    const profile = await this.profiles.lockOwnProfile(tx, userId);
 
     if (isAvailable && !(await this.hasVehicle(tx, profile.courierProfileId))) {
       throw new ConflictException(COURIERS_ERROR_MESSAGES.VEHICLE_REQUIRED);

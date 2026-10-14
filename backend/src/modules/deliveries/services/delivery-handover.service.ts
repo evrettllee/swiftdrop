@@ -1,21 +1,11 @@
-import {
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import {
   ROW_LOCK_NO_KEY_UPDATE,
   SINGLE_ROW_LIMIT,
 } from '../../../common/constants/database.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
+import { withLockConflict } from '../../../common/database/lock-conflict';
 import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
@@ -28,6 +18,7 @@ import {
 } from '../constants/deliveries.constants';
 import type { CourierIdentity, CourierOrder, HandoverOutcome } from '../types/deliveries.types';
 import { deliveryCodesMatch } from '../utils/delivery-code';
+import { handoverError } from '../utils/handover-error';
 import { CourierOrderViewsService } from './courier-order-views.service';
 
 @Injectable()
@@ -45,29 +36,20 @@ export class DeliveryHandoverService {
     code: string,
     now: Date = new Date(),
   ): Promise<CourierOrder> {
-    let outcome: HandoverOutcome;
+    const outcome = await withLockConflict(
+      () => this.db.transaction((tx) => this.checkCode(tx, courier, orderId, code, now)),
+      DELIVERIES_ERROR_MESSAGES.BUSY,
+    );
+    // A wrong code must stay counted, so its error is thrown only now, after the commit.
+    const error = handoverError(outcome, now);
 
-    try {
-      outcome = await this.db.transaction((tx) => this.checkCode(tx, courier, orderId, code, now));
-    } catch (error) {
-      if (isLockTimeout(error)) {
-        throw new ConflictException(DELIVERIES_ERROR_MESSAGES.BUSY);
-      }
-
+    if (error) {
       throw error;
     }
 
-    // A wrong code must stay counted, so its error is thrown only now, after the commit.
-    this.throwUnlessDelivered(outcome, now);
     this.logger.log(`Courier ${courier.courierProfileId} delivered order ${orderId}`);
 
-    const order = await this.views.findOfCourier(orderId, courier.courierProfileId);
-
-    if (!order) {
-      throw new NotFoundException(DELIVERIES_ERROR_MESSAGES.ORDER_NOT_FOUND);
-    }
-
-    return order;
+    return this.views.getOfCourier(orderId, courier.courierProfileId);
   }
 
   // The order row stays locked, so two codes entered at once never spend one attempt twice.
@@ -140,29 +122,5 @@ export class DeliveryHandoverService {
     return isLocked
       ? { kind: HANDOVER_OUTCOME.LOCKED, lockedUntil }
       : { kind: HANDOVER_OUTCOME.WRONG_CODE, attemptsLeft: DELIVERY_CODE_MAX_ATTEMPTS - attempts };
-  }
-
-  private throwUnlessDelivered(outcome: HandoverOutcome, now: Date): void {
-    switch (outcome.kind) {
-      case HANDOVER_OUTCOME.NOT_FOUND:
-        throw new NotFoundException(DELIVERIES_ERROR_MESSAGES.ORDER_NOT_FOUND);
-      case HANDOVER_OUTCOME.WRONG_STEP:
-        throw new ConflictException(DELIVERIES_ERROR_MESSAGES.WRONG_STEP);
-      case HANDOVER_OUTCOME.LOCKED: {
-        const minutesLeft = Math.ceil(
-          (outcome.lockedUntil.getTime() - now.getTime()) / MS_PER_MINUTE,
-        );
-        throw new HttpException(
-          DELIVERIES_ERROR_MESSAGES.CODE_LOCKED(minutesLeft),
-          HttpStatus.TOO_MANY_REQUESTS,
-        );
-      }
-      case HANDOVER_OUTCOME.WRONG_CODE:
-        throw new UnprocessableEntityException(
-          DELIVERIES_ERROR_MESSAGES.WRONG_CODE(outcome.attemptsLeft),
-        );
-      case HANDOVER_OUTCOME.DELIVERED:
-        break;
-    }
   }
 }

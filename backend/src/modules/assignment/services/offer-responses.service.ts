@@ -1,17 +1,20 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { and, eq, gt } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import {
   ORDERS_ONE_ACTIVE_PER_COURIER_INDEX,
   SINGLE_ROW_LIMIT,
 } from '../../../common/constants/database.constants';
+import { withLockConflict } from '../../../common/database/lock-conflict';
 import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { getUniqueViolationConstraint, isLockTimeout } from '../../../common/database/pg-errors';
+import { getUniqueViolationConstraint } from '../../../common/database/pg-errors';
 import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
 import { orderOffers } from '../../../database/schema';
+import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
 import { ASSIGNMENT_ERROR_MESSAGES } from '../constants/assignment.constants';
+import { openOfferOf } from '../utils/open-offer';
 import { OfferNotifierService } from './offer-notifier.service';
 
 @Injectable()
@@ -21,6 +24,7 @@ export class OfferResponsesService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly notifier: OfferNotifierService,
+    private readonly profiles: CourierProfilesService,
   ) {}
 
   // The courier takes the order of the offer; the order is theirs once this returns.
@@ -33,14 +37,12 @@ export class OfferResponsesService {
     let accepted: { orderId: number };
 
     try {
-      accepted = await this.db.transaction((tx) =>
-        this.takeOrder(tx, userId, courierProfileId, offerId, now),
+      accepted = await withLockConflict(
+        () =>
+          this.db.transaction((tx) => this.takeOrder(tx, userId, courierProfileId, offerId, now)),
+        ASSIGNMENT_ERROR_MESSAGES.BUSY,
       );
     } catch (error) {
-      if (isLockTimeout(error)) {
-        throw new ConflictException(ASSIGNMENT_ERROR_MESSAGES.BUSY);
-      }
-
       if (getUniqueViolationConstraint(error) === ORDERS_ONE_ACTIVE_PER_COURIER_INDEX) {
         throw new ConflictException(ASSIGNMENT_ERROR_MESSAGES.ON_ORDER);
       }
@@ -55,11 +57,16 @@ export class OfferResponsesService {
   }
 
   async decline(courierProfileId: number, offerId: number, now: Date = new Date()): Promise<void> {
-    const [declined] = await this.db
-      .update(orderOffers)
-      .set({ status: ORDER_OFFER_STATUS.DECLINED, respondedAt: now })
-      .where(this.openOffer(courierProfileId, offerId, now))
-      .returning({ orderId: orderOffers.orderId });
+    // The offer row is held while an accept of the same offer waits for its order.
+    const [declined] = await withLockConflict(
+      () =>
+        this.db
+          .update(orderOffers)
+          .set({ status: ORDER_OFFER_STATUS.DECLINED, respondedAt: now })
+          .where(this.openOffer(courierProfileId, offerId, now))
+          .returning({ orderId: orderOffers.orderId }),
+      ASSIGNMENT_ERROR_MESSAGES.BUSY,
+    );
 
     if (!declined) {
       await this.rejectClosed(this.db, courierProfileId, offerId);
@@ -69,7 +76,7 @@ export class OfferResponsesService {
     this.logger.log(`Courier ${courierProfileId} declined offer ${offerId}`);
   }
 
-  // Both changes commit together: an offer is never accepted for an order the courier did not get.
+  // All changes commit together: an offer is never accepted for an order the courier did not get.
   private async takeOrder(
     tx: Transaction,
     userId: number,
@@ -99,18 +106,19 @@ export class OfferResponsesService {
       throw new ConflictException(ASSIGNMENT_ERROR_MESSAGES.ORDER_UNAVAILABLE);
     }
 
+    // The offer of a courier who went off shift is closed, even before the job gets to it. The
+    // profile is locked after the order, as opening an offer does, so the two never deadlock.
+    if (!(await this.profiles.lockIsAvailable(tx, courierProfileId))) {
+      throw new ConflictException(ASSIGNMENT_ERROR_MESSAGES.OFFER_CLOSED);
+    }
+
     return { orderId: offer.orderId };
   }
 
   // An offer of this courier that is still open; a second answer waits for the first one and then
   // finds the offer closed.
   private openOffer(courierProfileId: number, offerId: number, now: Date) {
-    return and(
-      eq(orderOffers.offerId, offerId),
-      eq(orderOffers.courierId, courierProfileId),
-      eq(orderOffers.status, ORDER_OFFER_STATUS.PENDING),
-      gt(orderOffers.expiresAt, now),
-    );
+    return and(eq(orderOffers.offerId, offerId), openOfferOf(courierProfileId, now));
   }
 
   // Someone else's offer looks the same as a missing one.

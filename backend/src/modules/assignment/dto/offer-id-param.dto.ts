@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { ASSIGNMENT_VALIDATION_MESSAGES, OFFER_ID_MAX } from '../constants/assignment.constants';
+import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { ASSIGNMENT_VALIDATION_MESSAGES } from '../constants/assignment.constants';
 
 const error = ASSIGNMENT_VALIDATION_MESSAGES.OFFER_ID_INVALID;
 
@@ -9,7 +10,7 @@ export const offerIdParamSchema = z.object({
     .number({ error })
     .int({ error })
     .positive({ error })
-    .max(OFFER_ID_MAX, { error }),
+    .max(DB_INTEGER_MAX, { error }),
 });
 
 export type OfferIdParamDto = z.infer<typeof offerIdParamSchema>;

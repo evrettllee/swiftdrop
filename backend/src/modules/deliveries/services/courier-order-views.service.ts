@@ -1,12 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, inArray, type SQL } from 'drizzle-orm';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { and, eq, type SQL } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { COURIER_ACTIVE_ORDER_STATUSES } from '../../../common/constants/orders.constants';
+import { courierActiveOrder } from '../../../common/database/courier-active-order';
+import { parcelColumns } from '../../../common/database/parcel-columns';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orders, packages, users } from '../../../database/schema';
-import { parcelColumns } from '../../assignment/utils/parcel-columns';
 import { addressPointColumns, aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { DELIVERIES_ERROR_MESSAGES } from '../constants/deliveries.constants';
 import { toCourierOrder } from '../mappers/courier-order.mapper';
 import type { CourierOrder } from '../types/deliveries.types';
 
@@ -16,17 +17,20 @@ export class CourierOrderViewsService {
 
   // The order the courier carries now, at most one by the unique index of the orders table.
   findActive(courierProfileId: number): Promise<CourierOrder | null> {
-    return this.findOne(
-      and(
-        eq(orders.courierId, courierProfileId),
-        inArray(orders.status, [...COURIER_ACTIVE_ORDER_STATUSES]),
-      ),
-    );
+    return this.findOne(courierActiveOrder(courierProfileId));
   }
 
   // An order of the courier at any stage; someone else's order looks the same as a missing one.
-  findOfCourier(orderId: number, courierProfileId: number): Promise<CourierOrder | null> {
-    return this.findOne(and(eq(orders.orderId, orderId), eq(orders.courierId, courierProfileId)));
+  async getOfCourier(orderId: number, courierProfileId: number): Promise<CourierOrder> {
+    const order = await this.findOne(
+      and(eq(orders.orderId, orderId), eq(orders.courierId, courierProfileId)),
+    );
+
+    if (!order) {
+      throw new NotFoundException(DELIVERIES_ERROR_MESSAGES.ORDER_NOT_FOUND);
+    }
+
+    return order;
   }
 
   private async findOne(condition: SQL | undefined): Promise<CourierOrder | null> {

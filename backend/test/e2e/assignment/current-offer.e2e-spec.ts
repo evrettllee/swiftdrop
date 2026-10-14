@@ -123,6 +123,9 @@ describe('Current courier offer (e2e)', () => {
 
     await app.get(OfferNotifierService).announce(offerId, courierId);
 
-    expect(await received).toMatchObject({ offerId, orderId, delivery: DELIVERY_AREA });
+    const offer = await received;
+    expect(offer).toMatchObject({ offerId, orderId, delivery: DELIVERY_AREA });
+    expect(offer.delivery).not.toHaveProperty('house');
+    expect(offer.delivery).not.toHaveProperty('apartment');
   });
 });

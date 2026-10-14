@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gt, type SQL } from 'drizzle-orm';
+import { eq, type SQL } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
+import { parcelColumns } from '../../../common/database/parcel-columns';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orderOffers, orders, packages } from '../../../database/schema';
 import { addressPointColumns, aliasOrderAddresses } from '../../orders/utils/order-address-columns';
 import { toCourierOffer } from '../mappers/courier-offer.mapper';
 import type { CourierOffer } from '../types/assignment.types';
-import { parcelColumns } from '../utils/parcel-columns';
+import { openOfferOf } from '../utils/open-offer';
 
 @Injectable()
 export class OfferViewsService {
@@ -16,13 +16,7 @@ export class OfferViewsService {
 
   // The open offer of the courier, or null when there is none or its time is up.
   findCurrent(courierProfileId: number, now: Date = new Date()): Promise<CourierOffer | null> {
-    return this.findOne(
-      and(
-        eq(orderOffers.courierId, courierProfileId),
-        eq(orderOffers.status, ORDER_OFFER_STATUS.PENDING),
-        gt(orderOffers.expiresAt, now),
-      ),
-    );
+    return this.findOne(openOfferOf(courierProfileId, now));
   }
 
   findById(offerId: number): Promise<CourierOffer | null> {

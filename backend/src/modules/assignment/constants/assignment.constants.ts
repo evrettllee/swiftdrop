@@ -1,3 +1,4 @@
+import { ORDER_BUSY_MESSAGE } from '../../../common/constants/orders.constants';
 import { MS_PER_MINUTE, MS_PER_SECOND } from '../../../common/constants/time.constants';
 import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
 import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
@@ -40,8 +41,6 @@ export const OFFER_TTL_MS = 30 * MS_PER_SECOND;
 // Before accepting, the courier sees the delivery point only to about a kilometre: two digits
 // after the point of a degree.
 export const DELIVERY_AREA_COORDINATE_DIGITS = 2;
-// The largest value of an integer column: a bigger id cannot exist and must not reach the query.
-export const OFFER_ID_MAX = 2_147_483_647;
 
 // Dispatch
 // How often the dispatcher looks for orders without a courier and for offers whose time is up.
@@ -65,5 +64,5 @@ export const ASSIGNMENT_ERROR_MESSAGES = {
   ORDER_UNAVAILABLE: 'Заказ уже недоступен',
   ON_ORDER: 'Сначала завершите текущий заказ',
   // The order row is held by another operation (a cancellation, a payment being settled).
-  BUSY: 'Заказ сейчас обновляется. Попробуйте ещё раз',
+  BUSY: ORDER_BUSY_MESSAGE,
 } as const;

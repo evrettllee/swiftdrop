@@ -1,13 +1,16 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { COURIER_ACTIVE_ORDER_STATUSES } from '../../../common/constants/orders.constants';
+import { eq } from 'drizzle-orm';
+import {
+  ROW_LOCK_NO_KEY_UPDATE,
+  SINGLE_ROW_LIMIT,
+} from '../../../common/constants/database.constants';
+import { courierActiveOrder } from '../../../common/database/courier-active-order';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
 import { courierProfiles, orders, vehicles } from '../../../database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import { toCourierMe } from '../mappers/courier-profile.mapper';
-import type { CourierMe } from '../types/couriers.types';
+import type { CourierMe, LockedProfile } from '../types/couriers.types';
 
 @Injectable()
 export class CourierProfilesService {
@@ -35,6 +38,41 @@ export class CourierProfilesService {
     }
 
     return profile.courierProfileId;
+  }
+
+  // The profile of the user, locked until the commit: going on shift and a vehicle change wait
+  // for each other, so neither works on a state the other is changing.
+  async lockOwnProfile(tx: Transaction, userId: number): Promise<LockedProfile> {
+    await this.ensureProfile(userId, tx);
+
+    const [profile] = await tx
+      .select({
+        courierProfileId: courierProfiles.courierProfileId,
+        isAvailable: courierProfiles.isAvailable,
+      })
+      .from(courierProfiles)
+      .where(eq(courierProfiles.userId, userId))
+      .limit(SINGLE_ROW_LIMIT)
+      .for(ROW_LOCK_NO_KEY_UPDATE);
+
+    if (!profile) {
+      throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
+    }
+
+    return profile;
+  }
+
+  // Whether the courier is on shift, with the profile locked until the commit, so going off shift
+  // waits for the caller and then sees what it did.
+  async lockIsAvailable(tx: Transaction, courierProfileId: number): Promise<boolean> {
+    const [profile] = await tx
+      .select({ isAvailable: courierProfiles.isAvailable })
+      .from(courierProfiles)
+      .where(eq(courierProfiles.courierProfileId, courierProfileId))
+      .limit(SINGLE_ROW_LIMIT)
+      .for(ROW_LOCK_NO_KEY_UPDATE);
+
+    return profile?.isAvailable ?? false;
   }
 
   async getMe(userId: number): Promise<CourierMe> {
@@ -69,12 +107,7 @@ export class CourierProfilesService {
     const [order] = await executor
       .select({ orderId: orders.orderId })
       .from(orders)
-      .where(
-        and(
-          eq(orders.courierId, courierProfileId),
-          inArray(orders.status, [...COURIER_ACTIVE_ORDER_STATUSES]),
-        ),
-      )
+      .where(courierActiveOrder(courierProfileId))
       .limit(SINGLE_ROW_LIMIT);
 
     return order?.orderId ?? null;

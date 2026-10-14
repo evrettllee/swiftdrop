@@ -14,6 +14,12 @@ export type CourierMe = {
   activeOrderId: number | null;
 };
 
+// A profile held by its row lock for the rest of a transaction.
+export type LockedProfile = {
+  courierProfileId: number;
+  isAvailable: boolean;
+};
+
 // A profile row joined with its vehicle: the vehicle columns are null when there is none.
 export type CourierProfileRow = {
   courierProfileId: number;

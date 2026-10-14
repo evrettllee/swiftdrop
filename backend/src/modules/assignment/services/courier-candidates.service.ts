@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, gte, inArray, lte, notExists, sql } from 'drizzle-orm';
-import { COURIER_ACTIVE_ORDER_STATUSES } from '../../../common/constants/orders.constants';
+import { courierActiveOrder } from '../../../common/database/courier-active-order';
 import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
@@ -61,12 +61,7 @@ export class CourierCandidatesService {
     return this.db
       .select({ orderId: orders.orderId })
       .from(orders)
-      .where(
-        and(
-          eq(orders.courierId, courierProfiles.courierProfileId),
-          inArray(orders.status, [...COURIER_ACTIVE_ORDER_STATUSES]),
-        ),
-      );
+      .where(courierActiveOrder(courierProfiles.courierProfileId));
   }
 
   private pendingOffers() {

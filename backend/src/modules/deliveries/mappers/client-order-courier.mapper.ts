@@ -1,4 +1,5 @@
 import type { OrderStatus } from '../../../common/enums/order-status.enum';
+import { toCourierVehicle } from '../../couriers/mappers/courier-profile.mapper';
 import {
   COURIER_VISIBLE_STATUSES,
   DELIVERY_CODE_VISIBLE_STATUSES,
@@ -24,12 +25,12 @@ export function toClientOrderCourier(row: ClientOrderCourierRow): ClientOrderCou
           name: shortName(firstName, lastName),
           phone: row.phone,
           vehicle: vehicleType
-            ? {
+            ? toCourierVehicle({
                 type: vehicleType,
                 brand: row.brand,
                 model: row.model,
                 licensePlate: row.licensePlate,
-              }
+              })
             : null,
         }
       : null,

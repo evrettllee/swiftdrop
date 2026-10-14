@@ -2,26 +2,21 @@ import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import type { GeoPoint } from '../../../src/common/schemas/geo-point.schema';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orderOffers } from '../../../src/database/schema';
 import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import { COURIER_LOCATION_FRESH_MS } from '../../../src/modules/assignment/constants/assignment.constants';
 import { CourierCandidatesService } from '../../../src/modules/assignment/services/courier-candidates.service';
 import { DispatchOrdersService } from '../../../src/modules/assignment/services/dispatch-orders.service';
 import { createTestApp } from '../../support/app';
+import { addCourierOnShift, insertOffer } from '../../support/assignment';
 import { registerUser } from '../../support/auth';
 import {
   assignOrder,
   CAR,
   COURIER_ACCOUNT,
-  createCourier,
-  findCourierProfileId,
   ON_FOOT,
   placeCourierAt,
-  putAvailability,
-  putVehicle,
   SECOND_COURIER_ACCOUNT,
 } from '../../support/couriers';
 import {
@@ -46,21 +41,6 @@ describe('Courier candidates (e2e)', () => {
   let clientCookies: Cookies;
   let orderId: number;
   const getRoute = jest.fn();
-
-  // A courier on shift with the vehicle, standing at the point.
-  async function addCourier(
-    account: typeof COURIER_ACCOUNT,
-    vehicle: Record<string, unknown>,
-    point: GeoPoint,
-  ): Promise<number> {
-    const cookies = await createCourier(app, db, account);
-    await putVehicle(app, cookies, vehicle).expect(HttpStatus.OK);
-    await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
-    const courierProfileId = await findCourierProfileId(db, account.email);
-    await placeCourierAt(db, courierProfileId, point);
-
-    return courierProfileId;
-  }
 
   async function findCandidateIds(id: number): Promise<number[]> {
     const order = await dispatchOrders.load(id);
@@ -101,14 +81,14 @@ describe('Courier candidates (e2e)', () => {
   });
 
   it('should return the couriers on shift with the nearest to the pickup point first', async () => {
-    const farther = await addCourier(COURIER_ACCOUNT, CAR, MINSK_DELIVERY);
-    const nearer = await addCourier(SECOND_COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    const farther = await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MINSK_DELIVERY);
+    const nearer = await addCourierOnShift(app, db, SECOND_COURIER_ACCOUNT, CAR, MINSK_PICKUP);
 
     expect(await findCandidateIds(orderId)).toEqual([nearer, farther]);
   });
 
   it('should skip the courier when the position is stale', async () => {
-    const courierId = await addCourier(COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    const courierId = await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
     const staleAt = new Date(Date.now() - COURIER_LOCATION_FRESH_MS - STALE_MARGIN_MS);
     await placeCourierAt(db, courierId, MINSK_PICKUP, staleAt);
 
@@ -116,13 +96,13 @@ describe('Courier candidates (e2e)', () => {
   });
 
   it('should skip the courier when the courier is out of the search radius', async () => {
-    await addCourier(COURIER_ACCOUNT, CAR, MOSCOW);
+    await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MOSCOW);
 
     expect(await findCandidateIds(orderId)).toEqual([]);
   });
 
   it('should skip the courier when the vehicle cannot carry the package', async () => {
-    await addCourier(COURIER_ACCOUNT, ON_FOOT, MINSK_PICKUP);
+    await addCourierOnShift(app, db, COURIER_ACCOUNT, ON_FOOT, MINSK_PICKUP);
     const heavyOrder = {
       ...VALID_ORDER,
       package: { ...SMALL_PACKAGE, weightKg: HEAVY_PACKAGE_KG },
@@ -133,7 +113,7 @@ describe('Courier candidates (e2e)', () => {
   });
 
   it('should skip the courier when the courier already carries an order', async () => {
-    const courierId = await addCourier(COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    const courierId = await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
     const [carriedOrderId] = await placeOrders(app, clientCookies, 1);
     await assignOrder(db, carriedOrderId, courierId, ORDER_STATUS.PICKED_UP);
 
@@ -141,29 +121,16 @@ describe('Courier candidates (e2e)', () => {
   });
 
   it('should skip the courier when the order was offered to the courier before', async () => {
-    const courierId = await addCourier(COURIER_ACCOUNT, CAR, MINSK_PICKUP);
-    await db.insert(orderOffers).values({
-      orderId,
-      courierId,
-      status: ORDER_OFFER_STATUS.DECLINED,
-      expiresAt: new Date(),
-      pickupEtaSec: 0,
-      totalEtaSec: 0,
-    });
+    const courierId = await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    await insertOffer(db, orderId, courierId, { status: ORDER_OFFER_STATUS.DECLINED });
 
     expect(await findCandidateIds(orderId)).toEqual([]);
   });
 
   it('should skip the courier when the courier has an open offer of another order', async () => {
-    const courierId = await addCourier(COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    const courierId = await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
     const [otherOrderId] = await placeOrders(app, clientCookies, 1);
-    await db.insert(orderOffers).values({
-      orderId: otherOrderId,
-      courierId,
-      expiresAt: new Date(),
-      pickupEtaSec: 0,
-      totalEtaSec: 0,
-    });
+    await insertOffer(db, otherOrderId, courierId);
 
     expect(await findCandidateIds(orderId)).toEqual([]);
   });

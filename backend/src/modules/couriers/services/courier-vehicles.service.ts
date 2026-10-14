@@ -1,13 +1,8 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import {
-  ROW_LOCK_NO_KEY_UPDATE,
-  SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { isLockTimeout } from '../../../common/database/pg-errors';
+import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { withLockConflict } from '../../../common/database/lock-conflict';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
-import { courierProfiles, vehicles } from '../../../database/schema';
+import { vehicles } from '../../../database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import type { UpdateVehicleDto } from '../dto/update-vehicle.dto';
 import { toCourierVehicle } from '../mappers/courier-profile.mapper';
@@ -23,17 +18,12 @@ export class CourierVehiclesService {
     private readonly profiles: CourierProfilesService,
   ) {}
 
-  async update(userId: number, dto: UpdateVehicleDto): Promise<CourierVehicle> {
-    try {
-      return await this.db.transaction((tx) => this.replaceVehicle(tx, userId, dto));
-    } catch (error) {
-      if (isLockTimeout(error)) {
-        this.logger.warn(`Courier profile of user ${userId} is busy, vehicle change refused`);
-        throw new ConflictException(COURIERS_ERROR_MESSAGES.BUSY);
-      }
-
-      throw error;
-    }
+  update(userId: number, dto: UpdateVehicleDto): Promise<CourierVehicle> {
+    return withLockConflict(
+      () => this.db.transaction((tx) => this.replaceVehicle(tx, userId, dto)),
+      COURIERS_ERROR_MESSAGES.BUSY,
+      () => this.logger.warn(`Courier profile of user ${userId} is busy, vehicle change refused`),
+    );
   }
 
   // The profile row stays locked until the commit, so going on shift cannot slip in between the
@@ -43,21 +33,7 @@ export class CourierVehiclesService {
     userId: number,
     dto: UpdateVehicleDto,
   ): Promise<CourierVehicle> {
-    await this.profiles.ensureProfile(userId, tx);
-
-    const [profile] = await tx
-      .select({
-        courierProfileId: courierProfiles.courierProfileId,
-        isAvailable: courierProfiles.isAvailable,
-      })
-      .from(courierProfiles)
-      .where(eq(courierProfiles.userId, userId))
-      .limit(SINGLE_ROW_LIMIT)
-      .for(ROW_LOCK_NO_KEY_UPDATE);
-
-    if (!profile) {
-      throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
-    }
+    const profile = await this.profiles.lockOwnProfile(tx, userId);
 
     if (profile.isAvailable) {
       throw new ConflictException(COURIERS_ERROR_MESSAGES.ON_SHIFT);

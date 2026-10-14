@@ -4,7 +4,7 @@ import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orders, orderStatusHistory } from '../../../database/schema';
 import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
-import { HISTORY_STATUSES } from '../constants/deliveries.constants';
+import { HISTORY_FIRST_PAGE, HISTORY_STATUSES } from '../constants/deliveries.constants';
 import type { CourierHistoryDto } from '../dto/courier-history.dto';
 import type { CourierHistoryPage } from '../types/deliveries.types';
 
@@ -45,7 +45,7 @@ export class CourierHistoryService {
         .where(condition)
         .orderBy(desc(orders.orderId))
         .limit(limit)
-        .offset((page - 1) * limit),
+        .offset((page - HISTORY_FIRST_PAGE) * limit),
       this.db.select({ total: count() }).from(orders).where(condition),
     ]);
 

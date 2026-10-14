@@ -8,7 +8,8 @@ import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
-import { courierProfiles, orderOffers, orders } from '../../../database/schema';
+import { orderOffers, orders } from '../../../database/schema';
+import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
 import { OFFER_TTL_MS } from '../constants/assignment.constants';
 import type { OfferPlan } from '../types/assignment.types';
 
@@ -16,7 +17,10 @@ import type { OfferPlan } from '../types/assignment.types';
 export class OrderOffersService {
   private readonly logger = new Logger(OrderOffersService.name);
 
-  constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: Database,
+    private readonly profiles: CourierProfilesService,
+  ) {}
 
   // Opens an offer for the planned courier and returns its id, or null when it no longer fits:
   // the order left confirmed, the courier went off shift, or another offer of the order or of
@@ -53,14 +57,9 @@ export class OrderOffersService {
       .where(eq(orders.orderId, orderId))
       .limit(SINGLE_ROW_LIMIT)
       .for(ROW_LOCK_NO_KEY_UPDATE);
-    const [courier] = await tx
-      .select({ isAvailable: courierProfiles.isAvailable })
-      .from(courierProfiles)
-      .where(eq(courierProfiles.courierProfileId, plan.courierProfileId))
-      .limit(SINGLE_ROW_LIMIT)
-      .for(ROW_LOCK_NO_KEY_UPDATE);
+    const isOnShift = await this.profiles.lockIsAvailable(tx, plan.courierProfileId);
 
-    if (order?.status !== ORDER_STATUS.CONFIRMED || !courier?.isAvailable) {
+    if (order?.status !== ORDER_STATUS.CONFIRMED || !isOnShift) {
       return null;
     }
 

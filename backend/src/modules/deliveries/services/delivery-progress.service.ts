@@ -1,6 +1,6 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { withLockConflict } from '../../../common/database/lock-conflict';
 import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
@@ -41,30 +41,19 @@ export class DeliveryProgressService {
     orderId: number,
     step: DeliveryStep,
   ): Promise<CourierOrder> {
-    let moved: { orderId: number } | undefined;
-
-    try {
-      moved = await this.db.transaction((tx) =>
-        transitionOrderStatus(tx, {
-          orderId,
-          ...step,
-          changedBy: courier.userId,
-          courierId: courier.courierProfileId,
-        }),
-      );
-    } catch (error) {
-      if (isLockTimeout(error)) {
-        throw new ConflictException(DELIVERIES_ERROR_MESSAGES.BUSY);
-      }
-
-      throw error;
-    }
-
-    const order = await this.views.findOfCourier(orderId, courier.courierProfileId);
-
-    if (!order) {
-      throw new NotFoundException(DELIVERIES_ERROR_MESSAGES.ORDER_NOT_FOUND);
-    }
+    const moved = await withLockConflict(
+      () =>
+        this.db.transaction((tx) =>
+          transitionOrderStatus(tx, {
+            orderId,
+            ...step,
+            changedBy: courier.userId,
+            courierId: courier.courierProfileId,
+          }),
+        ),
+      DELIVERIES_ERROR_MESSAGES.BUSY,
+    );
+    const order = await this.views.getOfCourier(orderId, courier.courierProfileId);
 
     if (!moved) {
       throw new ConflictException(DELIVERIES_ERROR_MESSAGES.WRONG_STEP);
