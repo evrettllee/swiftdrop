@@ -76,3 +76,35 @@ export type ClientOrderCourier = {
   courier: (Contact & { vehicle: ClientCourierVehicle | null }) | null;
   deliveryCode: string | null;
 };
+
+type ShortAddress = { street: string; house: string };
+
+// A finished order as the query returns it; the finish time is null when its history is missing.
+export type CourierHistoryRow = {
+  orderId: number;
+  status: OrderStatus;
+  finishedAt: Date | null;
+  pickup: ShortAddress;
+  delivery: ShortAddress;
+  distanceKm: number;
+};
+
+export type CourierHistoryItem = Omit<CourierHistoryRow, 'finishedAt'> & {
+  finishedAt: string | null;
+};
+
+export type CourierHistoryPage = {
+  items: CourierHistoryItem[];
+  page: number;
+  limit: number;
+  total: number;
+};
+
+export type CourierTodayStats = {
+  delivered: number;
+  distanceKm: number;
+  offersReceived: number;
+  offersAccepted: number;
+  // Reviews come with their own part of the app; until then there is no rating.
+  rating: number | null;
+};

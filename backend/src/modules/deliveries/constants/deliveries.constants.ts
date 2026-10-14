@@ -7,9 +7,15 @@ import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
 export const COURIER_ORDERS_ROUTES = {
   BASE: 'couriers/me/orders',
   CURRENT: 'current',
+  HISTORY: 'history',
   PICKUP: `${ORDER_ID_ROUTE_PARAM}/pickup`,
   DEPART: `${ORDER_ID_ROUTE_PARAM}/depart`,
   DELIVER: `${ORDER_ID_ROUTE_PARAM}/deliver`,
+} as const;
+
+export const COURIER_STATS_ROUTES = {
+  BASE: 'couriers/me/stats',
+  TODAY: 'today',
 } as const;
 
 // The client's side of the delivery lives under the orders of the client.
@@ -56,9 +62,22 @@ export const DELIVERY_CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
 // The courier's last name is cut to its first letter and this mark.
 export const LAST_NAME_INITIAL_MARK = '.';
 
+// History
+// Orders that ended while they were with the courier.
+export const HISTORY_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.DELIVERED,
+  ORDER_STATUS.CANCELLED,
+];
+export const HISTORY_FIRST_PAGE = 1;
+export const HISTORY_PAGE_SIZE_MIN = 1;
+export const HISTORY_PAGE_SIZE_DEFAULT = 10;
+export const HISTORY_PAGE_SIZE_MAX = 50;
+
 // Validation
 export const DELIVERIES_VALIDATION_MESSAGES = {
   CODE_INVALID: 'Введите 4 цифры кода',
+  PAGE_INVALID: 'Некорректный номер страницы',
+  LIMIT_INVALID: `Размер страницы: от ${HISTORY_PAGE_SIZE_MIN} до ${HISTORY_PAGE_SIZE_MAX}`,
 } as const;
 
 // Errors
