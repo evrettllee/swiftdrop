@@ -31,4 +31,10 @@ export const LOCATION_UPDATE_REJECTIONS = {
   INVALID_LOCATION: 'invalid_location',
   OFF_SHIFT: 'off_shift',
   BUSY: 'busy',
+  // The position could not be saved for an unexpected reason; the next one may succeed.
+  UNAVAILABLE: 'unavailable',
 } as const;
+
+// Session
+// The longest delay setTimeout takes: a bigger one fires at once.
+export const SET_TIMEOUT_MAX_MS = 2 ** 31 - 1;

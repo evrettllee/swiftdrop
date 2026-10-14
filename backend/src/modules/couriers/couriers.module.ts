@@ -5,6 +5,7 @@ import { CouriersGateway } from './gateways/couriers.gateway';
 import { CourierAvailabilityService } from './services/courier-availability.service';
 import { CourierLocationService } from './services/courier-location.service';
 import { CourierProfilesService } from './services/courier-profiles.service';
+import { CourierSessionTimersService } from './services/courier-session-timers.service';
 import { CourierVehiclesService } from './services/courier-vehicles.service';
 
 @Module({
@@ -15,6 +16,7 @@ import { CourierVehiclesService } from './services/courier-vehicles.service';
     CourierVehiclesService,
     CourierAvailabilityService,
     CourierLocationService,
+    CourierSessionTimersService,
     CouriersGateway,
   ],
   exports: [CourierProfilesService, CouriersGateway],

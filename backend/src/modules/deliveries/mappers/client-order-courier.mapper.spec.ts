@@ -5,7 +5,6 @@ import { toClientOrderCourier } from './client-order-courier.mapper';
 
 const ROW: ClientOrderCourierRow = {
   status: ORDER_STATUS.COURIER_ASSIGNED,
-  courierId: 1,
   otpCode: '4821',
   firstName: 'Дмитрий',
   lastName: 'Соколов',

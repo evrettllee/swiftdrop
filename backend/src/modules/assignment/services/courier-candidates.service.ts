@@ -4,7 +4,7 @@ import { courierActiveOrder } from '../../../common/database/courier-active-orde
 import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { courierProfiles, orderOffers, orders, vehicles } from '../../../database/schema';
+import { courierProfiles, orderOffers, orders, users, vehicles } from '../../../database/schema';
 import {
   ASSIGNMENT_RADIUS_KM,
   COURIER_LOCATION_FRESH_MS,
@@ -40,9 +40,12 @@ export class CourierCandidatesService {
       })
       .from(courierProfiles)
       .innerJoin(vehicles, eq(vehicles.courierProfileId, courierProfiles.courierProfileId))
+      .innerJoin(users, eq(users.userId, courierProfiles.userId))
       .where(
         and(
           eq(courierProfiles.isAvailable, true),
+          // A blocked courier cannot answer an offer, so it would only expire.
+          eq(users.isBlocked, false),
           gte(courierProfiles.locationUpdatedAt, freshSince),
           inArray(vehicles.type, vehiclesThatCarry(order.parcel)),
           lte(distanceKm, ASSIGNMENT_RADIUS_KM),

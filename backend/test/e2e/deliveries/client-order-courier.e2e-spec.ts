@@ -8,6 +8,7 @@ import type { Database } from '../../../src/database/database.module';
 import { orders } from '../../../src/database/schema';
 import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
+import { CouriersGateway } from '../../../src/modules/couriers/gateways/couriers.gateway';
 import { CLIENT_ORDER_COURIER_ROUTES } from '../../../src/modules/deliveries/constants/deliveries.constants';
 import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
@@ -20,6 +21,7 @@ import {
   cancelOrder,
   type Cookies,
   placeOrders,
+  readOrderStatus,
   SECOND_CLIENT,
   setOrderStatus,
 } from '../../support/orders';
@@ -121,5 +123,23 @@ describe('Order courier for the client (e2e)', () => {
     await cancelOrder(app, clientCookies, orderId).expect(HttpStatus.OK);
 
     expect(await cancelled).toEqual({ orderId });
+  });
+
+  it('should cancel the order as usual when telling the courier fails', async () => {
+    await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
+    const emit = jest.spyOn(app.get(CouriersGateway), 'emitToCourier').mockImplementation(() => {
+      throw new Error('socket server is down');
+    });
+
+    try {
+      const response = await cancelOrder(app, clientCookies, orderId).expect(HttpStatus.OK);
+
+      expect(response.body).toEqual({ orderId, status: ORDER_STATUS.CANCELLED });
+      expect(emit).toHaveBeenCalledTimes(1);
+    } finally {
+      emit.mockRestore();
+    }
+
+    expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
   });
 });

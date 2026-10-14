@@ -54,7 +54,6 @@ export type HandoverOutcome =
 // An order with its courier as the query returns it: the courier columns are null when there is none.
 export type ClientOrderCourierRow = {
   status: OrderStatus;
-  courierId: number | null;
   otpCode: string | null;
   firstName: string | null;
   lastName: string | null;

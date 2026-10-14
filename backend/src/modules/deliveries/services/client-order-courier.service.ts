@@ -17,7 +17,6 @@ export class ClientOrderCourierService {
     const [row] = await this.db
       .select({
         status: orders.status,
-        courierId: orders.courierId,
         otpCode: orders.otpCode,
         firstName: users.firstName,
         lastName: users.lastName,

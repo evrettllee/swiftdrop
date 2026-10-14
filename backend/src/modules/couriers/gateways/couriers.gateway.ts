@@ -5,14 +5,14 @@ import {
   ConnectedSocket,
   MessageBody,
   type OnGatewayConnection,
+  type OnGatewayDisconnect,
   type OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
 import type { Namespace, Socket } from 'socket.io';
-import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ROLE } from '../../../common/enums/role.enum';
-import { type GeoPoint, geoPointSchema } from '../../../common/schemas/geo-point.schema';
+import { geoPointSchema } from '../../../common/schemas/geo-point.schema';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.constants';
 import { SocketAuthService } from '../../realtime/services/socket-auth.service';
@@ -24,13 +24,14 @@ import {
 } from '../constants/couriers-socket.constants';
 import { CourierLocationService } from '../services/courier-location.service';
 import { CourierProfilesService } from '../services/courier-profiles.service';
+import { CourierSessionTimersService } from '../services/courier-session-timers.service';
 import type { CourierSocketData, LocationAck } from '../types/couriers-socket.types';
 import { rejectLocationUpdate } from '../utils/location-update';
 
 // The HTTP rate limiter cannot read a socket message; positions have their own limit below.
 @SkipThrottle()
 @WebSocketGateway({ path: SOCKET_PATH, namespace: COURIERS_SOCKET_NAMESPACE, serveClient: false })
-export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
+export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(CouriersGateway.name);
   private readonly appOrigin: string;
   private namespace: Namespace | null = null;
@@ -39,6 +40,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
     private readonly socketAuth: SocketAuthService,
     private readonly profiles: CourierProfilesService,
     private readonly locations: CourierLocationService,
+    private readonly sessionTimers: CourierSessionTimersService,
     config: ConfigService,
   ) {
     this.appOrigin = new URL(config.getOrThrow<string>(ENV_KEYS.APP_URL)).origin;
@@ -60,7 +62,12 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
     const data = socket.data as CourierSocketData;
 
     await socket.join(courierRoom(data.courierProfileId));
+    this.sessionTimers.schedule(socket, data.sessionExpiresAtMs);
     this.logger.log(`Courier ${data.courierProfileId} connected`);
+  }
+
+  handleDisconnect(socket: Socket): void {
+    this.sessionTimers.clear(socket.id);
   }
 
   // Sends an event to every open tab of the courier; nothing happens when none is open.
@@ -85,30 +92,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
       ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION };
     } else {
       data.lastLocationAtMs = now.getTime();
-      ack = await this.savePosition(data.courierProfileId, point.data, now);
-    }
-
-    return ack;
-  }
-
-  private async savePosition(
-    courierProfileId: number,
-    point: GeoPoint,
-    at: Date,
-  ): Promise<LocationAck> {
-    let ack: LocationAck = { ok: true };
-
-    try {
-      if (!(await this.locations.save(courierProfileId, point, at))) {
-        ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.OFF_SHIFT };
-      }
-    } catch (error) {
-      if (!isLockTimeout(error)) {
-        throw error;
-      }
-
-      // Going on or off shift holds the profile row: the next position comes in 15 seconds anyway.
-      ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.BUSY };
+      ack = await this.locations.record(data.courierProfileId, point.data, now);
     }
 
     return ack;
@@ -122,7 +106,12 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection {
 
     const session = await this.socketAuth.authenticate(socket.handshake.headers.cookie);
 
-    if (!session || session.user.role !== ROLE.COURIER) {
+    // A token with less than a second left still passes the check of its seconds-precise expiry.
+    if (
+      !session ||
+      session.user.role !== ROLE.COURIER ||
+      !this.sessionTimers.hasTimeLeft(session.expiresAtMs)
+    ) {
       throw new Error(SOCKET_ERRORS.UNAUTHORIZED);
     }
 

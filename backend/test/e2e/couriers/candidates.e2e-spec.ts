@@ -1,9 +1,11 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { eq } from 'drizzle-orm';
 import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
+import { users } from '../../../src/database/schema';
 import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import { COURIER_LOCATION_FRESH_MS } from '../../../src/modules/assignment/constants/assignment.constants';
 import { CourierCandidatesService } from '../../../src/modules/assignment/services/courier-candidates.service';
@@ -133,5 +135,13 @@ describe('Courier candidates (e2e)', () => {
     await insertOffer(db, otherOrderId, courierId);
 
     expect(await findCandidateIds(orderId)).toEqual([]);
+  });
+
+  it('should skip the courier on shift nearby when the account is blocked', async () => {
+    await addCourierOnShift(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    const activeId = await addCourierOnShift(app, db, SECOND_COURIER_ACCOUNT, CAR, MINSK_DELIVERY);
+    await db.update(users).set({ isBlocked: true }).where(eq(users.email, COURIER_ACCOUNT.email));
+
+    expect(await findCandidateIds(orderId)).toEqual([activeId]);
   });
 });
