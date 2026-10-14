@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ROLE } from '../../../common/enums/role.enum';
 import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -7,7 +7,9 @@ import type { AuthUser } from '../../auth/types/auth.types';
 import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
 import { type OrderIdParamDto, orderIdParamSchema } from '../../orders/dto/order-id-param.dto';
 import { COURIER_ORDERS_ROUTES } from '../constants/deliveries.constants';
+import { type DeliverOrderDto, deliverOrderSchema } from '../dto/deliver-order.dto';
 import { CourierOrderViewsService } from '../services/courier-order-views.service';
+import { DeliveryHandoverService } from '../services/delivery-handover.service';
 import { DeliveryProgressService } from '../services/delivery-progress.service';
 import type { CourierIdentity, CourierOrder, CurrentCourierOrder } from '../types/deliveries.types';
 
@@ -18,6 +20,7 @@ export class CourierOrdersController {
     private readonly profiles: CourierProfilesService,
     private readonly views: CourierOrderViewsService,
     private readonly progress: DeliveryProgressService,
+    private readonly handover: DeliveryHandoverService,
   ) {}
 
   @Get(COURIER_ORDERS_ROUTES.CURRENT)
@@ -43,6 +46,16 @@ export class CourierOrdersController {
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
   ): Promise<CourierOrder> {
     return this.progress.depart(await this.identify(user), params.orderId);
+  }
+
+  @Post(COURIER_ORDERS_ROUTES.DELIVER)
+  @HttpCode(HttpStatus.OK)
+  async deliver(
+    @CurrentUser() user: AuthUser,
+    @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
+    @Body(new ZodValidationPipe(deliverOrderSchema)) dto: DeliverOrderDto,
+  ): Promise<CourierOrder> {
+    return this.handover.deliver(await this.identify(user), params.orderId, dto.code);
   }
 
   private async identify(user: AuthUser): Promise<CourierIdentity> {

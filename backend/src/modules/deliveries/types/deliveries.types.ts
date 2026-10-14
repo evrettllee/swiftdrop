@@ -2,6 +2,7 @@ import type { OrderTransitionChanges } from '../../../common/database/order-stat
 import type { OrderStatus } from '../../../common/enums/order-status.enum';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
 import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
+import type { HANDOVER_OUTCOME } from '../constants/deliveries.constants';
 
 // The courier making a request: the user writes the history, the profile owns the order.
 export type CourierIdentity = {
@@ -40,3 +41,10 @@ export type DeliveryStep = {
   to: OrderStatus;
   changes?: OrderTransitionChanges;
 };
+
+export type HandoverOutcome =
+  | { kind: typeof HANDOVER_OUTCOME.DELIVERED }
+  | { kind: typeof HANDOVER_OUTCOME.NOT_FOUND }
+  | { kind: typeof HANDOVER_OUTCOME.WRONG_STEP }
+  | { kind: typeof HANDOVER_OUTCOME.LOCKED; lockedUntil: Date }
+  | { kind: typeof HANDOVER_OUTCOME.WRONG_CODE; attemptsLeft: number };

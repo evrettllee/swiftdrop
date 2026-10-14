@@ -1,4 +1,5 @@
 import { ORDER_NOT_FOUND_MESSAGE } from '../../../common/constants/orders.constants';
+import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
 import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
 
 // Routes
@@ -7,6 +8,7 @@ export const COURIER_ORDERS_ROUTES = {
   CURRENT: 'current',
   PICKUP: `${ORDER_ID_ROUTE_PARAM}/pickup`,
   DEPART: `${ORDER_ID_ROUTE_PARAM}/depart`,
+  DELIVER: `${ORDER_ID_ROUTE_PARAM}/deliver`,
 } as const;
 
 // Delivery code
@@ -14,6 +16,25 @@ export const COURIER_ORDERS_ROUTES = {
 export const DELIVERY_CODE_LENGTH = 4;
 export const DELIVERY_CODE_RANGE = 10 ** DELIVERY_CODE_LENGTH;
 export const DELIVERY_CODE_PAD = '0';
+export const DELIVERY_CODE_PATTERN = /^[0-9]{4}$/;
+// Five wrong codes in a row lock the entering for a while, so 10 000 codes cannot be tried.
+export const DELIVERY_CODE_MAX_ATTEMPTS = 5;
+export const DELIVERY_CODE_LOCK_MINUTES = 15;
+export const DELIVERY_CODE_LOCK_MS = DELIVERY_CODE_LOCK_MINUTES * MS_PER_MINUTE;
+
+// What the check of a code ended with; the errors are thrown after the commit.
+export const HANDOVER_OUTCOME = {
+  DELIVERED: 'delivered',
+  NOT_FOUND: 'not_found',
+  WRONG_STEP: 'wrong_step',
+  LOCKED: 'locked',
+  WRONG_CODE: 'wrong_code',
+} as const;
+
+// Validation
+export const DELIVERIES_VALIDATION_MESSAGES = {
+  CODE_INVALID: 'Введите 4 цифры кода',
+} as const;
 
 // Errors
 export const DELIVERIES_ERROR_MESSAGES = {
@@ -21,4 +42,7 @@ export const DELIVERIES_ERROR_MESSAGES = {
   WRONG_STEP: 'Заказ уже на другом этапе или отменён',
   // The order row is held by another operation (a cancellation at the same moment).
   BUSY: 'Заказ сейчас обновляется. Попробуйте ещё раз',
+  WRONG_CODE: (attemptsLeft: number) => `Неверный код. Осталось попыток: ${attemptsLeft}`,
+  CODE_LOCKED: (minutesLeft: number) =>
+    `Слишком много неверных попыток. Попробуйте через ${minutesLeft} мин.`,
 } as const;

@@ -1,4 +1,4 @@
-import { randomInt } from 'node:crypto';
+import { randomInt, timingSafeEqual } from 'node:crypto';
 import {
   DELIVERY_CODE_LENGTH,
   DELIVERY_CODE_PAD,
@@ -10,4 +10,13 @@ export function generateDeliveryCode(): string {
   return randomInt(DELIVERY_CODE_RANGE)
     .toString()
     .padStart(DELIVERY_CODE_LENGTH, DELIVERY_CODE_PAD);
+}
+
+// Compares in constant time, so the answer time tells nothing about the right digits.
+export function deliveryCodesMatch(expected: string | null, given: string): boolean {
+  return (
+    expected !== null &&
+    expected.length === given.length &&
+    timingSafeEqual(Buffer.from(expected), Buffer.from(given))
+  );
 }
