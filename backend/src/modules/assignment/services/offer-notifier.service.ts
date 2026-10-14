@@ -19,4 +19,9 @@ export class OfferNotifierService {
       this.gateway.emitToCourier(courierProfileId, COURIER_SOCKET_EVENTS.OFFER_NEW, offer);
     }
   }
+
+  // Tells the courier to close the offer window.
+  withdraw(offerId: number, courierProfileId: number): void {
+    this.gateway.emitToCourier(courierProfileId, COURIER_SOCKET_EVENTS.OFFER_CLOSED, { offerId });
+  }
 }

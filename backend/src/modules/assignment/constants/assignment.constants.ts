@@ -36,3 +36,13 @@ export const OFFER_TTL_MS = 30 * MS_PER_SECOND;
 // Before accepting, the courier sees the delivery point only to about a kilometre: two digits
 // after the point of a degree.
 export const DELIVERY_AREA_COORDINATE_DIGITS = 2;
+
+// Dispatch
+// How often the dispatcher looks for orders without a courier and for offers whose time is up.
+export const ASSIGNMENT_INTERVAL_MS = 5 * MS_PER_SECOND;
+// Orders handled in one round; the rest wait for the next one.
+export const ASSIGNMENT_BATCH_SIZE = 20;
+// After this many offers nobody accepted, a manager assigns the order by hand.
+export const MAX_OFFERS_PER_ORDER = 5;
+// An order with no courier near for this long after the payment goes to a manager too.
+export const CANDIDATE_SEARCH_TIMEOUT_MS = 5 * MS_PER_MINUTE;

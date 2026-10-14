@@ -14,6 +14,8 @@ export function courierRoom(courierProfileId: number): string {
 export const COURIER_SOCKET_EVENTS = {
   LOCATION_UPDATE: 'location:update',
   OFFER_NEW: 'offer:new',
+  // The offer can no longer be accepted: its time is up, the order or the courier left.
+  OFFER_CLOSED: 'offer:closed',
 } as const;
 
 // Location
