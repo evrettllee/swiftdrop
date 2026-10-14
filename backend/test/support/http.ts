@@ -26,6 +26,14 @@ export function postApi(app: NestExpressApplication, path: string) {
   return rawPostApi(app, path).set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
 
+// A PUT as the real client sends it: its own address and the CSRF header, like every change.
+export function putApi(app: NestExpressApplication, path: string) {
+  return request(app.getHttpServer())
+    .put(`/${GLOBAL_PREFIX}/${path}`)
+    .set(CLIENT_IP_HEADER, nextClientIp())
+    .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
+}
+
 // A GET under the API prefix with its own address, the CSRF header is not needed for reads.
 export function getApi(app: NestExpressApplication, path: string) {
   return request(app.getHttpServer())

@@ -1,0 +1,94 @@
+import { HttpStatus } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { Socket } from 'socket.io-client';
+import { DRIZZLE } from '../../../src/database/database.constants';
+import type { Database } from '../../../src/database/database.module';
+import { courierProfiles } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import {
+  COURIER_SOCKET_EVENTS,
+  LOCATION_UPDATE_REJECTIONS,
+} from '../../../src/modules/couriers/constants/couriers-socket.constants';
+import type { LocationAck } from '../../../src/modules/couriers/types/couriers-socket.types';
+import { createTestApp } from '../../support/app';
+import { CAR, createCourier, putAvailability, putVehicle } from '../../support/couriers';
+import { MINSK_PICKUP } from '../../support/fixtures';
+import { resetServiceArea } from '../../support/pricing';
+import { connectCourierSocket, emitWithAck, listenTestApp } from '../../support/sockets';
+
+const INVALID_LATITUDE = 91;
+
+describe('Courier socket location (e2e)', () => {
+  let app: NestExpressApplication;
+  let db: Database;
+  let baseUrl: string;
+  let cookies: string;
+  let socket: Socket;
+  const getRoute = jest.fn();
+
+  function sendLocation(body: unknown): Promise<LocationAck> {
+    return emitWithAck<LocationAck>(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, body);
+  }
+
+  beforeAll(async () => {
+    app = await createTestApp([{ token: OsrmService, useValue: { getRoute } }]);
+    db = app.get<Database>(DRIZZLE);
+    baseUrl = await listenTestApp(app);
+  });
+
+  beforeEach(async () => {
+    await resetServiceArea(db, getRoute);
+    cookies = await createCourier(app, db);
+    await putVehicle(app, cookies, CAR).expect(HttpStatus.OK);
+  });
+
+  afterEach(() => {
+    socket?.close();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('should save the position when the courier is on shift', async () => {
+    await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
+    socket = await connectCourierSocket(baseUrl, cookies);
+
+    const ack = await sendLocation(MINSK_PICKUP);
+
+    const [profile] = await db.select().from(courierProfiles);
+    expect(ack).toEqual({ ok: true });
+    expect(profile.currentLat).toBe(MINSK_PICKUP.latitude);
+    expect(profile.currentLng).toBe(MINSK_PICKUP.longitude);
+    expect(profile.locationUpdatedAt).not.toBeNull();
+  });
+
+  it('should not save the position when the courier is off shift', async () => {
+    socket = await connectCourierSocket(baseUrl, cookies);
+
+    const ack = await sendLocation(MINSK_PICKUP);
+
+    const [profile] = await db.select().from(courierProfiles);
+    expect(ack).toEqual({ ok: false, reason: LOCATION_UPDATE_REJECTIONS.OFF_SHIFT });
+    expect(profile.currentLat).toBeNull();
+  });
+
+  it('should reject the position when the latitude is out of range', async () => {
+    await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
+    socket = await connectCourierSocket(baseUrl, cookies);
+
+    const ack = await sendLocation({ ...MINSK_PICKUP, latitude: INVALID_LATITUDE });
+
+    expect(ack).toEqual({ ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION });
+  });
+
+  it('should reject the second position when it comes too soon after the first', async () => {
+    await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
+    socket = await connectCourierSocket(baseUrl, cookies);
+    await sendLocation(MINSK_PICKUP);
+
+    const ack = await sendLocation(MINSK_PICKUP);
+
+    expect(ack).toEqual({ ok: false, reason: LOCATION_UPDATE_REJECTIONS.TOO_FREQUENT });
+  });
+});

@@ -11,9 +11,12 @@ import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
 import { transitionOrderStatus } from '../../../common/database/order-status-transition';
 import { isLockTimeout } from '../../../common/database/pg-errors';
 import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
+import { describeError } from '../../../common/utils/describe-error';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orders } from '../../../database/schema';
+import { COURIER_SOCKET_EVENTS } from '../../couriers/constants/couriers-socket.constants';
+import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
 import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
 import {
   CANCELLABLE_STATUSES,
@@ -32,6 +35,7 @@ export class OrderCancellationService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly paymentCancellation: PaymentCancellationService,
+    private readonly couriersGateway: CouriersGateway,
   ) {}
 
   async cancel(clientId: number, orderId: number): Promise<CancelledOrder> {
@@ -42,6 +46,7 @@ export class OrderCancellationService {
     }
 
     this.logger.log(`Order ${orderId} cancelled by client ${clientId}`);
+    await this.tellCourier(orderId);
 
     return { orderId, status: ORDER_STATUS.CANCELLED };
   }
@@ -79,6 +84,28 @@ export class OrderCancellationService {
 
       return updated;
     });
+  }
+
+  // A courier already heading to the pickup point closes the order screen at once. The order is
+  // already cancelled here, so a failed notice is only logged: the courier sees it on the next request.
+  private async tellCourier(orderId: number): Promise<void> {
+    try {
+      const [order] = await this.db
+        .select({ courierId: orders.courierId })
+        .from(orders)
+        .where(eq(orders.orderId, orderId))
+        .limit(SINGLE_ROW_LIMIT);
+
+      if (order?.courierId) {
+        this.couriersGateway.emitToCourier(order.courierId, COURIER_SOCKET_EVENTS.ORDER_CANCELLED, {
+          orderId,
+        });
+      }
+    } catch (error) {
+      this.logger.error(
+        `Courier of order ${orderId} not told of the cancellation: ${describeError(error)}`,
+      );
+    }
   }
 
   // A foreign order looks the same as a missing one, so ids cannot be probed.
