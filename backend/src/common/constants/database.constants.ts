@@ -7,3 +7,5 @@ export const ROW_LOCK_NO_KEY_UPDATE = 'no key update';
 
 // The partial unique index of the open payment attempt of an order.
 export const PAYMENTS_ONE_PENDING_PER_ORDER_INDEX = 'payments_one_pending_per_order_uidx';
+// The partial unique index that keeps one active order per courier.
+export const ORDERS_ONE_ACTIVE_PER_COURIER_INDEX = 'orders_one_active_per_courier_uidx';

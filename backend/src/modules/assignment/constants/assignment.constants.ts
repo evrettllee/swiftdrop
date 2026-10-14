@@ -4,9 +4,13 @@ import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constant
 import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
 
 // Routes
+export const OFFER_ID_ROUTE_PARAM = ':offerId';
+
 export const COURIER_OFFERS_ROUTES = {
   BASE: 'couriers/me/offers',
   CURRENT: 'current',
+  ACCEPT: `${OFFER_ID_ROUTE_PARAM}/accept`,
+  DECLINE: `${OFFER_ID_ROUTE_PARAM}/decline`,
 } as const;
 
 // Candidates
@@ -36,6 +40,8 @@ export const OFFER_TTL_MS = 30 * MS_PER_SECOND;
 // Before accepting, the courier sees the delivery point only to about a kilometre: two digits
 // after the point of a degree.
 export const DELIVERY_AREA_COORDINATE_DIGITS = 2;
+// The largest value of an integer column: a bigger id cannot exist and must not reach the query.
+export const OFFER_ID_MAX = 2_147_483_647;
 
 // Dispatch
 // How often the dispatcher looks for orders without a courier and for offers whose time is up.
@@ -46,3 +52,18 @@ export const ASSIGNMENT_BATCH_SIZE = 20;
 export const MAX_OFFERS_PER_ORDER = 5;
 // An order with no courier near for this long after the payment goes to a manager too.
 export const CANDIDATE_SEARCH_TIMEOUT_MS = 5 * MS_PER_MINUTE;
+
+// Validation
+export const ASSIGNMENT_VALIDATION_MESSAGES = {
+  OFFER_ID_INVALID: 'Некорректный номер предложения',
+} as const;
+
+// Errors
+export const ASSIGNMENT_ERROR_MESSAGES = {
+  OFFER_NOT_FOUND: 'Предложение не найдено',
+  OFFER_CLOSED: 'Предложение уже закрыто: время вышло или заказ отменён',
+  ORDER_UNAVAILABLE: 'Заказ уже недоступен',
+  ON_ORDER: 'Сначала завершите текущий заказ',
+  // The order row is held by another operation (a cancellation, a payment being settled).
+  BUSY: 'Заказ сейчас обновляется. Попробуйте ещё раз',
+} as const;
