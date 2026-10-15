@@ -1,6 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { describeError } from '../../../common/utils/describe-error';
 import { OsrmService } from '../../../integrations/osrm/services/osrm.service';
 import type { OsrmProfile, OsrmRoute } from '../../../integrations/osrm/types/osrm.types';
 import { VEHICLE_ROUTING_PROFILE } from '../constants/assignment.constants';
@@ -13,8 +12,6 @@ import type {
 
 @Injectable()
 export class OfferRoutesService {
-  private readonly logger = new Logger(OfferRoutesService.name);
-
   constructor(private readonly osrm: OsrmService) {}
 
   // The candidate who reaches the pickup point first, with the times of the whole trip, or null
@@ -57,7 +54,8 @@ export class OfferRoutesService {
       : null;
   }
 
-  // A failed route leaves the courier out of this round; it never stops the assignment.
+  // A failed route leaves the courier out of this round; it never stops the assignment. The routing
+  // service has logged the failure itself, so nothing is logged here a second time.
   private async findRoute(
     from: GeoPoint,
     to: GeoPoint,
@@ -67,8 +65,8 @@ export class OfferRoutesService {
 
     try {
       route = await this.osrm.getRoute(from, to, profile);
-    } catch (error) {
-      this.logger.warn(`Route for assignment failed: ${describeError(error)}`);
+    } catch {
+      route = null;
     }
 
     return route;

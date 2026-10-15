@@ -7,6 +7,7 @@ import { runWithConcurrency } from '../../../common/utils/run-with-concurrency';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orderOffers, orders } from '../../../database/schema';
+import { OsrmService } from '../../../integrations/osrm/services/osrm.service';
 import {
   ASSIGNMENT_BATCH_SIZE,
   ASSIGNMENT_ROUND_CONCURRENCY,
@@ -22,15 +23,24 @@ export class AssignmentRoundService {
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly staleOffers: StaleOffersService,
     private readonly dispatcher: OrderDispatchService,
+    private readonly osrm: OsrmService,
   ) {}
 
   // Closes the offers nobody can accept, then looks for a courier for every paid order that has
   // no open offer, the oldest order first. A few orders are dispatched at once, so a slow routing
   // service does not stretch the round by its delay for every order in turn. Two orders that pick
-  // the same courier at once get one offer: the other order tries again in the next round.
+  // the same courier at once get one offer: the other order tries again in the next round. While
+  // the routing service is paused after failures, no offer can be planned, so the search waits for
+  // a later round.
   async run(now: Date = new Date()): Promise<void> {
     await this.staleOffers.close(now);
 
+    if (this.osrm.isAvailable()) {
+      await this.dispatchWaiting(now);
+    }
+  }
+
+  private async dispatchWaiting(now: Date): Promise<void> {
     const waiting = await this.db
       .select({ orderId: orders.orderId })
       .from(orders)

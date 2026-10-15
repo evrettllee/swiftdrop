@@ -8,6 +8,7 @@ import {
   DB_CASING,
   DB_CONNECTION_OPTIONS,
   DB_PING_QUERY,
+  DB_POOL_MAX,
   DRIZZLE,
   PG_POOL,
 } from './database.constants';
@@ -26,6 +27,7 @@ export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
         const pool = new Pool({
           connectionString: config.getOrThrow<string>(ENV_KEYS.DATABASE_URL),
           options: DB_CONNECTION_OPTIONS,
+          max: DB_POOL_MAX,
         });
         await pool.query(DB_PING_QUERY);
         Logger.log('Connected to PostgreSQL', 'Database');

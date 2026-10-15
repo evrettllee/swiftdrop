@@ -6,6 +6,11 @@ export const DRIZZLE = Symbol('DRIZZLE');
 // The schema uses camelCase keys for snake_case columns: the app, the seed and drizzle-kit must agree.
 export const DB_CASING = 'snake_case';
 
+// Connections of the pool. The default of 10 is too tight: payment calls to Stripe and the NBRB run
+// inside transactions and hold a connection for up to their timeouts, and the dispatcher round
+// works on several orders at once.
+export const DB_POOL_MAX = 20;
+
 // Checks the connection at startup.
 export const DB_PING_QUERY = 'SELECT 1';
 
