@@ -11,7 +11,8 @@ import { selectZoneForPoint } from '../utils/zone-selection';
 export class ZonesService {
   constructor(@Inject(DRIZZLE) private readonly db: Database) {}
 
-  async findZoneForPoint(point: GeoPoint): Promise<ServiceZoneMatch | null> {
+  // The zone of every point, in the order of the points: the zones are read once for all of them.
+  async findZonesForPoints(points: readonly GeoPoint[]): Promise<(ServiceZoneMatch | null)[]> {
     const candidates = await this.db
       .select({
         zoneId: serviceZones.zoneId,
@@ -24,6 +25,6 @@ export class ZonesService {
       .innerJoin(tariffs, eq(serviceZones.tariffId, tariffs.tariffId))
       .where(and(eq(serviceZones.isActive, true), eq(tariffs.isActive, true)));
 
-    return selectZoneForPoint(candidates, point);
+    return points.map((point) => selectZoneForPoint(candidates, point));
   }
 }

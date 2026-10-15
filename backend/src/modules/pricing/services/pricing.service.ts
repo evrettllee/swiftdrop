@@ -49,9 +49,9 @@ export class PricingService {
       throw new UnprocessableEntityException(PRICING_ERROR_MESSAGES.NO_VEHICLE);
     }
 
-    const [pickupZone, deliveryZone] = await Promise.all([
-      this.zones.findZoneForPoint(dto.pickup),
-      this.zones.findZoneForPoint(dto.delivery),
+    const [pickupZone, deliveryZone] = await this.zones.findZonesForPoints([
+      dto.pickup,
+      dto.delivery,
     ]);
 
     if (!pickupZone) {

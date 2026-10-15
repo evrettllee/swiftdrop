@@ -28,15 +28,15 @@ function buildDb(rows: unknown[]): Database {
 }
 
 function setup(rows: unknown[] = [TARIFF_ROW]) {
-  const findZoneForPoint = jest.fn().mockResolvedValue(ZONE);
+  const findZonesForPoints = jest.fn().mockResolvedValue([ZONE, ZONE]);
   const getRoute = jest.fn().mockResolvedValue(ROUTE);
   const service = new PricingService(
     buildDb(rows),
-    { findZoneForPoint } as unknown as ZonesService,
+    { findZonesForPoints } as unknown as ZonesService,
     { getRoute } as unknown as OsrmService,
   );
 
-  return { service, findZoneForPoint, getRoute };
+  return { service, findZonesForPoints, getRoute };
 }
 
 describe('PricingService', () => {
@@ -78,16 +78,16 @@ describe('PricingService', () => {
   });
 
   it('should reject a pickup point outside every zone without calling OSRM', async () => {
-    const { service, findZoneForPoint, getRoute } = setup();
-    findZoneForPoint.mockResolvedValueOnce(null).mockResolvedValueOnce(ZONE);
+    const { service, findZonesForPoints, getRoute } = setup();
+    findZonesForPoints.mockResolvedValue([null, ZONE]);
 
     await expect(service.estimate(DTO)).rejects.toThrow(PRICING_ERROR_MESSAGES.PICKUP_OUT_OF_ZONE);
     expect(getRoute).not.toHaveBeenCalled();
   });
 
   it('should reject a delivery point outside every zone', async () => {
-    const { service, findZoneForPoint } = setup();
-    findZoneForPoint.mockResolvedValueOnce(ZONE).mockResolvedValueOnce(null);
+    const { service, findZonesForPoints } = setup();
+    findZonesForPoints.mockResolvedValue([ZONE, null]);
 
     await expect(service.estimate(DTO)).rejects.toThrow(
       PRICING_ERROR_MESSAGES.DELIVERY_OUT_OF_ZONE,
@@ -95,8 +95,8 @@ describe('PricingService', () => {
   });
 
   it('should throw UnprocessableEntityException for a point outside every zone', async () => {
-    const { service, findZoneForPoint } = setup();
-    findZoneForPoint.mockResolvedValue(null);
+    const { service, findZonesForPoints } = setup();
+    findZonesForPoints.mockResolvedValue([null, null]);
 
     await expect(service.estimate(DTO)).rejects.toBeInstanceOf(UnprocessableEntityException);
   });
