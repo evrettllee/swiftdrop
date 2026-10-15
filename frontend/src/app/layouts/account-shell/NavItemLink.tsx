@@ -1,7 +1,6 @@
-import type { Icon } from '@phosphor-icons/react';
 import { NavLink } from 'react-router';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
-import type { NavVariant } from './navigation';
+import type { NavItem, NavVariant } from './nav-item';
 
 const VARIANT_CLASSES: Record<NavVariant, string> = {
   sidebar: 'h-11 flex-row justify-start gap-3 rounded-md px-3 text-body',
@@ -15,11 +14,7 @@ const IDLE_CLASSES: Record<NavVariant, string> = {
   bottom: 'text-fg-secondary',
 };
 
-type NavItemLinkProps = {
-  to: string;
-  label: string;
-  icon: Icon;
-  isExact: boolean;
+type NavItemLinkProps = NavItem & {
   variant: NavVariant;
 };
 

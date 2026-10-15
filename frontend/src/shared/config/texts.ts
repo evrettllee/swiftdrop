@@ -14,6 +14,9 @@ export const UI_TEXTS = {
   RETRY: 'Повторить',
   ORDERS: 'Заказы',
   NEW_ORDER: 'Новый заказ',
+  // The account area of the courier.
+  COURIER_WORK: 'Работа',
+  COURIER_HISTORY: 'История',
   // A page that is not made yet.
   COMING_LATER: 'Страница появится позже',
 } as const;

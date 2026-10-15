@@ -7,6 +7,7 @@ import { APP_ROUTES, CATCH_ALL_ROUTE, ORDER_DETAILS_PATTERN } from '@/shared/rou
 import { ROLE } from '@/shared/session';
 import { PageLoader } from '@/shared/ui/page-loader';
 import { ClientLayout } from '../layouts/client-layout/ClientLayout';
+import { courierRoutes } from './courier-routes';
 import { GuestRoute } from './GuestRoute';
 import { PendingCheckoutRoute } from './PendingCheckoutRoute';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -101,6 +102,7 @@ export const router = createBrowserRouter([
               },
             ],
           },
+          courierRoutes,
           {
             path: APP_ROUTES.FORGOT_PASSWORD,
             element: <PlaceholderPage title={PLACEHOLDER_TEXTS.FORGOT_PASSWORD_TITLE} />,

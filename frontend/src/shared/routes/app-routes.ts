@@ -8,6 +8,9 @@ export const APP_ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   TERMS: '/terms',
   PRIVACY: '/privacy',
+  COURIER_WORK: '/courier',
+  COURIER_HISTORY: '/courier/history',
+  COURIER_PROFILE: '/courier/profile',
 } as const;
 
 // The router pattern of the page of one order and the path to a concrete order.

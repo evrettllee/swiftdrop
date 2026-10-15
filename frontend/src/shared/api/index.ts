@@ -1,4 +1,6 @@
 export { AUTH_API_PATHS } from './endpoints/auth';
+export type { CourierMe } from './endpoints/courier';
+export { COURIERS_API_PATHS, courierMeSchema } from './endpoints/courier';
 export type { AddressParts, AddressSuggestion } from './endpoints/geocoding/address-suggestion';
 export {
   GEOCODING_ERROR_MESSAGES,
@@ -19,5 +21,11 @@ export { PAYMENT_STATUS, startPayment } from './endpoints/payment';
 export type { PackageParams, PriceEstimate } from './endpoints/pricing';
 export { priceEstimateSchema } from './endpoints/pricing';
 export type { HttpOptions } from './http';
-export { ApiError, getApiErrorMessage, http, setSessionExpiredHandler } from './http';
+export {
+  ApiError,
+  getApiErrorMessage,
+  http,
+  refreshSessionOrExpire,
+  setSessionExpiredHandler,
+} from './http';
 export { API_BASE_PATH, API_ERROR_MESSAGES, HTTP_STATUS } from './request-config';
