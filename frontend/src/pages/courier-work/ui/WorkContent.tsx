@@ -1,6 +1,5 @@
 import type { CourierMe, CourierVehicle } from '@/shared/api';
 import { CONNECTION_STATUS, useConnectionStatus } from '@/shared/realtime';
-import { Divider } from '@/shared/ui/divider';
 import { LINE_SWITCH, useLineSwitch } from '../model/useLineSwitch';
 import { useLocationSharing } from '../model/useLocationSharing';
 import { useTodayStats } from '../model/useTodayStats';
@@ -19,7 +18,8 @@ export function WorkContent({ profile, vehicle }: WorkContentProps) {
   const connection = useConnectionStatus();
   const stats = useTodayStats();
   const isOnline = profile.isAvailable;
-  const location = useLocationSharing(isOnline && connection === CONNECTION_STATUS.CONNECTED);
+  const isConnected = connection === CONNECTION_STATUS.CONNECTED;
+  const location = useLocationSharing(isOnline && isConnected);
   const line = useLineSwitch({
     sendPoint: location.sendNow,
     onSwitched: (isAvailable) => {
@@ -31,18 +31,22 @@ export function WorkContent({ profile, vehicle }: WorkContentProps) {
     },
   });
 
+  // Off the line the problem is of going on it; on the line, of the position that was lost.
+  const geoProblem = isOnline ? location.problem : line.geoProblem;
+
   return (
     <>
-      {line.geoProblem === null ? null : (
+      {geoProblem === null ? null : (
         <GeoAlert
-          problem={line.geoProblem}
-          isChecking={line.pending === LINE_SWITCH.ON}
-          onRetry={() => void line.goOnline()}
+          problem={geoProblem}
+          isChecking={isOnline ? location.isChecking : line.pending === LINE_SWITCH.ON}
+          onRetry={() => void (isOnline ? location.recheck() : line.goOnline())}
         />
       )}
       {profile.activeOrderId === null ? (
         <LinePanel
           isOnline={isOnline}
+          isConnected={isConnected}
           vehicle={vehicle}
           point={location.point}
           pending={line.pending}
@@ -53,10 +57,6 @@ export function WorkContent({ profile, vehicle }: WorkContentProps) {
       ) : (
         <ActiveOrderNotice />
       )}
-      {/* The line keeps the space of the design: the gap of the page and 8px on each side. */}
-      <div className="py-2">
-        <Divider />
-      </div>
       <TodayStats state={stats} onRetry={stats.reload} />
     </>
   );

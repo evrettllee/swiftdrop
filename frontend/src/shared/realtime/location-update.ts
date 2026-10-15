@@ -1,11 +1,6 @@
 import { z } from 'zod';
 import { MS_PER_SECOND } from '@/shared/config';
 
-// The events of the courier gateway; must match the backend.
-export const COURIER_SOCKET_EVENTS = {
-  LOCATION_UPDATE: 'location:update',
-} as const;
-
 // Why the backend did not save a position (the reason of the acknowledgement); must match it.
 export const LOCATION_UPDATE_REJECTION = {
   SESSION_EXPIRED: 'session_expired',

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { create } from 'zustand';
 import type { CourierMe, CourierVehicle } from '@/shared/api';
 import { getCourierMe } from '../api/get-courier-me';
+import { setCourierPosition } from './courier-position';
 
 export const COURIER_PROFILE_STATUS = {
   LOADING: 'loading',
@@ -72,8 +73,8 @@ export function setCourierVehicle(vehicle: CourierVehicle): void {
   }));
 }
 
-// Loads the profile while the cabinet is open and forgets it when the cabinet is left, so the next
-// user of the tab never sees it.
+// Loads the profile while the cabinet is open and forgets it (and the position) when the cabinet is
+// left, so the next user of the tab never sees them.
 export function useCourierProfileLoader(): void {
   useEffect(() => {
     const controller = new AbortController();
@@ -83,6 +84,7 @@ export function useCourierProfileLoader(): void {
     return () => {
       controller.abort();
       useCourierProfileStore.setState(INITIAL_STATE);
+      setCourierPosition(null);
     };
   }, []);
 }

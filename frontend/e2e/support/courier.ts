@@ -6,6 +6,7 @@ import {
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
 } from '../../src/shared/api/request-config';
+import type { GeoPoint } from '../../src/shared/lib/geo/geo-point';
 import { APP_ROUTES } from '../../src/shared/routes/app-routes';
 
 // Couriers are not registered through the API: the account comes from the seed of the backend,
@@ -105,4 +106,78 @@ export async function denyGeolocation(page: Page): Promise<void> {
       },
     });
   });
+}
+
+// Where the stub below keeps the accuracy of every watch the page started, in order.
+const WATCH_MODES_KEY = 'e2eGeolocationWatchModes';
+
+// What the precise watch of the stub below does: times out at once (no GPS), or sends a position and
+// then times out (GPS that pauses).
+export const PRECISE_WATCH = {
+  TIMES_OUT: 'times-out',
+  PAUSES: 'pauses',
+} as const;
+
+type PreciseWatch = (typeof PRECISE_WATCH)[keyof typeof PRECISE_WATCH];
+
+// A device without GPS: a precise position times out, a rough one is found, for a single request
+// and for a watch. Takes effect from the next load.
+export async function stubGeolocationWithoutGps(
+  page: Page,
+  point: GeoPoint,
+  preciseWatch: PreciseWatch = PRECISE_WATCH.TIMES_OUT,
+): Promise<void> {
+  await page.addInitScript(
+    ([found, modesKey, precise, pauses]) => {
+      const watchModes: boolean[] = [];
+      const clearedWatches = new Set<number>();
+      Reflect.set(window, modesKey, watchModes);
+      const TIMEOUT = 3;
+      const position = { coords: { ...found, accuracy: 1000 }, timestamp: Date.now() };
+      const timeout = {
+        code: TIMEOUT,
+        message: 'Timeout expired',
+        PERMISSION_DENIED: 1,
+        POSITION_UNAVAILABLE: 2,
+        TIMEOUT,
+      };
+      type Success = (answer: typeof position) => void;
+      type Failure = (answer: typeof timeout) => void;
+
+      Object.defineProperty(navigator, 'geolocation', {
+        value: {
+          getCurrentPosition: (success: Success, error: Failure, options?: PositionOptions) =>
+            options?.enableHighAccuracy === true ? error(timeout) : success(position),
+          watchPosition: (success: Success, error: Failure, options?: PositionOptions) => {
+            const isPrecise = options?.enableHighAccuracy === true;
+            const watchId = watchModes.push(isPrecise);
+            // Asynchronously, as a browser answers, and never for a cleared watch.
+            setTimeout(() => {
+              if (clearedWatches.has(watchId)) {
+                return;
+              }
+
+              if (!isPrecise) {
+                success(position);
+              } else if (precise === pauses) {
+                success(position);
+                error(timeout);
+              } else {
+                error(timeout);
+              }
+            });
+
+            return watchId;
+          },
+          clearWatch: (watchId: number) => clearedWatches.add(watchId),
+        },
+      });
+    },
+    [point, WATCH_MODES_KEY, preciseWatch, PRECISE_WATCH.PAUSES] as const,
+  );
+}
+
+// The accuracy of every watch the stubbed page started: true for a precise one.
+export function getWatchModes(page: Page): Promise<unknown> {
+  return page.evaluate((modesKey) => Reflect.get(window, modesKey), WATCH_MODES_KEY);
 }

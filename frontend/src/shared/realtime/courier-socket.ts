@@ -2,8 +2,8 @@ import { io, type Socket } from 'socket.io-client';
 import { refreshSessionOrExpire } from '@/shared/api';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { CONNECTION_STATUS, setConnectionStatus } from './connection-status';
+import { COURIER_SOCKET_EVENTS, type CourierSocketEvent } from './courier-events';
 import {
-  COURIER_SOCKET_EVENTS,
   LOCATION_ACK_TIMEOUT_MS,
   type LocationAck,
   locationAckSchema,
@@ -97,6 +97,21 @@ export function disconnectCourierSocket(): void {
   isWanted = false;
   socket?.disconnect();
   setConnectionStatus(CONNECTION_STATUS.OFFLINE);
+}
+
+// Calls `handler` with the payload of every `event` of the backend until the returned function is
+// called; the payload is not checked here. Works before the first connection too.
+export function onCourierSocketEvent(
+  event: CourierSocketEvent,
+  handler: (payload: unknown) => void,
+): () => void {
+  socket ??= createSocket();
+  const current = socket;
+  current.on(event, handler);
+
+  return () => {
+    current.off(event, handler);
+  };
 }
 
 // Sends a position of the courier and returns the acknowledgement of the backend, or null when the

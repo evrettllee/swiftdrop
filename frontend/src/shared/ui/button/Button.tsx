@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 import { Link } from 'react-router';
 import { COLOR_TRANSITION_CLASS } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
@@ -39,7 +39,8 @@ function buildClassName(variant: ButtonVariant, fullWidth: boolean, isLoading: b
   );
 }
 
-type ButtonProps = CommonProps & { loading?: boolean } & Omit<
+// `ref` reaches the <button>, for example to focus it.
+type ButtonProps = CommonProps & { loading?: boolean; ref?: Ref<HTMLButtonElement> } & Omit<
     ButtonHTMLAttributes<HTMLButtonElement>,
     'children'
   >;

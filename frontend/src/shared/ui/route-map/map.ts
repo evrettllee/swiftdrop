@@ -15,6 +15,22 @@ export const MAP_ZOOM = {
 export const MAP_FIT_PADDING = 64;
 // The map of an order is small and has no tags or controls, so the points may come closer.
 export const MAP_VIEW_FIT_PADDING = 32;
+// Leaflet zooms around the center instead of the cursor or the fingers with this value.
+export const MAP_ZOOM_AROUND_CENTER = 'center';
+
+// The events of the Leaflet map the app listens to.
+export const LEAFLET_EVENT = {
+  DRAG_START: 'dragstart',
+} as const;
+
+// The column of the controls (44px buttons with a border, 16px from the edge) and a gap to it:
+// the points are fitted to the rest of the map.
+export const MAP_CONTROLS_CLEARANCE = 72;
+
+// The map of an offer is lower still: the area and the pickup point come close to its edge, but
+// stay above the attribution in the bottom-left corner (8px margin, 26px high, 6px more for the dot).
+export const MAP_AREA_FIT_PADDING = 12;
+export const MAP_AREA_FIT_PADDING_BOTTOM = 40;
 
 // Mapbox raster tiles (Static Tiles API) of its light and dark styles, one for each theme.
 // A tile is 512px, so Leaflet has to shift the zoom by -1.
@@ -63,6 +79,7 @@ export const MAP_CLASS = {
   POSITION_DOT: 'position-marker__dot',
   POSITION_PULSE: 'position-marker__pulse',
   POSITION_PULSE_LATE: 'position-marker__pulse--late',
+  AREA: 'delivery-area',
 } as const;
 
 // The dot of the position of the courier, 16px across (position-marker in route-map.css).
@@ -72,10 +89,12 @@ export const MAP_TEXTS = {
   REGION_LABEL: 'Карта города: отметьте точки «Откуда» и «Куда»',
   VIEW_LABEL: 'Схема маршрута',
   POSITION_LABEL: 'Ваше местоположение',
+  AREA_LABEL: 'Точка забора и район доставки',
   HINT_PICKUP: 'Отметьте точку «Откуда»',
   HINT_DELIVERY: 'Отметьте точку «Куда»',
   ZOOM_IN: 'Приблизить',
   ZOOM_OUT: 'Отдалить',
+  LOCATE: 'Ко мне',
   EXPAND: 'Развернуть карту',
   COLLAPSE: 'Свернуть карту',
   REMOVE_POINT: (pointLabel: string) => `Убрать точку «${pointLabel}»`,

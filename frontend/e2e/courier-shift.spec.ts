@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type BrowserContext, expect, test } from '@playwright/test';
 import { GEO_ALERT_TEXTS, LINE_TEXTS } from '../src/pages/courier-work/config/texts';
 import { VEHICLE_TYPE } from '../src/shared/api/endpoints/courier';
 import { CITY_CENTER } from '../src/shared/config/map';
@@ -6,10 +6,13 @@ import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import {
   denyGeolocation,
   getCourierMe,
+  getWatchModes,
+  PRECISE_WATCH,
   requireCourier,
   restoreVehicle,
   setCourierAvailability,
   signInAsCourier,
+  stubGeolocationWithoutGps,
 } from './support/courier';
 import { fillCar, saveVehicleButton, TEST_CAR, waitForPath } from './support/courier-pages';
 
@@ -25,9 +28,25 @@ test.use({
   permissions: ['geolocation'],
 });
 
-test.beforeEach(async ({ page }) => {
+type Cookies = Awaited<ReturnType<BrowserContext['cookies']>>;
+
+let courierCookies: Cookies = [];
+
+// The sign-in of the backend is rate-limited, so the courier signs in once for the whole file and
+// every test starts with the cookies of that session.
+test.beforeAll(async ({ browser }) => {
   requireCourier();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   await signInAsCourier(page);
+  await waitForPath(page, APP_ROUTES.COURIER_WORK);
+  courierCookies = await context.cookies();
+  await context.close();
+});
+
+test.beforeEach(async ({ page }) => {
+  await page.context().addCookies(courierCookies);
+  await page.goto(APP_ROUTES.COURIER_WORK);
   await waitForPath(page, APP_ROUTES.COURIER_WORK);
   // A test before may have failed on the line.
   await setCourierAvailability(page.request, false);
@@ -61,6 +80,40 @@ test('should stay off the line and explain why when the position is denied', asy
   await expect(page.getByRole('alert')).toContainText(GEO_ALERT_TEXTS.DENIED_TITLE);
   await expect(page.getByRole('heading', { name: LINE_TEXTS.OFFLINE_TITLE })).toBeVisible();
   expect((await getCourierMe(page.request)).isAvailable).toBe(false);
+});
+
+test('should go on the line and keep watching roughly when the precise position times out', async ({
+  page,
+}) => {
+  await stubGeolocationWithoutGps(page, { latitude: MINSK_LATITUDE, longitude: MINSK_LONGITUDE });
+  await page.reload();
+
+  await page.getByRole('button', { name: LINE_TEXTS.GO_ONLINE }).click();
+
+  await expect(page.getByRole('heading', { name: LINE_TEXTS.ONLINE_TITLE })).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect((await getCourierMe(page.request)).isAvailable).toBe(true);
+  // The precise watch timed out and the rough one took its place.
+  await expect.poll(() => getWatchModes(page)).toEqual([true, false]);
+});
+
+test('should keep watching precisely when the GPS pauses after its first position', async ({
+  page,
+}) => {
+  await stubGeolocationWithoutGps(
+    page,
+    { latitude: MINSK_LATITUDE, longitude: MINSK_LONGITUDE },
+    PRECISE_WATCH.PAUSES,
+  );
+  await page.reload();
+
+  await page.getByRole('button', { name: LINE_TEXTS.GO_ONLINE }).click();
+
+  await expect(page.getByRole('heading', { name: LINE_TEXTS.ONLINE_TITLE })).toBeVisible();
+  // The precise watch sent a position, so its timeout is a pause: no rough watch is started.
+  await expect.poll(() => getWatchModes(page)).toEqual([true]);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect((await getCourierMe(page.request)).isAvailable).toBe(true);
 });
 
 test('should open the vehicle page when the courier changes the vehicle', async ({ page }) => {

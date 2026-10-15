@@ -21,3 +21,8 @@ export function formatFullAddress(address: OrderAddress): string {
 
   return parts.join(ORDER_TEXTS.ADDRESS_PARTS_SEPARATOR);
 }
+
+// For example "пр-т Притыцкого, Минск": a delivery point a courier sees before taking the order.
+export function formatAreaAddress(address: Pick<OrderAddress, 'street' | 'city'>): string {
+  return [address.street, address.city].join(ORDER_TEXTS.ADDRESS_PARTS_SEPARATOR);
+}

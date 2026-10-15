@@ -101,6 +101,15 @@
   cursor: default;
 }
 
+/* The area of the delivery of an offer: the exact point is shown only after the order is taken. */
+.delivery-area {
+  fill: var(--accent);
+  fill-opacity: 0.12;
+  stroke: var(--accent);
+  stroke-width: 1.5px;
+  stroke-dasharray: 4 4;
+}
+
 /* The position of the courier: a solid dot with two rings that grow out of it in turn. */
 .position-marker {
   position: relative;
@@ -116,38 +125,50 @@
 }
 
 .position-marker__dot {
+  /* The 3px outline of the design is centred on the 16px circle, so the dot is 19px across. */
+  inset: -1.5px;
   box-sizing: border-box;
   background: var(--accent);
   border: 3px solid var(--surface);
 }
 
 .position-marker__pulse {
+  /* Two rings, 2s each, the second 1s later. */
+  --pulse-duration: 2s;
+  --pulse-delay: 1s;
+  --pulse-easing: cubic-bezier(0, 0, 0.2, 1);
+  --pulse-scale: 5;
+  --pulse-opacity: 0.35;
+
   background: var(--accent);
-  animation: position-pulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  animation: position-pulse var(--pulse-duration) var(--pulse-easing) infinite;
 }
 
 .position-marker__pulse--late {
-  animation-delay: 1s;
+  animation-delay: var(--pulse-delay);
 }
 
 @keyframes position-pulse {
   0% {
     transform: scale(1);
-    opacity: 0.35;
+    opacity: var(--pulse-opacity);
   }
 
   100% {
-    transform: scale(5);
+    transform: scale(var(--pulse-scale));
     opacity: 0;
   }
 }
 
-/* Without motion one still ring shows the same area. */
+/* The pulse shows that orders are being searched for: it is a sign of the state, like the spinner,
+   not a decoration, so less motion makes it softer instead of stopping it. One ring, slower and
+   smaller. */
 @media (prefers-reduced-motion: reduce) {
   .position-marker__pulse {
-    animation: none;
-    transform: scale(3);
-    opacity: 0.15;
+    --pulse-duration: 3s;
+    --pulse-easing: ease-out;
+    --pulse-scale: 3;
+    --pulse-opacity: 0.25;
   }
 
   .position-marker__pulse--late {

@@ -5,6 +5,8 @@ export const ORDER_TEXTS = {
   // The parts of an address are joined by it: "Свердлова, 13а".
   ADDRESS_PARTS_SEPARATOR: ', ',
   apartment: (apartment: string) => `кв. ${apartment}`,
+  weight: (weight: string) => `${weight} кг`,
+  size: (length: number, width: number, height: number) => `${length} × ${width} × ${height} см`,
 } as const;
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {

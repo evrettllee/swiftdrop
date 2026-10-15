@@ -1,4 +1,11 @@
 export { AUTH_API_PATHS } from './endpoints/auth';
+export type { CourierOffer } from './endpoints/courier-offer';
+export {
+  acceptedOfferSchema,
+  COURIER_OFFERS_API_PATHS,
+  courierOfferSchema,
+  currentOfferSchema,
+} from './endpoints/courier-offer';
 export type {
   CourierMe,
   CourierTodayStats,
