@@ -1,20 +1,26 @@
 import { ArrowRightIcon } from '@phosphor-icons/react';
 import { type ReactNode, useId } from 'react';
 import { ESTIMATE_STATUS, ESTIMATE_TEXTS, type EstimateView } from '@/features/estimate-price';
-import { formatCoefficient, formatDistanceKm, PRICE_TEXTS, splitPrice } from '@/entities/price';
+import {
+  DeliveryPriceRows,
+  formatCoefficient,
+  formatDistanceKm,
+  PRICE_TEXTS,
+  PriceTotal,
+  splitPrice,
+} from '@/entities/price';
 import type { PriceEstimate } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { formatMoney } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/button';
+import { Divider } from '@/shared/ui/divider';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { PriceRow } from '@/shared/ui/price-row';
 import { Spinner } from '@/shared/ui/spinner';
 import { CHECKOUT_TEXTS } from '../config/texts';
 
-const DIVIDER = <hr className="border-border" />;
-
 function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
-  const { base, surcharge } = splitPrice(estimate.price, estimate.coefficient);
+  const { surcharge } = splitPrice(estimate.price, estimate.coefficient);
 
   return (
     <>
@@ -25,15 +31,13 @@ function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
           value={PRICE_TEXTS.travelTime(estimate.estimatedMinutes)}
         />
       </dl>
-      {DIVIDER}
+      <Divider />
       <dl className="flex flex-col gap-2 text-small">
-        <PriceRow label={PRICE_TEXTS.DELIVERY} value={formatMoney(base, estimate.currency)} />
-        {surcharge === null ? null : (
-          <PriceRow
-            label={PRICE_TEXTS.surcharge(formatCoefficient(estimate.coefficient))}
-            value={PRICE_TEXTS.extra(formatMoney(surcharge, estimate.currency))}
-          />
-        )}
+        <DeliveryPriceRows
+          price={estimate.price}
+          coefficient={estimate.coefficient}
+          currency={estimate.currency}
+        />
       </dl>
       {surcharge === null ? null : (
         <InlineAlert
@@ -43,13 +47,8 @@ function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
           {CHECKOUT_TEXTS.DEMAND_TEXT}
         </InlineAlert>
       )}
-      {DIVIDER}
-      <div className="flex items-baseline justify-between gap-4">
-        <span className="font-semibold">{PRICE_TEXTS.TOTAL}</span>
-        <span className="text-heading-lg font-bold tabular-nums">
-          {formatMoney(estimate.price, estimate.currency)}
-        </span>
-      </div>
+      <Divider />
+      <PriceTotal value={formatMoney(estimate.price, estimate.currency)} />
     </>
   );
 }

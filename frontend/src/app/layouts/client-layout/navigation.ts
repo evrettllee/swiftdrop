@@ -10,8 +10,8 @@ import { APP_ROUTES } from '@/shared/routes';
 
 export const CLIENT_LAYOUT_TEXTS = {
   NAV_LABEL: 'Личный кабинет',
-  NAV_ORDERS: 'Заказы',
-  NAV_NEW_ORDER: 'Новый заказ',
+  NAV_ORDERS: UI_TEXTS.ORDERS,
+  NAV_NEW_ORDER: UI_TEXTS.NEW_ORDER,
   NAV_ADDRESSES: UI_TEXTS.ADDRESSES,
   NAV_PROFILE: UI_TEXTS.PROFILE,
 } as const;

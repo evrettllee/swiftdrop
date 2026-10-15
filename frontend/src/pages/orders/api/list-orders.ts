@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { http, orderListItemSchema, ORDERS_API_PATHS } from '@/shared/api';
+import { http, type HttpOptions, orderListItemSchema, ORDERS_API_PATHS } from '@/shared/api';
 import { ORDERS_PAGE_SIZE } from '../config/list';
 import type { OrderListFilter } from '../model/order-list';
 
@@ -13,10 +13,15 @@ const ordersPageSchema = z.object({
 
 type OrdersPage = z.infer<typeof ordersPageSchema>;
 
+type OrdersQuery = {
+  page: number;
+  filter: OrderListFilter;
+  limit?: number;
+};
+
 export async function listOrders(
-  page: number,
-  filter: OrderListFilter,
-  limit: number = ORDERS_PAGE_SIZE,
+  { page, filter, limit = ORDERS_PAGE_SIZE }: OrdersQuery,
+  options: HttpOptions = {},
 ): Promise<OrdersPage> {
   const query = new URLSearchParams({
     page: String(page),
@@ -24,5 +29,5 @@ export async function listOrders(
     filter,
   });
 
-  return ordersPageSchema.parse(await http.get(`${ORDERS_API_PATHS.ORDERS}?${query}`));
+  return ordersPageSchema.parse(await http.get(`${ORDERS_API_PATHS.ORDERS}?${query}`, options));
 }

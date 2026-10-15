@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { Outlet } from 'react-router';
 import { MAIN_CONTENT_ID } from '@/shared/config';
+import { ContentLoader } from '@/shared/ui/page-loader';
 import { SkipLink } from '@/shared/ui/skip-link';
-import { Spinner } from '@/shared/ui/spinner';
 import { ClientBottomNav } from './ClientBottomNav';
 import { ClientMobileHeader } from './ClientMobileHeader';
 import { ClientSidebar } from './ClientSidebar';
@@ -20,13 +20,7 @@ export function ClientLayout() {
         {/* A column, so that a loader of a page can fill the space between the header and the
             bottom navigation (flex-1) and stand in its center. */}
         <main id={MAIN_CONTENT_ID} className="flex flex-1 flex-col px-4 pt-4 pb-24 lg:p-12">
-          <Suspense
-            fallback={
-              <div className="grid flex-1 place-items-center">
-                <Spinner />
-              </div>
-            }
-          >
+          <Suspense fallback={<ContentLoader />}>
             <Outlet />
           </Suspense>
         </main>

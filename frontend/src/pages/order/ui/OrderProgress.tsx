@@ -1,8 +1,9 @@
 import { CheckCircleIcon, XCircleIcon } from '@phosphor-icons/react';
-import { type ReactNode, useId } from 'react';
+import type { ReactNode } from 'react';
 import type { OrderDetails } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { formatTime } from '@/shared/lib/format';
+import { Section } from '@/shared/ui/section';
 import { PROGRESS_STATE } from '../config/progress';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
 import { buildProgress } from '../lib/progress';
@@ -42,14 +43,10 @@ type OrderProgressProps = {
 
 // "Ход заказа": the passed steps with a check and the time, the current one in bold.
 export function OrderProgress({ order }: OrderProgressProps) {
-  const headingId = useId();
   const steps = buildProgress(order);
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
-      <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
-        {ORDER_DETAILS_TEXTS.SECTION_PROGRESS}
-      </h2>
+    <Section title={ORDER_DETAILS_TEXTS.SECTION_PROGRESS}>
       <ol className="flex flex-col gap-3">
         {steps.map((step) => {
           const isTodo = step.state === PROGRESS_STATE.TODO;
@@ -74,6 +71,6 @@ export function OrderProgress({ order }: OrderProgressProps) {
           );
         })}
       </ol>
-    </section>
+    </Section>
   );
 }

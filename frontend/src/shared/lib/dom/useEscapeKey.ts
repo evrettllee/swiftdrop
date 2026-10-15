@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent } from 'react';
-import { ESCAPE_KEY } from '@/shared/config';
+import { DOM_EVENT, ESCAPE_KEY } from '@/shared/config';
 
 // Listens on the document, so Escape works wherever the focus is; only while `isActive`.
 export function useEscapeKey(onEscape: () => void, isActive: boolean): void {
@@ -16,8 +16,8 @@ export function useEscapeKey(onEscape: () => void, isActive: boolean): void {
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener(DOM_EVENT.KEY_DOWN, handleKeyDown);
 
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener(DOM_EVENT.KEY_DOWN, handleKeyDown);
   }, [isActive]);
 }

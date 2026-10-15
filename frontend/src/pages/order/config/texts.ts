@@ -1,6 +1,8 @@
+import { UI_TEXTS } from '@/shared/config';
+
 export const ORDER_DETAILS_TEXTS = {
   BREADCRUMBS_LABEL: 'Хлебные крошки',
-  ORDERS: 'Заказы',
+  ORDERS: UI_TEXTS.ORDERS,
   BACK_TO_ORDERS: 'Все заказы',
   title: (orderNumber: string) => `Заказ ${orderNumber}`,
   createdAt: (date: string) => `Оформлен ${date}`,
@@ -8,7 +10,7 @@ export const ORDER_DETAILS_TEXTS = {
   LOAD_FAILED_TITLE: 'Не удалось загрузить заказ',
   NOT_FOUND_TITLE: 'Заказ не найден',
   NOT_FOUND_TEXT: 'Возможно, ссылка устарела или заказ оформлен с другой учётной записи.',
-  RETRY: 'Повторить',
+  RETRY: UI_TEXTS.RETRY,
   SECTION_PROGRESS: 'Ход заказа',
   SECTION_ROUTE: 'Маршрут',
   SECTION_RECIPIENT: 'Получатель и посылка',
@@ -19,14 +21,15 @@ export const ORDER_DETAILS_TEXTS = {
   FRAGILE: 'Хрупкое',
   YES: 'Да',
   NO: 'Нет',
-  apartment: (apartment: string) => `кв. ${apartment}`,
   weight: (weight: string) => `${weight} кг`,
   size: (length: number, width: number, height: number) => `${length} × ${width} × ${height} см`,
 } as const;
 
+const CANCEL_ORDER = 'Отменить заказ';
+
 export const CANCEL_TEXTS = {
-  title: (orderNumber: string) => `Отменить заказ ${orderNumber}?`,
-  CONFIRM: 'Отменить заказ',
+  title: (orderNumber: string) => `${CANCEL_ORDER} ${orderNumber}?`,
+  CONFIRM: CANCEL_ORDER,
   KEEP: 'Не отменять',
   PAID_BEFORE: 'Курьер ещё не забрал посылку, поэтому заказ можно отменить. Оплата ',
   PAID_AFTER: ' вернётся на карту, которой вы платили.',
@@ -41,7 +44,7 @@ export const PAYMENT_TEXTS = {
   UNPAID: 'Не оплачено',
   REFUNDED: 'Деньги возвращены',
   RETRY_PAY: 'Попробовать снова',
-  CANCEL: 'Отменить заказ',
+  CANCEL: CANCEL_ORDER,
   CANCEL_HINT: 'Отменить можно, пока курьер не забрал посылку.',
   REPEAT: 'Повторить заказ',
   REPEAT_HINT:

@@ -2,6 +2,7 @@ import { SignOutIcon } from '@phosphor-icons/react';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { useAuthStore } from '@/shared/session';
 import { Button } from '@/shared/ui/button';
+import { PageTitle } from '@/shared/ui/page-title';
 import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { PROFILE_TEXTS } from '../config/texts';
 
@@ -13,9 +14,7 @@ export function ProfilePage() {
 
   return (
     <div className="flex max-w-md flex-col gap-6 lg:gap-8">
-      <h1 className="text-heading-md font-bold text-balance lg:text-heading-lg">
-        {PROFILE_TEXTS.PROFILE}
-      </h1>
+      <PageTitle>{PROFILE_TEXTS.PROFILE}</PageTitle>
       <p className="text-small text-fg-secondary">
         {PROFILE_TEXTS.PROFILE_EMAIL}: {user?.email}
       </p>

@@ -13,3 +13,12 @@ export const ID_PART = {
 export const ESCAPE_KEY = 'Escape';
 
 export const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+export const DOM_EVENT = {
+  CHANGE: 'change',
+  KEY_DOWN: 'keydown',
+  PAGE_HIDE: 'pagehide',
+} as const;
+
+// The `overflow` of the body while a dialog or the expanded map covers the page.
+export const SCROLL_LOCK_OVERFLOW = 'hidden';

@@ -1,3 +1,4 @@
+import type { ControlPosition } from 'leaflet';
 import { MAPBOX_API_ORIGIN } from '@/shared/config';
 
 // The zoom range (12 shows the whole city core)
@@ -24,6 +25,12 @@ export const MAP_TILES = {
   TILE_SIZE: 512,
   ZOOM_OFFSET: -1,
 } as const;
+
+// The map of the calculator keeps the attribution on the right, the map of an order on the left.
+export const MAP_ATTRIBUTION_POSITION = {
+  PLACED: 'bottomright',
+  VIEW: 'bottomleft',
+} as const satisfies Record<string, ControlPosition>;
 
 export const MAP_ATTRIBUTION =
   '&copy; <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noreferrer">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>';

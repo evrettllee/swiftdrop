@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useEffectEvent, useRef } from 'react';
 import { type OrderDraftData, saveOrderDraft } from '@/features/order-draft';
+import { DOM_EVENT } from '@/shared/config';
 import { AUTH_STATUS, useAuthStore } from '@/shared/session';
 import { ORDER_DRAFT_SAVE_DELAY_MS } from '../config/draft-autosave';
-
-const PAGE_HIDE_EVENT = 'pagehide';
 
 // Keeps the draft of the order in step with the form, so a reload brings the form back as it was.
 // A change is saved after a short pause; a change still waiting is saved at once when the page is
@@ -61,10 +60,10 @@ export function useDraftAutosave(data: OrderDraftData): () => void {
   }, [snapshot, clearTimer, flush]);
 
   useEffect(() => {
-    window.addEventListener(PAGE_HIDE_EVENT, flush);
+    window.addEventListener(DOM_EVENT.PAGE_HIDE, flush);
 
     return () => {
-      window.removeEventListener(PAGE_HIDE_EVENT, flush);
+      window.removeEventListener(DOM_EVENT.PAGE_HIDE, flush);
       flush();
     };
   }, [flush]);

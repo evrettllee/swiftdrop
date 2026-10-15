@@ -1,6 +1,6 @@
-import { useId } from 'react';
 import { NAME_MAX_LENGTH, PHONE_INPUT_MAX_LENGTH } from '@/shared/lib/person-validation';
 import { Input } from '@/shared/ui/input';
+import { Section } from '@/shared/ui/section';
 import { CHECKOUT_FIELD } from '../config/checkout-form';
 import { CHECKOUT_TEXTS } from '../config/texts';
 import type { useCheckout } from '../model/useCheckout';
@@ -10,13 +10,8 @@ type CheckoutRecipientProps = {
 };
 
 export function CheckoutRecipient({ field }: CheckoutRecipientProps) {
-  const headingId = useId();
-
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
-      <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
-        {CHECKOUT_TEXTS.SECTION_RECIPIENT}
-      </h2>
+    <Section title={CHECKOUT_TEXTS.SECTION_RECIPIENT}>
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
         <Input
           label={CHECKOUT_TEXTS.RECIPIENT_NAME}
@@ -33,6 +28,6 @@ export function CheckoutRecipient({ field }: CheckoutRecipientProps) {
           {...field(CHECKOUT_FIELD.RECIPIENT_PHONE)}
         />
       </div>
-    </section>
+    </Section>
   );
 }

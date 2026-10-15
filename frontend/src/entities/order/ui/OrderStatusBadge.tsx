@@ -1,5 +1,6 @@
 import type { OrderStatus } from '@/shared/api';
-import { ORDER_STATUS_META, TONE_DOT_CLASS, TONE_RING_CLASS } from '../model/order-status';
+import { TONE_DOT_CLASS, TONE_RING_CLASS } from '../config/status-tone';
+import { ORDER_STATUS_META } from '../model/order-status';
 
 type OrderStatusBadgeProps = {
   status: OrderStatus;
