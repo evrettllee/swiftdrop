@@ -5,12 +5,16 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { MS_PER_SECOND } from '../../../common/constants/time.constants';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import { CircuitBreaker } from '../../../common/utils/circuit-breaker';
 import { describeError } from '../../../common/utils/describe-error';
 import { ENV_KEYS } from '../../../config/env.constants';
 import {
   COORDINATE_SEPARATOR,
   METERS_PER_KM,
+  OSRM_COOLDOWN_MS,
+  OSRM_FAILURE_THRESHOLD,
   OSRM_NO_ROUTE_CODE,
   OSRM_OK_CODE,
   OSRM_PROFILE,
@@ -30,15 +34,64 @@ import type { OsrmProfile, OsrmRoute } from '../types/osrm.types';
 export class OsrmService {
   private readonly logger = new Logger(OsrmService.name);
   private readonly baseUrl: string;
+  // One for the whole app: pricing and assignment share the same routing service.
+  private readonly breaker = new CircuitBreaker(OSRM_FAILURE_THRESHOLD, OSRM_COOLDOWN_MS);
 
   constructor(config: ConfigService) {
     this.baseUrl = config.getOrThrow<string>(ENV_KEYS.OSRM_URL).replace(TRAILING_SLASHES, '');
   }
 
+  // False while the breaker is open: a request now would fail at once anyway.
+  isAvailable(): boolean {
+    return !this.breaker.isOpen(Date.now());
+  }
+
+  // While the breaker is open the request is not made and nothing is logged. Only an unavailable
+  // service or an unexpected answer (503) is a failure; "no route" (422) is a normal answer.
   async getRoute(
     from: GeoPoint,
     to: GeoPoint,
     profile: OsrmProfile = OSRM_PROFILE.CAR,
+  ): Promise<OsrmRoute> {
+    if (!this.isAvailable()) {
+      throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
+    }
+
+    try {
+      const route = await this.requestRoute(from, to, profile);
+      this.onAnswer();
+
+      return route;
+    } catch (error) {
+      if (error instanceof ServiceUnavailableException) {
+        this.onFailure();
+      } else {
+        this.onAnswer();
+      }
+
+      throw error;
+    }
+  }
+
+  private onAnswer(): void {
+    if (this.breaker.recordSuccess()) {
+      this.logger.log('OSRM answers again, routing resumed');
+    }
+  }
+
+  private onFailure(): void {
+    if (this.breaker.recordFailure(Date.now())) {
+      this.logger.warn(
+        `OSRM failed ${OSRM_FAILURE_THRESHOLD} times in a row, ` +
+          `requests paused for ${OSRM_COOLDOWN_MS / MS_PER_SECOND} s`,
+      );
+    }
+  }
+
+  private async requestRoute(
+    from: GeoPoint,
+    to: GeoPoint,
+    profile: OsrmProfile,
   ): Promise<OsrmRoute> {
     const payload = await this.fetchPayload(this.buildUrl(from, to, profile));
     const parsed = osrmResponseSchema.safeParse(payload);

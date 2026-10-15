@@ -10,7 +10,7 @@ import type { Database, Transaction } from '../../../database/database.module';
 import { courierProfiles, orders, vehicles } from '../../../database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import { toCourierMe } from '../mappers/courier-profile.mapper';
-import type { CourierMe, LockedProfile } from '../types/couriers.types';
+import type { CourierMe, CourierProfileRow, LockedProfile } from '../types/couriers.types';
 
 @Injectable()
 export class CourierProfilesService {
@@ -24,20 +24,16 @@ export class CourierProfilesService {
       .onConflictDoNothing({ target: courierProfiles.userId });
   }
 
+  // Every courier request starts here, so the profile is read first and inserted only on the
+  // first visit: a read request writes nothing.
   async getProfileId(userId: number): Promise<number> {
-    await this.ensureProfile(userId);
+    const profileId = await this.findOrCreate(userId, () => this.findProfileId(userId));
 
-    const [profile] = await this.db
-      .select({ courierProfileId: courierProfiles.courierProfileId })
-      .from(courierProfiles)
-      .where(eq(courierProfiles.userId, userId))
-      .limit(SINGLE_ROW_LIMIT);
-
-    if (!profile) {
+    if (profileId === null) {
       throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
     }
 
-    return profile.courierProfileId;
+    return profileId;
   }
 
   // The profile of the user, locked until the commit: going on shift and a vehicle change wait
@@ -76,21 +72,7 @@ export class CourierProfilesService {
   }
 
   async getMe(userId: number): Promise<CourierMe> {
-    await this.ensureProfile(userId);
-
-    const [row] = await this.db
-      .select({
-        courierProfileId: courierProfiles.courierProfileId,
-        isAvailable: courierProfiles.isAvailable,
-        vehicleType: vehicles.type,
-        brand: vehicles.brand,
-        model: vehicles.model,
-        licensePlate: vehicles.licensePlate,
-      })
-      .from(courierProfiles)
-      .leftJoin(vehicles, eq(vehicles.courierProfileId, courierProfiles.courierProfileId))
-      .where(eq(courierProfiles.userId, userId))
-      .limit(SINGLE_ROW_LIMIT);
+    const row = await this.findOrCreate(userId, () => this.findProfileRow(userId));
 
     if (!row) {
       throw new NotFoundException(COURIERS_ERROR_MESSAGES.PROFILE_NOT_FOUND);
@@ -111,5 +93,46 @@ export class CourierProfilesService {
       .limit(SINGLE_ROW_LIMIT);
 
     return order?.orderId ?? null;
+  }
+
+  // Reads the profile, and only when there is none yet creates it and reads again.
+  private async findOrCreate<T>(userId: number, read: () => Promise<T | null>): Promise<T | null> {
+    const found = await read();
+
+    if (found !== null) {
+      return found;
+    }
+
+    await this.ensureProfile(userId);
+
+    return read();
+  }
+
+  private async findProfileId(userId: number): Promise<number | null> {
+    const [profile] = await this.db
+      .select({ courierProfileId: courierProfiles.courierProfileId })
+      .from(courierProfiles)
+      .where(eq(courierProfiles.userId, userId))
+      .limit(SINGLE_ROW_LIMIT);
+
+    return profile?.courierProfileId ?? null;
+  }
+
+  private async findProfileRow(userId: number): Promise<CourierProfileRow | null> {
+    const [row] = await this.db
+      .select({
+        courierProfileId: courierProfiles.courierProfileId,
+        isAvailable: courierProfiles.isAvailable,
+        vehicleType: vehicles.type,
+        brand: vehicles.brand,
+        model: vehicles.model,
+        licensePlate: vehicles.licensePlate,
+      })
+      .from(courierProfiles)
+      .leftJoin(vehicles, eq(vehicles.courierProfileId, courierProfiles.courierProfileId))
+      .where(eq(courierProfiles.userId, userId))
+      .limit(SINGLE_ROW_LIMIT);
+
+    return row ?? null;
   }
 }

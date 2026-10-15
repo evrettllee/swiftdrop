@@ -25,6 +25,11 @@ export const COORDINATE_SEPARATOR = ',';
 export const POINT_SEPARATOR = ';';
 export const METERS_PER_KM = 1000;
 
+// Circuit breaker: after this many failures in a row the routing service is not asked for a while,
+// so callers fail at once instead of waiting for a timeout each.
+export const OSRM_FAILURE_THRESHOLD = 3;
+export const OSRM_COOLDOWN_MS = 30 * MS_PER_SECOND;
+
 // Response codes
 export const OSRM_OK_CODE = 'Ok';
 export const OSRM_NO_ROUTE_CODE = 'NoRoute';

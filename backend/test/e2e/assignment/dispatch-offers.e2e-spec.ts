@@ -38,14 +38,16 @@ describe('Order dispatch offers (e2e)', () => {
   let courierId: number;
   let courierCookies: string;
   let socket: Socket | undefined;
+  // The routing service answers unless a test pauses it like its circuit breaker would.
   const getRoute = jest.fn();
+  const isAvailable = jest.fn(() => true);
 
   function readOffers() {
     return db.select().from(orderOffers).orderBy(orderOffers.offerId);
   }
 
   beforeAll(async () => {
-    app = await createTestApp([{ token: OsrmService, useValue: { getRoute } }]);
+    app = await createTestApp([{ token: OsrmService, useValue: { getRoute, isAvailable } }]);
     db = app.get<Database>(DRIZZLE);
     baseUrl = await listenTestApp(app);
     rounds = app.get(AssignmentRoundService);
@@ -124,5 +126,18 @@ describe('Order dispatch offers (e2e)', () => {
     await rounds.run();
 
     expect((await readOffers())[0].status).toBe(ORDER_OFFER_STATUS.EXPIRED);
+  });
+
+  it('should close stale offers but open none while the routing service is paused', async () => {
+    await addCourierOnShift(app, db, SECOND_COURIER_ACCOUNT, CAR, MINSK_DELIVERY);
+    await rounds.run();
+    getRoute.mockClear();
+    isAvailable.mockReturnValueOnce(false);
+
+    await rounds.run(new Date(Date.now() + AFTER_EXPIRY_MS));
+
+    const offers = await readOffers();
+    expect(offers.map(({ status }) => status)).toEqual([ORDER_OFFER_STATUS.EXPIRED]);
+    expect(getRoute).not.toHaveBeenCalled();
   });
 });

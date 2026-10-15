@@ -21,8 +21,11 @@ export class OrderDetailsService {
       throw new NotFoundException(ORDERS_ERROR_MESSAGES.NOT_FOUND);
     }
 
-    const history = await this.findHistory(orderId);
-    const payment = await this.findLatestPayment(orderId);
+    // Read only after the order proved to be the client's, and at once: they do not depend on each other.
+    const [history, payment] = await Promise.all([
+      this.findHistory(orderId),
+      this.findLatestPayment(orderId),
+    ]);
     const { recipientName, recipientPhone, price, ...rest } = row;
 
     return {

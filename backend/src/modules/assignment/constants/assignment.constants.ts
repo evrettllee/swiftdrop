@@ -47,6 +47,9 @@ export const DELIVERY_AREA_COORDINATE_DIGITS = 2;
 export const ASSIGNMENT_INTERVAL_MS = 5 * MS_PER_SECOND;
 // Orders handled in one round; the rest wait for the next one.
 export const ASSIGNMENT_BATCH_SIZE = 20;
+// Orders of a round dispatched at once: each waits mostly for the routing service, and every one
+// in flight may hold a pool connection for a moment.
+export const ASSIGNMENT_ROUND_CONCURRENCY = 5;
 // After this many offers nobody accepted, a manager assigns the order by hand.
 export const MAX_OFFERS_PER_ORDER = 5;
 // An order with no courier near for this long after the payment goes to a manager too.

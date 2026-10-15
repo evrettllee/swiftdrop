@@ -33,9 +33,10 @@ describe('Order dispatch to manual assignment (e2e)', () => {
   let orderId: number;
   let courierId: number;
   const getRoute = jest.fn();
+  const isAvailable = jest.fn(() => true);
 
   beforeAll(async () => {
-    app = await createTestApp([{ token: OsrmService, useValue: { getRoute } }]);
+    app = await createTestApp([{ token: OsrmService, useValue: { getRoute, isAvailable } }]);
     db = app.get<Database>(DRIZZLE);
   });
 
