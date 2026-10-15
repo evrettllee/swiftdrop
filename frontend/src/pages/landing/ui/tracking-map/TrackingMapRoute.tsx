@@ -1,7 +1,4 @@
-// Sizes in the units of the viewBox.
-const ROUTE_STROKE = 2;
-const ROUTE_DASH = '8 8';
-const MARKER_RADIUS = 6;
+import { MAP_ROUTE } from '../../config/tracking-map';
 
 type MapPoint = { readonly x: number; readonly y: number };
 
@@ -19,25 +16,25 @@ export function TrackingMapRoute({ passed, remaining, pickup, drop }: TrackingMa
       <polyline
         points={remaining}
         className="fill-none stroke-accent"
-        strokeWidth={ROUTE_STROKE}
-        strokeDasharray={ROUTE_DASH}
+        strokeWidth={MAP_ROUTE.STROKE}
+        strokeDasharray={MAP_ROUTE.DASH}
         strokeLinejoin="round"
       />
       <polyline
         points={passed}
         className="fill-none stroke-accent"
-        strokeWidth={ROUTE_STROKE}
+        strokeWidth={MAP_ROUTE.STROKE}
         strokeLinejoin="round"
         strokeLinecap="round"
       />
       <circle
         cx={pickup.x}
         cy={pickup.y}
-        r={MARKER_RADIUS}
+        r={MAP_ROUTE.MARKER_RADIUS}
         className="fill-surface stroke-accent"
-        strokeWidth={ROUTE_STROKE}
+        strokeWidth={MAP_ROUTE.STROKE}
       />
-      <circle cx={drop.x} cy={drop.y} r={MARKER_RADIUS} className="fill-fg" />
+      <circle cx={drop.x} cy={drop.y} r={MAP_ROUTE.MARKER_RADIUS} className="fill-fg" />
     </>
   );
 }

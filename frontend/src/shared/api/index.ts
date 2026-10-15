@@ -18,5 +18,6 @@ export {
 export { PAYMENT_STATUS, startPayment } from './endpoints/payment';
 export type { PackageParams, PriceEstimate } from './endpoints/pricing';
 export { priceEstimateSchema } from './endpoints/pricing';
+export type { HttpOptions } from './http';
 export { ApiError, getApiErrorMessage, http, setSessionExpiredHandler } from './http';
 export { API_BASE_PATH, API_ERROR_MESSAGES, HTTP_STATUS } from './request-config';

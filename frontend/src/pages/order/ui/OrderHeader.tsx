@@ -6,6 +6,7 @@ import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config'
 import { formatFullDateTime, formatShortDateTime } from '@/shared/lib/format';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
+import { PageTitle } from '@/shared/ui/page-title';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
 
 type OrderHeaderProps = {
@@ -49,9 +50,7 @@ export function OrderHeader({ order }: OrderHeaderProps) {
         </LinkButton>
       </div>
       <div className="flex flex-wrap items-baseline gap-4">
-        <h1 className="text-heading-md font-bold text-balance tabular-nums lg:text-heading-lg">
-          {ORDER_DETAILS_TEXTS.title(orderNumber)}
-        </h1>
+        <PageTitle className="tabular-nums">{ORDER_DETAILS_TEXTS.title(orderNumber)}</PageTitle>
         <span className="hidden lg:inline-flex">
           <OrderStatusBadge status={order.status} />
         </span>

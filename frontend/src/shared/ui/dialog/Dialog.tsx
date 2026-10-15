@@ -1,6 +1,7 @@
 import { XIcon } from '@phosphor-icons/react';
 import { type MouseEvent, type ReactNode, useEffect, useId, useRef } from 'react';
 import { ICON_SIZE, ICON_WEIGHT, UI_TEXTS } from '@/shared/config';
+import { useBodyScrollLock } from '@/shared/lib/dom';
 import { IconButton } from '@/shared/ui/icon-button';
 
 // A centered window on the desktop, a sheet from the bottom on a phone (design system §10).
@@ -39,18 +40,7 @@ export function Dialog({ isOpen, onClose, title, actions, children }: DialogProp
   }, [isOpen]);
 
   // The page under the window does not scroll.
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   // A click on the dimmed backdrop lands on the <dialog> itself, a click inside lands on its content.
   function handleClick(event: MouseEvent<HTMLDialogElement>): void {

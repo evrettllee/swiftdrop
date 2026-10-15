@@ -2,12 +2,7 @@ import { useId } from 'react';
 import { useEstimate } from '@/features/estimate-price';
 import { PackageFields, usePackageForm } from '@/features/package-form';
 import { useRouteAddresses } from '@/features/route-picker';
-import {
-  ADDRESS_PLACEHOLDER,
-  ROUTE_POINT,
-  ROUTE_POINT_LABELS,
-  ROUTE_POINT_ORDER,
-} from '@/shared/config';
+import { ADDRESS_PLACEHOLDER, ROUTE_POINT_LABELS, ROUTE_POINT_ORDER } from '@/shared/config';
 import { AddressField } from '@/shared/ui/address-field';
 import { LinkButton } from '@/shared/ui/button';
 import { RouteMap } from '@/shared/ui/route-map';
@@ -20,40 +15,14 @@ import { EstimateResult } from './EstimateResult';
 // The map on the left, the form with the price on the right; on a phone the map goes first.
 export function CalculatorCard() {
   const titleId = useId();
-  const {
-    pickup,
-    delivery,
-    hint,
-    texts,
-    parts,
-    lookingUp,
-    setTarget,
-    changeText,
-    selectSuggestion,
-    placePoint,
-    pickPoint,
-  } = useRouteAddresses();
+  const route = useRouteAddresses();
   const packageForm = usePackageForm();
-  const estimate = useEstimate(pickup, delivery, packageForm.params);
+  const estimate = useEstimate(route.pickup, route.delivery, packageForm.params);
   const orderLink = useOrderLink();
 
   // The order form starts from what is entered here, even if it is unfinished.
   function handleOrder(): void {
-    orderLink.startOrder({
-      route: {
-        [ROUTE_POINT.PICKUP]: {
-          point: pickup,
-          text: texts[ROUTE_POINT.PICKUP],
-          parts: parts[ROUTE_POINT.PICKUP],
-        },
-        [ROUTE_POINT.DELIVERY]: {
-          point: delivery,
-          text: texts[ROUTE_POINT.DELIVERY],
-          parts: parts[ROUTE_POINT.DELIVERY],
-        },
-      },
-      package: packageForm.values,
-    });
+    orderLink.startOrder({ route: route.values, package: packageForm.values });
   }
 
   return (
@@ -64,12 +33,12 @@ export function CalculatorCard() {
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <RouteMap
-          pickup={pickup}
-          delivery={delivery}
-          hint={hint}
-          onPick={pickPoint}
-          onMove={placePoint}
-          onRemove={(kind) => changeText(kind, '')}
+          pickup={route.pickup}
+          delivery={route.delivery}
+          hint={route.hint}
+          onPick={route.pickPoint}
+          onMove={route.placePoint}
+          onRemove={(kind) => route.changeText(kind, '')}
           className="h-65 lg:h-auto lg:min-h-140"
         />
         <div className="flex flex-col gap-6">
@@ -85,11 +54,11 @@ export function CalculatorCard() {
                 key={kind}
                 label={ROUTE_POINT_LABELS[kind]}
                 placeholder={ADDRESS_PLACEHOLDER}
-                value={texts[kind]}
-                onChange={(text) => changeText(kind, text)}
-                onSelect={(suggestion) => selectSuggestion(kind, suggestion)}
-                onFocus={() => setTarget(kind)}
-                isLookingUp={lookingUp[kind]}
+                value={route.texts[kind]}
+                onChange={(text) => route.changeText(kind, text)}
+                onSelect={(suggestion) => route.selectSuggestion(kind, suggestion)}
+                onFocus={() => route.setTarget(kind)}
+                isLookingUp={route.lookingUp[kind]}
               />
             ))}
           </div>

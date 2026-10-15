@@ -1,80 +1,48 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ApiError, getApiErrorMessage, HTTP_STATUS, type OrderDetails } from '@/shared/api';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
 import { getOrderDetails } from '../api/get-order-details';
-import { ORDER_DETAILS_TEXTS } from '../config/texts';
-
-type StoredAnswer = {
-  key: string;
-  orderId: number | null;
-  status: ListStatus;
-  order: OrderDetails | null;
-  isNotFound: boolean;
-  message: string | null;
-};
-
-const NO_ANSWER: StoredAnswer = {
-  key: '',
-  orderId: null,
-  status: LIST_STATUS.LOADING,
-  order: null,
-  isNotFound: false,
-  message: null,
-};
-
-function isValidOrderId(orderId: number): boolean {
-  return Number.isInteger(orderId) && orderId > 0;
-}
+import {
+  isValidOrderId,
+  orderRequestKey,
+  toFailedAnswer,
+  toReadyAnswer,
+} from '../lib/order-answer';
+import { NO_ANSWER, type StoredAnswer } from './order-answer';
 
 // One order of the client. `reload` asks the server again (after a cancel or a payment) and keeps
-// the shown order until the new answer comes; a wrong id in the address is a missing order.
+// the shown order until the new answer comes; a wrong id in the address is a missing order. A
+// request that is not needed any more (another order, a newer reload, the page left) is cancelled.
 export function useOrderDetails(orderId: number) {
   const [attempt, setAttempt] = useState(0);
   const [answer, setAnswer] = useState<StoredAnswer>(NO_ANSWER);
   const isValidId = isValidOrderId(orderId);
-  const currentKey = `${orderId}:${attempt}`;
+  const currentKey = orderRequestKey(orderId, attempt);
 
   useEffect(() => {
     if (!isValidId) {
-      return;
+      return undefined;
     }
 
-    let isCurrent = true;
-    const key = `${orderId}:${attempt}`;
+    const controller = new AbortController();
+    const key = orderRequestKey(orderId, attempt);
 
     async function load(): Promise<void> {
       try {
-        const order = await getOrderDetails(orderId);
+        const order = await getOrderDetails(orderId, { signal: controller.signal });
 
-        if (isCurrent) {
-          setAnswer({
-            key,
-            orderId,
-            status: LIST_STATUS.READY,
-            order,
-            isNotFound: false,
-            message: null,
-          });
+        if (!controller.signal.aborted) {
+          setAnswer(toReadyAnswer(key, orderId, order));
         }
       } catch (error) {
-        if (isCurrent) {
-          setAnswer({
-            key,
-            orderId,
-            status: LIST_STATUS.ERROR,
-            order: null,
-            isNotFound: error instanceof ApiError && error.status === HTTP_STATUS.NOT_FOUND,
-            message: getApiErrorMessage(error, ORDER_DETAILS_TEXTS.LOAD_FAILED),
-          });
+        if (!controller.signal.aborted) {
+          setAnswer(toFailedAnswer(key, orderId, error));
         }
       }
     }
 
     void load();
 
-    return () => {
-      isCurrent = false;
-    };
+    return () => controller.abort();
   }, [orderId, attempt, isValidId]);
 
   // Stable, so effects that reload the order do not restart on every render.

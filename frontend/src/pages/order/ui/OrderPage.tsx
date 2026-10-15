@@ -4,8 +4,9 @@ import { useParams } from 'react-router';
 import { LIST_STATUS } from '@/shared/config';
 import { APP_ROUTES, ORDER_ID_PARAM } from '@/shared/routes';
 import { Button, LinkButton } from '@/shared/ui/button';
+import { Divider } from '@/shared/ui/divider';
 import { EmptyState } from '@/shared/ui/empty-state';
-import { Spinner } from '@/shared/ui/spinner';
+import { ContentLoader } from '@/shared/ui/page-loader';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
 import { useOrderDetails } from '../model/useOrderDetails';
 import { usePaymentReturn } from '../model/usePaymentReturn';
@@ -16,8 +17,6 @@ import { OrderPaymentPanel } from './OrderPaymentPanel';
 import { OrderProgress } from './OrderProgress';
 import { OrderRecipient } from './OrderRecipient';
 import { OrderRoute } from './OrderRoute';
-
-const DIVIDER = <hr className="border-border" />;
 
 export function OrderPage() {
   const params = useParams();
@@ -45,9 +44,9 @@ export function OrderPage() {
         <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-12">
           <div className="flex min-w-0 flex-col gap-6 lg:gap-8">
             <OrderProgress order={order} />
-            {DIVIDER}
+            <Divider />
             <OrderRoute order={order} />
-            {DIVIDER}
+            <Divider />
             <OrderRecipient order={order} />
           </div>
           <OrderPaymentPanel
@@ -65,12 +64,7 @@ export function OrderPage() {
       </div>
     );
   } else if (details.status === LIST_STATUS.LOADING) {
-    // Fills the main area of the client layout (a column) and stands in its center.
-    content = (
-      <div className="grid flex-1 place-items-center">
-        <Spinner />
-      </div>
-    );
+    content = <ContentLoader />;
   } else if (details.isNotFound) {
     content = (
       <EmptyState

@@ -1,5 +1,5 @@
-import { useId } from 'react';
 import type { OrderDetails } from '@/shared/api';
+import { Section } from '@/shared/ui/section';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
 import { formatPhone, formatSize, formatWeight } from '../lib/order-details-format';
 
@@ -24,14 +24,10 @@ type OrderRecipientProps = {
 };
 
 export function OrderRecipient({ order }: OrderRecipientProps) {
-  const headingId = useId();
   const { recipient, parcel } = order;
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
-      <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
-        {ORDER_DETAILS_TEXTS.SECTION_RECIPIENT}
-      </h2>
+    <Section title={ORDER_DETAILS_TEXTS.SECTION_RECIPIENT}>
       <dl className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
         <Field label={ORDER_DETAILS_TEXTS.RECIPIENT} value={recipient.name} isWide />
         <Field label={ORDER_DETAILS_TEXTS.PHONE} value={formatPhone(recipient.phone)} isWide />
@@ -42,6 +38,6 @@ export function OrderRecipient({ order }: OrderRecipientProps) {
           value={parcel.isFragile ? ORDER_DETAILS_TEXTS.YES : ORDER_DETAILS_TEXTS.NO}
         />
       </dl>
-    </section>
+    </Section>
   );
 }

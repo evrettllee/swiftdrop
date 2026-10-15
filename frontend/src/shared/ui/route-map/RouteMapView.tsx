@@ -4,7 +4,14 @@ import { useState } from 'react';
 import { MapContainer, Marker, Polyline } from 'react-leaflet';
 import { IS_MAPBOX_CONFIGURED, ROUTE_POINT } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
-import { MAP_CLASS, MAP_EXPANDED_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM } from './map';
+import {
+  MAP_ATTRIBUTION_POSITION,
+  MAP_CLASS,
+  MAP_EXPANDED_CLASS,
+  MAP_PLACED_CLASS,
+  MAP_TEXTS,
+  MAP_ZOOM,
+} from './map';
 import { toLatLng } from './lat-lng';
 import { usePrefersReducedMotion } from '@/shared/lib/dom';
 import { useExpandedMap } from './useExpandedMap';
@@ -63,7 +70,7 @@ export function RouteMapView({ pickup, delivery, className }: RouteMapViewProps)
           keyboard={false}
           className="isolate size-full"
         >
-          <MapTiles attributionPosition="bottomleft" />
+          <MapTiles attributionPosition={MAP_ATTRIBUTION_POSITION.VIEW} />
           <Polyline
             positions={[toLatLng(pickup), toLatLng(delivery)]}
             pathOptions={{ className: MAP_CLASS.LINE, interactive: false }}

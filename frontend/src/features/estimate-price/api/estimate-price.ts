@@ -1,4 +1,10 @@
-import { ApiError, http, type PriceEstimate, priceEstimateSchema } from '@/shared/api';
+import {
+  ApiError,
+  http,
+  type HttpOptions,
+  type PriceEstimate,
+  priceEstimateSchema,
+} from '@/shared/api';
 import { PRICING_API_PATHS } from '../config/estimate';
 import { ESTIMATE_STATUS_MESSAGES } from '../config/texts';
 import type { EstimateInput } from '../model/estimate-input';
@@ -14,9 +20,14 @@ function toEstimateError(error: unknown): unknown {
   return message === undefined ? error : new ApiError(error.status, message, error.fieldErrors);
 }
 
-export async function estimatePrice(input: EstimateInput): Promise<PriceEstimate> {
+export async function estimatePrice(
+  input: EstimateInput,
+  options: HttpOptions = {},
+): Promise<PriceEstimate> {
   try {
-    return priceEstimateSchema.parse(await http.post(PRICING_API_PATHS.ESTIMATES, input));
+    return priceEstimateSchema.parse(
+      await http.post(PRICING_API_PATHS.ESTIMATES, input, options),
+    );
   } catch (error) {
     throw toEstimateError(error);
   }

@@ -13,17 +13,20 @@ export function useOrderCounts(): OrderCounts {
   const [counts, setCounts] = useState<OrderCounts>(UNKNOWN_COUNTS);
 
   useEffect(() => {
-    let isCurrent = true;
+    const controller = new AbortController();
 
     async function load(): Promise<void> {
       try {
         const pages = await Promise.all(
           ORDER_LIST_FILTERS.map((filter) =>
-            listOrders(ORDERS_FIRST_PAGE, filter, ORDER_COUNT_PROBE_LIMIT),
+            listOrders(
+              { page: ORDERS_FIRST_PAGE, filter, limit: ORDER_COUNT_PROBE_LIMIT },
+              { signal: controller.signal },
+            ),
           ),
         );
 
-        if (isCurrent) {
+        if (!controller.signal.aborted) {
           setCounts({ all: pages[0].total, active: pages[1].total, finished: pages[2].total });
         }
       } catch {
@@ -33,9 +36,7 @@ export function useOrderCounts(): OrderCounts {
 
     void load();
 
-    return () => {
-      isCurrent = false;
-    };
+    return () => controller.abort();
   }, []);
 
   return counts;

@@ -1,3 +1,5 @@
+import { DOM_EVENT } from '@/shared/config';
+
 export function matchesMediaQuery(query: string): boolean {
   return window.matchMedia(query).matches;
 }
@@ -10,7 +12,7 @@ export function subscribeToMediaQuery(
   const mediaQuery = window.matchMedia(query);
   const handleChange = (event: MediaQueryListEvent) => onChange(event.matches);
 
-  mediaQuery.addEventListener('change', handleChange);
+  mediaQuery.addEventListener(DOM_EVENT.CHANGE, handleChange);
 
-  return () => mediaQuery.removeEventListener('change', handleChange);
+  return () => mediaQuery.removeEventListener(DOM_EVENT.CHANGE, handleChange);
 }

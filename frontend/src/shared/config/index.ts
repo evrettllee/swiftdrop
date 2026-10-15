@@ -1,5 +1,12 @@
 export { ADDRESS_TEXT_MAX_LENGTH, APARTMENT_MAX_LENGTH } from './address';
-export { ESCAPE_KEY, ID_PART, MAIN_CONTENT_ID, REDUCED_MOTION_QUERY } from './dom';
+export {
+  DOM_EVENT,
+  ESCAPE_KEY,
+  ID_PART,
+  MAIN_CONTENT_ID,
+  REDUCED_MOTION_QUERY,
+  SCROLL_LOCK_OVERFLOW,
+} from './dom';
 export { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from './env';
 export { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE, INVALID_FIELD_SELECTOR } from './forms';
 export type { ListStatus } from './list-status';

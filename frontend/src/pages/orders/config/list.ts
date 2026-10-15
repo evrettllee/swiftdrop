@@ -11,6 +11,9 @@ export const ORDER_LIST_FILTERS = [
   ORDER_LIST_FILTER.FINISHED,
 ] as const;
 
+// Prefix of the ids that link the filter tabs and their panels.
+export const ORDERS_TABS_ID_PREFIX = 'orders-filter';
+
 export const ORDERS_FIRST_PAGE = 1;
 export const ORDERS_PAGE_SIZE = 5;
 

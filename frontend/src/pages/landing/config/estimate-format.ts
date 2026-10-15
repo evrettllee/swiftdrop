@@ -1,4 +1,2 @@
-// Formatting of the estimate in the calculator
-export const PRICING_LOCALE = 'ru-RU';
-export const PRICE_FRACTION_DIGITS = 2;
+// Formatting of the estimate in the calculator: the distance always has one decimal.
 export const DISTANCE_FRACTION_DIGITS = 1;

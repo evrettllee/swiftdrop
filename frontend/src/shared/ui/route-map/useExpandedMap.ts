@@ -1,6 +1,6 @@
 import type { Map as LeafletMap } from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useEscapeKey } from '@/shared/lib/dom';
+import { useBodyScrollLock, useEscapeKey } from '@/shared/lib/dom';
 
 // The map can cover the whole screen: the page below it does not scroll, Escape closes the map,
 // and Leaflet is told about the new size, because it does not notice the change by itself.
@@ -19,18 +19,7 @@ export function useExpandedMap(map: LeafletMap | null) {
     toggleButtonRef.current?.focus();
   }, isExpanded);
 
-  useEffect(() => {
-    if (!isExpanded) {
-      return undefined;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isExpanded]);
+  useBodyScrollLock(isExpanded);
 
   const toggle = useCallback(() => {
     setIsExpanded((current) => !current);

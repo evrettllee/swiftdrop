@@ -4,15 +4,14 @@ import { ICON_SIZE, ICON_WEIGHT, LIST_STATUS } from '@/shared/config';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { PageTitle } from '@/shared/ui/page-title';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
-import { ORDER_LIST_FILTER, ORDER_LIST_FILTERS } from '../config/list';
+import { ORDER_LIST_FILTER, ORDER_LIST_FILTERS, ORDERS_TABS_ID_PREFIX } from '../config/list';
 import { ORDER_TAB_LABELS, ORDERS_EMPTY_TEXTS, ORDERS_TEXTS } from '../config/texts';
 import type { OrderListFilter } from '../model/order-list';
 import { useOrderCounts } from '../model/useOrderCounts';
 import { useOrdersList } from '../model/useOrdersList';
 import { OrdersList } from './OrdersList';
-
-const TABS_ID_PREFIX = 'orders-filter';
 
 function NewOrderButton() {
   return (
@@ -41,9 +40,7 @@ export function OrdersPage() {
   return (
     <div className="flex flex-col gap-4 lg:gap-8">
       <header className="flex items-center justify-between gap-6">
-        <h1 className="text-heading-md font-bold text-balance lg:text-heading-lg">
-          {ORDERS_TEXTS.PAGE_TITLE}
-        </h1>
+        <PageTitle>{ORDERS_TEXTS.PAGE_TITLE}</PageTitle>
         {hasNoOrders ? null : (
           <div className="hidden lg:block">
             <NewOrderButton />
@@ -62,10 +59,10 @@ export function OrdersPage() {
             value={filter}
             onChange={setFilter}
             label={ORDERS_TEXTS.TABS_LABEL}
-            idPrefix={TABS_ID_PREFIX}
+            idPrefix={ORDERS_TABS_ID_PREFIX}
           />
           {ORDER_LIST_FILTERS.map((id) => (
-            <TabPanel key={id} idPrefix={TABS_ID_PREFIX} id={id} activeId={filter}>
+            <TabPanel key={id} idPrefix={ORDERS_TABS_ID_PREFIX} id={id} activeId={filter}>
               <OrdersList filter={filter} list={list} />
             </TabPanel>
           ))}
