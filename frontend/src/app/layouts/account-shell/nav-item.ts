@@ -14,4 +14,6 @@ export type NavItem = {
   icon: Icon;
   // The item is active only on its own address, not on the pages below it.
   isExact: boolean;
+  // Other pages the item stands for, for example a step the courier must pass before the work.
+  alsoActiveOn?: readonly string[];
 };

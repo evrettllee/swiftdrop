@@ -16,6 +16,8 @@ export const COURIER_NAV_ITEMS: readonly NavItem[] = [
     label: COURIER_LAYOUT_TEXTS.NAV_WORK,
     icon: CubeIcon,
     isExact: true,
+    // The vehicle is the first step of the work.
+    alsoActiveOn: [APP_ROUTES.COURIER_VEHICLE],
   },
   {
     to: APP_ROUTES.COURIER_HISTORY,

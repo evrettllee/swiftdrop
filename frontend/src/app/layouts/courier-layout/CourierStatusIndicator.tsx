@@ -1,11 +1,12 @@
 import { useCourierProfile } from '@/entities/courier';
 import { COURIER_STATUS_META, getCourierStatus } from './courier-status';
 
-// Nothing is shown until /couriers/me answers: a guess could be wrong.
+// Nothing is shown until /couriers/me answers (a guess could be wrong), and nothing while the
+// courier has no vehicle: without one they cannot go on the line at all.
 export function CourierStatusIndicator() {
   const profile = useCourierProfile();
 
-  if (profile === null) {
+  if (profile === null || profile.vehicle === null) {
     return null;
   }
 

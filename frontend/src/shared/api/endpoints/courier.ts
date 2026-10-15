@@ -2,9 +2,10 @@ import { z } from 'zod';
 
 export const COURIERS_API_PATHS = {
   ME: '/couriers/me',
+  VEHICLE: '/couriers/me/vehicle',
 } as const;
 
-// Must match the vehicle types of the backend.
+// Must match the vehicle types of the backend, from the lightest to the heaviest.
 export const VEHICLE_TYPE = {
   FOOT: 'foot',
   BICYCLE: 'bicycle',
@@ -15,12 +16,14 @@ export const VEHICLE_TYPE = {
 
 export type VehicleType = (typeof VEHICLE_TYPE)[keyof typeof VEHICLE_TYPE];
 
-const courierVehicleSchema = z.object({
+export const courierVehicleSchema = z.object({
   type: z.enum(VEHICLE_TYPE),
   brand: z.string().nullable(),
   model: z.string().nullable(),
   licensePlate: z.string().nullable(),
 });
+
+export type CourierVehicle = z.infer<typeof courierVehicleSchema>;
 
 // What the courier cabinet needs on opening: whether the courier is on the line, their vehicle and
 // the order they are delivering.

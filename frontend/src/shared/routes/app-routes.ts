@@ -11,6 +11,7 @@ export const APP_ROUTES = {
   COURIER_WORK: '/courier',
   COURIER_HISTORY: '/courier/history',
   COURIER_PROFILE: '/courier/profile',
+  COURIER_VEHICLE: '/courier/vehicle',
 } as const;
 
 // The router pattern of the page of one order and the path to a concrete order.

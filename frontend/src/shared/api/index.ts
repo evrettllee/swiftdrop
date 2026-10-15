@@ -1,6 +1,11 @@
 export { AUTH_API_PATHS } from './endpoints/auth';
-export type { CourierMe } from './endpoints/courier';
-export { COURIERS_API_PATHS, courierMeSchema } from './endpoints/courier';
+export type { CourierMe, CourierVehicle, VehicleType } from './endpoints/courier';
+export {
+  COURIERS_API_PATHS,
+  courierMeSchema,
+  courierVehicleSchema,
+  VEHICLE_TYPE,
+} from './endpoints/courier';
 export type { AddressParts, AddressSuggestion } from './endpoints/geocoding/address-suggestion';
 export {
   GEOCODING_ERROR_MESSAGES,

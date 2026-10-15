@@ -35,6 +35,14 @@ export const courierRoutes: RouteObject = {
           ),
         },
         {
+          path: APP_ROUTES.COURIER_VEHICLE,
+          Component: lazy(() =>
+            import('@/pages/courier-vehicle').then((module) => ({
+              default: module.CourierVehiclePage,
+            })),
+          ),
+        },
+        {
           path: APP_ROUTES.COURIER_PROFILE,
           element: (
             <PlaceholderSection

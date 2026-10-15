@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router';
+import { matchPath, NavLink, useLocation } from 'react-router';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import type { NavItem, NavVariant } from './nav-item';
 
@@ -18,13 +18,23 @@ type NavItemLinkProps = NavItem & {
   variant: NavVariant;
 };
 
-export function NavItemLink({ to, label, icon: ItemIcon, isExact, variant }: NavItemLinkProps) {
+export function NavItemLink({
+  to,
+  label,
+  icon: ItemIcon,
+  isExact,
+  alsoActiveOn = [],
+  variant,
+}: NavItemLinkProps) {
+  const { pathname } = useLocation();
+  const isOnRelatedPage = alsoActiveOn.some((path) => matchPath(path, pathname) !== null);
+
   return (
     <NavLink
       to={to}
       end={isExact}
       className={({ isActive }) =>
-        `flex items-center ${COLOR_TRANSITION_CLASS} ${VARIANT_CLASSES[variant]} ${isActive ? ACTIVE_CLASS : IDLE_CLASSES[variant]}`
+        `flex items-center ${COLOR_TRANSITION_CLASS} ${VARIANT_CLASSES[variant]} ${isActive || isOnRelatedPage ? ACTIVE_CLASS : IDLE_CLASSES[variant]}`
       }
     >
       <ItemIcon size={ICON_SIZE.LARGE} weight={ICON_WEIGHT} aria-hidden="true" />
