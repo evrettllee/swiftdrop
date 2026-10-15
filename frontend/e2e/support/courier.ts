@@ -15,6 +15,7 @@ const COURIER_PASSWORD = process.env.E2E_COURIER_PASSWORD ?? '';
 
 const COURIER_ME_URL = `${API_BASE_PATH}${COURIERS_API_PATHS.ME}`;
 const COURIER_VEHICLE_URL = `${API_BASE_PATH}${COURIERS_API_PATHS.VEHICLE}`;
+const COURIER_AVAILABILITY_URL = `${API_BASE_PATH}${COURIERS_API_PATHS.AVAILABILITY}`;
 
 // Skips the test when the seeded courier is not given.
 export function requireCourier(): void {
@@ -64,4 +65,44 @@ export async function stubCourierWithoutVehicle(page: Page): Promise<void> {
   await page.route(`**${COURIER_ME_URL}`, (route) =>
     route.request().method() === 'GET' ? route.fulfill({ json: profile }) : route.fallback(),
   );
+}
+
+// Puts the courier on or off the line through the API, for example back off it after a test.
+export async function setCourierAvailability(
+  request: APIRequestContext,
+  isAvailable: boolean,
+): Promise<void> {
+  const response = await request.put(COURIER_AVAILABILITY_URL, {
+    headers: { [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE },
+    data: { isAvailable },
+  });
+
+  expect(response.ok(), await response.text()).toBe(true);
+}
+
+// Denies the position to the page, as a courier who refused it in the browser: the geolocation of
+// the page answers every request with PERMISSION_DENIED. Takes effect from the next load.
+export async function denyGeolocation(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const PERMISSION_DENIED = 1;
+    const denial = {
+      code: PERMISSION_DENIED,
+      message: 'User denied Geolocation',
+      PERMISSION_DENIED,
+      POSITION_UNAVAILABLE: 2,
+      TIMEOUT: 3,
+    };
+
+    Object.defineProperty(navigator, 'geolocation', {
+      value: {
+        getCurrentPosition: (_success: unknown, error?: (failure: typeof denial) => void) =>
+          error?.(denial),
+        watchPosition: (_success: unknown, error?: (failure: typeof denial) => void) => {
+          error?.(denial);
+          return 0;
+        },
+        clearWatch: () => undefined,
+      },
+    });
+  });
 }

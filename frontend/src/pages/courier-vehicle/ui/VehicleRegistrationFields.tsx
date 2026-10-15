@@ -12,18 +12,20 @@ type FieldProps = {
 };
 
 type VehicleRegistrationFieldsProps = {
+  // "Автомобиль" or "Грузовик", by the chosen type.
+  title: string;
   field: (name: string) => FieldProps;
 };
 
 // The brand, the model and the plate of a car or a truck. On the desktop they share a grid of two
 // columns: the brand and the model fill the first row, the plate takes one column of the second.
-export function VehicleRegistrationFields({ field }: VehicleRegistrationFieldsProps) {
+export function VehicleRegistrationFields({ title, field }: VehicleRegistrationFieldsProps) {
   const titleId = useId();
 
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-4">
       <h2 id={titleId} className="text-heading-sm font-semibold">
-        {COURIER_VEHICLE_TEXTS.REGISTRATION_TITLE}
+        {title}
       </h2>
       <div className="grid gap-4 lg:grid-cols-2 lg:gap-x-6">
         <Input

@@ -49,6 +49,22 @@ export async function loadCourierProfile(signal?: AbortSignal): Promise<void> {
   }
 }
 
+// Loads the profile again without the loading state, so the page under it does not flash. A
+// failure keeps the profile the page shows.
+export async function refreshCourierProfile(): Promise<void> {
+  try {
+    const profile = await getCourierMe();
+    useCourierProfileStore.setState({ status: COURIER_PROFILE_STATUS.READY, profile });
+  } catch {
+    // The next change of the line or the next visit loads it again.
+  }
+}
+
+// The profile the backend answered with, for example after a change of the line.
+export function setCourierProfile(profile: CourierMe): void {
+  useCourierProfileStore.setState({ status: COURIER_PROFILE_STATUS.READY, profile });
+}
+
 // The vehicle the backend saved: the profile is not loaded again for it.
 export function setCourierVehicle(vehicle: CourierVehicle): void {
   useCourierProfileStore.setState(({ profile }) => ({

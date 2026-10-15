@@ -1,8 +1,14 @@
 export { AUTH_API_PATHS } from './endpoints/auth';
-export type { CourierMe, CourierVehicle, VehicleType } from './endpoints/courier';
+export type {
+  CourierMe,
+  CourierTodayStats,
+  CourierVehicle,
+  VehicleType,
+} from './endpoints/courier';
 export {
   COURIERS_API_PATHS,
   courierMeSchema,
+  courierTodayStatsSchema,
   courierVehicleSchema,
   VEHICLE_TYPE,
 } from './endpoints/courier';

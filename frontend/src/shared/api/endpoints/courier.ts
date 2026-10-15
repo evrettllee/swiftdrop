@@ -3,6 +3,8 @@ import { z } from 'zod';
 export const COURIERS_API_PATHS = {
   ME: '/couriers/me',
   VEHICLE: '/couriers/me/vehicle',
+  AVAILABILITY: '/couriers/me/availability',
+  STATS_TODAY: '/couriers/me/stats/today',
 } as const;
 
 // Must match the vehicle types of the backend, from the lightest to the heaviest.
@@ -34,3 +36,15 @@ export const courierMeSchema = z.object({
 });
 
 export type CourierMe = z.infer<typeof courierMeSchema>;
+
+// The results of the day of the courier, counted from midnight in Minsk.
+export const courierTodayStatsSchema = z.object({
+  delivered: z.number(),
+  distanceKm: z.number(),
+  offersReceived: z.number(),
+  offersAccepted: z.number(),
+  // Null until the reviews exist.
+  rating: z.number().nullable(),
+});
+
+export type CourierTodayStats = z.infer<typeof courierTodayStatsSchema>;

@@ -10,6 +10,7 @@ import { ContentLoader } from '@/shared/ui/page-loader';
 import { PageTitle } from '@/shared/ui/page-title';
 import { COURIER_WORK_TEXTS } from '../config/texts';
 import { ConnectionAlert } from './ConnectionAlert';
+import { WorkContent } from './WorkContent';
 
 export function CourierWorkPage() {
   const status = useCourierProfileStatus();
@@ -29,7 +30,11 @@ export function CourierWorkPage() {
     <div className="flex max-w-276 flex-col gap-6 lg:gap-8">
       <PageTitle>{COURIER_WORK_TEXTS.PAGE_TITLE}</PageTitle>
       <ConnectionAlert />
-      {profile === null ? <CourierProfileError /> : null}
+      {profile === null || profile.vehicle === null ? (
+        <CourierProfileError />
+      ) : (
+        <WorkContent profile={profile} vehicle={profile.vehicle} />
+      )}
     </div>
   );
 }

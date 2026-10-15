@@ -59,11 +59,19 @@ export const MAP_CLASS = {
   LINE: 'route-line',
   VIEW: 'route-map-view',
   VIEW_STATIC: 'route-map-view--static',
+  POSITION: 'position-marker',
+  POSITION_DOT: 'position-marker__dot',
+  POSITION_PULSE: 'position-marker__pulse',
+  POSITION_PULSE_LATE: 'position-marker__pulse--late',
 } as const;
+
+// The dot of the position of the courier, 16px across (position-marker in route-map.css).
+export const POSITION_MARKER_SIZE = 16;
 
 export const MAP_TEXTS = {
   REGION_LABEL: 'Карта города: отметьте точки «Откуда» и «Куда»',
   VIEW_LABEL: 'Схема маршрута',
+  POSITION_LABEL: 'Ваше местоположение',
   HINT_PICKUP: 'Отметьте точку «Откуда»',
   HINT_DELIVERY: 'Отметьте точку «Куда»',
   ZOOM_IN: 'Приблизить',

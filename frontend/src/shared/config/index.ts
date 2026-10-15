@@ -24,4 +24,4 @@ export {
 } from './route-point';
 export { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from './styles';
 export { PAGINATION_TEXTS, THEME_TEXTS, UI_TEXTS } from './texts';
-export { MS_PER_MINUTE } from './time';
+export { MS_PER_MINUTE, MS_PER_SECOND } from './time';

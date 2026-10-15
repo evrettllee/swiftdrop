@@ -1,8 +1,9 @@
+import { VEHICLE_TYPE } from '@/shared/api';
+
 export const COURIER_VEHICLE_TEXTS = {
   PAGE_TITLE: 'Ваш транспорт',
   NO_VEHICLE: 'Укажите транспорт, чтобы выйти на линию',
   TYPE_LEGEND: 'Тип транспорта',
-  REGISTRATION_TITLE: 'Автомобиль',
   BRAND: 'Марка',
   MODEL: 'Модель',
   LICENSE_PLATE: 'Госномер',
@@ -10,6 +11,12 @@ export const COURIER_VEHICLE_TEXTS = {
   SUBMIT: 'Сохранить транспорт',
   NO_FRAGILE: 'Без хрупких посылок',
   weightLimit: (kilograms: number) => `до ${kilograms} кг`,
+} as const;
+
+// The title of the brand, the model and the plate: the transport that has them.
+export const REGISTRATION_TITLES = {
+  [VEHICLE_TYPE.CAR]: 'Автомобиль',
+  [VEHICLE_TYPE.TRUCK]: 'Грузовик',
 } as const;
 
 // The same texts as the validation of the backend, so a message does not change after the request.

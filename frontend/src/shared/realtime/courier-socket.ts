@@ -1,6 +1,14 @@
 import { io, type Socket } from 'socket.io-client';
 import { refreshSessionOrExpire } from '@/shared/api';
+import type { GeoPoint } from '@/shared/lib/geo';
 import { CONNECTION_STATUS, setConnectionStatus } from './connection-status';
+import {
+  COURIER_SOCKET_EVENTS,
+  LOCATION_ACK_TIMEOUT_MS,
+  type LocationAck,
+  locationAckSchema,
+  LOCATION_UPDATE_REJECTION,
+} from './location-update';
 import {
   COURIERS_NAMESPACE,
   DISCONNECT_REASON,
@@ -89,4 +97,35 @@ export function disconnectCourierSocket(): void {
   isWanted = false;
   socket?.disconnect();
   setConnectionStatus(CONNECTION_STATUS.OFFLINE);
+}
+
+// Sends a position of the courier and returns the acknowledgement of the backend, or null when the
+// socket is not connected or no acknowledgement came in time.
+export async function sendCourierLocation(point: GeoPoint): Promise<LocationAck | null> {
+  const current = socket;
+  let ack: LocationAck | null = null;
+
+  if (current?.connected === true) {
+    try {
+      const answer: unknown = await current
+        .timeout(LOCATION_ACK_TIMEOUT_MS)
+        .emitWithAck(COURIER_SOCKET_EVENTS.LOCATION_UPDATE, point);
+      ack = locationAckSchema.parse(answer);
+    } catch {
+      ack = null;
+    }
+  }
+
+  // The access token of the socket has expired: the backend closes it at about the same moment,
+  // and whichever comes first opens it again with a refreshed session.
+  if (
+    current !== null &&
+    ack?.ok === false &&
+    ack.reason === LOCATION_UPDATE_REJECTION.SESSION_EXPIRED
+  ) {
+    current.disconnect();
+    void reconnectWithFreshSession(current);
+  }
+
+  return ack;
 }
