@@ -6,6 +6,7 @@ import {
   OSRM_FAILURE_THRESHOLD,
   OSRM_UNAVAILABLE_MESSAGE,
 } from '../constants/osrm.constants';
+import { OsrmClient } from './osrm-client.service';
 import { OsrmService } from './osrm.service';
 
 const FROM = { latitude: 53.9006, longitude: 27.559 };
@@ -32,7 +33,7 @@ describe('OsrmService circuit breaker', () => {
   }
 
   beforeEach(() => {
-    service = new OsrmService(new ConfigService({ OSRM_URL: 'https://osrm.test' }));
+    service = new OsrmService(new OsrmClient(new ConfigService({ OSRM_URL: 'https://osrm.test' })));
     jest.spyOn(Date, 'now').mockReturnValue(START_MS);
     fetchSpy = jest.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('network down'));
     errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);

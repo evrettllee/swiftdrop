@@ -2,7 +2,6 @@ import type { ChangeEvent, ReactNode } from 'react';
 import type { AddressSuggestion } from '@/shared/api';
 import { ADDRESS_TEXT_MAX_LENGTH } from '@/shared/config';
 import { Input } from '@/shared/ui/input';
-import { Spinner } from '@/shared/ui/spinner';
 import { NO_ACTIVE_INDEX } from './address-field';
 import { AddressSuggestions } from './AddressSuggestions';
 import { SEARCH_STATUS } from './search-status';
@@ -67,11 +66,7 @@ export function AddressField({
       onKeyDown={combobox.handleKeyDown}
       onFocus={onFocus}
       onBlur={combobox.close}
-      endAdornment={
-        <span className="flex items-center pe-3">
-          {isLookingUp || (isOpen && status === SEARCH_STATUS.LOADING) ? <Spinner /> : null}
-        </span>
-      }
+      loading={isLookingUp || (isOpen && status === SEARCH_STATUS.LOADING)}
       popup={
         isListShown || isEmptyShown ? (
           <AddressSuggestions

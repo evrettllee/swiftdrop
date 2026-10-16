@@ -45,8 +45,9 @@ test.beforeAll(async ({ browser }) => {
   await waitForPath(page, APP_ROUTES.COURIER_WORK);
 });
 
+// The page is not opened when the courier is not given and the tests are skipped.
 test.afterAll(async () => {
-  await page.close();
+  await page?.close();
 });
 
 // Every test opens the cabinet again with the offer open and the answers it sets.

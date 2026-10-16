@@ -22,6 +22,7 @@ import { DeliveriesModule } from './modules/deliveries/deliveries.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { PricingModule } from './modules/pricing/pricing.module';
+import { RoutingModule } from './modules/routing/routing.module';
 import { ZonesModule } from './modules/zones/zones.module';
 
 @Module({
@@ -45,6 +46,7 @@ import { ZonesModule } from './modules/zones/zones.module';
     CouriersModule,
     AssignmentModule,
     DeliveriesModule,
+    RoutingModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -103,6 +103,7 @@ export const MAP_TEXTS = {
   EXIT_FULLSCREEN: 'Свернуть',
   REMOVE_POINT: (pointLabel: string) => `Убрать точку «${pointLabel}»`,
   UNAVAILABLE: 'Карта временно недоступна',
+  ROUTE_UNAVAILABLE: 'Маршрут недоступен',
   // Shown to a developer only (the dev server), not to a visitor.
   UNAVAILABLE_DEV_HINT: 'Задайте VITE_MAPBOX_TOKEN в файле .env в корне репозитория.',
 } as const;

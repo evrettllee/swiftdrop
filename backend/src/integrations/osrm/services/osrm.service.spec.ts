@@ -1,6 +1,7 @@
 import { Logger, ServiceUnavailableException, UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OSRM_PROFILE } from '../constants/osrm.constants';
+import { OsrmClient } from './osrm-client.service';
 import { OsrmService } from './osrm.service';
 
 const BASE_URL = 'https://osrm.test';
@@ -12,7 +13,7 @@ const ROUTE_DISTANCE_KM = 6.3;
 const NO_ROUTE_STATUS = 400;
 
 function buildService(baseUrl = BASE_URL): OsrmService {
-  return new OsrmService(new ConfigService({ OSRM_URL: baseUrl }));
+  return new OsrmService(new OsrmClient(new ConfigService({ OSRM_URL: baseUrl })));
 }
 
 function mockJsonResponse(body: unknown, status = 200): jest.SpyInstance {

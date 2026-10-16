@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { useRoutePreview } from '@/features/route-picker';
 import {
   ADDRESS_PLACEHOLDER,
   APARTMENT_MAX_LENGTH,
@@ -31,11 +32,14 @@ type CheckoutRouteProps = {
 
 // The map and a block for each of the two points.
 export function CheckoutRoute({ route, field, addressErrors }: CheckoutRouteProps) {
+  const routeLines = useRoutePreview(route.pickup, route.delivery);
+
   return (
     <Section title={CHECKOUT_TEXTS.SECTION_ROUTE}>
       <RouteMap
         pickup={route.pickup}
         delivery={route.delivery}
+        route={routeLines}
         hint={route.hint}
         onPick={route.pickPoint}
         onMove={route.placePoint}

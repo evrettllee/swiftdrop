@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ROLE } from '../../../common/enums/role.enum';
 import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -6,7 +17,13 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import type { AuthUser } from '../../auth/types/auth.types';
 import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
 import { type OrderIdParamDto, orderIdParamSchema } from '../../orders/dto/order-id-param.dto';
-import { COURIER_ORDERS_ROUTES } from '../constants/deliveries.constants';
+import { ROUTING_THROTTLE } from '../../routing/constants/routing.constants';
+import { RouteLinesService } from '../../routing/services/route-lines.service';
+import type { RouteLines } from '../../routing/types/routing.types';
+import {
+  COURIER_ORDERS_ROUTES,
+  DELIVERIES_ERROR_MESSAGES,
+} from '../constants/deliveries.constants';
 import { type CourierHistoryDto, courierHistorySchema } from '../dto/courier-history.dto';
 import { type DeliverOrderDto, deliverOrderSchema } from '../dto/deliver-order.dto';
 import { CourierHistoryService } from '../services/courier-history.service';
@@ -29,6 +46,7 @@ export class CourierOrdersController {
     private readonly progress: DeliveryProgressService,
     private readonly handover: DeliveryHandoverService,
     private readonly history: CourierHistoryService,
+    private readonly routes: RouteLinesService,
   ) {}
 
   @Get(COURIER_ORDERS_ROUTES.CURRENT)
@@ -36,6 +54,20 @@ export class CourierOrdersController {
     const courierProfileId = await this.profiles.getProfileId(user.userId);
 
     return { order: await this.views.findActive(courierProfileId) };
+  }
+
+  // Before the pickup: to the pickup point and on to the recipient; after it: to the recipient.
+  @Get(COURIER_ORDERS_ROUTES.CURRENT_ROUTE)
+  @Throttle(ROUTING_THROTTLE)
+  async currentRoute(@CurrentUser() user: AuthUser): Promise<RouteLines> {
+    const courierProfileId = await this.profiles.getProfileId(user.userId);
+    const order = await this.views.findActive(courierProfileId);
+
+    if (order === null) {
+      throw new NotFoundException(DELIVERIES_ERROR_MESSAGES.ORDER_NOT_FOUND);
+    }
+
+    return this.routes.forCourierOrder(courierProfileId, order);
   }
 
   @Get(COURIER_ORDERS_ROUTES.HISTORY)

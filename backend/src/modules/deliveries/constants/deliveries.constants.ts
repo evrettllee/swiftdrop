@@ -5,11 +5,13 @@ import {
 import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
 import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
 import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
+import { ROUTE_PATH_SEGMENT } from '../../routing/constants/routing.constants';
 
 // Routes
 export const COURIER_ORDERS_ROUTES = {
   BASE: 'couriers/me/orders',
   CURRENT: 'current',
+  CURRENT_ROUTE: `current/${ROUTE_PATH_SEGMENT}`,
   HISTORY: 'history',
   PICKUP: `${ORDER_ID_ROUTE_PARAM}/pickup`,
   DEPART: `${ORDER_ID_ROUTE_PARAM}/depart`,
@@ -25,6 +27,7 @@ export const COURIER_STATS_ROUTES = {
 export const CLIENT_ORDER_COURIER_ROUTES = {
   BASE: 'orders',
   COURIER: `${ORDER_ID_ROUTE_PARAM}/courier`,
+  ROUTE: `${ORDER_ID_ROUTE_PARAM}/${ROUTE_PATH_SEGMENT}`,
 } as const;
 
 // Delivery code

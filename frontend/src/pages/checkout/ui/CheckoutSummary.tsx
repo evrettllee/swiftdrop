@@ -15,8 +15,8 @@ import { formatMoney } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/button';
 import { Divider } from '@/shared/ui/divider';
 import { InlineAlert } from '@/shared/ui/inline-alert';
+import { BlockLoader } from '@/shared/ui/page-loader';
 import { PriceRow } from '@/shared/ui/price-row';
-import { Spinner } from '@/shared/ui/spinner';
 import { CHECKOUT_TEXTS } from '../config/texts';
 
 function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
@@ -77,12 +77,7 @@ export function CheckoutSummary({
   } else if (estimate.status === ESTIMATE_STATUS.ERROR) {
     body = <InlineAlert variant="error">{estimate.message}</InlineAlert>;
   } else if (estimate.status === ESTIMATE_STATUS.LOADING) {
-    body = (
-      <div className="flex items-center justify-center gap-2 text-small text-fg-secondary">
-        <Spinner />
-        <span>{ESTIMATE_TEXTS.LOADING}</span>
-      </div>
-    );
+    body = <BlockLoader text={ESTIMATE_TEXTS.LOADING} className="text-small text-fg-secondary" />;
   } else if (estimate.status === ESTIMATE_STATUS.NEEDS_PACKAGE) {
     body = <p className="text-small text-fg-secondary">{ESTIMATE_TEXTS.NEEDS_PACKAGE}</p>;
   }
@@ -101,9 +96,7 @@ export function CheckoutSummary({
       {formError === null ? null : <InlineAlert variant="error">{formError}</InlineAlert>}
       <Button type="submit" form={formId} fullWidth loading={isSubmitting}>
         {CHECKOUT_TEXTS.SUBMIT}
-        {isSubmitting ? null : (
-          <ArrowRightIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-        )}
+        <ArrowRightIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
       </Button>
     </aside>
   );

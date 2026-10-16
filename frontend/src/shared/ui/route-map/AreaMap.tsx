@@ -1,17 +1,15 @@
-import { latLng, type Map as LeafletMap } from 'leaflet';
+import type { Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useEffectEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Circle, MapContainer, Marker } from 'react-leaflet';
 import { IS_MAPBOX_CONFIGURED, ROUTE_POINT } from '@/shared/config';
 import { usePrefersReducedMotion } from '@/shared/lib/dom';
 import type { GeoPoint } from '@/shared/lib/geo';
+import type { MapRoute } from '@/shared/lib/route-lines';
 import { toLatLng } from './lat-lng';
 import {
-  MAP_AREA_FIT_PADDING,
-  MAP_AREA_FIT_PADDING_BOTTOM,
   MAP_ATTRIBUTION_POSITION,
   MAP_CLASS,
-  MAP_CONTROLS_CLEARANCE,
   MAP_FULLSCREEN_CLASS,
   MAP_PLACED_CLASS,
   MAP_TEXTS,
@@ -22,6 +20,9 @@ import { MapTiles } from './MapTiles';
 import { MapUnavailable } from './MapUnavailable';
 import { MARKER_ICONS } from './marker-icons';
 import { POSITION_ICON, POSITION_ICON_STILL } from './position-icon';
+import { RouteLines } from './RouteLines';
+import { RouteUnavailableBadge } from './RouteUnavailableBadge';
+import { useFitArea } from './useFitArea';
 import { useFullscreenMap } from './useFullscreenMap';
 import './route-map.css';
 
@@ -34,48 +35,11 @@ type AreaMapProps = {
   courierPoint: GeoPoint | null;
   // The rings of the courier pulse while orders are searched for, as on the work page.
   isCourierPulsing: boolean;
+  // The way of the courier to the pickup point along the roads, when it is there.
+  route: MapRoute;
   // The parent sets the height of the map.
   className: string;
 };
-
-// Fits the map to the pickup point, the area and the courier once Leaflet has the map: the window it
-// opens in may have had no size before. A courier who moves does not fit the map again, so it does
-// not jump under the hand; one who appears later does.
-function useFitArea(
-  map: LeafletMap | null,
-  pickup: GeoPoint,
-  areaCenter: GeoPoint,
-  areaRadiusM: number,
-  courierPoint: GeoPoint | null,
-): void {
-  const { latitude, longitude } = pickup;
-  const { latitude: areaLatitude, longitude: areaLongitude } = areaCenter;
-  const hasCourier = courierPoint !== null;
-  const getCourierPoint = useEffectEvent(() => courierPoint);
-
-  useEffect(() => {
-    if (map === null) {
-      return;
-    }
-
-    const bounds = latLng(areaLatitude, areaLongitude)
-      .toBounds(areaRadiusM * 2)
-      .extend(latLng(latitude, longitude));
-    const courier = hasCourier ? getCourierPoint() : null;
-
-    if (courier !== null) {
-      bounds.extend(toLatLng(courier));
-    }
-
-    map.invalidateSize();
-    map.fitBounds(bounds, {
-      paddingTopLeft: [MAP_AREA_FIT_PADDING, MAP_AREA_FIT_PADDING],
-      paddingBottomRight: [MAP_CONTROLS_CLEARANCE, MAP_AREA_FIT_PADDING_BOTTOM],
-      maxZoom: MAP_ZOOM.FIT_MAX,
-      animate: false,
-    });
-  }, [map, latitude, longitude, areaLatitude, areaLongitude, areaRadiusM, hasCourier]);
-}
 
 // The pickup point and the area of the delivery of an order that is not taken yet, with the courier,
 // fitted to all of them. It moves and zooms by hand, but not with the wheel: the wheel scrolls the window the map
@@ -87,12 +51,13 @@ export function AreaMap({
   areaRadiusM,
   courierPoint,
   isCourierPulsing,
+  route,
   className,
 }: AreaMapProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
   const { containerRef, isFullscreen, isSupported, toggle } = useFullscreenMap(map);
   const prefersReducedMotion = usePrefersReducedMotion();
-  useFitArea(map, pickup, areaCenter, areaRadiusM, courierPoint);
+  useFitArea(map, pickup, areaCenter, areaRadiusM, courierPoint, route.lines);
 
   useEffect(() => {
     if (isFullscreen) {
@@ -137,6 +102,7 @@ export function AreaMap({
             radius={areaRadiusM}
             pathOptions={{ className: MAP_CLASS.AREA, interactive: false }}
           />
+          <RouteLines lines={route.lines} />
           <Marker
             position={toLatLng(pickup)}
             icon={MARKER_ICONS[ROUTE_POINT.PICKUP]}
@@ -159,6 +125,7 @@ export function AreaMap({
           onToggleFullscreen={isSupported ? toggle : undefined}
           zoomOnlyWhenExpanded
         />
+        {route.isUnavailable ? <RouteUnavailableBadge /> : null}
       </div>
     </div>
   );

@@ -59,13 +59,16 @@
   display: none;
 }
 
-/* A straight dashed line until the real route is available. */
+/* A route along the roads, as the routing service gives it; every line of a map looks the same.
+   As .m-route of the design: the caps and the joins are the SVG defaults there, so the round ones
+   Leaflet writes into the attributes are overridden. */
 .route-line {
   fill: none;
   stroke: var(--accent);
   stroke-width: 2px;
   stroke-dasharray: 8 8;
-  stroke-linecap: round;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
 }
 
 /* The attribution is required by the licenses of the data and the tiles, so it is only restyled. */

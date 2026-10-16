@@ -38,6 +38,16 @@ export {
 export { PAYMENT_STATUS, startPayment } from './endpoints/payment';
 export type { PackageParams, PriceEstimate } from './endpoints/pricing';
 export { priceEstimateSchema } from './endpoints/pricing';
+export type { RouteLines, RouteSegmentKind } from './endpoints/routing';
+export {
+  getClientOrderRoute,
+  getCourierOrderRoute,
+  getOfferRoute,
+  getRoutePreview,
+  ROUTE_SEGMENT_KIND,
+  ROUTING_API_PATHS,
+  routeLinesSchema,
+} from './endpoints/routing';
 export type { HttpOptions } from './http';
 export {
   ApiError,
@@ -46,4 +56,10 @@ export {
   refreshSessionOrExpire,
   setSessionExpiredHandler,
 } from './http';
-export { API_BASE_PATH, API_ERROR_MESSAGES, HTTP_STATUS } from './request-config';
+export {
+  API_BASE_PATH,
+  API_ERROR_MESSAGES,
+  HTTP_STATUS,
+  NETWORK_ERROR_STATUS,
+  SERVER_ERROR_STATUS_MIN,
+} from './request-config';

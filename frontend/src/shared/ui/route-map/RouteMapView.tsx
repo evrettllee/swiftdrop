@@ -1,9 +1,10 @@
 import type { Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
-import { MapContainer, Marker, Polyline } from 'react-leaflet';
+import { MapContainer, Marker } from 'react-leaflet';
 import { IS_MAPBOX_CONFIGURED, ROUTE_POINT } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
+import type { MapRoute } from '@/shared/lib/route-lines';
 import {
   MAP_ATTRIBUTION_POSITION,
   MAP_CLASS,
@@ -21,23 +22,27 @@ import { MapControls } from './MapControls';
 import { MapTiles } from './MapTiles';
 import { MapUnavailable } from './MapUnavailable';
 import { MARKER_ICONS } from './marker-icons';
+import { RouteLines } from './RouteLines';
+import { RouteUnavailableBadge } from './RouteUnavailableBadge';
 import './route-map.css';
 
 type RouteMapViewProps = {
   pickup: GeoPoint;
   delivery: GeoPoint;
+  // The trip of the parcel and the way of its courier, along the roads, when they are there.
+  route: MapRoute;
   // The parent sets the height of the map.
   className: string;
 };
 
 // The route of an order to look at: the points cannot be moved. In the page the map does not
 // take the scroll of the page, so it neither moves nor zooms; expanded, it moves and zooms.
-export function RouteMapView({ pickup, delivery, className }: RouteMapViewProps) {
+export function RouteMapView({ pickup, delivery, route, className }: RouteMapViewProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
   const { isExpanded, toggle, toggleButtonRef } = useExpandedMap(map);
   useMapInteractions(map, isExpanded);
   // After useExpandedMap: the route is fitted to the map once Leaflet knows its new size.
-  useFitRoute(map, pickup, delivery, isExpanded);
+  useFitRoute(map, pickup, delivery, isExpanded, route.lines);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   if (!IS_MAPBOX_CONFIGURED) {
@@ -71,10 +76,7 @@ export function RouteMapView({ pickup, delivery, className }: RouteMapViewProps)
           className="isolate size-full"
         >
           <MapTiles attributionPosition={MAP_ATTRIBUTION_POSITION.VIEW} />
-          <Polyline
-            positions={[toLatLng(pickup), toLatLng(delivery)]}
-            pathOptions={{ className: MAP_CLASS.LINE, interactive: false }}
-          />
+          <RouteLines lines={route.lines} />
           <Marker
             position={toLatLng(pickup)}
             icon={MARKER_ICONS[ROUTE_POINT.PICKUP]}
@@ -95,6 +97,7 @@ export function RouteMapView({ pickup, delivery, className }: RouteMapViewProps)
           expandButtonRef={toggleButtonRef}
           zoomOnlyWhenExpanded
         />
+        {route.isUnavailable ? <RouteUnavailableBadge /> : null}
       </div>
     </div>
   );

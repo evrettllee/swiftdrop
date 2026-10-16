@@ -15,6 +15,13 @@ export const TRACKABLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.IN_TRANSIT,
 ];
 
+// The order is with its courier, who moves: the map of the order follows them (matches
+// COURIER_ACTIVE_ORDER_STATUSES of the backend).
+export const COURIER_ACTIVE_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ...TRACKABLE_STATUSES,
+];
+
 // Finished orders: the order page offers to repeat them (matches FINISHED_STATUSES of the backend).
 export const FINISHED_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,

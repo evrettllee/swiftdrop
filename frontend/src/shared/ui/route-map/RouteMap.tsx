@@ -1,7 +1,7 @@
 import type { Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
-import { MapContainer, Polyline, useMapEvents } from 'react-leaflet';
+import { MapContainer, useMapEvents } from 'react-leaflet';
 import {
   CITY_CENTER,
   IS_MAPBOX_CONFIGURED,
@@ -9,8 +9,9 @@ import {
   type RoutePointKind,
 } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
-import { MAP_CLASS, MAP_EXPANDED_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM } from './map';
-import { fromLatLng, toLatLng } from './lat-lng';
+import type { MapRoute } from '@/shared/lib/route-lines';
+import { MAP_EXPANDED_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM } from './map';
+import { fromLatLng } from './lat-lng';
 import { usePrefersReducedMotion } from '@/shared/lib/dom';
 import { useExpandedMap } from './useExpandedMap';
 import { FitToPoints } from './FitToPoints';
@@ -18,12 +19,16 @@ import { MapControls } from './MapControls';
 import { MapHint } from './MapHint';
 import { MapTiles } from './MapTiles';
 import { MapUnavailable } from './MapUnavailable';
+import { RouteLines } from './RouteLines';
 import { RouteMarker } from './RouteMarker';
+import { RouteUnavailableBadge } from './RouteUnavailableBadge';
 import './route-map.css';
 
 type RouteMapProps = {
   pickup: GeoPoint | null;
   delivery: GeoPoint | null;
+  // The line between the points along the roads, when it is there.
+  route: MapRoute;
   // The missing point that the next click sets; `null` when both points are set (no hint).
   hint: RoutePointKind | null;
   onPick: (point: GeoPoint) => void;
@@ -44,6 +49,7 @@ function ClickHandler({ onPick }: { onPick: (point: GeoPoint) => void }) {
 export function RouteMap({
   pickup,
   delivery,
+  route,
   hint,
   onPick,
   onMove,
@@ -80,13 +86,8 @@ export function RouteMap({
         >
           <MapTiles />
           <ClickHandler onPick={onPick} />
-          <FitToPoints pickup={pickup} delivery={delivery} />
-          {pickup !== null && delivery !== null ? (
-            <Polyline
-              positions={[toLatLng(pickup), toLatLng(delivery)]}
-              pathOptions={{ className: MAP_CLASS.LINE, interactive: false }}
-            />
-          ) : null}
+          <FitToPoints pickup={pickup} delivery={delivery} lines={route.lines} />
+          <RouteLines lines={route.lines} />
           {pickup === null ? null : (
             <RouteMarker
               kind={ROUTE_POINT.PICKUP}
@@ -111,6 +112,7 @@ export function RouteMap({
           expandButtonRef={toggleButtonRef}
         />
         {hint === null ? null : <MapHint kind={hint} />}
+        {route.isUnavailable ? <RouteUnavailableBadge /> : null}
       </div>
     </div>
   );

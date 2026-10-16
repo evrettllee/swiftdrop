@@ -23,6 +23,7 @@ export const HTTP_METHOD = {
 export const HTTP_STATUS = {
   NO_CONTENT: 204,
   UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
   NOT_FOUND: 404,
   CONFLICT: 409,
   TOO_MANY_REQUESTS: 429,
@@ -30,6 +31,8 @@ export const HTTP_STATUS = {
 } as const;
 
 export const NETWORK_ERROR_STATUS = 0;
+// The first status of a failure of the server (5xx).
+export const SERVER_ERROR_STATUS_MIN = 500;
 
 export const API_ERROR_MESSAGES = {
   NETWORK: 'Нет соединения с сервером. Проверьте интернет и повторите попытку',
