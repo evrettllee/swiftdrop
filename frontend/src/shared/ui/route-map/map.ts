@@ -23,8 +23,8 @@ export const LEAFLET_EVENT = {
   DRAG_START: 'dragstart',
 } as const;
 
-// The column of the controls (44px buttons with a border, 16px from the edge) and a gap to it:
-// the points are fitted to the rest of the map.
+// The column of the controls (44px buttons, 12px from the edge) and a gap to it: the points are
+// fitted to the rest of the map.
 export const MAP_CONTROLS_CLEARANCE = 72;
 
 // The map of an offer is lower still: the area and the pickup point come close to its edge, but
@@ -61,6 +61,8 @@ export const MAP_PLACED_CLASS =
   'absolute inset-0 overflow-hidden rounded-lg border border-border bg-field';
 // The expanded map covers the whole screen above the header.
 export const MAP_EXPANDED_CLASS = 'fixed inset-0 z-50 bg-field';
+// The map in the full screen of the browser (Fullscreen API) loses the frame of its place.
+export const MAP_FULLSCREEN_CLASS = '[&:fullscreen]:rounded-none [&:fullscreen]:border-0';
 
 // Class names used by route-map.css
 
@@ -97,6 +99,8 @@ export const MAP_TEXTS = {
   LOCATE: 'Ко мне',
   EXPAND: 'Развернуть карту',
   COLLAPSE: 'Свернуть карту',
+  FULLSCREEN: 'На весь экран',
+  EXIT_FULLSCREEN: 'Свернуть',
   REMOVE_POINT: (pointLabel: string) => `Убрать точку «${pointLabel}»`,
   UNAVAILABLE: 'Карта временно недоступна',
   // Shown to a developer only (the dev server), not to a visitor.

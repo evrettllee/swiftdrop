@@ -10,6 +10,7 @@ import {
   LEAFLET_EVENT,
   MAP_ATTRIBUTION_POSITION,
   MAP_CLASS,
+  MAP_FULLSCREEN_CLASS,
   MAP_PLACED_CLASS,
   MAP_TEXTS,
   MAP_ZOOM,
@@ -19,6 +20,7 @@ import { MapControls } from './MapControls';
 import { MapTiles } from './MapTiles';
 import { MapUnavailable } from './MapUnavailable';
 import { POSITION_ICON, POSITION_ICON_STILL } from './position-icon';
+import { useFullscreenMap } from './useFullscreenMap';
 import './route-map.css';
 
 type PositionMapProps = {
@@ -34,6 +36,7 @@ type PositionMapProps = {
 export function PositionMap({ point, isPulsing, className }: PositionMapProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
   const [isFollowing, setIsFollowing] = useState(true);
+  const { containerRef, isFullscreen, isSupported, toggle } = useFullscreenMap(map);
   const prefersReducedMotion = usePrefersReducedMotion();
   const { latitude, longitude } = point;
 
@@ -66,9 +69,10 @@ export function PositionMap({ point, isPulsing, className }: PositionMapProps) {
   return (
     <div className={`relative ${className}`}>
       <div
+        ref={containerRef}
         role="region"
         aria-label={MAP_TEXTS.POSITION_LABEL}
-        className={`${MAP_CLASS.VIEW} ${MAP_PLACED_CLASS}`}
+        className={`${MAP_CLASS.VIEW} ${MAP_PLACED_CLASS} ${MAP_FULLSCREEN_CLASS}`}
       >
         {/* `isolate` keeps the high z-index values of Leaflet inside the map. */}
         <MapContainer
@@ -93,7 +97,13 @@ export function PositionMap({ point, isPulsing, className }: PositionMapProps) {
             keyboard={false}
           />
         </MapContainer>
-        <MapControls map={map} onLocate={handleLocate} />
+        <MapControls
+          map={map}
+          onLocate={handleLocate}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={isSupported ? toggle : undefined}
+          zoomOnlyOnDesktop
+        />
       </div>
     </div>
   );

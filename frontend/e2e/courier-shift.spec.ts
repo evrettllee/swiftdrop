@@ -4,16 +4,19 @@ import { VEHICLE_TYPE } from '../src/shared/api/endpoints/courier';
 import { CITY_CENTER } from '../src/shared/config/map';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import {
-  denyGeolocation,
   getCourierMe,
-  getWatchModes,
-  PRECISE_WATCH,
   requireCourier,
   restoreVehicle,
   setCourierAvailability,
   signInAsCourier,
-  stubGeolocationWithoutGps,
 } from './support/courier';
+import {
+  denyGeolocation,
+  getWatchModes,
+  PRECISE_WATCH,
+  stubGeolocationExtension,
+  stubGeolocationWithoutGps,
+} from './support/geolocation';
 import { fillCar, saveVehicleButton, TEST_CAR, waitForPath } from './support/courier-pages';
 
 // These tests change the seeded courier (the line, the vehicle), so they run one after another
@@ -80,6 +83,19 @@ test('should stay off the line and explain why when the position is denied', asy
   await expect(page.getByRole('alert')).toContainText(GEO_ALERT_TEXTS.DENIED_TITLE);
   await expect(page.getByRole('heading', { name: LINE_TEXTS.OFFLINE_TITLE })).toBeVisible();
   expect((await getCourierMe(page.request)).isAvailable).toBe(false);
+});
+
+test('should go on the line when an extension denies the position before it sends one', async ({
+  page,
+}) => {
+  await stubGeolocationExtension(page, { latitude: MINSK_LATITUDE, longitude: MINSK_LONGITUDE });
+  await page.reload();
+
+  await page.getByRole('button', { name: LINE_TEXTS.GO_ONLINE }).click();
+
+  await expect(page.getByRole('heading', { name: LINE_TEXTS.ONLINE_TITLE })).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect((await getCourierMe(page.request)).isAvailable).toBe(true);
 });
 
 test('should go on the line and keep watching roughly when the precise position times out', async ({

@@ -8,6 +8,7 @@ import {
 } from '@/entities/order';
 import type { CourierOffer } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT, ROUTE_POINT } from '@/shared/config';
+import { Divider } from '@/shared/ui/divider';
 import { RoutePointMark } from '@/shared/ui/route-point-mark';
 import { OFFER_TEXTS } from '../config/texts';
 import { formatEtaMinutes, formatToPickup } from '../lib/offer-format';
@@ -40,7 +41,7 @@ export function OfferDetails({ offer }: OfferDetailsProps) {
           <span className="text-small text-fg-secondary">{OFFER_TEXTS.WHOLE_ORDER}</span>
         </p>
       </div>
-      <OfferMap offer={offer} />
+      <OfferMap offer={offer} position={position} />
       <div className="flex flex-col gap-3">
         <div className="flex items-start gap-3">
           <RoutePointMark kind={ROUTE_POINT.PICKUP} className="mt-2" />
@@ -58,16 +59,19 @@ export function OfferDetails({ offer }: OfferDetailsProps) {
           </p>
         </div>
       </div>
-      <dl className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <div className="flex min-w-0 flex-col">
+      <Divider />
+      {/* Columns as wide as their values, so a short weight leaves no gap; a row that does not
+          fit wraps. */}
+      <dl className="flex flex-wrap gap-x-8 gap-y-4">
+        <div className="flex flex-col">
           <dt className="text-small text-fg-secondary">{OFFER_TEXTS.WEIGHT}</dt>
           <dd className="font-semibold tabular-nums">{formatParcelWeight(parcel)}</dd>
         </div>
-        <div className="flex min-w-0 flex-col">
+        <div className="flex flex-col">
           <dt className="text-small text-fg-secondary">{OFFER_TEXTS.SIZE}</dt>
           <dd className="font-semibold tabular-nums">{formatParcelSize(parcel)}</dd>
         </div>
-        <div className="flex min-w-0 flex-col">
+        <div className="flex flex-col">
           <dt className="text-small text-fg-secondary">{OFFER_TEXTS.FRAGILE}</dt>
           {parcel.isFragile ? (
             <dd className="flex items-center gap-1 font-semibold text-warning">

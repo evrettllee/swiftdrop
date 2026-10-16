@@ -15,11 +15,97 @@ export function toGeoProblem(error: GeolocationPositionError): GeoProblem {
   return error.code === error.PERMISSION_DENIED ? GEO_PROBLEM.DENIED : GEO_PROBLEM.FAILED;
 }
 
-function requestPosition(
-  options: PositionOptions,
-): Promise<GeolocationPosition | GeolocationPositionError> {
+// Whether the browser itself allows the position to the page. Without the Permissions API, or when
+// it fails, the answer is no.
+async function isPositionAllowed(): Promise<boolean> {
+  if (!('permissions' in navigator)) {
+    return false;
+  }
+
+  try {
+    const status = await navigator.permissions.query({ name: 'geolocation' });
+
+    return status.state === 'granted';
+  } catch {
+    return false;
+  }
+}
+
+type DenialHandlers = {
+  // The browser confirms the denial.
+  onDenied: () => void;
+  // The browser allows the position, but none came by `deadline` (a time of Date.now()): the same as
+  // a timeout of the try. Null waits without a limit.
+  deadline: number | null;
+  onTimeout: () => void;
+};
+
+// An extension that changes the position (a VPN) answers PERMISSION_DENIED first and its position
+// right after, while the browser allows the position. Such a denial is not the courier's answer:
+// the try waits for the position until its own timeout. Returns the function that stops waiting,
+// to call when the position comes or the try ends.
+export function waitAfterDenial({ onDenied, deadline, onTimeout }: DenialHandlers): () => void {
+  let isWaiting = true;
+  const timer =
+    deadline === null
+      ? undefined
+      : window.setTimeout(
+          () => {
+            isWaiting = false;
+            onTimeout();
+          },
+          Math.max(deadline - Date.now(), 0),
+        );
+
+  function stop(): void {
+    isWaiting = false;
+    window.clearTimeout(timer);
+  }
+
+  void isPositionAllowed().then((isAllowed) => {
+    if (isWaiting && !isAllowed) {
+      stop();
+      onDenied();
+    }
+  });
+
+  return stop;
+}
+
+function requestPosition(options: PositionOptions): Promise<GeoPoint | GeoProblem> {
+  const deadline = Date.now() + (options.timeout ?? 0);
+
   return new Promise((resolve) => {
-    navigator.geolocation.getCurrentPosition(resolve, resolve, options);
+    let stopWaiting: (() => void) | null = null;
+    let isDone = false;
+
+    function finish(result: GeoPoint | GeoProblem): void {
+      if (!isDone) {
+        isDone = true;
+        stopWaiting?.();
+        resolve(result);
+      }
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => finish(toGeoPoint(position)),
+      (error) => {
+        if (isDone || stopWaiting !== null) {
+          return;
+        }
+
+        if (toGeoProblem(error) === GEO_PROBLEM.DENIED) {
+          stopWaiting = waitAfterDenial({
+            onDenied: () => finish(GEO_PROBLEM.DENIED),
+            deadline,
+            onTimeout: () => finish(GEO_PROBLEM.FAILED),
+          });
+        } else {
+          finish(GEO_PROBLEM.FAILED);
+        }
+      },
+      options,
+    );
   });
 }
 
@@ -30,11 +116,7 @@ export async function getCurrentPoint(): Promise<GeoPoint | GeoProblem> {
     return GEO_PROBLEM.FAILED;
   }
 
-  let result = await requestPosition(FIRST_POSITION_OPTIONS);
+  const result = await requestPosition(FIRST_POSITION_OPTIONS);
 
-  if (!('coords' in result) && toGeoProblem(result) === GEO_PROBLEM.FAILED) {
-    result = await requestPosition(FALLBACK_POSITION_OPTIONS);
-  }
-
-  return 'coords' in result ? toGeoPoint(result) : toGeoProblem(result);
+  return result === GEO_PROBLEM.FAILED ? requestPosition(FALLBACK_POSITION_OPTIONS) : result;
 }

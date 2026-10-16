@@ -5,7 +5,9 @@ import { COURIER_OFFERS_API_PATHS } from '../src/shared/api/endpoints/courier-of
 import { HTTP_STATUS } from '../src/shared/api/request-config';
 import { COURIER_SOCKET_EVENTS } from '../src/shared/realtime/courier-events';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
-import { requireCourier, signInAsCourier } from './support/courier';
+import { CITY_CENTER } from '../src/shared/config/map';
+import { MAP_CLASS, MAP_TEXTS } from '../src/shared/ui/route-map/map';
+import { requireCourier, signInAsCourier, stubCourierOnLine } from './support/courier';
 import { waitForPath } from './support/courier-pages';
 import { stubMapbox } from './support/mapbox';
 import {
@@ -78,6 +80,39 @@ test('should keep the offer open when the courier presses Escape', async () => {
   await page.keyboard.press('Escape');
 
   await expect(offerWindow()).toBeVisible();
+});
+
+test('should put the map of the offer in the full screen and back when the courier presses the button', async () => {
+  await openCabinet();
+  const map = offerWindow().getByRole('region', { name: MAP_TEXTS.AREA_LABEL });
+  const isMapFullscreen = () => map.evaluate((element) => document.fullscreenElement === element);
+
+  await map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN }).click();
+
+  await expect.poll(isMapFullscreen).toBe(true);
+  const exitButton = map.getByRole('button', { name: MAP_TEXTS.EXIT_FULLSCREEN });
+  await expect(exitButton).toHaveAttribute('aria-pressed', 'true');
+
+  await exitButton.click();
+
+  await expect.poll(isMapFullscreen).toBe(false);
+  await expect(map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+});
+
+test('should show the courier on the map of the offer when their position is known', async () => {
+  const [latitude, longitude] = CITY_CENTER;
+  await page.context().grantPermissions(['geolocation']);
+  await page.context().setGeolocation({ latitude, longitude });
+  await stubCourierOnLine(page);
+  await openCabinet();
+
+  const map = offerWindow().getByRole('region', { name: MAP_TEXTS.AREA_LABEL });
+
+  await expect(map.locator(`.${MAP_CLASS.POSITION}`)).toBeVisible();
+  await expect(map.getByRole('button', { name: MAP_TEXTS.LOCATE })).toBeVisible();
 });
 
 test('should close the offer when the courier declines it', async () => {
