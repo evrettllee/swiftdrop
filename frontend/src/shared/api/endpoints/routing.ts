@@ -7,6 +7,7 @@ export const ROUTING_API_PATHS = {
   OFFER: '/couriers/me/offers/current/route',
   COURIER_ORDER: '/couriers/me/orders/current/route',
   clientOrder: (orderId: number) => `/orders/${orderId}/route`,
+  courierHistoryOrder: (orderId: number) => `/couriers/me/orders/${orderId}/route`,
 } as const;
 
 // Must match the segments of the backend: each is its own line on a map.
@@ -54,4 +55,14 @@ export async function getClientOrderRoute(
   options: HttpOptions = {},
 ): Promise<RouteLines> {
   return routeLinesSchema.parse(await http.get(ROUTING_API_PATHS.clientOrder(orderId), options));
+}
+
+// A finished order of the courier: the trip of the parcel by the vehicle of the courier.
+export async function getCourierHistoryOrderRoute(
+  orderId: number,
+  options: HttpOptions = {},
+): Promise<RouteLines> {
+  return routeLinesSchema.parse(
+    await http.get(ROUTING_API_PATHS.courierHistoryOrder(orderId), options),
+  );
 }

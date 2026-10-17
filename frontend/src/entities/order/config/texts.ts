@@ -9,6 +9,15 @@ export const ORDER_TEXTS = {
   size: (length: number, width: number, height: number) => `${length} × ${width} × ${height} см`,
 } as const;
 
+// The facts of a parcel on the pages of an order.
+export const PARCEL_FACT_TEXTS = {
+  WEIGHT: 'Вес',
+  SIZE: 'Размеры',
+  FRAGILE: 'Хрупкое',
+  YES: 'Да',
+  NO: 'Нет',
+} as const;
+
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [ORDER_STATUS.PENDING]: 'Ожидает оплаты',
   [ORDER_STATUS.CONFIRMED]: 'Подтверждён',

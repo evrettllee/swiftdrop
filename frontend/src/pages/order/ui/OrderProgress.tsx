@@ -1,76 +1,19 @@
-import { CheckCircleIcon, XCircleIcon } from '@phosphor-icons/react';
-import type { ReactNode } from 'react';
+import { buildOrderProgress, OrderProgressSteps } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
-import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
-import { formatTime } from '@/shared/lib/format';
-import { Section } from '@/shared/ui/section';
-import { PROGRESS_STATE } from '../config/progress';
+import { PROGRESS_ALIASES, PROGRESS_STEPS, PROGRESS_STOP_LABELS } from '../config/progress';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
-import { buildProgress } from '../lib/progress';
-import type { ProgressState } from '../model/order-progress';
-
-function StepIcon({ state }: { state: ProgressState }) {
-  let icon: ReactNode = (
-    <span aria-hidden="true" className="size-5 shrink-0 rounded-full border border-fg-muted" />
-  );
-
-  if (state === PROGRESS_STATE.DONE || state === PROGRESS_STATE.CURRENT) {
-    icon = (
-      <CheckCircleIcon
-        size={ICON_SIZE.MEDIUM}
-        weight={ICON_WEIGHT}
-        aria-hidden="true"
-        className="shrink-0 text-accent"
-      />
-    );
-  } else if (state === PROGRESS_STATE.STOPPED) {
-    icon = (
-      <XCircleIcon
-        size={ICON_SIZE.MEDIUM}
-        weight={ICON_WEIGHT}
-        aria-hidden="true"
-        className="shrink-0 text-danger"
-      />
-    );
-  }
-
-  return icon;
-}
 
 type OrderProgressProps = {
   order: OrderDetails;
 };
 
-// "Ход заказа": the passed steps with a check and the time, the current one in bold.
+// "Ход заказа" with the steps of the client.
 export function OrderProgress({ order }: OrderProgressProps) {
-  const steps = buildProgress(order);
+  const steps = buildOrderProgress(order, {
+    steps: PROGRESS_STEPS,
+    stopLabels: PROGRESS_STOP_LABELS,
+    aliases: PROGRESS_ALIASES,
+  });
 
-  return (
-    <Section title={ORDER_DETAILS_TEXTS.SECTION_PROGRESS}>
-      <ol className="flex flex-col gap-3">
-        {steps.map((step) => {
-          const isTodo = step.state === PROGRESS_STATE.TODO;
-          const isBold =
-            step.state === PROGRESS_STATE.CURRENT || step.state === PROGRESS_STATE.STOPPED;
-
-          return (
-            <li
-              key={step.key}
-              className={`flex items-center gap-3 ${isTodo ? 'text-fg-secondary' : ''}`}
-            >
-              <StepIcon state={step.state} />
-              <span className={`min-w-0 flex-1 ${isBold ? 'font-semibold' : ''}`}>
-                {step.label}
-              </span>
-              {step.time === null ? null : (
-                <span className="text-small text-fg-secondary tabular-nums">
-                  {formatTime(step.time)}
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
-    </Section>
-  );
+  return <OrderProgressSteps title={ORDER_DETAILS_TEXTS.SECTION_PROGRESS} steps={steps} />;
 }

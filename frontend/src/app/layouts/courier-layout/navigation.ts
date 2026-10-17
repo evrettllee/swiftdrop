@@ -24,6 +24,8 @@ export const COURIER_NAV_ITEMS: readonly NavItem[] = [
     label: COURIER_LAYOUT_TEXTS.NAV_HISTORY,
     icon: ClockCounterClockwiseIcon,
     isExact: true,
+    // A finished order is a part of the history.
+    alsoActiveOn: [APP_ROUTES.COURIER_HISTORY_ORDER],
   },
   {
     to: APP_ROUTES.COURIER_PROFILE,

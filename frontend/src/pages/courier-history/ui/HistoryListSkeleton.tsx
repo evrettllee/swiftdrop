@@ -61,6 +61,7 @@ export function HistoryListSkeleton() {
             <Skeleton className="size-2.5 rounded-full" />
             <Skeleton className="h-4 w-21 rounded-sm" />
           </Line>
+          <Skeleton className="size-5 justify-self-end rounded-sm [grid-area:chev]" />
         </div>
       ))}
     </div>

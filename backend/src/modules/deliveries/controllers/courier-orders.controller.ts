@@ -26,11 +26,13 @@ import {
 } from '../constants/deliveries.constants';
 import { type CourierHistoryDto, courierHistorySchema } from '../dto/courier-history.dto';
 import { type DeliverOrderDto, deliverOrderSchema } from '../dto/deliver-order.dto';
+import { CourierHistoryOrderService } from '../services/courier-history-order.service';
 import { CourierHistoryService } from '../services/courier-history.service';
 import { CourierOrderViewsService } from '../services/courier-order-views.service';
 import { DeliveryHandoverService } from '../services/delivery-handover.service';
 import { DeliveryProgressService } from '../services/delivery-progress.service';
 import type {
+  CourierHistoryOrder,
   CourierHistoryPage,
   CourierIdentity,
   CourierOrder,
@@ -46,6 +48,7 @@ export class CourierOrdersController {
     private readonly progress: DeliveryProgressService,
     private readonly handover: DeliveryHandoverService,
     private readonly history: CourierHistoryService,
+    private readonly historyOrders: CourierHistoryOrderService,
     private readonly routes: RouteLinesService,
   ) {}
 
@@ -104,6 +107,31 @@ export class CourierOrdersController {
     @Body(new ZodValidationPipe(deliverOrderSchema)) dto: DeliverOrderDto,
   ): Promise<CourierOrder> {
     return this.handover.deliver(await this.identify(user), params.orderId, dto.code);
+  }
+
+  // After CURRENT, CURRENT_ROUTE and HISTORY: `:orderId` would catch them otherwise.
+  @Get(COURIER_ORDERS_ROUTES.ORDER)
+  async findFinished(
+    @CurrentUser() user: AuthUser,
+    @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
+  ): Promise<CourierHistoryOrder> {
+    return this.historyOrders.findOne(
+      await this.profiles.getProfileId(user.userId),
+      params.orderId,
+    );
+  }
+
+  // The trip of the parcel of a finished order, by the vehicle of the courier.
+  @Get(COURIER_ORDERS_ROUTES.ORDER_ROUTE)
+  @Throttle(ROUTING_THROTTLE)
+  async finishedRoute(
+    @CurrentUser() user: AuthUser,
+    @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
+  ): Promise<RouteLines> {
+    const courierProfileId = await this.profiles.getProfileId(user.userId);
+    const order = await this.historyOrders.findRow(courierProfileId, params.orderId);
+
+    return this.routes.forHistoryOrder(courierProfileId, order);
   }
 
   private async identify(user: AuthUser): Promise<CourierIdentity> {

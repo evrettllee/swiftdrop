@@ -47,6 +47,17 @@ export class RouteLinesService {
     return this.build(courierOrderPlans(order, courier.position), courier.profile);
   }
 
+  // A finished order of the courier: the trip of the parcel only. The profile is of the vehicle the
+  // courier has now: the vehicle of the moment of the order is not stored.
+  async forHistoryOrder(
+    courierProfileId: number,
+    order: Pick<RoutedOrder, 'pickup' | 'delivery'>,
+  ): Promise<RouteLines> {
+    const courier = await this.findCourier(courierProfileId);
+
+    return this.build([parcelPlan(order)], courier.profile);
+  }
+
   // The vehicle of the courier sets the profile once there is a courier.
   async forClientOrder(order: RoutedOrder & { courierId: number | null }): Promise<RouteLines> {
     const courier = order.courierId === null ? null : await this.findCourier(order.courierId);

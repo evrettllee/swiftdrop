@@ -6,6 +6,7 @@ import { CourierOrdersController } from './controllers/courier-orders.controller
 import { CourierStatsController } from './controllers/courier-stats.controller';
 import { ClientOrderCourierService } from './services/client-order-courier.service';
 import { ClientOrderRouteService } from './services/client-order-route.service';
+import { CourierHistoryOrderService } from './services/courier-history-order.service';
 import { CourierHistoryService } from './services/courier-history.service';
 import { CourierOrderViewsService } from './services/courier-order-views.service';
 import { CourierStatsService } from './services/courier-stats.service';
@@ -22,6 +23,7 @@ import { DeliveryProgressService } from './services/delivery-progress.service';
     ClientOrderCourierService,
     ClientOrderRouteService,
     CourierHistoryService,
+    CourierHistoryOrderService,
     CourierStatsService,
   ],
 })

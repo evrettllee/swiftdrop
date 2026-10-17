@@ -6,8 +6,12 @@ export {
   courierOfferSchema,
   currentOfferSchema,
 } from './endpoints/courier-offer';
-export type { CourierHistoryItem } from './endpoints/courier-history';
-export { courierHistoryItemSchema, courierHistoryPageSchema } from './endpoints/courier-history';
+export type { CourierHistoryItem, CourierHistoryOrder } from './endpoints/courier-history';
+export {
+  courierHistoryItemSchema,
+  courierHistoryOrderSchema,
+  courierHistoryPageSchema,
+} from './endpoints/courier-history';
 export type { CourierOrder } from './endpoints/courier-order';
 export {
   COURIER_ORDERS_API_PATHS,
@@ -49,6 +53,7 @@ export { priceEstimateSchema } from './endpoints/pricing';
 export type { RouteLines, RouteSegmentKind } from './endpoints/routing';
 export {
   getClientOrderRoute,
+  getCourierHistoryOrderRoute,
   getCourierOrderRoute,
   getOfferRoute,
   getRoutePreview,

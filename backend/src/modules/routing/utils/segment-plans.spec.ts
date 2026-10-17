@@ -1,6 +1,6 @@
 import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
 import { ROUTE_SEGMENT_KIND } from '../constants/routing.constants';
-import { clientOrderPlans, courierOrderPlans } from './segment-plans';
+import { clientOrderPlans, courierOrderPlans, parcelPlan } from './segment-plans';
 
 const PICKUP = { latitude: 53.9006, longitude: 27.559 };
 const DELIVERY = { latitude: 53.9075, longitude: 27.457 };
@@ -47,4 +47,11 @@ describe('clientOrderPlans', () => {
       expect(clientOrderPlans(orderIn(status), COURIER)).toEqual([PARCEL]);
     },
   );
+});
+
+describe('parcelPlan', () => {
+  // A finished order of the history: the trip of the parcel, whatever its address carries.
+  it('should go from the pickup point to the delivery point', () => {
+    expect(parcelPlan(orderIn(ORDER_STATUS.DELIVERED))).toEqual(PARCEL);
+  });
 });

@@ -35,6 +35,14 @@ export const courierRoutes: RouteObject = {
           ),
         },
         {
+          path: APP_ROUTES.COURIER_HISTORY_ORDER,
+          Component: lazy(() =>
+            import('@/pages/courier-history-order').then((module) => ({
+              default: module.HistoryOrderPage,
+            })),
+          ),
+        },
+        {
           path: APP_ROUTES.COURIER_VEHICLE,
           Component: lazy(() =>
             import('@/pages/courier-vehicle').then((module) => ({

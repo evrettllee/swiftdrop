@@ -6,6 +6,7 @@ const COURIER_ORDERS_PATH = '/couriers/me/orders';
 export const COURIER_ORDERS_API_PATHS = {
   CURRENT: `${COURIER_ORDERS_PATH}/current`,
   HISTORY: `${COURIER_ORDERS_PATH}/history`,
+  historyOrder: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}`,
   pickup: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}/pickup`,
   depart: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}/depart`,
   deliver: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}/deliver`,

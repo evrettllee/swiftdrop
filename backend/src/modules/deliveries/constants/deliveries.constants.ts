@@ -16,6 +16,9 @@ export const COURIER_ORDERS_ROUTES = {
   PICKUP: `${ORDER_ID_ROUTE_PARAM}/pickup`,
   DEPART: `${ORDER_ID_ROUTE_PARAM}/depart`,
   DELIVER: `${ORDER_ID_ROUTE_PARAM}/deliver`,
+  // A finished order of the history; declared after CURRENT and HISTORY, which it would catch.
+  ORDER: ORDER_ID_ROUTE_PARAM,
+  ORDER_ROUTE: `${ORDER_ID_ROUTE_PARAM}/${ROUTE_PATH_SEGMENT}`,
 } as const;
 
 export const COURIER_STATS_ROUTES = {
@@ -71,6 +74,14 @@ export const LAST_NAME_INITIAL_MARK = '.';
 // History
 // Orders that ended while they were with the courier.
 export const HISTORY_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.DELIVERED,
+  ORDER_STATUS.CANCELLED,
+];
+// The stages of an order the courier took part in: a finished order shows only these.
+export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
   ORDER_STATUS.DELIVERED,
   ORDER_STATUS.CANCELLED,
 ];

@@ -33,6 +33,19 @@ export type CourierOrderRow = {
   distanceKm: number;
 };
 
+// A finished order of the courier: the places, the parcel and the stages, without the people of the
+// order (no names and no phones).
+export type CourierHistoryOrder = {
+  orderId: number;
+  status: OrderStatus;
+  finishedAt: string | null;
+  pickup: OrderAddress;
+  delivery: OrderAddress;
+  parcel: PackageSpec;
+  distanceKm: number;
+  history: { status: OrderStatus; changedAt: Date }[];
+};
+
 // An order as the courier sees it after accepting.
 export type CourierOrder = Omit<CourierOrderRow, 'sender'> & { sender: Contact };
 

@@ -32,7 +32,7 @@ export function HistoryList({ list }: HistoryListProps) {
         className="flex scroll-mt-4 flex-col gap-4"
       >
         {list.items.map((item) => (
-          <HistoryCard key={item.orderId} item={item} />
+          <HistoryCard key={item.orderId} item={item} page={list.page} />
         ))}
       </ul>
       {list.status === LIST_STATUS.ERROR ? <HistoryLoadError onRetry={list.retry} /> : null}

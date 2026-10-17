@@ -1,56 +1,69 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { LIST_STATUS } from '@/shared/config';
-import { getHistory } from '../api/get-history';
-import { HISTORY_PAGE_SIZE, LOAD_MODE } from '../config/list';
-import {
-  FIRST_REQUEST,
-  type HistoryAnswer,
-  type HistoryRequest,
-  NO_ANSWER,
-  requestKey,
-  toFailedAnswer,
-  toReadyAnswer,
-} from './history-list';
+import { matchesMediaQuery } from '@/shared/lib/dom';
+import { HISTORY_PAGE_PARAM, parseHistoryPage } from '@/shared/routes';
+import { HISTORY_DESKTOP_QUERY, HISTORY_FIRST_PAGE, LOAD_MODE } from '../config/list';
+import { getTotalPages, type HistoryRequest, openRequest, requestKey } from './history-list';
+import { useHistoryAnswer } from './useHistoryAnswer';
+
+// The first page has no parameter in the address.
+function toParamValue(page: number): string | null {
+  return page > HISTORY_FIRST_PAGE ? String(page) : null;
+}
+
+function openPage(page: number): HistoryRequest {
+  return openRequest(page, matchesMediaQuery(HISTORY_DESKTOP_QUERY));
+}
 
 // The history of the courier. The desktop moves between pages (`goToPage`), a phone adds the next
-// page to the end (`showMore`). Clicks change only the request, the effect loads it; a request
-// that is not needed any more (another page, the page left) is cancelled, so an old answer never
-// replaces a new one. "Loading" means the stored answer belongs to another request.
+// page to the end (`showMore`). Clicks change only the request; the effect loads it, and the
+// address follows it (?page=N, replacing the entry, so the Back button of the browser does not
+// stick). A page opened from the address is loaded as it says; one that is not a page of the
+// history is the first page, and the address is corrected. "Loading" means the stored answer
+// belongs to another request.
 export function useHistoryList() {
-  const [request, setRequest] = useState<HistoryRequest>(FIRST_REQUEST);
-  const [answer, setAnswer] = useState<HistoryAnswer>(NO_ANSWER);
-  const { page, mode, attempt } = request;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawPage = searchParams.get(HISTORY_PAGE_PARAM);
+  const urlPage = parseHistoryPage(rawPage);
+  const [request, setRequest] = useState<HistoryRequest>(() => openPage(urlPage));
+  const [seenUrlPage, setSeenUrlPage] = useState(urlPage);
+  const answer = useHistoryAnswer(request);
+  const isAnswered = answer.key === requestKey(request);
+  const isPastEnd =
+    isAnswered && answer.status === LIST_STATUS.READY && request.page > getTotalPages(answer.total);
+
+  // The address changed by someone else (the menu, Back) is a new request; a change that followed
+  // the request already has its page.
+  if (urlPage !== seenUrlPage) {
+    setSeenUrlPage(urlPage);
+
+    if (urlPage !== request.page) {
+      setRequest(openPage(urlPage));
+    }
+  }
+
+  // A page past the end is the first page.
+  if (isPastEnd) {
+    setRequest(openPage(HISTORY_FIRST_PAGE));
+  }
 
   useEffect(() => {
-    const controller = new AbortController();
-    const current: HistoryRequest = { page, mode, attempt };
+    const value = toParamValue(request.page);
 
-    getHistory({ page }, controller.signal).then(
-      (result) => {
-        if (!controller.signal.aborted) {
-          setAnswer((previous) => toReadyAnswer(previous, current, result));
-        }
-      },
-      () => {
-        if (!controller.signal.aborted) {
-          setAnswer((previous) => toFailedAnswer(previous, current));
-        }
-      },
-    );
-
-    return () => controller.abort();
-  }, [page, mode, attempt]);
-
-  const isAnswered = answer.key === requestKey(request);
+    if (rawPage !== value) {
+      setSearchParams(value === null ? {} : { [HISTORY_PAGE_PARAM]: value }, { replace: true });
+    }
+  }, [request.page, rawPage, setSearchParams]);
 
   return {
     status: isAnswered ? answer.status : LIST_STATUS.LOADING,
     items: answer.items,
     page: answer.page,
     total: answer.total,
-    totalPages: Math.ceil(answer.total / HISTORY_PAGE_SIZE),
+    totalPages: getTotalPages(answer.total),
     hasMore: answer.items.length < answer.total,
-    goToPage: (next: number) => setRequest({ page: next, mode: LOAD_MODE.REPLACE, attempt: 0 }),
+    goToPage: (page: number) => setRequest({ page, mode: LOAD_MODE.REPLACE, attempt: 0 }),
     showMore: () => setRequest({ page: answer.page + 1, mode: LOAD_MODE.APPEND, attempt: 0 }),
     retry: () => setRequest((current) => ({ ...current, attempt: current.attempt + 1 })),
   };

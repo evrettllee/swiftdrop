@@ -22,3 +22,32 @@ export const courierHistoryPageSchema = z.object({
   limit: z.number(),
   total: z.number(),
 });
+
+const pointSchema = z.object({
+  city: z.string(),
+  street: z.string(),
+  house: z.string(),
+  apartment: z.string().nullable(),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
+// Response of GET /api/couriers/me/orders/:orderId: a finished order without the people of it.
+export const courierHistoryOrderSchema = z.object({
+  orderId: z.number(),
+  status: orderStatusSchema,
+  finishedAt: dateSchema.nullable(),
+  pickup: pointSchema,
+  delivery: pointSchema,
+  parcel: z.object({
+    weightKg: z.number(),
+    lengthCm: z.number(),
+    widthCm: z.number(),
+    heightCm: z.number(),
+    isFragile: z.boolean(),
+  }),
+  distanceKm: z.number(),
+  history: z.array(z.object({ status: orderStatusSchema, changedAt: dateSchema })),
+});
+
+export type CourierHistoryOrder = z.infer<typeof courierHistoryOrderSchema>;
