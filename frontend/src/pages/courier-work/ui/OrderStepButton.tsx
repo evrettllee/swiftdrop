@@ -1,5 +1,5 @@
 import { Button } from '@/shared/ui/button';
-import { ORDER_ACTION, type OrderStep } from '../config/order-steps';
+import type { OrderStep } from '../config/order-steps';
 
 type OrderStepButtonProps = {
   step: OrderStep;
@@ -7,15 +7,10 @@ type OrderStepButtonProps = {
   onPress: () => void;
 };
 
-// The next step of the order. Entering the code comes with its own screen, until then it waits.
+// The next step of the order; entering the code opens its own screen.
 export function OrderStepButton({ step, isPending, onPress }: OrderStepButtonProps) {
   return (
-    <Button
-      fullWidth
-      loading={isPending}
-      disabled={step.action === ORDER_ACTION.ENTER_CODE}
-      onClick={onPress}
-    >
+    <Button fullWidth loading={isPending} onClick={onPress}>
       {step.actionLabel}
     </Button>
   );

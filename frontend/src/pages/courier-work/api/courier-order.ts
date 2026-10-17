@@ -24,3 +24,10 @@ export async function pickUpOrder(orderId: number): Promise<CourierOrder> {
 export async function departOrder(orderId: number): Promise<CourierOrder> {
   return courierOrderSchema.parse(await http.post(COURIER_ORDERS_API_PATHS.depart(orderId)));
 }
+
+// The recipient's code closes the order; the backend counts the wrong tries and locks them.
+export async function deliverOrder(orderId: number, code: string): Promise<CourierOrder> {
+  return courierOrderSchema.parse(
+    await http.post(COURIER_ORDERS_API_PATHS.deliver(orderId), { code }),
+  );
+}

@@ -23,6 +23,12 @@ export function WorkContent({ profile, vehicle }: WorkContentProps) {
       location={location}
     />
   ) : (
-    <CurrentOrder orderId={profile.activeOrderId} vehicle={vehicle} location={location} />
+    // A new order starts on its own screen, never on the code or the closed state of the last one.
+    <CurrentOrder
+      key={profile.activeOrderId}
+      orderId={profile.activeOrderId}
+      vehicle={vehicle}
+      location={location}
+    />
   );
 }

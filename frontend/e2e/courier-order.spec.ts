@@ -96,7 +96,7 @@ test('should take the courier through the pickup and on to the recipient', async
 
   await expect(title(ORDER_STEP_TEXTS.TO_RECIPIENT)).toBeVisible();
   await expect(page.getByText(ORDER_STEP_TEXTS.CODE_HINT)).toBeVisible();
-  await expect(stepButton(ORDER_STEP_TEXTS.ENTER_CODE)).toBeDisabled();
+  await expect(stepButton(ORDER_STEP_TEXTS.ENTER_CODE)).toBeEnabled();
 });
 
 test('should tell the error of the backend and load the order again when the step is stale', async () => {

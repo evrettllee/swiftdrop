@@ -60,6 +60,22 @@ export const ORDER_TEXTS = {
   orderNumber: (number: string) => `Заказ ${number}`,
 } as const;
 
+// The screen where the courier enters the code of the recipient.
+export const DELIVERY_CODE_TEXTS = {
+  BACK: 'К заказу',
+  TITLE: 'Код доставки',
+  HINT: 'Попросите у получателя 4 цифры.',
+  LABEL: 'Код из заказа',
+  SUBMIT: 'Подтвердить доставку',
+} as const;
+
+// The screen after the right code.
+export const ORDER_DELIVERED_TEXTS = {
+  TITLE: 'Заказ доставлен',
+  BACK_TO_WORK: 'К работе',
+  closed: (order: string, time: string) => `${order} закрыт в ${time}.`,
+} as const;
+
 // The alert when the browser gives no position, so the courier cannot go on the line.
 export const GEO_ALERT_TEXTS = {
   DENIED_TITLE: 'Нет доступа к геопозиции',

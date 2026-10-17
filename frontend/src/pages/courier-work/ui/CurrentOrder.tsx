@@ -4,11 +4,14 @@ import { Button } from '@/shared/ui/button';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { ContentLoader } from '@/shared/ui/page-loader';
 import { PageTitle } from '@/shared/ui/page-title';
-import { ORDER_STEPS } from '../config/order-steps';
+import { ORDER_ACTION, ORDER_STEPS } from '../config/order-steps';
 import { COURIER_WORK_TEXTS, ORDER_TEXTS } from '../config/texts';
 import { useCurrentOrder } from '../model/useCurrentOrder';
 import type { LocationSharing } from '../model/useLocationSharing';
+import { ORDER_VIEW, useOrderView } from '../model/useOrderView';
 import { ConnectionAlert } from './ConnectionAlert';
+import { DeliveryCodeScreen } from './DeliveryCodeScreen';
+import { OrderDelivered } from './OrderDelivered';
 import { OrderScreen } from './OrderScreen';
 
 type CurrentOrderProps = {
@@ -17,21 +20,40 @@ type CurrentOrderProps = {
   location: LocationSharing;
 };
 
-// The order the courier carries: loaded by the screen itself, shown stage by stage.
+// The order the courier carries: loaded by the screen itself, shown stage by stage, then the code
+// of the recipient and the closed order.
 export function CurrentOrder({ orderId, vehicle, location }: CurrentOrderProps) {
-  const current = useCurrentOrder(orderId);
+  const { view, openCode, showOrder, showDelivered } = useOrderView();
+  const current = useCurrentOrder(orderId, view.kind === ORDER_VIEW.DELIVERED);
   const { order } = current;
   const step = order === null ? undefined : ORDER_STEPS[order.status];
 
+  if (view.kind === ORDER_VIEW.DELIVERED) {
+    return <OrderDelivered orderId={view.orderId} closedAt={view.closedAt} />;
+  }
+
   if (order !== null && step !== undefined) {
-    return (
+    return view.kind === ORDER_VIEW.CODE && step.action === ORDER_ACTION.ENTER_CODE ? (
+      <DeliveryCodeScreen
+        orderId={order.orderId}
+        location={location}
+        onBack={() => showOrder()}
+        onDelivered={(closedAt) => showDelivered(order.orderId, closedAt)}
+        onStale={(message) => {
+          showOrder(message);
+          current.reload();
+        }}
+      />
+    ) : (
       <OrderScreen
         order={order}
         step={step}
         vehicle={vehicle}
         location={location}
+        deliveryError={view.kind === ORDER_VIEW.ORDER ? view.error : null}
         onChanged={current.setOrder}
         onStale={current.reload}
+        onEnterCode={openCode}
       />
     );
   }

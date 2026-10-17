@@ -16,7 +16,8 @@ const FAILED: CurrentOrderState = { status: LIST_STATUS.ERROR, order: null };
 
 // Asks for the order again each time the socket connects back: the order may have been cancelled
 // while there was no connection. The first connection is not a return, the page loads it anyway.
-function useReconnectReload(reload: () => void): void {
+// Not while `isPaused`.
+function useReconnectReload(reload: () => void, isPaused: boolean): void {
   const connection = useConnectionStatus();
   const previous = useRef(connection);
   const hasBeenConnected = useRef(false);
@@ -27,20 +28,22 @@ function useReconnectReload(reload: () => void): void {
       isConnected && previous.current !== CONNECTION_STATUS.CONNECTED && hasBeenConnected.current;
     previous.current = connection;
 
-    if (isReturn) {
+    if (isReturn && !isPaused) {
       reload();
     }
 
     if (isConnected) {
       hasBeenConnected.current = true;
     }
-  }, [connection, reload]);
+  }, [connection, reload, isPaused]);
 }
 
 // The order the courier carries, loaded when the screen opens, when the order of the profile
 // changes and when the socket connects back. No order means the profile is behind: it is loaded
 // again, and the page goes back to the line. A failed load keeps the order the screen shows.
-export function useCurrentOrder(activeOrderId: number) {
+// `isReconnectReloadPaused` keeps the screen of the closed order: a load would find no order and
+// take the courier to the line before they press «К работе».
+export function useCurrentOrder(activeOrderId: number, isReconnectReloadPaused: boolean) {
   const [version, setVersion] = useState(0);
   const [state, setState] = useState<CurrentOrderState>(LOADING);
   const reload = useCallback(() => setVersion((current) => current + 1), []);
@@ -72,7 +75,7 @@ export function useCurrentOrder(activeOrderId: number) {
     return () => controller.abort();
   }, [activeOrderId, version]);
 
-  useReconnectReload(reload);
+  useReconnectReload(reload, isReconnectReloadPaused);
 
   // The answer of a step is the order after it.
   const setOrder = useCallback(

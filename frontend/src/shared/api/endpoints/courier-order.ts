@@ -7,6 +7,7 @@ export const COURIER_ORDERS_API_PATHS = {
   CURRENT: `${COURIER_ORDERS_PATH}/current`,
   pickup: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}/pickup`,
   depart: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}/depart`,
+  deliver: (orderId: number) => `${COURIER_ORDERS_PATH}/${orderId}/deliver`,
 } as const;
 
 // After the accept the courier sees the exact address of both points.
