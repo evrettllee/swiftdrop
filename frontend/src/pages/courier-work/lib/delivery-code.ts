@@ -1,4 +1,4 @@
-import { DELIVERY_CODE_LENGTH } from '../config/delivery-code';
+import { DELIVERY_CODE_LENGTH } from '@/shared/config';
 
 const NON_DIGITS = /\D/g;
 

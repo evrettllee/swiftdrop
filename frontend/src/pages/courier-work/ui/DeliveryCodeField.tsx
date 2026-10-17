@@ -1,8 +1,7 @@
 import { type ClipboardEvent, type Ref, useId } from 'react';
-import { COLOR_TRANSITION_CLASS, ID_PART } from '@/shared/config';
+import { COLOR_TRANSITION_CLASS, DELIVERY_CODE_LENGTH, ID_PART } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
 import { FieldError } from '@/shared/ui/field-error';
-import { DELIVERY_CODE_LENGTH } from '../config/delivery-code';
 import { DELIVERY_CODE_TEXTS } from '../config/texts';
 import { pasteIntoDeliveryCode, toDeliveryCode } from '../lib/delivery-code';
 

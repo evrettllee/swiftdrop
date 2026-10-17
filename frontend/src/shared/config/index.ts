@@ -7,6 +7,7 @@ export {
   REDUCED_MOTION_QUERY,
   SCROLL_LOCK_OVERFLOW,
 } from './dom';
+export { DELIVERY_CODE_LENGTH } from './delivery-code';
 export { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from './env';
 export { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE, INVALID_FIELD_SELECTOR } from './forms';
 export type { ListStatus } from './list-status';

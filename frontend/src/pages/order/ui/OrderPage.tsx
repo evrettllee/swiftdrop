@@ -1,67 +1,42 @@
 import { MagnifyingGlassIcon, WarningCircleIcon } from '@phosphor-icons/react';
-import { type ReactNode, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useParams } from 'react-router';
 import { LIST_STATUS } from '@/shared/config';
 import { APP_ROUTES, ORDER_ID_PARAM } from '@/shared/routes';
 import { Button, LinkButton } from '@/shared/ui/button';
-import { Divider } from '@/shared/ui/divider';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { ContentLoader } from '@/shared/ui/page-loader';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
+import { POLLED_STATUSES } from '../model/order-status-groups';
+import { useOrderCourier } from '../model/useOrderCourier';
 import { useOrderDetails } from '../model/useOrderDetails';
+import { useOrderPolling } from '../model/useOrderPolling';
 import { usePaymentReturn } from '../model/usePaymentReturn';
-import { CancelOrderDialog } from './CancelOrderDialog';
-import { OrderHeader } from './OrderHeader';
-import { OrderPaymentAlert } from './OrderPaymentAlert';
-import { OrderPaymentPanel } from './OrderPaymentPanel';
-import { OrderProgress } from './OrderProgress';
-import { OrderRecipient } from './OrderRecipient';
-import { OrderRoute } from './OrderRoute';
+import { OrderContent } from './OrderContent';
 
 export function OrderPage() {
   const params = useParams();
-  const details = useOrderDetails(Number(params[ORDER_ID_PARAM]));
+  const orderId = Number(params[ORDER_ID_PARAM]);
+  const details = useOrderDetails(orderId);
   const paymentReturn = usePaymentReturn(details.order, details.reload);
-  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const status = details.order?.status ?? null;
+  const { courier, deliveryCode, refresh: refreshCourier } = useOrderCourier(orderId, status);
+  // The client has no socket: while the order can still change, the page asks for it by itself.
+  useOrderPolling(status !== null && POLLED_STATUSES.includes(status), () => {
+    details.refresh();
+    refreshCourier();
+  });
   let content: ReactNode;
 
-  function handleCancelled(): void {
-    setIsCancelOpen(false);
-    details.reload();
-  }
-
   if (details.order !== null) {
-    const order = details.order;
-
     content = (
-      <div className="flex flex-col gap-6 lg:gap-8">
-        <OrderHeader order={order} />
-        <OrderPaymentAlert
-          order={order}
-          isChecking={paymentReturn.isChecking}
-          isFailed={paymentReturn.isFailed}
-        />
-        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-12">
-          <div className="flex min-w-0 flex-col gap-6 lg:gap-8">
-            <OrderProgress order={order} />
-            <Divider />
-            <OrderRoute order={order} />
-            <Divider />
-            <OrderRecipient order={order} />
-          </div>
-          <OrderPaymentPanel
-            order={order}
-            isPayFailed={paymentReturn.isFailed}
-            onCancel={() => setIsCancelOpen(true)}
-          />
-        </div>
-        <CancelOrderDialog
-          order={order}
-          isOpen={isCancelOpen}
-          onClose={() => setIsCancelOpen(false)}
-          onCancelled={handleCancelled}
-        />
-      </div>
+      <OrderContent
+        order={details.order}
+        courier={courier}
+        deliveryCode={deliveryCode}
+        paymentReturn={paymentReturn}
+        onReload={details.reload}
+      />
     );
   } else if (details.status === LIST_STATUS.LOADING) {
     content = <ContentLoader />;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { DELIVERY_CODE_LENGTH } from '@/shared/config';
 import { deliverOrder } from '../api/courier-order';
-import { DELIVERY_CODE_LENGTH } from '../config/delivery-code';
 import { DELIVERY_FAILURE, type DeliveryFailure, readDeliveryFailure } from './delivery-failure';
 
 type DeliveryCodeOptions = {

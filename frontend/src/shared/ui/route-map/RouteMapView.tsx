@@ -1,6 +1,6 @@
 import type { Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { MapContainer, Marker } from 'react-leaflet';
 import { IS_MAPBOX_CONFIGURED, ROUTE_POINT } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
@@ -33,11 +33,13 @@ type RouteMapViewProps = {
   route: MapRoute;
   // The parent sets the height of the map.
   className: string;
+  // More layers of the map, for example a pulse under the pickup point (SearchPulse).
+  children?: ReactNode;
 };
 
 // The route of an order to look at: the points cannot be moved. In the page the map does not
 // take the scroll of the page, so it neither moves nor zooms; expanded, it moves and zooms.
-export function RouteMapView({ pickup, delivery, route, className }: RouteMapViewProps) {
+export function RouteMapView({ pickup, delivery, route, className, children }: RouteMapViewProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
   const { isExpanded, toggle, toggleButtonRef } = useExpandedMap(map);
   useMapInteractions(map, isExpanded);
@@ -89,6 +91,7 @@ export function RouteMapView({ pickup, delivery, route, className }: RouteMapVie
             interactive={false}
             keyboard={false}
           />
+          {children}
         </MapContainer>
         <MapControls
           map={map}
