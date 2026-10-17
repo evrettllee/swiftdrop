@@ -81,6 +81,7 @@ export type CourierHistoryRow = {
   pickup: ShortAddress;
   delivery: ShortAddress;
   distanceKm: number;
+  weightKg: number;
 };
 
 export type CourierHistoryItem = Omit<CourierHistoryRow, 'finishedAt'> & {

@@ -4,8 +4,8 @@ import { ORDER_TEXTS } from '../config/texts';
 // The address of a point of an order: the list and the page of an order share its shape.
 type OrderAddress = OrderListItem['pickup'];
 
-// For example "Свердлова, 13а": the address in lists.
-export function formatShortAddress(address: OrderAddress): string {
+// For example "Свердлова, 13а": the address in lists (the history of a courier has only these two).
+export function formatShortAddress(address: Pick<OrderAddress, 'street' | 'house'>): string {
   return [address.street, address.house].join(ORDER_TEXTS.ADDRESS_PARTS_SEPARATOR);
 }
 

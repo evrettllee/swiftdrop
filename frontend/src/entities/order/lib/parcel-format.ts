@@ -11,7 +11,7 @@ const weightFormat = new Intl.NumberFormat(APP_LOCALE, {
 });
 
 // For example "2,5 кг"
-export function formatParcelWeight(parcel: OrderParcel): string {
+export function formatParcelWeight(parcel: Pick<OrderParcel, 'weightKg'>): string {
   return ORDER_TEXTS.weight(weightFormat.format(parcel.weightKg));
 }
 

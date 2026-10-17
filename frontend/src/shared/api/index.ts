@@ -6,6 +6,8 @@ export {
   courierOfferSchema,
   currentOfferSchema,
 } from './endpoints/courier-offer';
+export type { CourierHistoryItem } from './endpoints/courier-history';
+export { courierHistoryItemSchema, courierHistoryPageSchema } from './endpoints/courier-history';
 export type { CourierOrder } from './endpoints/courier-order';
 export {
   COURIER_ORDERS_API_PATHS,
