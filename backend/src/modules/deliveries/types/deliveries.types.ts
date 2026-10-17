@@ -71,7 +71,6 @@ export type ClientOrderCourierRow = {
   otpCode: string | null;
   firstName: string | null;
   lastName: string | null;
-  phone: string | null;
   vehicleType: VehicleType | null;
   brand: string | null;
   model: string | null;
@@ -80,7 +79,7 @@ export type ClientOrderCourierRow = {
 
 // What the client sees about the courier of an order.
 export type ClientOrderCourier = {
-  courier: (Contact & { vehicle: CourierVehicle | null }) | null;
+  courier: { name: string; vehicle: CourierVehicle | null } | null;
   deliveryCode: string | null;
 };
 
