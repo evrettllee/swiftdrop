@@ -1,9 +1,10 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
 import {
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
-} from '../../../src/auth/constants/tokens.constants';
+} from '../../../src/modules/auth/constants/tokens.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';
@@ -37,10 +38,12 @@ describe('Auth (e2e)', () => {
     it('should return 204 and make the refresh token unusable when logging out', async () => {
       const { cookies, refreshToken } = await registerUser(app);
 
-      await postAuth(app, AUTH_ROUTES.LOGOUT).set(COOKIE_HEADER, cookies).expect(204);
+      await postAuth(app, AUTH_ROUTES.LOGOUT)
+        .set(COOKIE_HEADER, cookies)
+        .expect(HttpStatus.NO_CONTENT);
       await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
     });
 
     it('should clear both session cookies when logging out', async () => {
@@ -48,14 +51,14 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.LOGOUT)
         .set(COOKIE_HEADER, cookies)
-        .expect(204);
+        .expect(HttpStatus.NO_CONTENT);
 
       expect(extractCookieValue(response, ACCESS_COOKIE_NAME)).toBe('');
       expect(extractCookieValue(response, REFRESH_COOKIE_NAME)).toBe('');
     });
 
     it('should return 204 when there is no refresh cookie', async () => {
-      await postAuth(app, AUTH_ROUTES.LOGOUT).expect(204);
+      await postAuth(app, AUTH_ROUTES.LOGOUT).expect(HttpStatus.NO_CONTENT);
     });
   });
 });

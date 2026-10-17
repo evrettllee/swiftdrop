@@ -1,20 +1,18 @@
-import { Logger } from '@nestjs/common';
+import { Logger, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENT_EVENT,
   SESSION_EXPIRE_RESULT,
-} from '../../../src/payments/payments.constants';
+} from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
@@ -25,6 +23,7 @@ import {
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 const PAYMENT_REF = 'pi_test_reconciled';
 
@@ -46,10 +45,7 @@ describe('Order cancellation with a session that is no longer open (e2e)', () =>
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     resetGatewayMock(gateway);
 
     ({ cookies } = await registerUser(app));
@@ -83,7 +79,7 @@ describe('Order cancellation with a session that is no longer open (e2e)', () =>
 
     expect(error).not.toHaveBeenCalled();
     error.mockRestore();
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatus.OK);
     expect(gateway.getCheckoutSession).toHaveBeenCalledWith(CHECKOUT_SESSION.sessionId);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.FAILED);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
@@ -95,7 +91,7 @@ describe('Order cancellation with a session that is no longer open (e2e)', () =>
 
     const response = await cancelOrder(app, cookies, orderId);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatus.OK);
     expect(gateway.refund).toHaveBeenCalledTimes(1);
     expect(gateway.refund).toHaveBeenCalledWith(PAYMENT_REF);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
@@ -104,7 +100,7 @@ describe('Order cancellation with a session that is no longer open (e2e)', () =>
 
   it('should change nothing when the webhook of the paid session comes after the reconciliation', async () => {
     paySession();
-    await cancelOrder(app, cookies, orderId).expect(200);
+    await cancelOrder(app, cookies, orderId).expect(HttpStatus.OK);
     gateway.parseWebhook.mockReturnValue({
       type: PAYMENT_EVENT.PAID,
       orderId,
@@ -112,8 +108,8 @@ describe('Order cancellation with a session that is no longer open (e2e)', () =>
       paymentRef: PAYMENT_REF,
     });
 
-    await postWebhook(app, WEBHOOK_SIGNATURE).expect(200);
-    await postWebhook(app, WEBHOOK_SIGNATURE).expect(200);
+    await postWebhook(app, WEBHOOK_SIGNATURE).expect(HttpStatus.OK);
+    await postWebhook(app, WEBHOOK_SIGNATURE).expect(HttpStatus.OK);
 
     expect(gateway.refund).toHaveBeenCalledTimes(1);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);

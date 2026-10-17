@@ -1,20 +1,26 @@
 import { ArrowRightIcon } from '@phosphor-icons/react';
 import { type ReactNode, useId } from 'react';
 import { ESTIMATE_STATUS, ESTIMATE_TEXTS, type EstimateView } from '@/features/estimate-price';
-import { formatCoefficient, formatDistanceKm, PRICE_TEXTS, splitPrice } from '@/entities/price';
+import {
+  DeliveryPriceRows,
+  formatCoefficient,
+  formatDistanceKm,
+  PRICE_TEXTS,
+  PriceTotal,
+  splitPrice,
+} from '@/entities/price';
 import type { PriceEstimate } from '@/shared/api';
-import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { ICON_SIZE, ICON_WEIGHT, SIDE_COLUMN_CLASS } from '@/shared/config';
 import { formatMoney } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/button';
+import { Divider } from '@/shared/ui/divider';
 import { InlineAlert } from '@/shared/ui/inline-alert';
+import { BlockLoader } from '@/shared/ui/page-loader';
 import { PriceRow } from '@/shared/ui/price-row';
-import { Spinner } from '@/shared/ui/spinner';
 import { CHECKOUT_TEXTS } from '../config/texts';
 
-const DIVIDER = <hr className="border-border" />;
-
 function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
-  const { base, surcharge } = splitPrice(estimate.price, estimate.coefficient);
+  const { surcharge } = splitPrice(estimate.price, estimate.coefficient);
 
   return (
     <>
@@ -25,15 +31,13 @@ function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
           value={PRICE_TEXTS.travelTime(estimate.estimatedMinutes)}
         />
       </dl>
-      {DIVIDER}
+      <Divider />
       <dl className="flex flex-col gap-2 text-small">
-        <PriceRow label={PRICE_TEXTS.DELIVERY} value={formatMoney(base, estimate.currency)} />
-        {surcharge === null ? null : (
-          <PriceRow
-            label={PRICE_TEXTS.surcharge(formatCoefficient(estimate.coefficient))}
-            value={PRICE_TEXTS.extra(formatMoney(surcharge, estimate.currency))}
-          />
-        )}
+        <DeliveryPriceRows
+          price={estimate.price}
+          coefficient={estimate.coefficient}
+          currency={estimate.currency}
+        />
       </dl>
       {surcharge === null ? null : (
         <InlineAlert
@@ -43,13 +47,8 @@ function ReadyRows({ estimate }: { estimate: PriceEstimate }) {
           {CHECKOUT_TEXTS.DEMAND_TEXT}
         </InlineAlert>
       )}
-      {DIVIDER}
-      <div className="flex items-baseline justify-between gap-4">
-        <span className="font-semibold">{PRICE_TEXTS.TOTAL}</span>
-        <span className="text-heading-lg font-bold tabular-nums">
-          {formatMoney(estimate.price, estimate.currency)}
-        </span>
-      </div>
+      <Divider />
+      <PriceTotal value={formatMoney(estimate.price, estimate.currency)} />
     </>
   );
 }
@@ -78,12 +77,7 @@ export function CheckoutSummary({
   } else if (estimate.status === ESTIMATE_STATUS.ERROR) {
     body = <InlineAlert variant="error">{estimate.message}</InlineAlert>;
   } else if (estimate.status === ESTIMATE_STATUS.LOADING) {
-    body = (
-      <div className="flex items-center justify-center gap-2 text-small text-fg-secondary">
-        <Spinner />
-        <span>{ESTIMATE_TEXTS.LOADING}</span>
-      </div>
-    );
+    body = <BlockLoader text={ESTIMATE_TEXTS.LOADING} className="text-small text-fg-secondary" />;
   } else if (estimate.status === ESTIMATE_STATUS.NEEDS_PACKAGE) {
     body = <p className="text-small text-fg-secondary">{ESTIMATE_TEXTS.NEEDS_PACKAGE}</p>;
   }
@@ -91,7 +85,7 @@ export function CheckoutSummary({
   return (
     <aside
       aria-labelledby={headingId}
-      className="flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-md lg:sticky lg:top-12 lg:p-6 dark:border dark:border-border"
+      className={`${SIDE_COLUMN_CLASS} flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-md lg:sticky lg:top-12 lg:p-6 dark:border dark:border-border`}
     >
       <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
         {CHECKOUT_TEXTS.SECTION_SUMMARY}
@@ -102,9 +96,7 @@ export function CheckoutSummary({
       {formError === null ? null : <InlineAlert variant="error">{formError}</InlineAlert>}
       <Button type="submit" form={formId} fullWidth loading={isSubmitting}>
         {CHECKOUT_TEXTS.SUBMIT}
-        {isSubmitting ? null : (
-          <ArrowRightIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-        )}
+        <ArrowRightIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
       </Button>
     </aside>
   );

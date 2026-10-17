@@ -1,15 +1,13 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
@@ -20,6 +18,7 @@ import {
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Payment webhook (e2e)', () => {
   let app: NestExpressApplication;
@@ -38,10 +37,7 @@ describe('Payment webhook (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     resetGatewayMock(gateway);
 
     const { cookies } = await registerUser(app);
@@ -58,14 +54,14 @@ describe('Payment webhook (e2e)', () => {
 
     const response = await postWebhook(app, WEBHOOK_SIGNATURE);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatus.OK);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PENDING);
   });
 
   it('should answer 400 and not touch the gateway when the signature header is missing', async () => {
     const response = await postWebhook(app);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     expect(gateway.parseWebhook).not.toHaveBeenCalled();
   });
 
@@ -76,7 +72,7 @@ describe('Payment webhook (e2e)', () => {
 
     const response = await postWebhook(app, WEBHOOK_SIGNATURE);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.PENDING);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.PENDING);
   });

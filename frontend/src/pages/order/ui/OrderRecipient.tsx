@@ -1,7 +1,8 @@
-import { useId } from 'react';
+import { formatParcelSize, formatParcelWeight } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
+import { formatPhone } from '@/shared/lib/format';
+import { Section } from '@/shared/ui/section';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
-import { formatPhone, formatSize, formatWeight } from '../lib/order-details-format';
 
 type FieldProps = {
   label: string;
@@ -24,24 +25,20 @@ type OrderRecipientProps = {
 };
 
 export function OrderRecipient({ order }: OrderRecipientProps) {
-  const headingId = useId();
   const { recipient, parcel } = order;
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
-      <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
-        {ORDER_DETAILS_TEXTS.SECTION_RECIPIENT}
-      </h2>
+    <Section title={ORDER_DETAILS_TEXTS.SECTION_RECIPIENT}>
       <dl className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
         <Field label={ORDER_DETAILS_TEXTS.RECIPIENT} value={recipient.name} isWide />
         <Field label={ORDER_DETAILS_TEXTS.PHONE} value={formatPhone(recipient.phone)} isWide />
-        <Field label={ORDER_DETAILS_TEXTS.WEIGHT} value={formatWeight(parcel)} />
-        <Field label={ORDER_DETAILS_TEXTS.SIZE} value={formatSize(parcel)} />
+        <Field label={ORDER_DETAILS_TEXTS.WEIGHT} value={formatParcelWeight(parcel)} />
+        <Field label={ORDER_DETAILS_TEXTS.SIZE} value={formatParcelSize(parcel)} />
         <Field
           label={ORDER_DETAILS_TEXTS.FRAGILE}
           value={parcel.isFragile ? ORDER_DETAILS_TEXTS.YES : ORDER_DETAILS_TEXTS.NO}
         />
       </dl>
-    </section>
+    </Section>
   );
 }

@@ -1,5 +1,4 @@
-// How much wider the casing is than the road, in the units of the viewBox.
-const CASING_EXTRA = 2;
+import { ROAD_CASING_EXTRA } from '../../config/tracking-map';
 
 type TrackingMapRoadProps = {
   d: string;
@@ -10,7 +9,7 @@ type TrackingMapRoadProps = {
 export function TrackingMapRoad({ d, width }: TrackingMapRoadProps) {
   return (
     <>
-      <path d={d} className="stroke-border" strokeWidth={width + CASING_EXTRA} />
+      <path d={d} className="stroke-border" strokeWidth={width + ROAD_CASING_EXTRA} />
       <path d={d} className="stroke-surface-elevated" strokeWidth={width} />
     </>
   );

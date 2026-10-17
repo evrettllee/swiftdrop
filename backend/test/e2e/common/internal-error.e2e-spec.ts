@@ -1,20 +1,17 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { INTERNAL_ERROR_MESSAGE } from '../../../src/common/constants/http.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OrdersQueryService } from '../../../src/orders/services/orders-query.service';
+import { OrdersQueryService } from '../../../src/modules/orders/services/orders-query.service';
 import { ORDER_NOT_FOUND_MESSAGE } from '../../../src/common/constants/orders.constants';
-import { ORDERS_ROUTES } from '../../../src/orders/orders.constants';
+import { ORDERS_ROUTES } from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { COOKIE_HEADER, registerUser } from '../../support/auth';
 import { resetTestData } from '../../support/database';
 import { postApi } from '../../support/http';
 import { getOrders } from '../../support/orders';
 
-const HTTP_INTERNAL_ERROR = 500;
-const HTTP_NOT_FOUND = 404;
-const HTTP_BAD_REQUEST = 400;
 const MALFORMED_JSON = '{"pickup":';
 // What an unexpected failure may carry: SQL with a column name, a file path of the server.
 const INTERNAL_SQL = 'select "password_hash" from "users" where "user_id" = $1';
@@ -46,11 +43,11 @@ describe('Unexpected server error (e2e)', () => {
     list.mockRejectedValue(failure);
     const { cookies } = await registerUser(app);
 
-    const response = await getOrders(app, cookies).expect(HTTP_INTERNAL_ERROR);
+    const response = await getOrders(app, cookies).expect(HttpStatus.INTERNAL_SERVER_ERROR);
     const body = JSON.stringify(response.body);
 
     expect(response.body).toEqual({
-      statusCode: HTTP_INTERNAL_ERROR,
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message: INTERNAL_ERROR_MESSAGE,
     });
     for (const marker of LEAK_MARKERS) {
@@ -62,7 +59,7 @@ describe('Unexpected server error (e2e)', () => {
     list.mockRejectedValue(new NotFoundException(ORDER_NOT_FOUND_MESSAGE));
     const { cookies } = await registerUser(app);
 
-    const response = await getOrders(app, cookies).expect(HTTP_NOT_FOUND);
+    const response = await getOrders(app, cookies).expect(HttpStatus.NOT_FOUND);
 
     expect(response.body.message).toBe(ORDER_NOT_FOUND_MESSAGE);
   });
@@ -74,6 +71,6 @@ describe('Unexpected server error (e2e)', () => {
       .set(COOKIE_HEADER, cookies)
       .set('Content-Type', 'application/json')
       .send(MALFORMED_JSON)
-      .expect(HTTP_BAD_REQUEST);
+      .expect(HttpStatus.BAD_REQUEST);
   });
 });

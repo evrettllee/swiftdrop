@@ -1,0 +1,1 @@
+export const WEIGHT_FRACTION_DIGITS = 2;

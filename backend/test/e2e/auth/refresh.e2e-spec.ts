@@ -1,6 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ERROR_MESSAGES } from '../../../src/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';
@@ -39,7 +40,7 @@ describe('Auth (e2e)', () => {
 
       const first = await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(200);
+        .expect(HttpStatus.OK);
       const newToken = extractRefreshToken(first);
 
       expect(newToken).not.toBe(refreshToken);
@@ -47,7 +48,7 @@ describe('Auth (e2e)', () => {
       await endRefreshGraceWindow(db);
       await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
     });
 
     it('should set a new access cookie and return the user without tokens when refreshing', async () => {
@@ -55,7 +56,7 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(200);
+        .expect(HttpStatus.OK);
 
       expect(extractAccessToken(response)).toEqual(expect.any(String));
       expect(response.body.user.email).toBe(validRegistration.email);
@@ -66,25 +67,24 @@ describe('Auth (e2e)', () => {
       const { refreshToken } = await registerUser(app);
       const first = await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(200);
+        .expect(HttpStatus.OK);
       const newToken = extractRefreshToken(first);
       await endRefreshGraceWindow(db);
 
       await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(refreshToken))
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
       const response = await postAuth(app, AUTH_ROUTES.REFRESH)
         .set(COOKIE_HEADER, refreshCookie(newToken))
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
 
       expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_SESSION);
     });
 
     it('should return 401 when there is no refresh cookie', async () => {
-      const response = await postAuth(app, AUTH_ROUTES.REFRESH).expect(401);
+      const response = await postAuth(app, AUTH_ROUTES.REFRESH).expect(HttpStatus.UNAUTHORIZED);
 
       expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_SESSION);
     });
-
   });
 });

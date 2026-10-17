@@ -11,7 +11,11 @@ export const SMALL_PACKAGE = {
 // 704.8 seconds is 12 minutes after rounding up, plus the 10 minute pickup buffer.
 export const ROUTE = { distanceKm: 7.98, durationSec: 704.8 };
 
-// A valid order body for the test service area, its price is 9.23 BYN with ROUTE.
+// The price of VALID_ORDER with ROUTE in BYN, as a number and as a numeric column keeps it.
+export const VALID_ORDER_PRICE = 9.23;
+export const VALID_ORDER_PRICE_TEXT = '9.23';
+
+// A valid order body for the test service area, its price is VALID_ORDER_PRICE with ROUTE.
 export const VALID_ORDER = {
   pickup: { ...MINSK_PICKUP, city: 'Минск', street: 'ул. Свердлова', house: '13а' },
   delivery: {

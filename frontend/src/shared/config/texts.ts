@@ -11,6 +11,14 @@ export const UI_TEXTS = {
   TERMS_TITLE: 'Условия использования',
   PRIVACY_TITLE: 'Политика конфиденциальности',
   CLOSE: 'Закрыть',
+  RETRY: 'Повторить',
+  ORDERS: 'Заказы',
+  NEW_ORDER: 'Новый заказ',
+  // The account area of the courier.
+  COURIER_WORK: 'Работа',
+  COURIER_HISTORY: 'История',
+  // A page that is not made yet.
+  COMING_LATER: 'Страница появится позже',
 } as const;
 
 export const PAGINATION_TEXTS = {

@@ -3,6 +3,7 @@ import { PAYMENT_STATUS } from './payment';
 
 export const ORDERS_API_PATHS = {
   ORDERS: '/orders',
+  courier: (orderId: number) => `/orders/${orderId}/courier`,
 } as const;
 
 export const ORDER_CANCEL_SEGMENT = 'cancel';

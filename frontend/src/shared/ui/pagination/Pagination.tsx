@@ -11,7 +11,7 @@ type PaginationProps = {
   onChange: (page: number) => void;
 };
 
-// The footer of a list: "1–5 из 23" on the left, the arrows and "Страница 1 из 5" on the right.
+// The footer of a list: "1–5 из 23" on the left, "‹ Страница 1 из 5 ›" on the right.
 export function Pagination({ page, totalPages, total, pageSize, onChange }: PaginationProps) {
   const first = (page - 1) * pageSize + 1;
   const last = Math.min(page * pageSize, total);
@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, total, pageSize, onChange }: Pagi
       <span className="text-small text-fg-secondary tabular-nums">
         {PAGINATION_TEXTS.range(first, last, total)}
       </span>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           aria-label={PAGINATION_TEXTS.PREVIOUS}
@@ -31,6 +31,9 @@ export function Pagination({ page, totalPages, total, pageSize, onChange }: Pagi
         >
           <CaretLeftIcon size={ICON_SIZE.SMALL} weight={ICON_WEIGHT} aria-hidden="true" />
         </button>
+        <span className="text-small text-fg-secondary tabular-nums">
+          {PAGINATION_TEXTS.page(page, totalPages)}
+        </span>
         <button
           type="button"
           aria-label={PAGINATION_TEXTS.NEXT}
@@ -40,9 +43,6 @@ export function Pagination({ page, totalPages, total, pageSize, onChange }: Pagi
         >
           <CaretRightIcon size={ICON_SIZE.SMALL} weight={ICON_WEIGHT} aria-hidden="true" />
         </button>
-        <span className="text-small text-fg-secondary tabular-nums">
-          {PAGINATION_TEXTS.page(page, totalPages)}
-        </span>
       </div>
     </nav>
   );

@@ -1,30 +1,29 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { payments } from '../../src/db/schema';
+import { payments } from '../../src/database/schema';
 import type { Database } from '../../src/database/database.module';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENTS_ROUTES,
   SESSION_EXPIRE_RESULT,
-} from '../../src/payments/payments.constants';
-import type { CheckoutSessionState } from '../../src/payments/payments.types';
+  WEBHOOK_SIGNATURE_HEADER,
+} from '../../src/modules/payments/constants/payments.constants';
+import type { CheckoutSessionState } from '../../src/modules/payments/types/payments.types';
 import { COOKIE_HEADER } from './auth';
-import { postApi, nextClientIp } from './http';
+import { CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE } from './constants';
+import { VALID_ORDER_PRICE_TEXT } from './fixtures';
+import { postApi, rawPostApi } from './http';
 import type { Cookies } from './orders';
-import request from 'supertest';
-import { GLOBAL_PREFIX } from '../../src/common/constants/http.constants';
-import { WEBHOOK_SIGNATURE_HEADER } from '../../src/payments/payments.constants';
-import { CLIENT_IP_HEADER } from './constants';
 
 export const WEBHOOK_SIGNATURE = 't=1,v1=test';
 const WEBHOOK_BODY = '{"id":"evt_test"}';
 
 // The call as the payment system makes it: no cookies and no CSRF header.
 export function postWebhook(app: NestExpressApplication, signature?: string) {
-  const webhookRequest = request(app.getHttpServer())
-    .post(`/${GLOBAL_PREFIX}/${PAYMENTS_ROUTES.BASE}/${PAYMENTS_ROUTES.WEBHOOK}`)
-    .set(CLIENT_IP_HEADER, nextClientIp())
-    .set('Content-Type', 'application/json');
+  const webhookRequest = rawPostApi(app, `${PAYMENTS_ROUTES.BASE}/${PAYMENTS_ROUTES.WEBHOOK}`).set(
+    CONTENT_TYPE_HEADER,
+    JSON_CONTENT_TYPE,
+  );
 
   if (signature) {
     webhookRequest.set(WEBHOOK_SIGNATURE_HEADER, signature);
@@ -33,8 +32,13 @@ export function postWebhook(app: NestExpressApplication, signature?: string) {
   return webhookRequest.send(WEBHOOK_BODY);
 }
 
-// BYN for one dollar, 9.23 BYN at this rate is 304 cents.
+// BYN for one dollar, the price of VALID_ORDER at this rate is 304 cents.
 export const USD_RATE = 3.0371;
+export const VALID_ORDER_AMOUNT_USD = 3.04;
+export const VALID_ORDER_AMOUNT_USD_TEXT = '3.04';
+
+// The reference of a payment in the payment system.
+export const PAYMENT_REF = 'pi_test_1';
 
 export const CHECKOUT_SESSION = {
   sessionId: 'cs_test_1',
@@ -89,8 +93,8 @@ export async function insertPayment(
     .insert(payments)
     .values({
       orderId,
-      amount: '9.23',
-      amountUsd: '3.04',
+      amount: VALID_ORDER_PRICE_TEXT,
+      amountUsd: VALID_ORDER_AMOUNT_USD_TEXT,
       exchangeRate: USD_RATE,
       checkoutSessionId: `cs_test_inserted_${sessionCounter}`,
       ...overrides,

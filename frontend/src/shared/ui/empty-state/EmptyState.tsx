@@ -13,7 +13,7 @@ type EmptyStateProps = {
 // The state of a block without content: no orders yet, nothing found, the list did not load.
 export function EmptyState({ icon: StateIcon, title, text, children }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-4 px-4 py-16 lg:py-24 text-center">
+    <div className="flex flex-col items-center gap-4 px-4 py-24 text-center">
       <StateIcon
         size={ICON_SIZE.XLARGE}
         weight={ICON_WEIGHT}

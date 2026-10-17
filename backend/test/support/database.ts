@@ -2,10 +2,10 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
-import { ROLE_NAMES } from '../../src/common/enums/role.enum';
 import { DB_CASING } from '../../src/database/database.constants';
 import type { Database } from '../../src/database/database.module';
-import * as schema from '../../src/db/schema';
+import * as schema from '../../src/database/schema';
+import { seedRoles } from '../../src/database/seed-steps';
 import {
   MIGRATIONS_FOLDER,
   TEST_DB_NAME_SUFFIX,
@@ -20,10 +20,7 @@ export async function prepareTestDatabase(): Promise<void> {
 
   try {
     await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
-    await db
-      .insert(schema.roles)
-      .values(ROLE_NAMES.map((name) => ({ name })))
-      .onConflictDoNothing();
+    await seedRoles(db);
   } finally {
     await pool.end();
   }

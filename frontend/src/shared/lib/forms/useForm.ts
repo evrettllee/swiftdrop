@@ -1,10 +1,8 @@
-import { type ChangeEvent, type FormEvent, useRef, useState } from 'react';
+import { type FormEvent, useRef } from 'react';
 import type { z } from 'zod';
-import { API_ERROR_MESSAGES, ApiError, getApiErrorMessage } from '@/shared/api';
-import { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE } from '@/shared/config';
 import { collectFieldErrors, focusFirstInvalid } from './field-errors';
-
-type FormValues = Record<string, string>;
+import { type FormValues, useFieldState } from './useFieldState';
+import { useFormSubmit } from './useFormSubmit';
 
 type UseFormOptions<TSchema extends z.ZodType> = {
   initialValues: FormValues;
@@ -20,86 +18,47 @@ export function useForm<TSchema extends z.ZodType>({
   onSubmit,
 }: UseFormOptions<TSchema>) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [values, setValues] = useState<FormValues>(initialValues);
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const state = useFieldState(initialValues);
+  const submission = useFormSubmit(onSubmit, formRef, state.setServerErrors);
 
-  const parsed = schema.safeParse(values);
+  const parsed = schema.safeParse(state.values);
   const clientErrors: Record<string, string> = parsed.success
     ? {}
     : collectFieldErrors(parsed.error.issues);
 
   function getError(name: string): string | undefined {
-    return serverErrors[name] ?? (touched[name] ? clientErrors[name] : undefined);
-  }
-
-  function setValue(name: string, value: string): void {
-    setValues((current) => ({ ...current, [name]: value }));
-    setServerErrors((current) =>
-      Object.fromEntries(Object.entries(current).filter(([key]) => key !== name)),
-    );
-  }
-
-  function markTouched(name: string): void {
-    setTouched((current) => ({ ...current, [name]: true }));
+    return state.serverErrors[name] ?? (state.touched[name] ? clientErrors[name] : undefined);
   }
 
   function field(name: string) {
-    return {
-      name,
-      value: values[name] ?? '',
-      error: getError(name),
-      onChange: (event: ChangeEvent<HTMLInputElement>) => setValue(name, event.target.value),
-      onBlur: () => markTouched(name),
-    };
+    return state.bindInput(name, getError(name));
   }
 
   function checkbox(name: string) {
-    return {
-      name,
-      checked: values[name] === CHECKBOX_CHECKED_VALUE,
-      error: getError(name),
-      onChange: (event: ChangeEvent<HTMLInputElement>) => {
-        setValue(name, event.target.checked ? CHECKBOX_CHECKED_VALUE : CHECKBOX_UNCHECKED_VALUE);
-        markTouched(name);
-      },
-    };
-  }
-
-  async function submitValid(data: z.output<TSchema>): Promise<void> {
-    setIsSubmitting(true);
-
-    try {
-      await onSubmit(data);
-    } catch (error) {
-      if (error instanceof ApiError && error.fieldErrors.length > 0) {
-        setServerErrors(
-          Object.fromEntries(error.fieldErrors.map((item) => [item.field, item.message])),
-        );
-        requestAnimationFrame(() => focusFirstInvalid(formRef.current));
-      } else {
-        setFormError(getApiErrorMessage(error, API_ERROR_MESSAGES.GENERIC));
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    return state.bindCheckbox(name, getError(name));
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    setFormError(null);
-    setTouched(Object.fromEntries(Object.keys(values).map((name) => [name, true])));
+    submission.setFormError(null);
+    state.touchAll();
 
-    if (!isSubmitting) {
+    if (!submission.isSubmitting) {
       if (parsed.success) {
-        void submitValid(parsed.data);
+        void submission.submitValid(parsed.data);
       } else {
         requestAnimationFrame(() => focusFirstInvalid(formRef.current));
       }
     }
   }
 
-  return { formRef, values, field, checkbox, formError, isSubmitting, handleSubmit };
+  return {
+    formRef,
+    values: state.values,
+    field,
+    checkbox,
+    formError: submission.formError,
+    isSubmitting: submission.isSubmitting,
+    handleSubmit,
+  };
 }

@@ -9,18 +9,20 @@ type RoutePoint = {
   parts: AddressParts | null;
 };
 
+type FullAddressParts = { city: string; street: string; house: string };
+
+// An order needs the city, the street and the house of each point.
+function isFullAddress(parts: AddressParts | null): parts is FullAddressParts {
+  return parts !== null && parts.city !== null && parts.street !== null && parts.house !== null;
+}
+
 // What is wrong with a route point, or null when an order can be placed with it.
 export function getAddressError({ point, parts }: RoutePoint): string | null {
   let error: string | null = null;
 
   if (point === null) {
     error = CHECKOUT_TEXTS.ADDRESS_REQUIRED;
-  } else if (
-    parts === null ||
-    parts.city === null ||
-    parts.street === null ||
-    parts.house === null
-  ) {
+  } else if (!isFullAddress(parts)) {
     error = CHECKOUT_TEXTS.HOUSE_REQUIRED;
   }
 
@@ -28,13 +30,7 @@ export function getAddressError({ point, parts }: RoutePoint): string | null {
 }
 
 function toAddress({ point, parts }: RoutePoint, apartment: string): OrderAddressInput | null {
-  if (
-    point === null ||
-    parts === null ||
-    parts.city === null ||
-    parts.street === null ||
-    parts.house === null
-  ) {
+  if (point === null || !isFullAddress(parts)) {
     return null;
   }
 

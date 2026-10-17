@@ -1,13 +1,12 @@
 import { ArrowRightIcon, CaretRightIcon, MapPinIcon } from '@phosphor-icons/react';
 import { Link } from 'react-router';
-import { formatOrderNumber, OrderStatusBadge } from '@/entities/order';
+import { formatOrderNumber, formatShortAddress, OrderStatusBadge } from '@/entities/order';
 import type { OrderListItem } from '@/shared/api';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { formatMoney, formatShortDateTime } from '@/shared/lib/format';
 import { getOrderPath } from '@/shared/routes';
 import { ORDER_CARD_CLASS } from '../config/card';
 import { ORDERS_TEXTS } from '../config/texts';
-import { formatShortAddress } from '../lib/address';
 
 const PIN = (
   <MapPinIcon

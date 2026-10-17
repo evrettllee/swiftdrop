@@ -11,6 +11,7 @@ import {
   JSON_CONTENT_TYPE,
   NETWORK_ERROR_STATUS,
   REFRESH_LOCK_NAME,
+  REQUEST_CREDENTIALS,
 } from './request-config';
 
 const fieldErrorSchema = z.object({ field: z.string(), message: z.string() });
@@ -34,7 +35,11 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
   return error instanceof ApiError ? error.message : fallback;
 }
 
-type RequestOptions = { method: string; body?: unknown };
+// `signal` cancels a request whose answer is not needed any more (the page was left, or a newer
+// request replaced it).
+export type HttpOptions = { signal?: AbortSignal };
+
+type RequestOptions = HttpOptions & { method: string; body?: unknown };
 
 const errorBodySchema = z.object({
   message: z.string().optional(),
@@ -62,10 +67,14 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
       method: options.method,
       headers,
       body: hasBody ? JSON.stringify(options.body) : undefined,
-      credentials: 'same-origin',
+      credentials: REQUEST_CREDENTIALS,
+      signal: options.signal,
     });
-  } catch {
-    throw new ApiError(NETWORK_ERROR_STATUS, API_ERROR_MESSAGES.NETWORK);
+  } catch (error) {
+    // A cancelled request is not a network failure: the caller has already dropped it.
+    throw options.signal?.aborted === true
+      ? error
+      : new ApiError(NETWORK_ERROR_STATUS, API_ERROR_MESSAGES.NETWORK);
   }
 }
 
@@ -113,19 +122,26 @@ function refreshSession(): Promise<boolean> {
   return refreshInFlight;
 }
 
-async function retryAfterRefresh(
-  path: string,
-  options: RequestOptions,
-  failed: Response,
-): Promise<Response> {
+// Refreshes the session after the backend refused an expired one; when the refresh fails too, the
+// session is over and the user is signed out. The socket of the courier uses it as well.
+export async function refreshSessionOrExpire(): Promise<boolean> {
   const isRefreshed = await refreshSession();
-  const result = isRefreshed ? await send(path, options) : failed;
 
   if (!isRefreshed) {
     sessionExpiredHandler?.();
   }
 
-  return result;
+  return isRefreshed;
+}
+
+async function retryAfterRefresh(
+  path: string,
+  options: RequestOptions,
+  failed: Response,
+): Promise<Response> {
+  const isRefreshed = await refreshSessionOrExpire();
+
+  return isRefreshed ? send(path, options) : failed;
 }
 
 async function request(path: string, options: RequestOptions): Promise<unknown> {
@@ -144,9 +160,14 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
 
 // Responses are returned as unknown: callers validate them with a zod schema.
 export const http = {
-  get: (path: string) => request(path, { method: HTTP_METHOD.GET }),
-  post: (path: string, body?: unknown) => request(path, { method: HTTP_METHOD.POST, body }),
-  put: (path: string, body?: unknown) => request(path, { method: HTTP_METHOD.PUT, body }),
-  patch: (path: string, body?: unknown) => request(path, { method: HTTP_METHOD.PATCH, body }),
-  delete: (path: string) => request(path, { method: HTTP_METHOD.DELETE }),
+  get: (path: string, options: HttpOptions = {}) =>
+    request(path, { ...options, method: HTTP_METHOD.GET }),
+  post: (path: string, body?: unknown, options: HttpOptions = {}) =>
+    request(path, { ...options, method: HTTP_METHOD.POST, body }),
+  put: (path: string, body?: unknown, options: HttpOptions = {}) =>
+    request(path, { ...options, method: HTTP_METHOD.PUT, body }),
+  patch: (path: string, body?: unknown, options: HttpOptions = {}) =>
+    request(path, { ...options, method: HTTP_METHOD.PATCH, body }),
+  delete: (path: string, options: HttpOptions = {}) =>
+    request(path, { ...options, method: HTTP_METHOD.DELETE }),
 };

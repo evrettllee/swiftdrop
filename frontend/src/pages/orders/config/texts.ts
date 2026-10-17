@@ -1,13 +1,14 @@
+import { UI_TEXTS } from '@/shared/config';
 import { ORDER_LIST_FILTER } from './list';
 
 export const ORDERS_TEXTS = {
   PAGE_TITLE: 'Мои заказы',
-  NEW_ORDER: 'Новый заказ',
+  NEW_ORDER: UI_TEXTS.NEW_ORDER,
   TABS_LABEL: 'Фильтр заказов',
   LIST_FAILED: 'Не удалось загрузить заказы. Попробуйте ещё раз',
   LIST_FAILED_TITLE: 'Не удалось загрузить заказы',
   LIST_LOADING: 'Загрузка заказов',
-  RETRY: 'Повторить',
+  RETRY: UI_TEXTS.RETRY,
   SHOW_MORE: 'Показать ещё',
   shown: (shown: number, total: number) => `Показано ${shown} из ${total}`,
   // Couriers are not assigned yet: the name comes with the courier slice.

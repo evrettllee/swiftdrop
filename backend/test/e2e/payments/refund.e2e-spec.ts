@@ -3,20 +3,20 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
-import { PaymentRefundService } from '../../../src/payments/services/payment-refund.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
+import { PaymentRefundService } from '../../../src/modules/payments/services/payment-refund.service';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { placeOrders } from '../../support/orders';
 import {
   createGatewayMock,
   insertPayment,
   readPaymentStatus,
   resetGatewayMock,
+  PAYMENT_REF,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Payment refund (e2e)', () => {
   let app: NestExpressApplication;
@@ -36,10 +36,7 @@ describe('Payment refund (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     resetGatewayMock(gateway);
 
     const { cookies } = await registerUser(app);
@@ -53,13 +50,13 @@ describe('Payment refund (e2e)', () => {
   it('should refund through the gateway and mark the payment refunded when it is paid', async () => {
     const paymentId = await insertPayment(db, orderId, {
       status: PAYMENT_STATUS.PAID,
-      stripePaymentId: 'pi_test_1',
+      stripePaymentId: PAYMENT_REF,
     });
 
     const result = await refunds.refundPayment(paymentId);
 
     expect(result).toBe(true);
-    expect(gateway.refund).toHaveBeenCalledWith('pi_test_1');
+    expect(gateway.refund).toHaveBeenCalledWith(PAYMENT_REF);
     expect(await readPaymentStatus(db, paymentId)).toBe(PAYMENT_STATUS.REFUNDED);
   });
 
@@ -76,7 +73,7 @@ describe('Payment refund (e2e)', () => {
   it('should refund once when the refund is requested twice', async () => {
     const paymentId = await insertPayment(db, orderId, {
       status: PAYMENT_STATUS.PAID,
-      stripePaymentId: 'pi_test_1',
+      stripePaymentId: PAYMENT_REF,
     });
 
     await refunds.refundPayment(paymentId);
@@ -89,7 +86,7 @@ describe('Payment refund (e2e)', () => {
   it('should keep the payment paid and pass the error on when the gateway fails', async () => {
     const paymentId = await insertPayment(db, orderId, {
       status: PAYMENT_STATUS.PAID,
-      stripePaymentId: 'pi_test_1',
+      stripePaymentId: PAYMENT_REF,
     });
     gateway.refund.mockRejectedValue(new ServiceUnavailableException());
 
@@ -100,7 +97,7 @@ describe('Payment refund (e2e)', () => {
   it('should refund every paid payment of the order and skip the others when an order is refunded', async () => {
     const firstPaid = await insertPayment(db, orderId, {
       status: PAYMENT_STATUS.PAID,
-      stripePaymentId: 'pi_test_1',
+      stripePaymentId: PAYMENT_REF,
     });
     const secondPaid = await insertPayment(db, orderId, {
       status: PAYMENT_STATUS.PAID,

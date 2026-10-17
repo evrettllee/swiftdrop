@@ -1,6 +1,8 @@
 export const API_BASE_PATH = '/api';
 export const JSON_CONTENT_TYPE = 'application/json';
 export const CONTENT_TYPE_HEADER = 'Content-Type';
+// The session cookies go only to the backend of the same origin (the /api proxy).
+export const REQUEST_CREDENTIALS: RequestCredentials = 'same-origin';
 
 // CSRF protection: must match the header the backend requires on unsafe methods.
 export const CSRF_HEADER_NAME = 'X-Requested-With';
@@ -21,12 +23,17 @@ export const HTTP_METHOD = {
 export const HTTP_STATUS = {
   NO_CONTENT: 204,
   UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
   NOT_FOUND: 404,
+  CONFLICT: 409,
+  UNPROCESSABLE_CONTENT: 422,
   TOO_MANY_REQUESTS: 429,
   SERVICE_UNAVAILABLE: 503,
 } as const;
 
 export const NETWORK_ERROR_STATUS = 0;
+// The first status of a failure of the server (5xx).
+export const SERVER_ERROR_STATUS_MIN = 500;
 
 export const API_ERROR_MESSAGES = {
   NETWORK: 'Нет соединения с сервером. Проверьте интернет и повторите попытку',

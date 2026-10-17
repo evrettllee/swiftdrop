@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { useRoutePreview } from '@/features/route-picker';
 import {
   ADDRESS_PLACEHOLDER,
   APARTMENT_MAX_LENGTH,
@@ -11,6 +12,7 @@ import { AddressField } from '@/shared/ui/address-field';
 import { Input } from '@/shared/ui/input';
 import { RouteMap } from '@/shared/ui/route-map';
 import { RoutePointMark } from '@/shared/ui/route-point-mark';
+import { Section } from '@/shared/ui/section';
 import { CHECKOUT_FIELD } from '../config/checkout-form';
 import { CHECKOUT_TEXTS } from '../config/texts';
 import type { useCheckout } from '../model/useCheckout';
@@ -30,16 +32,14 @@ type CheckoutRouteProps = {
 
 // The map and a block for each of the two points.
 export function CheckoutRoute({ route, field, addressErrors }: CheckoutRouteProps) {
-  const headingId = useId();
+  const routeLines = useRoutePreview(route.pickup, route.delivery);
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
-      <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
-        {CHECKOUT_TEXTS.SECTION_ROUTE}
-      </h2>
+    <Section title={CHECKOUT_TEXTS.SECTION_ROUTE}>
       <RouteMap
         pickup={route.pickup}
         delivery={route.delivery}
+        route={routeLines}
         hint={route.hint}
         onPick={route.pickPoint}
         onMove={route.placePoint}
@@ -57,7 +57,7 @@ export function CheckoutRoute({ route, field, addressErrors }: CheckoutRouteProp
           />
         ))}
       </div>
-    </section>
+    </Section>
   );
 }
 

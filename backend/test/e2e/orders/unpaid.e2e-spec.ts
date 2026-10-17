@@ -6,15 +6,13 @@ import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders, orderStatusHistory } from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { UNPAID_ORDER_TTL_MS } from '../../../src/orders/orders.constants';
-import { UnpaidOrdersService } from '../../../src/orders/services/unpaid-orders.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
+import { orders, orderStatusHistory } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { UNPAID_ORDER_TTL_MS } from '../../../src/modules/orders/constants/orders.constants';
+import { UnpaidOrdersService } from '../../../src/modules/orders/services/unpaid-orders.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
@@ -22,7 +20,9 @@ import {
   insertPayment,
   readPaymentStatus,
   resetGatewayMock,
+  PAYMENT_REF,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Unpaid orders cancellation (e2e)', () => {
   let app: NestExpressApplication;
@@ -48,10 +48,7 @@ describe('Unpaid orders cancellation (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     resetGatewayMock(gateway);
 
     const { cookies } = await registerUser(app);
@@ -119,7 +116,7 @@ describe('Unpaid orders cancellation (e2e)', () => {
     await makeOld(healthyId);
     await insertPayment(db, failingId, {
       status: PAYMENT_STATUS.PAID,
-      stripePaymentId: 'pi_test_1',
+      stripePaymentId: PAYMENT_REF,
     });
     gateway.refund.mockRejectedValue(new ServiceUnavailableException());
 

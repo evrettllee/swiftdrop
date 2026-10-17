@@ -1,24 +1,23 @@
-import { ServiceUnavailableException } from '@nestjs/common';
+import { ServiceUnavailableException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders, payments } from '../../../src/db/schema';
-import { NBRB_ERROR_MESSAGES } from '../../../src/integrations/nbrb/nbrb.constants';
-import { NbrbService } from '../../../src/integrations/nbrb/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { ORDERS_ERROR_MESSAGES } from '../../../src/orders/orders.constants';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
-import { PAYMENTS_ERROR_MESSAGES } from '../../../src/payments/payments.constants';
+import { orders, payments } from '../../../src/database/schema';
+import { NBRB_ERROR_MESSAGES } from '../../../src/integrations/nbrb/constants/nbrb.constants';
+import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDERS_ERROR_MESSAGES } from '../../../src/modules/orders/constants/orders.constants';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENTS_ERROR_MESSAGES } from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
+import { MISSING_ORDER_ID } from '../../support/constants';
 import { placeOrders, SECOND_CLIENT } from '../../support/orders';
 import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
-const MISSING_ORDER_ID = 999_999;
 // At this rate 9.23 BYN is one cent, below the 50 cents that Stripe accepts.
 const TINY_AMOUNT_RATE = 1000;
 
@@ -39,10 +38,7 @@ describe('Payments rejections (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     getUsdRate.mockReset();
     getUsdRate.mockResolvedValue(USD_RATE);
     resetGatewayMock(gateway);
@@ -60,7 +56,7 @@ describe('Payments rejections (e2e)', () => {
       .set({ status: ORDER_STATUS.CANCELLED })
       .where(eq(orders.orderId, orderId));
 
-    const response = await postPayment(app, cookies, { orderId }).expect(409);
+    const response = await postPayment(app, cookies, { orderId }).expect(HttpStatus.CONFLICT);
 
     expect(response.body.message).toBe(PAYMENTS_ERROR_MESSAGES.ORDER_NOT_PAYABLE);
     expect(gateway.createCheckoutSession).not.toHaveBeenCalled();
@@ -71,7 +67,7 @@ describe('Payments rejections (e2e)', () => {
     const { cookies: otherCookies } = await registerUser(app, SECOND_CLIENT);
     const [orderId] = await placeOrders(app, cookies, 1);
 
-    const response = await postPayment(app, otherCookies, { orderId }).expect(404);
+    const response = await postPayment(app, otherCookies, { orderId }).expect(HttpStatus.NOT_FOUND);
 
     expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.NOT_FOUND);
     expect(gateway.createCheckoutSession).not.toHaveBeenCalled();
@@ -80,7 +76,9 @@ describe('Payments rejections (e2e)', () => {
   it('should return 404 when the order does not exist', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await postPayment(app, cookies, { orderId: MISSING_ORDER_ID }).expect(404);
+    const response = await postPayment(app, cookies, { orderId: MISSING_ORDER_ID }).expect(
+      HttpStatus.NOT_FOUND,
+    );
 
     expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.NOT_FOUND);
   });
@@ -90,7 +88,9 @@ describe('Payments rejections (e2e)', () => {
     const [orderId] = await placeOrders(app, cookies, 1);
     getUsdRate.mockResolvedValue(TINY_AMOUNT_RATE);
 
-    const response = await postPayment(app, cookies, { orderId }).expect(422);
+    const response = await postPayment(app, cookies, { orderId }).expect(
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
 
     expect(response.body.message).toBe(PAYMENTS_ERROR_MESSAGES.AMOUNT_TOO_SMALL);
     expect(gateway.createCheckoutSession).not.toHaveBeenCalled();
@@ -104,7 +104,9 @@ describe('Payments rejections (e2e)', () => {
       new ServiceUnavailableException(NBRB_ERROR_MESSAGES.RATE_UNAVAILABLE),
     );
 
-    const response = await postPayment(app, cookies, { orderId }).expect(503);
+    const response = await postPayment(app, cookies, { orderId }).expect(
+      HttpStatus.SERVICE_UNAVAILABLE,
+    );
 
     expect(response.body.message).toBe(NBRB_ERROR_MESSAGES.RATE_UNAVAILABLE);
     expect(gateway.createCheckoutSession).not.toHaveBeenCalled();

@@ -1,22 +1,27 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orderStatusHistory } from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
+import { orderStatusHistory } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import {
   ORDERS_ERROR_MESSAGES,
   ORDERS_ROUTES,
   ORDERS_VALIDATION_MESSAGES,
-} from '../../../src/orders/orders.constants';
+} from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../../support/fixtures';
+import { MISSING_ORDER_ID } from '../../support/constants';
+import {
+  MINSK_DELIVERY,
+  MINSK_PICKUP,
+  SMALL_PACKAGE,
+  VALID_ORDER_PRICE,
+} from '../../support/fixtures';
 import { getApi } from '../../support/http';
 import { type Cookies, placeOrders, SECOND_CLIENT } from '../../support/orders';
-
-const MISSING_ORDER_ID = 999_999;
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Order details (e2e)', () => {
   let app: NestExpressApplication;
@@ -29,10 +34,7 @@ describe('Order details (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
   });
 
   afterAll(async () => {
@@ -47,12 +49,12 @@ describe('Order details (e2e)', () => {
     const { cookies } = await registerUser(app);
     const [orderId] = await placeOrders(app, cookies, 1);
 
-    const response = await getOrder(cookies, orderId).expect(200);
+    const response = await getOrder(cookies, orderId).expect(HttpStatus.OK);
 
     expect(response.body).toEqual({
       orderId,
       status: ORDER_STATUS.PENDING,
-      price: 9.23,
+      price: VALID_ORDER_PRICE,
       currency: 'BYN',
       priceCoefficient: 1,
       distanceKm: 7.98,
@@ -90,7 +92,7 @@ describe('Order details (e2e)', () => {
     const [orderId] = await placeOrders(app, cookies, 1);
     await db.insert(orderStatusHistory).values({ orderId, status: ORDER_STATUS.CONFIRMED });
 
-    const response = await getOrder(cookies, orderId).expect(200);
+    const response = await getOrder(cookies, orderId).expect(HttpStatus.OK);
 
     expect(response.body.history.map((entry: { status: string }) => entry.status)).toEqual([
       ORDER_STATUS.PENDING,
@@ -103,7 +105,7 @@ describe('Order details (e2e)', () => {
     const { cookies: otherCookies } = await registerUser(app, SECOND_CLIENT);
     const [orderId] = await placeOrders(app, cookies, 1);
 
-    const response = await getOrder(otherCookies, orderId).expect(404);
+    const response = await getOrder(otherCookies, orderId).expect(HttpStatus.NOT_FOUND);
 
     expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.NOT_FOUND);
   });
@@ -111,7 +113,7 @@ describe('Order details (e2e)', () => {
   it('should return 404 when the order does not exist', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await getOrder(cookies, MISSING_ORDER_ID).expect(404);
+    const response = await getOrder(cookies, MISSING_ORDER_ID).expect(HttpStatus.NOT_FOUND);
 
     expect(response.body.message).toBe(ORDERS_ERROR_MESSAGES.NOT_FOUND);
   });
@@ -119,7 +121,7 @@ describe('Order details (e2e)', () => {
   it('should return 400 with a field error when the order id is not a number', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await getOrder(cookies, 'abc').expect(400);
+    const response = await getOrder(cookies, 'abc').expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body.errors).toEqual(
       expect.arrayContaining([
@@ -132,6 +134,6 @@ describe('Order details (e2e)', () => {
   });
 
   it('should return 401 when the request has no authentication', async () => {
-    await getApi(app, `${ORDERS_ROUTES.BASE}/1`).expect(401);
+    await getApi(app, `${ORDERS_ROUTES.BASE}/1`).expect(HttpStatus.UNAUTHORIZED);
   });
 });

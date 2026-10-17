@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
@@ -11,16 +12,21 @@ import {
   packages,
   roles,
   users,
-} from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { ORDERS_ROUTES } from '../../../src/orders/orders.constants';
-import { PRICING_ERROR_MESSAGES } from '../../../src/pricing/pricing.constants';
+} from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDERS_ROUTES } from '../../../src/modules/orders/constants/orders.constants';
+import { PRICING_ERROR_MESSAGES } from '../../../src/modules/pricing/constants/pricing.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { MOSCOW, ROUTE, VALID_ORDER } from '../../support/fixtures';
+import {
+  MOSCOW,
+  VALID_ORDER,
+  VALID_ORDER_PRICE,
+  VALID_ORDER_PRICE_TEXT,
+} from '../../support/fixtures';
 import { postApi } from '../../support/http';
 import { postOrder } from '../../support/orders';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Orders (e2e)', () => {
   let app: NestExpressApplication;
@@ -33,10 +39,7 @@ describe('Orders (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
   });
 
   afterAll(async () => {
@@ -47,12 +50,12 @@ describe('Orders (e2e)', () => {
     it('should create a pending order with the calculated price when a client sends a valid order', async () => {
       const { cookies } = await registerUser(app);
 
-      const response = await postOrder(app, cookies, VALID_ORDER).expect(201);
+      const response = await postOrder(app, cookies, VALID_ORDER).expect(HttpStatus.CREATED);
 
       expect(response.body).toEqual({
         orderId: expect.any(Number),
         status: ORDER_STATUS.PENDING,
-        price: 9.23,
+        price: VALID_ORDER_PRICE,
         currency: 'BYN',
         estimatedDeliveryAt: expect.any(String),
       });
@@ -66,7 +69,7 @@ describe('Orders (e2e)', () => {
         status: ORDER_STATUS.PENDING,
         recipientName: 'Ирина Козлова',
         recipientPhone: '+375291234567',
-        price: '9.23',
+        price: VALID_ORDER_PRICE_TEXT,
         distanceKm: 7.98,
       });
     });
@@ -74,7 +77,7 @@ describe('Orders (e2e)', () => {
     it('should store the address copies, the package and the first history record when an order is created', async () => {
       const { cookies } = await registerUser(app);
 
-      const response = await postOrder(app, cookies, VALID_ORDER).expect(201);
+      const response = await postOrder(app, cookies, VALID_ORDER).expect(HttpStatus.CREATED);
 
       const addressRows = await db.select().from(addresses);
       const [parcel] = await db.select().from(packages);
@@ -99,13 +102,15 @@ describe('Orders (e2e)', () => {
     it('should ignore the price from the request when a client sends its own', async () => {
       const { cookies } = await registerUser(app);
 
-      const response = await postOrder(app, cookies, { ...VALID_ORDER, price: 0.01 }).expect(201);
+      const response = await postOrder(app, cookies, { ...VALID_ORDER, price: 0.01 }).expect(
+        HttpStatus.CREATED,
+      );
 
-      expect(response.body.price).toBe(9.23);
+      expect(response.body.price).toBe(VALID_ORDER_PRICE);
     });
 
     it('should return 401 when the request has no authentication', async () => {
-      await postApi(app, ORDERS_ROUTES.BASE).send(VALID_ORDER).expect(401);
+      await postApi(app, ORDERS_ROUTES.BASE).send(VALID_ORDER).expect(HttpStatus.UNAUTHORIZED);
     });
 
     it('should return 403 when the user is not a client', async () => {
@@ -116,7 +121,7 @@ describe('Orders (e2e)', () => {
         .where(eq(roles.name, ROLE.COURIER));
       await db.update(users).set({ roleId: courierRole.roleId });
 
-      await postOrder(app, cookies, VALID_ORDER).expect(403);
+      await postOrder(app, cookies, VALID_ORDER).expect(HttpStatus.FORBIDDEN);
     });
 
     it('should return 400 with a field error when the house is empty', async () => {
@@ -125,7 +130,7 @@ describe('Orders (e2e)', () => {
       const response = await postOrder(app, cookies, {
         ...VALID_ORDER,
         pickup: { ...VALID_ORDER.pickup, house: '' },
-      }).expect(400);
+      }).expect(HttpStatus.BAD_REQUEST);
 
       expect(response.body.errors).toEqual(
         expect.arrayContaining([
@@ -140,7 +145,7 @@ describe('Orders (e2e)', () => {
       const response = await postOrder(app, cookies, {
         ...VALID_ORDER,
         delivery: { ...VALID_ORDER.delivery, ...MOSCOW },
-      }).expect(422);
+      }).expect(HttpStatus.UNPROCESSABLE_ENTITY);
 
       expect(response.body.message).toBe(PRICING_ERROR_MESSAGES.DELIVERY_OUT_OF_ZONE);
       expect(await db.select().from(orders)).toHaveLength(0);

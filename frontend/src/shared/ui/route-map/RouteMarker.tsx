@@ -62,7 +62,12 @@ export function RouteMarker({ kind, point, onMove, onRemove }: RouteMarkerProps)
       keyboard={false}
       eventHandlers={eventHandlers}
     >
-      <Tooltip permanent interactive direction="top" className={`${MAP_CLASS.TAG} ${TAG_KIND_CLASS[kind]}`}>
+      <Tooltip
+        permanent
+        interactive
+        direction="top"
+        className={`${MAP_CLASS.TAG} ${TAG_KIND_CLASS[kind]}`}
+      >
         <span ref={disableMapClicks} className={TAG_CONTENT_CLASS}>
           <span className="flex items-center gap-2">
             <RoutePointMark kind={kind} />

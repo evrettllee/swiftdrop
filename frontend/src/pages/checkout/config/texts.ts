@@ -1,8 +1,8 @@
+import { APARTMENT_MAX_LENGTH, UI_TEXTS } from '@/shared/config';
 import { NAME_MAX_LENGTH, NAME_MIN_LENGTH, PHONE_EXAMPLE } from '@/shared/lib/person-validation';
-import { APARTMENT_MAX_LENGTH } from '@/shared/config';
 
 export const CHECKOUT_TEXTS = {
-  PAGE_TITLE: 'Новый заказ',
+  PAGE_TITLE: UI_TEXTS.NEW_ORDER,
   SECTION_ROUTE: 'Маршрут',
   SECTION_RECIPIENT: 'Получатель',
   SECTION_PACKAGE: 'Посылка',

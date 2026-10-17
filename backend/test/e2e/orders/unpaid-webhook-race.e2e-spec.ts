@@ -1,5 +1,5 @@
 import { setTimeout as delay } from 'node:timers/promises';
-import { Logger, ServiceUnavailableException } from '@nestjs/common';
+import { Logger, ServiceUnavailableException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Response } from 'supertest';
@@ -8,16 +8,15 @@ import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
 import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { UNPAID_ORDER_TTL_MS } from '../../../src/orders/orders.constants';
-import { UnpaidOrdersService } from '../../../src/orders/services/unpaid-orders.service';
-import { PaymentGateway } from '../../../src/payments/gateway/payment.gateway';
-import { PAYMENT_EVENT } from '../../../src/payments/payments.constants';
+import { orders } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { UNPAID_ORDER_TTL_MS } from '../../../src/modules/orders/constants/orders.constants';
+import { UnpaidOrdersService } from '../../../src/modules/orders/services/unpaid-orders.service';
+import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENT_EVENT } from '../../../src/modules/payments/constants/payments.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
+import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
 import { placeOrders, readOrderStatus } from '../../support/orders';
 import {
   CHECKOUT_SESSION,
@@ -28,13 +27,13 @@ import {
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
 } from '../../support/payments';
+import { resetServiceArea } from '../../support/pricing';
 
 const PAYMENT_REF = 'pi_test_race';
 // Time for the webhook to mark the payment paid and reach the lock of the order row, which the
 // cancelling transaction holds.
 const LOCK_WAIT_MS = 300;
 // The test waits for the lock timeout itself, so it gets this much more than the timeout.
-const LOCK_TEST_MARGIN_MS = 10_000;
 
 describe('Unpaid order cancelled while its payment arrives (e2e)', () => {
   let app: NestExpressApplication;
@@ -55,10 +54,7 @@ describe('Unpaid order cancelled while its payment arrives (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
     resetGatewayMock(gateway);
 
     const { cookies } = await registerUser(app);
@@ -96,7 +92,7 @@ describe('Unpaid order cancelled while its payment arrives (e2e)', () => {
     const webhookResponse = await webhook;
 
     expect(cancelledCount).toBe(1);
-    expect(webhookResponse?.status).toBe(200);
+    expect(webhookResponse?.status).toBe(HttpStatus.OK);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
     expect(gateway.refund).toHaveBeenCalledTimes(1);
     expect(gateway.refund).toHaveBeenCalledWith(PAYMENT_REF);
@@ -104,7 +100,7 @@ describe('Unpaid order cancelled while its payment arrives (e2e)', () => {
   });
 
   it('should leave the order confirmed and the payment kept when the payment arrives before the cancellation', async () => {
-    await postWebhook(app, WEBHOOK_SIGNATURE).expect(200);
+    await postWebhook(app, WEBHOOK_SIGNATURE).expect(HttpStatus.OK);
 
     const cancelledCount = await unpaidOrders.cancelExpired();
 
@@ -151,7 +147,7 @@ describe('Unpaid order cancelled while its payment arrives (e2e)', () => {
     gateway.expireCheckoutSession.mockRejectedValue(new ServiceUnavailableException());
 
     const cancelledCount = await unpaidOrders.cancelExpired();
-    await postWebhook(app, WEBHOOK_SIGNATURE).expect(200);
+    await postWebhook(app, WEBHOOK_SIGNATURE).expect(HttpStatus.OK);
 
     expect(cancelledCount).toBe(1);
     expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);

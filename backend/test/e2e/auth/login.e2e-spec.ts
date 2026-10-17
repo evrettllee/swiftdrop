@@ -1,9 +1,10 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import {
   AUTH_ERROR_MESSAGES,
   AUTH_THROTTLE_LIMIT,
-} from '../../../src/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+} from '../../../src/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { createTestApp } from '../../support/app';
@@ -14,6 +15,7 @@ import {
   registerUser,
   validRegistration,
   WRONG_PASSWORD,
+  UNKNOWN_EMAIL,
 } from '../../support/auth';
 import { CLIENT_IP_HEADER } from '../../support/constants';
 import { resetTestData } from '../../support/database';
@@ -43,7 +45,7 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.LOGIN)
         .send({ email: validRegistration.email, password: validRegistration.password })
-        .expect(200);
+        .expect(HttpStatus.OK);
 
       expect(response.body.user.email).toBe(validRegistration.email);
       expect(response.body).not.toHaveProperty('accessToken');
@@ -56,7 +58,7 @@ describe('Auth (e2e)', () => {
 
       await postAuth(app, AUTH_ROUTES.LOGIN)
         .send({ email: 'IVAN@Example.COM', password: validRegistration.password })
-        .expect(200);
+        .expect(HttpStatus.OK);
     });
 
     it('should give the same answer when the password is wrong and when the email is unknown', async () => {
@@ -64,10 +66,10 @@ describe('Auth (e2e)', () => {
 
       const wrongPassword = await postAuth(app, AUTH_ROUTES.LOGIN)
         .send({ email: validRegistration.email, password: WRONG_PASSWORD })
-        .expect(401);
+        .expect(HttpStatus.UNAUTHORIZED);
       const unknownEmail = await postAuth(app, AUTH_ROUTES.LOGIN)
-        .send({ email: 'nobody@example.com', password: validRegistration.password })
-        .expect(401);
+        .send({ email: UNKNOWN_EMAIL, password: validRegistration.password })
+        .expect(HttpStatus.UNAUTHORIZED);
 
       expect(wrongPassword.body.message).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
       expect(unknownEmail.body).toEqual(wrongPassword.body);
@@ -79,7 +81,7 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.LOGIN)
         .send({ email: validRegistration.email, password: validRegistration.password })
-        .expect(403);
+        .expect(HttpStatus.FORBIDDEN);
 
       expect(response.body.message).toBe(AUTH_ERROR_MESSAGES.ACCOUNT_BLOCKED);
     });
@@ -96,7 +98,10 @@ describe('Auth (e2e)', () => {
         statuses.push(response.status);
       }
 
-      expect(statuses).toEqual([...Array.from({ length: AUTH_THROTTLE_LIMIT }, () => 401), 429]);
+      expect(statuses).toEqual([
+        ...Array.from({ length: AUTH_THROTTLE_LIMIT }, () => HttpStatus.UNAUTHORIZED),
+        HttpStatus.TOO_MANY_REQUESTS,
+      ]);
     });
   });
 });

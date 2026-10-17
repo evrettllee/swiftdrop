@@ -3,8 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { ENV_KEYS } from '../config/env.constants';
-import * as schema from '../db/schema';
-import { DB_CASING, DB_CONNECTION_OPTIONS, DRIZZLE, PG_POOL } from './database.constants';
+import * as schema from './schema';
+import {
+  DB_CASING,
+  DB_CONNECTION_OPTIONS,
+  DB_PING_QUERY,
+  DB_POOL_MAX,
+  DRIZZLE,
+  PG_POOL,
+} from './database.constants';
 
 export type Database = NodePgDatabase<typeof schema>;
 // The handle a callback of db.transaction gets.
@@ -20,8 +27,9 @@ export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
         const pool = new Pool({
           connectionString: config.getOrThrow<string>(ENV_KEYS.DATABASE_URL),
           options: DB_CONNECTION_OPTIONS,
+          max: DB_POOL_MAX,
         });
-        await pool.query('SELECT 1');
+        await pool.query(DB_PING_QUERY);
         Logger.log('Connected to PostgreSQL', 'Database');
         return pool;
       },

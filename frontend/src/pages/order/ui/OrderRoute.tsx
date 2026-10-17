@@ -1,39 +1,47 @@
-import { useId } from 'react';
-import type { OrderDetails } from '@/shared/api';
-import { ROUTE_POINT, ROUTE_POINT_LABELS } from '@/shared/config';
-import { RouteMapView } from '@/shared/ui/route-map';
-import { RoutePointMark } from '@/shared/ui/route-point-mark';
+import { OrderRoutePoints } from '@/entities/order';
+import { getClientOrderRoute, type OrderDetails } from '@/shared/api';
+import { ROUTE_REFRESH_INTERVAL_MS, useRouteLines } from '@/shared/lib/route-lines';
+import { RouteMapView, SearchPulse } from '@/shared/ui/route-map';
+import { Section } from '@/shared/ui/section';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
-import { formatFullAddress } from '../lib/order-details-format';
+import { ORDER_COURIER_TEXTS } from '../config/tracking';
+import { COURIER_ACTIVE_STATUSES, SEARCHING_STATUSES } from '../model/order-status-groups';
 
 type OrderRouteProps = {
   order: OrderDetails;
 };
 
 export function OrderRoute({ order }: OrderRouteProps) {
-  const headingId = useId();
-  const points = [
-    { kind: ROUTE_POINT.PICKUP, address: order.pickup },
-    { kind: ROUTE_POINT.DELIVERY, address: order.delivery },
-  ] as const;
+  const { orderId, status } = order;
+  const isSearching = SEARCHING_STATUSES.includes(status);
+  // The page does not see the courier move, so while the order is with them the route is asked for
+  // again on the interval: the backend knows where the courier is. Otherwise it is asked for once,
+  // and again when the status changes.
+  const routeLines = useRouteLines(
+    (options) => getClientOrderRoute(orderId, options),
+    `${orderId}:${status}`,
+    {
+      refreshIntervalMs: COURIER_ACTIVE_STATUSES.includes(status)
+        ? ROUTE_REFRESH_INTERVAL_MS
+        : null,
+    },
+  );
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-4">
-      <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
-        {ORDER_DETAILS_TEXTS.SECTION_ROUTE}
-      </h2>
-      <RouteMapView pickup={order.pickup} delivery={order.delivery} className="h-40 lg:h-45" />
-      <div className="flex flex-col gap-3">
-        {points.map(({ kind, address }) => (
-          <div key={kind} className="flex items-start gap-3">
-            <RoutePointMark kind={kind} className="mt-2" />
-            <div className="flex min-w-0 flex-col">
-              <span className="text-small text-fg-secondary">{ROUTE_POINT_LABELS[kind]}</span>
-              <span>{formatFullAddress(address)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+    <Section title={ORDER_DETAILS_TEXTS.SECTION_ROUTE}>
+      <RouteMapView
+        pickup={order.pickup}
+        delivery={order.delivery}
+        route={routeLines}
+        className="h-40 lg:h-45"
+      >
+        {isSearching ? <SearchPulse point={order.pickup} /> : null}
+      </RouteMapView>
+      {/* The region stays in the page, so the text that appears in it is read out politely. */}
+      <p aria-live="polite" className="font-semibold empty:hidden">
+        {isSearching ? ORDER_COURIER_TEXTS.SEARCHING : null}
+      </p>
+      <OrderRoutePoints pickup={order.pickup} delivery={order.delivery} />
+    </Section>
   );
 }

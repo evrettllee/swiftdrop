@@ -1,16 +1,16 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { asc, eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orderStatusHistory, users } from '../../../src/db/schema';
-import { OsrmService } from '../../../src/integrations/osrm/osrm.service';
-import { CANCELLABLE_STATUSES } from '../../../src/orders/orders.constants';
+import { orderStatusHistory, users } from '../../../src/database/schema';
+import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { CANCELLABLE_STATUSES } from '../../../src/modules/orders/constants/orders.constants';
 import { createTestApp } from '../../support/app';
 import { registerUser } from '../../support/auth';
-import { resetTestData, seedServiceArea } from '../../support/database';
-import { ROUTE } from '../../support/fixtures';
 import { cancelOrder, placeOrders, readOrderStatus, setOrderStatus } from '../../support/orders';
+import { resetServiceArea } from '../../support/pricing';
 
 describe('Order cancellation (e2e)', () => {
   let app: NestExpressApplication;
@@ -23,10 +23,7 @@ describe('Order cancellation (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetTestData(db);
-    await seedServiceArea(db);
-    getRoute.mockReset();
-    getRoute.mockResolvedValue(ROUTE);
+    await resetServiceArea(db, getRoute);
   });
 
   afterAll(async () => {
@@ -37,7 +34,7 @@ describe('Order cancellation (e2e)', () => {
     const { cookies } = await registerUser(app);
     const [orderId] = await placeOrders(app, cookies, 1);
 
-    const response = await cancelOrder(app, cookies, orderId).expect(200);
+    const response = await cancelOrder(app, cookies, orderId).expect(HttpStatus.OK);
 
     const history = await db
       .select()
@@ -61,7 +58,7 @@ describe('Order cancellation (e2e)', () => {
       const [orderId] = await placeOrders(app, cookies, 1);
       await setOrderStatus(db, orderId, status);
 
-      await cancelOrder(app, cookies, orderId).expect(200);
+      await cancelOrder(app, cookies, orderId).expect(HttpStatus.OK);
 
       expect(await readOrderStatus(db, orderId)).toBe(ORDER_STATUS.CANCELLED);
     },
@@ -70,9 +67,9 @@ describe('Order cancellation (e2e)', () => {
   it('should return 409 and keep one cancellation record when the order is cancelled twice', async () => {
     const { cookies } = await registerUser(app);
     const [orderId] = await placeOrders(app, cookies, 1);
-    await cancelOrder(app, cookies, orderId).expect(200);
+    await cancelOrder(app, cookies, orderId).expect(HttpStatus.OK);
 
-    await cancelOrder(app, cookies, orderId).expect(409);
+    await cancelOrder(app, cookies, orderId).expect(HttpStatus.CONFLICT);
 
     const history = await db
       .select()

@@ -24,6 +24,7 @@ Thumbs.db
 CLAUDE.md
 CLAUDE.local.md
 .mcp.json
+.playwright-mcp/
 .cursor/
 .cursorrules
 .cursorignore
@@ -34,3 +35,5 @@ skills-lock.json
 coverage/
 playwright-report/
 test-results/
+# The saved session of the seeded courier for the e2e run (e2e/global-setup.ts).
+frontend/playwright/.auth/

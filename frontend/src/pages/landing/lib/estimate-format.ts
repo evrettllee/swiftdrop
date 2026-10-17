@@ -1,22 +1,16 @@
-import {
-  DISTANCE_FRACTION_DIGITS,
-  PRICE_FRACTION_DIGITS,
-  PRICING_LOCALE,
-} from '../config/estimate-format';
+import { APP_LOCALE } from '@/shared/config';
+import { formatMoney } from '@/shared/lib/format';
+import { DISTANCE_FRACTION_DIGITS } from '../config/estimate-format';
 import { CALCULATOR_TEXTS } from '../config/texts';
 
-const priceFormat = new Intl.NumberFormat(PRICING_LOCALE, {
-  minimumFractionDigits: PRICE_FRACTION_DIGITS,
-  maximumFractionDigits: PRICE_FRACTION_DIGITS,
-});
-
-const distanceFormat = new Intl.NumberFormat(PRICING_LOCALE, {
+const distanceFormat = new Intl.NumberFormat(APP_LOCALE, {
   minimumFractionDigits: DISTANCE_FRACTION_DIGITS,
   maximumFractionDigits: DISTANCE_FRACTION_DIGITS,
 });
 
+// The estimate is approximate, unlike the exact amount of an order: "≈ 12,50 BYN".
 export function formatPrice(price: number, currency: string): string {
-  return `${CALCULATOR_TEXTS.APPROX} ${priceFormat.format(price)} ${currency}`;
+  return `${CALCULATOR_TEXTS.APPROX} ${formatMoney(price, currency)}`;
 }
 
 export function formatDistance(distanceKm: number): string {

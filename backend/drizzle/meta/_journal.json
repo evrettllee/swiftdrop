@@ -29,6 +29,13 @@
       "when": 1791571576279,
       "tag": "0003_add_payments_one_pending_per_order",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791955571175,
+      "tag": "0004_add_courier_assignment",
+      "breakpoints": true
     }
   ]
 }

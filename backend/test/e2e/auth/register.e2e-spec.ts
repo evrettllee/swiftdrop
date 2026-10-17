@@ -1,6 +1,7 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ROUTES } from '../../../src/auth/constants/routes.constants';
+import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
 import {
   ACCESS_COOKIE_NAME,
   ACCESS_COOKIE_PATH,
@@ -9,13 +10,13 @@ import {
   REFRESH_COOKIE_NAME,
   REFRESH_COOKIE_PATH,
   REFRESH_TOKEN_TTL_MS,
-} from '../../../src/auth/constants/tokens.constants';
+} from '../../../src/modules/auth/constants/tokens.constants';
 import { MS_PER_SECOND } from '../../../src/common/constants/time.constants';
 import { ROLE } from '../../../src/common/enums/role.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/db/schema';
-import { USERS_ERROR_MESSAGES } from '../../../src/users/users.constants';
+import { users } from '../../../src/database/schema';
+import { USERS_ERROR_MESSAGES } from '../../../src/modules/users/constants/users.constants';
 import { createTestApp } from '../../support/app';
 import { findSetCookie, postAuth, registerUser, validRegistration } from '../../support/auth';
 import { resetTestData } from '../../support/database';
@@ -48,7 +49,7 @@ describe('Auth (e2e)', () => {
     it('should create a client and keep tokens out of the response body when the data is valid', async () => {
       const response = await postAuth(app, AUTH_ROUTES.REGISTER)
         .send(validRegistration)
-        .expect(201);
+        .expect(HttpStatus.CREATED);
 
       expect(response.body.user).toMatchObject({
         email: validRegistration.email,
@@ -63,7 +64,7 @@ describe('Auth (e2e)', () => {
     it('should set httpOnly access and refresh cookies with their own paths and lifetimes when registering', async () => {
       const response = await postAuth(app, AUTH_ROUTES.REGISTER)
         .send(validRegistration)
-        .expect(201);
+        .expect(HttpStatus.CREATED);
       const accessSetCookie = findSetCookie(response, ACCESS_COOKIE_NAME) ?? '';
       const refreshSetCookie = findSetCookie(response, REFRESH_COOKIE_NAME) ?? '';
 
@@ -82,7 +83,7 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.REGISTER)
         .send({ ...SECOND_USER, email: validRegistration.email })
-        .expect(409);
+        .expect(HttpStatus.CONFLICT);
 
       expect(response.body.message).toBe(USERS_ERROR_MESSAGES.EMAIL_TAKEN);
     });
@@ -92,7 +93,7 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.REGISTER)
         .send({ ...SECOND_USER, phone: validRegistration.phone })
-        .expect(409);
+        .expect(HttpStatus.CONFLICT);
 
       expect(response.body.message).toBe(USERS_ERROR_MESSAGES.PHONE_TAKEN);
     });
@@ -102,7 +103,7 @@ describe('Auth (e2e)', () => {
 
       const response = await postAuth(app, AUTH_ROUTES.REGISTER)
         .send({ ...SECOND_USER, email: validRegistration.email.toUpperCase() })
-        .expect(409);
+        .expect(HttpStatus.CONFLICT);
 
       expect(response.body.message).toBe(USERS_ERROR_MESSAGES.EMAIL_TAKEN);
     });
@@ -114,7 +115,7 @@ describe('Auth (e2e)', () => {
       ]);
       const created = await db.select().from(users).where(eq(users.email, validRegistration.email));
 
-      expect(sortedStatuses(responses)).toEqual([201, 409]);
+      expect(sortedStatuses(responses)).toEqual([HttpStatus.CREATED, HttpStatus.CONFLICT]);
       expect(created).toHaveLength(1);
     });
   });

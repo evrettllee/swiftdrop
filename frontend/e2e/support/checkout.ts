@@ -156,9 +156,12 @@ async function capturePostBody(page: Page, path: string): Promise<{ body: Promis
   return { body: promise };
 }
 
+export type PlacedOrder = { orderId: number; sessionId: string };
+
 // Fills the order form, waits for the price and goes to the payment: the order is placed, and the
-// browser lands on the (replaced) Stripe page of the session the backend created.
-export async function placeOrder(page: Page, order: TestOrder): Promise<number> {
+// browser lands on the (replaced) Stripe page of the session the backend created, whose id is
+// the last part of its address.
+export async function placeOrderWithSession(page: Page, order: TestOrder): Promise<PlacedOrder> {
   await stubStripeCheckout(page);
   await fillCheckout(page, order);
 
@@ -177,5 +180,11 @@ export async function placeOrder(page: Page, order: TestOrder): Promise<number> 
   expect(page.url()).toBe(checkoutUrl);
   expect(new URL(checkoutUrl).pathname).toMatch(CHECKOUT_SESSION_ID_PATTERN);
 
-  return orderId;
+  const sessionId = new URL(checkoutUrl).pathname.match(CHECKOUT_SESSION_ID_PATTERN)?.[0].slice(1);
+
+  return { orderId, sessionId: sessionId ?? '' };
+}
+
+export async function placeOrder(page: Page, order: TestOrder): Promise<number> {
+  return (await placeOrderWithSession(page, order)).orderId;
 }
