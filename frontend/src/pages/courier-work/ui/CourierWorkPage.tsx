@@ -26,15 +26,15 @@ export function CourierWorkPage() {
     return <Navigate to={APP_ROUTES.COURIER_VEHICLE} replace />;
   }
 
-  return (
-    <div className="flex flex-col gap-6 lg:gap-8">
-      <PageTitle>{COURIER_WORK_TEXTS.PAGE_TITLE}</PageTitle>
-      <ConnectionAlert />
-      {profile === null || profile.vehicle === null ? (
+  if (profile === null || profile.vehicle === null) {
+    return (
+      <div className="flex flex-col gap-6 lg:gap-8">
+        <PageTitle>{COURIER_WORK_TEXTS.PAGE_TITLE}</PageTitle>
+        <ConnectionAlert />
         <CourierProfileError />
-      ) : (
-        <WorkContent profile={profile} vehicle={profile.vehicle} />
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return <WorkContent profile={profile} vehicle={profile.vehicle} />;
 }

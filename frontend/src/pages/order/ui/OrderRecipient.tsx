@@ -1,8 +1,8 @@
 import { formatParcelSize, formatParcelWeight } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
+import { formatPhone } from '@/shared/lib/format';
 import { Section } from '@/shared/ui/section';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
-import { formatPhone } from '../lib/order-details-format';
 
 type FieldProps = {
   label: string;

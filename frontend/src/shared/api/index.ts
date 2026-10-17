@@ -6,6 +6,12 @@ export {
   courierOfferSchema,
   currentOfferSchema,
 } from './endpoints/courier-offer';
+export type { CourierOrder } from './endpoints/courier-order';
+export {
+  COURIER_ORDERS_API_PATHS,
+  courierOrderSchema,
+  currentCourierOrderSchema,
+} from './endpoints/courier-order';
 export type {
   CourierMe,
   CourierTodayStats,

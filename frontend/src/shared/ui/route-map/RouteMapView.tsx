@@ -42,7 +42,7 @@ export function RouteMapView({ pickup, delivery, route, className }: RouteMapVie
   const { isExpanded, toggle, toggleButtonRef } = useExpandedMap(map);
   useMapInteractions(map, isExpanded);
   // After useExpandedMap: the route is fitted to the map once Leaflet knows its new size.
-  useFitRoute(map, pickup, delivery, isExpanded, route.lines);
+  useFitRoute(map, pickup, delivery, null, isExpanded, route.lines);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   if (!IS_MAPBOX_CONFIGURED) {

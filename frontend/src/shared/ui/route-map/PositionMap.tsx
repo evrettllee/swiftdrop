@@ -1,27 +1,12 @@
-import type { Map as LeafletMap } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
-import { MapContainer, Marker } from 'react-leaflet';
-import { IS_MAPBOX_CONFIGURED } from '@/shared/config';
+import { Marker } from 'react-leaflet';
 import { usePrefersReducedMotion } from '@/shared/lib/dom';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { toLatLng } from './lat-lng';
-import {
-  LEAFLET_EVENT,
-  MAP_ATTRIBUTION_POSITION,
-  MAP_CLASS,
-  MAP_FULLSCREEN_CLASS,
-  MAP_PLACED_CLASS,
-  MAP_TEXTS,
-  MAP_ZOOM,
-  MAP_ZOOM_AROUND_CENTER,
-} from './map';
-import { MapControls } from './MapControls';
-import { MapTiles } from './MapTiles';
-import { MapUnavailable } from './MapUnavailable';
+import { LEAFLET_EVENT, MAP_TEXTS, MAP_ZOOM } from './map';
+import { MovableMapFrame } from './MovableMapFrame';
 import { POSITION_ICON, POSITION_ICON_STILL } from './position-icon';
-import { useFullscreenMap } from './useFullscreenMap';
-import './route-map.css';
+import { useMovableMap } from './useMovableMap';
 
 type PositionMapProps = {
   point: GeoPoint;
@@ -34,9 +19,9 @@ type PositionMapProps = {
 // Where the courier is. The map follows the point until the courier drags it away; «Ко мне» brings
 // it back. The wheel and the pinch zoom around the center, so they never stop the following.
 export function PositionMap({ point, isPulsing, className }: PositionMapProps) {
-  const [map, setMap] = useState<LeafletMap | null>(null);
+  const frame = useMovableMap();
+  const { map } = frame;
   const [isFollowing, setIsFollowing] = useState(true);
-  const { containerRef, isFullscreen, isSupported, toggle } = useFullscreenMap(map);
   const prefersReducedMotion = usePrefersReducedMotion();
   const { latitude, longitude } = point;
 
@@ -62,49 +47,21 @@ export function PositionMap({ point, isPulsing, className }: PositionMapProps) {
     map?.setView([latitude, longitude], map.getZoom(), { animate: !prefersReducedMotion });
   }
 
-  if (!IS_MAPBOX_CONFIGURED) {
-    return <MapUnavailable className={className} />;
-  }
-
   return (
-    <div className={`relative ${className}`}>
-      <div
-        ref={containerRef}
-        role="region"
-        aria-label={MAP_TEXTS.POSITION_LABEL}
-        className={`${MAP_CLASS.VIEW} ${MAP_PLACED_CLASS} ${MAP_FULLSCREEN_CLASS}`}
-      >
-        {/* `isolate` keeps the high z-index values of Leaflet inside the map. */}
-        <MapContainer
-          ref={setMap}
-          center={toLatLng(point)}
-          zoom={MAP_ZOOM.FOCUS}
-          zoomControl={false}
-          zoomAnimation={!prefersReducedMotion}
-          attributionControl={false}
-          scrollWheelZoom={MAP_ZOOM_AROUND_CENTER}
-          touchZoom={MAP_ZOOM_AROUND_CENTER}
-          doubleClickZoom={MAP_ZOOM_AROUND_CENTER}
-          boxZoom={false}
-          keyboard={false}
-          className="isolate size-full"
-        >
-          <MapTiles attributionPosition={MAP_ATTRIBUTION_POSITION.VIEW} />
-          <Marker
-            position={toLatLng(point)}
-            icon={isPulsing ? POSITION_ICON : POSITION_ICON_STILL}
-            interactive={false}
-            keyboard={false}
-          />
-        </MapContainer>
-        <MapControls
-          map={map}
-          onLocate={handleLocate}
-          isFullscreen={isFullscreen}
-          onToggleFullscreen={isSupported ? toggle : undefined}
-          zoomOnlyOnDesktop
-        />
-      </div>
-    </div>
+    <MovableMapFrame
+      frame={frame}
+      label={MAP_TEXTS.POSITION_LABEL}
+      center={point}
+      zoom={MAP_ZOOM.FOCUS}
+      onLocate={handleLocate}
+      className={className}
+    >
+      <Marker
+        position={toLatLng(point)}
+        icon={isPulsing ? POSITION_ICON : POSITION_ICON_STILL}
+        interactive={false}
+        keyboard={false}
+      />
+    </MovableMapFrame>
   );
 }

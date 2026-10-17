@@ -200,6 +200,13 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
+
+  /* A focused element is scrolled clear of the action bar and the bottom menu of a phone. */
+  html:has([data-action-bar]) {
+    @variant max-lg {
+      scroll-padding-bottom: calc(--spacing(36) + env(safe-area-inset-bottom));
+    }
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

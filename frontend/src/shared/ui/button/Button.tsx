@@ -88,7 +88,17 @@ export function Button({
 type LinkButtonProps = CommonProps & {
   // Runs before the navigation, for example to remember what the next page needs.
   onClick?: () => void;
-} & ({ href: string; to?: never } | { to: string; href?: never });
+  // The name for screen readers when the text alone does not say enough, for example whom to call.
+  label?: string;
+} & (
+    | {
+        href: string;
+        to?: never;
+        // Opens in a new tab, so the current page keeps working.
+        isExternal?: boolean;
+      }
+    | { to: string; href?: never; isExternal?: never }
+  );
 
 // A link that looks like a button: `to` for pages of the app, `href` for full-page navigation.
 export function LinkButton({
@@ -96,6 +106,8 @@ export function LinkButton({
   fullWidth = false,
   icon,
   onClick,
+  label,
+  isExternal = false,
   children,
   ...target
 }: LinkButtonProps) {
@@ -110,11 +122,18 @@ export function LinkButton({
   );
 
   return target.to === undefined ? (
-    <a href={target.href} className={className} onClick={handleClick}>
+    <a
+      href={target.href}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      aria-label={label}
+      className={className}
+      onClick={handleClick}
+    >
       {content}
     </a>
   ) : (
-    <Link to={target.to} className={className} onClick={handleClick}>
+    <Link to={target.to} aria-label={label} className={className} onClick={handleClick}>
       {content}
     </Link>
   );

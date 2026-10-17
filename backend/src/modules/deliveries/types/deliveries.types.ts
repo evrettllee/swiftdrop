@@ -30,6 +30,7 @@ export type CourierOrderRow = {
   sender: { firstName: string; lastName: string; phone: string | null };
   recipient: { name: string; phone: string };
   parcel: PackageSpec;
+  distanceKm: number;
 };
 
 // An order as the courier sees it after accepting.

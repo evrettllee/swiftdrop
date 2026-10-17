@@ -10,7 +10,8 @@ export function CourierStatusIndicator() {
     return null;
   }
 
-  const { label, dotClass } = COURIER_STATUS_META[getCourierStatus(profile.isAvailable)];
+  const { label, dotClass } =
+    COURIER_STATUS_META[getCourierStatus(profile.isAvailable, profile.activeOrderId !== null)];
 
   return (
     <p role="status" className="inline-flex items-center gap-2 text-small whitespace-nowrap">

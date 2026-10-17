@@ -21,8 +21,43 @@ export const LINE_TEXTS = {
   ONLINE_HINT: 'Ищем заказы рядом. Не закрывайте вкладку.',
   GO_OFFLINE: 'Уйти с линии',
   CHANGE_VEHICLE: 'Изменить',
-  ACTIVE_ORDER_TITLE: 'У вас активный заказ',
-  ACTIVE_ORDER_HINT: 'Скоро здесь появится экран текущего заказа.',
+} as const;
+
+// The stages of the order the courier carries: the title of the screen and the main button.
+export const ORDER_STEP_TEXTS = {
+  TO_PICKUP: 'Едете к точке забора',
+  PICK_UP: 'Забрал посылку',
+  PICKED_UP: 'Посылка у вас',
+  DEPART: 'Еду к получателю',
+  TO_RECIPIENT: 'Едете к получателю',
+  ENTER_CODE: 'Ввести код',
+  CODE_HINT: 'Код доставки спросите у получателя',
+  step: (number: number, total: number) => `Этап ${number} из ${total}`,
+} as const;
+
+// The screen of the order the courier carries.
+export const ORDER_TEXTS = {
+  PICKUP: 'Забрать',
+  DELIVERY_NEXT: 'Потом доставить',
+  DELIVERY: 'Доставить',
+  ADDRESS: 'Адрес',
+  SENDER: 'Отправитель',
+  RECIPIENT: 'Получатель',
+  PHONE: 'Телефон',
+  ROUTE: 'Маршрут',
+  CALL: 'Позвонить',
+  CALL_SENDER: 'Позвонить отправителю',
+  CALL_RECIPIENT: 'Позвонить получателю',
+  PARCEL: 'Посылка',
+  WEIGHT: 'Вес',
+  SIZE: 'Размеры',
+  FRAGILE: 'Хрупкое',
+  YES: 'Да',
+  NO: 'Нет',
+  DISTANCE: 'Расстояние',
+  LOAD_ERROR: 'Не удалось загрузить заказ',
+  RETRY: UI_TEXTS.RETRY,
+  orderNumber: (number: string) => `Заказ ${number}`,
 } as const;
 
 // The alert when the browser gives no position, so the courier cannot go on the line.

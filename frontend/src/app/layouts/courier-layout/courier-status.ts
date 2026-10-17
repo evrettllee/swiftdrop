@@ -1,6 +1,7 @@
-// Whether the courier is on the line, as the top bar of the phone shows it. The connection itself
-// is reported by the alert of the work page, not here.
+// Whether the courier is on the line or carries an order, as the top bar of the phone shows it.
+// The connection itself is reported by the alert of the work page, not here.
 export const COURIER_STATUS = {
+  ON_ORDER: 'onOrder',
   ON_LINE: 'onLine',
   OFF_LINE: 'offLine',
 } as const;
@@ -14,10 +15,16 @@ type CourierStatusMeta = {
 };
 
 export const COURIER_STATUS_META: Record<CourierStatus, CourierStatusMeta> = {
+  [COURIER_STATUS.ON_ORDER]: { label: 'На заказе', dotClass: 'bg-status-active' },
   [COURIER_STATUS.ON_LINE]: { label: 'На линии', dotClass: 'bg-success' },
   [COURIER_STATUS.OFF_LINE]: { label: 'Не на линии', dotClass: 'bg-status-new' },
 };
 
-export function getCourierStatus(isAvailable: boolean): CourierStatus {
+// An order comes first: while the courier carries it, the line does not matter.
+export function getCourierStatus(isAvailable: boolean, hasActiveOrder: boolean): CourierStatus {
+  if (hasActiveOrder) {
+    return COURIER_STATUS.ON_ORDER;
+  }
+
   return isAvailable ? COURIER_STATUS.ON_LINE : COURIER_STATUS.OFF_LINE;
 }

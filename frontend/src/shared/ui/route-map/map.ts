@@ -26,6 +26,12 @@ export const LEAFLET_EVENT = {
 // The column of the controls (44px buttons, 12px from the edge) and a gap to it: the points are
 // fitted to the rest of the map.
 export const MAP_CONTROLS_CLEARANCE = 72;
+// The bottom-right padding of a map of an order with the column of the controls: the points stay to
+// the left of it.
+export const MAP_VIEW_CONTROLS_FIT_PADDING: [number, number] = [
+  MAP_CONTROLS_CLEARANCE,
+  MAP_VIEW_FIT_PADDING,
+];
 
 // The map of an offer is lower still: the area and the pickup point come close to its edge, but
 // stay above the attribution in the bottom-left corner (8px margin, 26px high, 6px more for the dot).
@@ -92,6 +98,7 @@ export const MAP_TEXTS = {
   VIEW_LABEL: 'Схема маршрута',
   POSITION_LABEL: 'Ваше местоположение',
   AREA_LABEL: 'Точка забора и район доставки',
+  COURIER_ROUTE_LABEL: 'Маршрут заказа',
   HINT_PICKUP: 'Отметьте точку «Откуда»',
   HINT_DELIVERY: 'Отметьте точку «Куда»',
   ZOOM_IN: 'Приблизить',

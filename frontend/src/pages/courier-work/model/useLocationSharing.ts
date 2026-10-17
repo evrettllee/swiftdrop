@@ -96,3 +96,5 @@ export function useLocationSharing(isSharing: boolean) {
 
   return { point, problem, isChecking, sendNow, recheck, reset };
 }
+
+export type LocationSharing = ReturnType<typeof useLocationSharing>;
