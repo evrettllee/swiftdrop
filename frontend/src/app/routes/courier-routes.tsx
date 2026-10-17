@@ -1,6 +1,5 @@
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router';
-import { PLACEHOLDER_TEXTS, PlaceholderSection } from '@/pages/placeholder';
 import { APP_ROUTES } from '@/shared/routes';
 import { ROLE } from '@/shared/session';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -52,11 +51,11 @@ export const courierRoutes: RouteObject = {
         },
         {
           path: APP_ROUTES.COURIER_PROFILE,
-          element: (
-            <PlaceholderSection
-              title={PLACEHOLDER_TEXTS.COURIER_PROFILE_TITLE}
-              homeTo={APP_ROUTES.COURIER_WORK}
-            />
+          // The same page as the client's: it knows nothing about the role.
+          Component: lazy(() =>
+            import('@/pages/profile').then((module) => ({
+              default: module.ProfilePage,
+            })),
           ),
         },
       ],
