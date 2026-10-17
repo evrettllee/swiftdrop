@@ -10,7 +10,7 @@ import {
   splitPrice,
 } from '@/entities/price';
 import type { PriceEstimate } from '@/shared/api';
-import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { ICON_SIZE, ICON_WEIGHT, SIDE_COLUMN_CLASS } from '@/shared/config';
 import { formatMoney } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/button';
 import { Divider } from '@/shared/ui/divider';
@@ -85,7 +85,7 @@ export function CheckoutSummary({
   return (
     <aside
       aria-labelledby={headingId}
-      className="flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-md lg:sticky lg:top-12 lg:p-6 dark:border dark:border-border"
+      className={`${SIDE_COLUMN_CLASS} flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-md lg:sticky lg:top-12 lg:p-6 dark:border dark:border-border`}
     >
       <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
         {CHECKOUT_TEXTS.SECTION_SUMMARY}

@@ -201,7 +201,14 @@
     outline-offset: 2px;
   }
 
-  /* A focused element is scrolled clear of the action bar and the bottom menu of a phone. */
+  /* A focused element is scrolled clear of the bottom menu of a phone (64px and a margin), and of
+     the action bar above it on the pages that have one. The bar rule comes later, so it wins. */
+  html:has([data-bottom-nav]) {
+    @variant max-lg {
+      scroll-padding-bottom: calc(--spacing(20) + env(safe-area-inset-bottom));
+    }
+  }
+
   html:has([data-action-bar]) {
     @variant max-lg {
       scroll-padding-bottom: calc(--spacing(36) + env(safe-area-inset-bottom));

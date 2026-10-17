@@ -65,8 +65,6 @@ export const MAP_MARKER_TAG_OFFSET = 14;
 // The frame of the map in its place in the page; the placeholder of a missing map uses it too.
 export const MAP_PLACED_CLASS =
   'absolute inset-0 overflow-hidden rounded-lg border border-border bg-field';
-// The expanded map covers the whole screen above the header.
-export const MAP_EXPANDED_CLASS = 'fixed inset-0 z-50 bg-field';
 // The map in the full screen of the browser (Fullscreen API) loses the frame of its place.
 export const MAP_FULLSCREEN_CLASS = '[&:fullscreen]:rounded-none [&:fullscreen]:border-0';
 
@@ -82,7 +80,6 @@ export const MAP_CLASS = {
   TAG_DELIVERY: 'route-tag--delivery',
   LINE: 'route-line',
   VIEW: 'route-map-view',
-  VIEW_STATIC: 'route-map-view--static',
   POSITION: 'position-marker',
   POSITION_DOT: 'position-marker__dot',
   POSITION_PULSE: 'position-marker__pulse',
@@ -104,8 +101,6 @@ export const MAP_TEXTS = {
   ZOOM_IN: 'Приблизить',
   ZOOM_OUT: 'Отдалить',
   LOCATE: 'Ко мне',
-  EXPAND: 'Развернуть карту',
-  COLLAPSE: 'Свернуть карту',
   FULLSCREEN: 'На весь экран',
   EXIT_FULLSCREEN: 'Свернуть',
   REMOVE_POINT: (pointLabel: string) => `Убрать точку «${pointLabel}»`,

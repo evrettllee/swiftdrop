@@ -23,6 +23,13 @@ export {
   ROUTE_POINT_LABELS,
   ROUTE_POINT_ORDER,
 } from './route-point';
-export { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from './styles';
+export {
+  COLOR_TRANSITION_CLASS,
+  ICON_SIZE,
+  ICON_WEIGHT,
+  MAIN_COLUMN_CLASS,
+  SIDE_COLUMN_CLASS,
+  SIDE_COLUMN_LAYOUT_CLASS,
+} from './styles';
 export { PAGINATION_TEXTS, THEME_TEXTS, UI_TEXTS } from './texts';
 export { MS_PER_MINUTE, MS_PER_SECOND } from './time';

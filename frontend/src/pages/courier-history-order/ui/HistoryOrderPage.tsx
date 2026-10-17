@@ -2,7 +2,7 @@ import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { buildOrderProgress, OrderProgressSteps } from '@/entities/order';
-import { LIST_STATUS } from '@/shared/config';
+import { LIST_STATUS, MAIN_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 import {
   getCourierHistoryPath,
   HISTORY_PAGE_PARAM,
@@ -34,8 +34,8 @@ export function HistoryOrderPage() {
     content = (
       <div className="flex flex-col gap-6 lg:gap-8">
         <HistoryOrderHeader order={order} historyPage={historyPage} />
-        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-12">
-          <div className="flex min-w-0 flex-col gap-6 lg:gap-8">
+        <div className={SIDE_COLUMN_LAYOUT_CLASS}>
+          <div className={`${MAIN_COLUMN_CLASS} flex flex-col gap-6 lg:gap-8`}>
             <HistoryOrderRoute order={order} />
             <Divider />
             <OrderProgressSteps

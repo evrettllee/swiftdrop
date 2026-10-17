@@ -1,6 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { useCourierProfileLoader } from '@/entities/courier';
 import { OrderOffer } from '@/features/order-offer';
+import { CourierLocationProvider } from '@/features/courier-location';
 import { connectCourierSocket, disconnectCourierSocket } from '@/shared/realtime';
 import { APP_ROUTES } from '@/shared/routes';
 import { AccountShell } from '../account-shell/AccountShell';
@@ -24,7 +25,7 @@ export function CourierLayout() {
   useCourierProfileLoader();
 
   return (
-    <>
+    <CourierLocationProvider>
       <AccountShell
         homeTo={APP_ROUTES.COURIER_WORK}
         navLabel={COURIER_LAYOUT_TEXTS.NAV_LABEL}
@@ -32,6 +33,6 @@ export function CourierLayout() {
         headerEnd={<CourierStatusIndicator />}
       />
       <OrderOffer />
-    </>
+    </CourierLocationProvider>
   );
 }

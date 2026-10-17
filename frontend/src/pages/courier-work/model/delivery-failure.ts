@@ -19,7 +19,7 @@ export const DELIVERY_FAILURE = {
   OTHER: 'other',
 } as const;
 
-export type DeliveryFailureKind = (typeof DELIVERY_FAILURE)[keyof typeof DELIVERY_FAILURE];
+type DeliveryFailureKind = (typeof DELIVERY_FAILURE)[keyof typeof DELIVERY_FAILURE];
 
 export type DeliveryFailure = {
   kind: DeliveryFailureKind;

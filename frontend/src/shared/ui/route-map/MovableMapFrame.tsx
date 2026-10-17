@@ -35,8 +35,8 @@ type MovableMapFrameProps = {
 };
 
 // A map that moves in the page: the wheel, the pinch and the double click zoom around the center,
-// the zoom buttons are on the desktop and in the full screen, «Ко мне» and the full screen of the
-// browser are always there.
+// the zoom buttons are on the desktop and in the full screen (MapControls), «Ко мне» and the full
+// screen of the browser are there too.
 export function MovableMapFrame({
   frame,
   label,
@@ -85,7 +85,6 @@ export function MovableMapFrame({
           onLocate={onLocate}
           isFullscreen={isFullscreen}
           onToggleFullscreen={isSupported ? toggle : undefined}
-          zoomOnlyOnDesktop
         />
         {overlay}
       </div>

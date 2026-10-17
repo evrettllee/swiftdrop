@@ -1,8 +1,8 @@
+import type { LocationSharing } from '@/features/courier-location';
 import type { CourierOrder, CourierVehicle } from '@/shared/api';
 import { Divider } from '@/shared/ui/divider';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { ORDER_ACTION, type OrderStep } from '../config/order-steps';
-import type { LocationSharing } from '../model/useLocationSharing';
 import { useOrderStep } from '../model/useOrderStep';
 import { ConnectionAlert } from './ConnectionAlert';
 import { GeoAlert } from './GeoAlert';
@@ -20,6 +20,8 @@ type OrderScreenProps = {
   location: LocationSharing;
   // The order has moved on while the code was entered: the text of the backend.
   deliveryError: string | null;
+  // The courier comes back from the code screen: its button is gone, the focus goes to the title.
+  isFocusOnTitle: boolean;
   onChanged: (order: CourierOrder) => void;
   onStale: () => void;
   onEnterCode: () => void;
@@ -33,6 +35,7 @@ export function OrderScreen({
   vehicle,
   location,
   deliveryError,
+  isFocusOnTitle,
   onChanged,
   onStale,
   onEnterCode,
@@ -54,7 +57,7 @@ export function OrderScreen({
   return (
     // On a phone the end of the page stays clear of the bar with the button (24px above it).
     <div className="flex flex-col gap-6 pb-15 lg:gap-8 lg:pb-0">
-      <OrderHeader orderId={order.orderId} step={step} />
+      <OrderHeader orderId={order.orderId} step={step} isFocusOnMount={isFocusOnTitle} />
       <ConnectionAlert />
       {location.problem === null ? null : (
         <GeoAlert

@@ -1,27 +1,50 @@
-import { useCallback, useEffect, useState } from 'react';
-import type { ClientOrderCourier, OrderStatus } from '@/shared/api';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  ApiError,
+  type ClientOrderCourier,
+  NETWORK_ERROR_STATUS,
+  type OrderStatus,
+  isTransientStatus,
+} from '@/shared/api';
 import { getOrderCourier } from '../api/get-order-courier';
-import { CODE_VISIBLE_STATUSES, COURIER_VISIBLE_STATUSES } from './order-status-groups';
+import { ORDER_COURIER_RETRIES_WITHOUT_POLLING, ORDER_COURIER_RETRY_MS } from '../config/tracking';
+import {
+  CODE_VISIBLE_STATUSES,
+  COURIER_VISIBLE_STATUSES,
+  POLLED_STATUSES,
+} from './order-status-groups';
 
 type StoredCourier = { orderId: number | null; answer: ClientOrderCourier | null };
 
 const NOTHING: StoredCourier = { orderId: null, answer: null };
 
 // Who carries the order and the code for them. Asked for from the assignment on and again when the
-// status changes or `refresh` is called; a failed request changes nothing (the next one tries
-// again). What the status does not allow to show is not shown, whatever came earlier, so the code
-// is gone the moment the parcel is handed over.
+// status changes or `refresh` is called. A failed request changes nothing and is repeated quietly
+// after ORDER_COURIER_RETRY_MS when the failure may pass (the network, a limit, the server): a
+// refused one (401, 403, 404...) is not. An order the page does not ask about again by itself gets
+// one repeat. What the status does not allow to show is not shown, whatever came earlier, so the
+// code is gone the moment the parcel is handed over.
 export function useOrderCourier(orderId: number, status: OrderStatus | null) {
   const [tick, setTick] = useState(0);
   const [stored, setStored] = useState<StoredCourier>(NOTHING);
   const isVisible = status !== null && COURIER_VISIBLE_STATUSES.includes(status);
+  const isPolled = status !== null && POLLED_STATUSES.includes(status);
+  // The repeats made for this order at this status.
+  const retries = useRef({ key: '', used: 0 });
 
   useEffect(() => {
     if (!isVisible) {
       return undefined;
     }
 
+    const key = `${orderId}:${status}`;
+
+    if (retries.current.key !== key) {
+      retries.current = { key, used: 0 };
+    }
+
     const controller = new AbortController();
+    let timer: number | undefined;
 
     getOrderCourier(orderId, { signal: controller.signal }).then(
       (answer) => {
@@ -29,11 +52,26 @@ export function useOrderCourier(orderId: number, status: OrderStatus | null) {
           setStored({ orderId, answer });
         }
       },
-      () => undefined,
+      (error: unknown) => {
+        const failure = error instanceof ApiError ? error.status : NETWORK_ERROR_STATUS;
+        const hasRetriesLeft =
+          isPolled || retries.current.used < ORDER_COURIER_RETRIES_WITHOUT_POLLING;
+
+        if (!controller.signal.aborted && isTransientStatus(failure) && hasRetriesLeft) {
+          retries.current.used += 1;
+          timer = window.setTimeout(
+            () => setTick((current) => current + 1),
+            ORDER_COURIER_RETRY_MS,
+          );
+        }
+      },
     );
 
-    return () => controller.abort();
-  }, [orderId, status, tick, isVisible]);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [orderId, status, tick, isVisible, isPolled]);
 
   const refresh = useCallback(() => setTick((current) => current + 1), []);
   const answer = isVisible && stored.orderId === orderId ? stored.answer : null;

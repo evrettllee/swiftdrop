@@ -1,3 +1,4 @@
+import type { LocationSharing } from '@/features/courier-location';
 import type { CourierVehicle } from '@/shared/api';
 import { LIST_STATUS } from '@/shared/config';
 import { Button } from '@/shared/ui/button';
@@ -7,30 +8,26 @@ import { PageTitle } from '@/shared/ui/page-title';
 import { ORDER_ACTION, ORDER_STEPS } from '../config/order-steps';
 import { COURIER_WORK_TEXTS, ORDER_TEXTS } from '../config/texts';
 import { useCurrentOrder } from '../model/useCurrentOrder';
-import type { LocationSharing } from '../model/useLocationSharing';
 import { ORDER_VIEW, useOrderView } from '../model/useOrderView';
 import { ConnectionAlert } from './ConnectionAlert';
 import { DeliveryCodeScreen } from './DeliveryCodeScreen';
-import { OrderDelivered } from './OrderDelivered';
 import { OrderScreen } from './OrderScreen';
 
 type CurrentOrderProps = {
   orderId: number;
   vehicle: CourierVehicle;
   location: LocationSharing;
+  // The order is closed: the work page shows it, so no refresh of the profile can take it away.
+  onDelivered: (orderId: number, closedAt: Date) => void;
 };
 
 // The order the courier carries: loaded by the screen itself, shown stage by stage, then the code
-// of the recipient and the closed order.
-export function CurrentOrder({ orderId, vehicle, location }: CurrentOrderProps) {
-  const { view, openCode, showOrder, showDelivered } = useOrderView();
-  const current = useCurrentOrder(orderId, view.kind === ORDER_VIEW.DELIVERED);
+// of the recipient.
+export function CurrentOrder({ orderId, vehicle, location, onDelivered }: CurrentOrderProps) {
+  const { view, openCode, showOrder } = useOrderView();
+  const current = useCurrentOrder(orderId);
   const { order } = current;
   const step = order === null ? undefined : ORDER_STEPS[order.status];
-
-  if (view.kind === ORDER_VIEW.DELIVERED) {
-    return <OrderDelivered orderId={view.orderId} closedAt={view.closedAt} />;
-  }
 
   if (order !== null && step !== undefined) {
     return view.kind === ORDER_VIEW.CODE && step.action === ORDER_ACTION.ENTER_CODE ? (
@@ -38,7 +35,7 @@ export function CurrentOrder({ orderId, vehicle, location }: CurrentOrderProps) 
         orderId={order.orderId}
         location={location}
         onBack={() => showOrder()}
-        onDelivered={(closedAt) => showDelivered(order.orderId, closedAt)}
+        onDelivered={(closedAt) => onDelivered(order.orderId, closedAt)}
         onStale={(message) => {
           showOrder(message);
           current.reload();
@@ -51,6 +48,7 @@ export function CurrentOrder({ orderId, vehicle, location }: CurrentOrderProps) 
         vehicle={vehicle}
         location={location}
         deliveryError={view.kind === ORDER_VIEW.ORDER ? view.error : null}
+        isFocusOnTitle={view.kind === ORDER_VIEW.ORDER && view.isReturn}
         onChanged={current.setOrder}
         onStale={current.reload}
         onEnterCode={openCode}

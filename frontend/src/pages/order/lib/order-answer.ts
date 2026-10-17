@@ -50,13 +50,19 @@ export function toReadyAnswer(
   };
 }
 
+// A forbidden order looks like a missing one: the page does not tell that the order exists.
+const HIDDEN_ORDER_STATUSES: ReadonlySet<number> = new Set([
+  HTTP_STATUS.NOT_FOUND,
+  HTTP_STATUS.FORBIDDEN,
+]);
+
 export function toFailedAnswer(key: string, orderId: number, error: unknown): StoredAnswer {
   return {
     key,
     orderId,
     status: LIST_STATUS.ERROR,
     order: null,
-    isNotFound: error instanceof ApiError && error.status === HTTP_STATUS.NOT_FOUND,
+    isNotFound: error instanceof ApiError && HIDDEN_ORDER_STATUSES.has(error.status),
     message: getApiErrorMessage(error, ORDER_DETAILS_TEXTS.LOAD_FAILED),
   };
 }

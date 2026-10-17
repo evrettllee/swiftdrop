@@ -4,8 +4,8 @@ import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { PARCEL_FACT_TEXTS } from '../config/texts';
 import { formatParcelSize, formatParcelWeight } from '../lib/parcel-format';
 
-// On a phone the facts are columns as wide as their values and wrap; on the desktop they are rows
-// with the value at the end.
+// On a phone the facts are two columns, as in the design; on the desktop they are rows with the
+// value at the end.
 const FACT_LAYOUT_CLASS =
   'min-w-0 flex-col lg:flex-row lg:items-baseline lg:justify-between lg:gap-4 lg:text-small';
 const VALUE_CLASS = 'font-semibold tabular-nums lg:text-end';
@@ -17,9 +17,7 @@ type ParcelFactsProps = {
 // The facts of a parcel as a list; the page puts in it the rows it needs.
 export function ParcelFacts({ children }: ParcelFactsProps) {
   return (
-    <dl className="flex flex-wrap gap-x-8 gap-y-4 lg:flex-col lg:flex-nowrap lg:gap-2">
-      {children}
-    </dl>
+    <dl className="grid grid-cols-2 gap-x-4 gap-y-4 lg:flex lg:flex-col lg:gap-2">{children}</dl>
   );
 }
 

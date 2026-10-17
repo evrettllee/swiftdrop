@@ -1,7 +1,7 @@
 import { GpsSlashIcon } from '@phosphor-icons/react';
+import { GEO_PROBLEM, type GeoProblem } from '@/features/courier-location';
 import { Button } from '@/shared/ui/button';
 import { InlineAlert } from '@/shared/ui/inline-alert';
-import { GEO_PROBLEM, type GeoProblem } from '../config/geolocation';
 import { GEO_ALERT_TEXTS } from '../config/texts';
 
 type GeoAlertProps = {

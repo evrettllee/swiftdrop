@@ -10,6 +10,7 @@ import { OrderPaymentPanel } from './OrderPaymentPanel';
 import { OrderProgress } from './OrderProgress';
 import { OrderRecipient } from './OrderRecipient';
 import { OrderRoute } from './OrderRoute';
+import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 
 type OrderContentProps = {
   order: OrderDetails;
@@ -45,8 +46,8 @@ export function OrderContent({
         isChecking={paymentReturn.isChecking}
         isFailed={paymentReturn.isFailed}
       />
-      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-12">
-        <div className="flex min-w-0 flex-col gap-6 lg:gap-8">
+      <div className={SIDE_COLUMN_LAYOUT_CLASS}>
+        <div className={`${MAIN_COLUMN_CLASS} flex flex-col gap-6 lg:gap-8`}>
           {courier === null ? null : (
             <>
               <OrderCourier courier={courier} />
@@ -61,7 +62,7 @@ export function OrderContent({
         </div>
         {/* On a phone the column does not exist: the code (first) and the payment are placed in
             the one column of the page. */}
-        <div className="contents lg:flex lg:flex-col lg:gap-6">
+        <div className={`contents lg:flex lg:flex-col lg:gap-6 ${SIDE_COLUMN_CLASS}`}>
           {deliveryCode === null ? null : <OrderDeliveryCode code={deliveryCode} />}
           <OrderPaymentPanel
             order={order}

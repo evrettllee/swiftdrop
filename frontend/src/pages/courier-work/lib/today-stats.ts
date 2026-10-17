@@ -11,7 +11,7 @@ const ratingFormat = new Intl.NumberFormat(APP_LOCALE, {
   maximumFractionDigits: RATING_FRACTION_DIGITS,
 });
 
-export type TodayStatItem = {
+type TodayStatItem = {
   label: string;
   // Null while the results are loading.
   value: string | null;

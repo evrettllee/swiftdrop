@@ -1,12 +1,12 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { useId } from 'react';
 import { formatOrderNumber } from '@/entities/order';
+import type { LocationSharing } from '@/features/courier-location';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { Button } from '@/shared/ui/button';
 import { PageTitle } from '@/shared/ui/page-title';
 import { DELIVERY_CODE_TEXTS, ORDER_TEXTS } from '../config/texts';
 import { useDeliveryCode } from '../model/useDeliveryCode';
-import type { LocationSharing } from '../model/useLocationSharing';
 import { ConnectionAlert } from './ConnectionAlert';
 import { DeliveryCodeField } from './DeliveryCodeField';
 import { GeoAlert } from './GeoAlert';

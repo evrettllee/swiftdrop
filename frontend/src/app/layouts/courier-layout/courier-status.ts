@@ -6,7 +6,7 @@ export const COURIER_STATUS = {
   OFF_LINE: 'offLine',
 } as const;
 
-export type CourierStatus = (typeof COURIER_STATUS)[keyof typeof COURIER_STATUS];
+type CourierStatus = (typeof COURIER_STATUS)[keyof typeof COURIER_STATUS];
 
 type CourierStatusMeta = {
   label: string;

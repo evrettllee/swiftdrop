@@ -16,7 +16,7 @@ type ConnectionState = {
   status: ConnectionStatus;
 };
 
-export const useConnectionStore = create<ConnectionState>()(() => ({
+const useConnectionStore = create<ConnectionState>()(() => ({
   status: CONNECTION_STATUS.OFFLINE,
 }));
 

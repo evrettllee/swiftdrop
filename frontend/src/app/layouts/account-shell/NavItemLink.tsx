@@ -1,4 +1,4 @@
-import { matchPath, NavLink, useLocation } from 'react-router';
+import { Link, matchPath, useLocation } from 'react-router';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import type { NavItem, NavVariant } from './nav-item';
 
@@ -27,18 +27,20 @@ export function NavItemLink({
   variant,
 }: NavItemLinkProps) {
   const { pathname } = useLocation();
-  const isOnRelatedPage = alsoActiveOn.some((path) => matchPath(path, pathname) !== null);
+  // One answer for the highlight and for assistive technology: the item stands for its own page
+  // and for the pages that belong to it.
+  const isCurrent =
+    matchPath({ path: to, end: isExact }, pathname) !== null ||
+    alsoActiveOn.some((path) => matchPath(path, pathname) !== null);
 
   return (
-    <NavLink
+    <Link
       to={to}
-      end={isExact}
-      className={({ isActive }) =>
-        `flex items-center ${COLOR_TRANSITION_CLASS} ${VARIANT_CLASSES[variant]} ${isActive || isOnRelatedPage ? ACTIVE_CLASS : IDLE_CLASSES[variant]}`
-      }
+      aria-current={isCurrent ? 'page' : undefined}
+      className={`flex items-center ${COLOR_TRANSITION_CLASS} ${VARIANT_CLASSES[variant]} ${isCurrent ? ACTIVE_CLASS : IDLE_CLASSES[variant]}`}
     >
       <ItemIcon size={ICON_SIZE.LARGE} weight={ICON_WEIGHT} aria-hidden="true" />
       {label}
-    </NavLink>
+    </Link>
   );
 }

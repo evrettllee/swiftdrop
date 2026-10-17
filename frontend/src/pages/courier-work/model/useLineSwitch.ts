@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react';
 import { setCourierProfile } from '@/entities/courier';
+import { type GeoProblem, getCurrentPoint } from '@/features/courier-location';
 import { API_ERROR_MESSAGES, getApiErrorMessage } from '@/shared/api';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { setAvailability } from '../api/set-availability';
-import type { GeoProblem } from '../config/geolocation';
-import { getCurrentPoint } from '../lib/geolocation';
 
 export const LINE_SWITCH = {
   ON: 'on',

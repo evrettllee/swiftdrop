@@ -7,6 +7,7 @@ import { InlineAlert } from '@/shared/ui/inline-alert';
 import { Section } from '@/shared/ui/section';
 import { ORDER_ACTION, type OrderStep } from '../config/order-steps';
 import { ORDER_STEP_TEXTS, ORDER_TEXTS } from '../config/texts';
+import { SIDE_COLUMN_CLASS } from '@/shared/config';
 
 type OrderParcelProps = {
   order: CourierOrder;
@@ -20,7 +21,9 @@ export function OrderParcel({ order, step, button }: OrderParcelProps) {
   const { parcel } = order;
 
   return (
-    <div className="flex flex-col gap-6 lg:w-100 lg:shrink-0 lg:gap-4 lg:rounded-xl lg:border lg:border-transparent lg:bg-surface lg:p-6 lg:shadow-md lg:dark:border-border">
+    <div
+      className={`${SIDE_COLUMN_CLASS} flex flex-col gap-6 lg:gap-4 lg:rounded-xl lg:border lg:border-transparent lg:bg-surface lg:p-6 lg:shadow-md lg:dark:border-border`}
+    >
       <Section title={ORDER_TEXTS.PARCEL}>
         <ParcelFacts>
           <ParcelBasicFacts parcel={parcel} />

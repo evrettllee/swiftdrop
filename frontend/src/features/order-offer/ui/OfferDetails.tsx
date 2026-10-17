@@ -60,9 +60,9 @@ export function OfferDetails({ offer }: OfferDetailsProps) {
         </div>
       </div>
       <Divider />
-      {/* Columns as wide as their values, so a short weight leaves no gap; a row that does not
-          fit wraps. */}
-      <dl className="flex flex-wrap gap-x-8 gap-y-4">
+      {/* Two columns on a phone, as in the design; on the desktop columns as wide as their values,
+          so a short weight leaves no gap, and a row that does not fit wraps. */}
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 lg:flex lg:flex-wrap lg:gap-x-8">
         <div className="flex flex-col">
           <dt className="text-small text-fg-secondary">{OFFER_TEXTS.WEIGHT}</dt>
           <dd className="font-semibold tabular-nums">{formatParcelWeight(parcel)}</dd>

@@ -1,7 +1,7 @@
+import type { LocationSharing } from '@/features/courier-location';
 import type { CourierMe, CourierVehicle } from '@/shared/api';
 import { PageTitle } from '@/shared/ui/page-title';
 import { COURIER_WORK_TEXTS } from '../config/texts';
-import type { LocationSharing } from '../model/useLocationSharing';
 import { LINE_SWITCH, useLineSwitch } from '../model/useLineSwitch';
 import { useTodayStats } from '../model/useTodayStats';
 import { ConnectionAlert } from './ConnectionAlert';

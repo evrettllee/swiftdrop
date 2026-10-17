@@ -4,9 +4,9 @@ import { COLOR_TRANSITION_CLASS } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
 import { Spinner } from '@/shared/ui/spinner';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'inverse' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'text' | 'inverse' | 'danger';
 
-const BASE_CLASS = `relative inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-md px-4 py-2.5 text-body font-semibold ${COLOR_TRANSITION_CLASS}`;
+const BASE_CLASS = `relative inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-md px-4 py-2 text-body font-semibold ${COLOR_TRANSITION_CLASS}`;
 
 // A loading button is disabled too, but keeps the look of its variant (design system §8): the
 // disabled look applies only while the button is not busy.

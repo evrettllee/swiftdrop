@@ -10,23 +10,29 @@ import { ORDER_DELIVERED_TEXTS, ORDER_TEXTS } from '../config/texts';
 type OrderDeliveredProps = {
   orderId: number;
   closedAt: Date;
+  // The profile came and has no order of the courier on this screen any more.
+  onBack: () => void;
 };
 
-// The order is closed. «К работе» loads the profile, which has no order now, so the page goes back
-// to the line, and the line loads the results of the day anew. In the middle of the page, as the
+// The order is closed. «К работе» loads the profile, which has no order now, and the page goes back
+// to the line, which loads the results of the day anew. In the middle of the page, as the
 // state of a block (EmptyState) with the icon of success.
-export function OrderDelivered({ orderId, closedAt }: OrderDeliveredProps) {
+export function OrderDelivered({ orderId, closedAt, onBack }: OrderDeliveredProps) {
   const [isLeaving, setIsLeaving] = useState(false);
-  const backRef = useRef<HTMLButtonElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
-  // The button of the code screen is gone: the focus goes to the only action left.
-  useEffect(() => backRef.current?.focus(), []);
+  // The button of the code screen is gone: the focus goes to the title of the new screen.
+  useEffect(() => titleRef.current?.focus(), []);
 
   async function backToWork(): Promise<void> {
     setIsLeaving(true);
-    await refreshCourierProfile();
-    // Still here: the profile did not come, the courier can press again.
-    setIsLeaving(false);
+
+    if (await refreshCourierProfile()) {
+      onBack();
+    } else {
+      // The profile did not come: the courier can press again.
+      setIsLeaving(false);
+    }
   }
 
   return (
@@ -39,7 +45,11 @@ export function OrderDelivered({ orderId, closedAt }: OrderDeliveredProps) {
           className="text-success"
         />
         <div className="flex flex-col items-center gap-1">
-          <h1 className="text-heading-sm font-semibold text-balance">
+          <h1
+            ref={titleRef}
+            tabIndex={-1}
+            className="text-heading-sm font-semibold text-balance focus-visible:outline-none"
+          >
             {ORDER_DELIVERED_TEXTS.TITLE}
           </h1>
           <p className="text-small text-fg-secondary tabular-nums">
@@ -49,7 +59,7 @@ export function OrderDelivered({ orderId, closedAt }: OrderDeliveredProps) {
             )}
           </p>
         </div>
-        <Button ref={backRef} loading={isLeaving} onClick={() => void backToWork()}>
+        <Button loading={isLeaving} onClick={() => void backToWork()}>
           {ORDER_DELIVERED_TEXTS.BACK_TO_WORK}
         </Button>
       </section>

@@ -99,11 +99,6 @@
   margin: 0 0 8px 8px;
 }
 
-/* The map of an order does not move in the page, so it shows no grab cursor until it is expanded. */
-.route-map-view--static .leaflet-container {
-  cursor: default;
-}
-
 /* The area of the delivery of an offer: the exact point is shown only after the order is taken. */
 .delivery-area {
   fill: var(--accent);
@@ -163,15 +158,12 @@
   }
 }
 
-/* The pulse shows that orders are being searched for: it is a sign of the state, like the spinner,
-   not a decoration, so less motion makes it softer instead of stopping it. One ring, slower and
-   smaller. */
+/* As in the design: with less motion the pulse stands still, one faint ring around the dot. */
 @media (prefers-reduced-motion: reduce) {
   .position-marker__pulse {
-    --pulse-duration: 3s;
-    --pulse-easing: ease-out;
-    --pulse-scale: 3;
-    --pulse-opacity: 0.25;
+    animation: none;
+    transform: scale(3);
+    opacity: 0.15;
   }
 
   .position-marker__pulse--late {

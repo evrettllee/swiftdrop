@@ -10,10 +10,10 @@ import {
 } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
 import type { MapRoute } from '@/shared/lib/route-lines';
-import { MAP_EXPANDED_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM } from './map';
+import { MAP_FULLSCREEN_CLASS, MAP_PLACED_CLASS, MAP_TEXTS, MAP_ZOOM } from './map';
 import { fromLatLng } from './lat-lng';
 import { usePrefersReducedMotion } from '@/shared/lib/dom';
-import { useExpandedMap } from './useExpandedMap';
+import { useFullscreenMap } from './useFullscreenMap';
 import { FitToPoints } from './FitToPoints';
 import { MapControls } from './MapControls';
 import { MapHint } from './MapHint';
@@ -57,7 +57,7 @@ export function RouteMap({
   className = '',
 }: RouteMapProps) {
   const [map, setMap] = useState<LeafletMap | null>(null);
-  const { isExpanded, toggle, toggleButtonRef } = useExpandedMap(map);
+  const { containerRef, isFullscreen, isSupported, toggle } = useFullscreenMap(map);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   if (!IS_MAPBOX_CONFIGURED) {
@@ -65,12 +65,12 @@ export function RouteMap({
   }
 
   return (
-    // This block keeps the place of the map in the page while the map itself is expanded.
     <div className={`relative ${className}`}>
       <div
+        ref={containerRef}
         role="region"
         aria-label={MAP_TEXTS.REGION_LABEL}
-        className={isExpanded ? MAP_EXPANDED_CLASS : MAP_PLACED_CLASS}
+        className={`${MAP_PLACED_CLASS} ${MAP_FULLSCREEN_CLASS}`}
       >
         {/* `isolate` keeps the high z-index values of Leaflet inside the map, below the sticky header. */}
         <MapContainer
@@ -107,9 +107,8 @@ export function RouteMap({
         </MapContainer>
         <MapControls
           map={map}
-          isExpanded={isExpanded}
-          onToggleExpand={toggle}
-          expandButtonRef={toggleButtonRef}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={isSupported ? toggle : undefined}
         />
         {hint === null ? null : <MapHint kind={hint} />}
         {route.isUnavailable ? <RouteUnavailableBadge /> : null}

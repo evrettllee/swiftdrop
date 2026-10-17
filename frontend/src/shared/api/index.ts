@@ -78,3 +78,4 @@ export {
   NETWORK_ERROR_STATUS,
   SERVER_ERROR_STATUS_MIN,
 } from './request-config';
+export { isTransientStatus } from './transient-status';

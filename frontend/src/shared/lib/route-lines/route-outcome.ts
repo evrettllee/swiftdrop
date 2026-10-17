@@ -2,7 +2,7 @@ import {
   ApiError,
   HTTP_STATUS,
   type HttpOptions,
-  NETWORK_ERROR_STATUS,
+  isTransientStatus,
   type RouteLines,
   SERVER_ERROR_STATUS_MIN,
 } from '@/shared/api';
@@ -27,14 +27,6 @@ const FINAL_STATUSES: readonly number[] = [
   HTTP_STATUS.NOT_FOUND,
 ];
 
-function isTransient(status: number): boolean {
-  return (
-    status === NETWORK_ERROR_STATUS ||
-    status === HTTP_STATUS.TOO_MANY_REQUESTS ||
-    status >= SERVER_ERROR_STATUS_MIN
-  );
-}
-
 function toFailureOutcome(error: unknown): RouteOutcome {
   // An answer the schema does not accept is a failure of the server as well.
   const status = error instanceof ApiError ? error.status : SERVER_ERROR_STATUS_MIN;
@@ -45,7 +37,7 @@ function toFailureOutcome(error: unknown): RouteOutcome {
 
   // A transient failure (the network, a limit, the server) is asked again; a refused request (points
   // outside the service area) would be refused again, so the badge stays without a retry.
-  const shouldRetry = isTransient(status);
+  const shouldRetry = isTransientStatus(status);
 
   return { route: UNAVAILABLE_ROUTE, shouldRetry, isFinal: !shouldRetry };
 }

@@ -10,7 +10,7 @@ export const CANCELLABLE_STATUSES: readonly OrderStatus[] = [
 ];
 
 // The courier carries the parcel: the order page offers to track it.
-export const TRACKABLE_STATUSES: readonly OrderStatus[] = [
+const TRACKABLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.PICKED_UP,
   ORDER_STATUS.IN_TRANSIT,
 ];
