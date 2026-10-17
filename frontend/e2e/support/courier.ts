@@ -7,6 +7,7 @@ import {
   CSRF_HEADER_VALUE,
 } from '../../src/shared/api/request-config';
 import { APP_ROUTES } from '../../src/shared/routes/app-routes';
+import { readSavedCourierCookies } from './courier-session';
 
 // Couriers are not registered through the API: the account comes from the seed of the backend,
 // and its email and password are given to the tests through these variables.
@@ -25,12 +26,28 @@ export function requireCourier(): void {
   );
 }
 
-// Signs the courier in through the form of the auth page, as a person would.
-export async function signInAsCourier(page: Page): Promise<void> {
+// Signs the courier in through the form of the auth page, as a person would. The specs that are
+// about the sign-in itself use it; the others use signInAsCourier.
+export async function signInAsCourierByForm(page: Page): Promise<void> {
   await page.goto(APP_ROUTES.AUTH);
   await page.getByLabel(AUTH_TEXTS.LABEL_EMAIL, { exact: true }).fill(COURIER_EMAIL);
   await page.getByLabel(AUTH_TEXTS.LABEL_PASSWORD, { exact: true }).fill(COURIER_PASSWORD);
   await page.getByRole('button', { name: AUTH_TEXTS.SUBMIT_LOGIN, exact: true }).click();
+}
+
+// Opens the cabinet signed in as the courier, with the session the global setup saved (the sign-in
+// of the backend is rate-limited); without a saved session it signs in through the form.
+export async function signInAsCourier(page: Page): Promise<void> {
+  const cookies = readSavedCourierCookies();
+
+  if (cookies === null) {
+    await signInAsCourierByForm(page);
+
+    return;
+  }
+
+  await page.context().addCookies(cookies);
+  await page.goto(APP_ROUTES.COURIER_WORK);
 }
 
 // The profile of the signed-in courier (the request shares the cookies of the page).

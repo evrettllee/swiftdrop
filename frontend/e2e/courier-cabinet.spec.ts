@@ -3,7 +3,7 @@ import { COURIER_LAYOUT_TEXTS } from '../src/app/layouts/courier-layout/navigati
 import { FORBIDDEN_TEXTS } from '../src/pages/forbidden/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { registerClient } from './support/client';
-import { requireCourier, signInAsCourier } from './support/courier';
+import { requireCourier, signInAsCourierByForm } from './support/courier';
 
 const COURIER_NAV_LABELS = [
   COURIER_LAYOUT_TEXTS.NAV_WORK,
@@ -16,7 +16,7 @@ test('should open the courier cabinet with its three menu items when a courier s
 }) => {
   requireCourier();
 
-  await signInAsCourier(page);
+  await signInAsCourierByForm(page);
 
   await page.waitForURL((url) => url.pathname === APP_ROUTES.COURIER_WORK);
   const menu = page.getByRole('navigation', { name: COURIER_LAYOUT_TEXTS.NAV_LABEL });

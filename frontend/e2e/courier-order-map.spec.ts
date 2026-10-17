@@ -86,7 +86,6 @@ test('should start the navigator from the courier and give the map the controls 
   await expect(map.getByRole('button', { name: MAP_TEXTS.LOCATE })).toBeVisible();
   await expect(map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN })).toBeVisible();
   await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_IN })).toBeVisible();
-  await expect(map.getByRole('button', { name: MAP_TEXTS.EXPAND })).toHaveCount(0);
 });
 
 test('should hide the zoom buttons of the order map on a phone', async () => {

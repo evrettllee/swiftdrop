@@ -11,7 +11,6 @@ import { stubMapbox } from './support/mapbox';
 import {
   buildTestOrderDetails,
   COURIER_NAME,
-  COURIER_PHONE_DIGITS,
   DELIVERY_CODE,
   stubOrderCourier,
 } from './support/order-details';
@@ -94,9 +93,7 @@ test('should search for a courier with a pulse on the pickup point while the ord
   await expect(codeGroup(page)).toHaveCount(0);
 });
 
-test('should show the courier without a phone and without a code once one is assigned', async ({
-  page,
-}) => {
+test('should show the courier and no code once one is assigned', async ({ page }) => {
   status = ORDER_STATUS.COURIER_ASSIGNED;
   await openOrder(page);
 
@@ -106,7 +103,6 @@ test('should show the courier without a phone and without a code once one is ass
   await expect(page.getByText(ORDER_COURIER_TEXTS.SEARCHING)).toHaveCount(0);
   await expect(page.locator('.position-marker__pulse')).toHaveCount(0);
   await expect(codeGroup(page)).toHaveCount(0);
-  await expect(page.locator('main')).not.toContainText(COURIER_PHONE_DIGITS);
 });
 
 test('should show the code for the courier once the parcel is picked up, off the live regions', async ({

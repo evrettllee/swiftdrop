@@ -6,6 +6,12 @@ const BACKEND_READY_URL = 'http://localhost:8080/api/auth/me';
 // The backend compiles before it listens.
 const SERVER_START_TIMEOUT_MS = 180_000;
 
+// The specs that use the one seeded courier (the line, the vehicle, the orders it carries): they
+// cannot run at the same time, so they make a project of their own with one worker. The other
+// specs run in parallel with them; the courier of those is a stub.
+const SEEDED_COURIER_SPECS =
+  /(courier-(cabinet|delivery-code|history-order|history-url|history|offer-route|offer|order-map|order|shift|vehicle)|delivery-flow)\.spec\.ts$/;
+
 // The end-to-end tests of the frontend: the real dev servers of the frontend and the backend,
 // with Mapbox and Stripe replaced in the browser (e2e/support). The database must be up, migrated
 // and seeded.
@@ -21,7 +27,22 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // Signs the seeded courier in once for the run (e2e/global-setup.ts).
+  globalSetup: './e2e/global-setup.ts',
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: SEEDED_COURIER_SPECS,
+    },
+    {
+      name: 'courier',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: SEEDED_COURIER_SPECS,
+      fullyParallel: false,
+      workers: 1,
+    },
+  ],
   webServer: [
     {
       command: 'npm run dev',

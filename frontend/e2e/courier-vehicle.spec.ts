@@ -4,7 +4,12 @@ import {
   VEHICLE_VALIDATION_MESSAGES,
 } from '../src/pages/courier-vehicle/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
-import { requireCourier, signInAsCourier, stubCourierWithoutVehicle } from './support/courier';
+import {
+  requireCourier,
+  signInAsCourier,
+  signInAsCourierByForm,
+  stubCourierWithoutVehicle,
+} from './support/courier';
 import { fillCar, saveVehicleButton, waitForPath } from './support/courier-pages';
 
 // These tests change nothing on the backend; the ones that do are in courier-shift.spec.ts.
@@ -17,7 +22,7 @@ test.beforeEach(() => {
 test('should open the vehicle page when a courier without a vehicle signs in', async ({ page }) => {
   await stubCourierWithoutVehicle(page);
 
-  await signInAsCourier(page);
+  await signInAsCourierByForm(page);
 
   await waitForPath(page, APP_ROUTES.COURIER_VEHICLE);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(

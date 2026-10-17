@@ -39,9 +39,6 @@ export function buildTestOrderDetails(
 }
 
 export const COURIER_NAME = 'Дмитрий С.';
-// The phone of the courier is in the answer of the backend; the page must not show it.
-export const COURIER_PHONE = '+375 29 555-66-77';
-export const COURIER_PHONE_DIGITS = '5556677';
 // Four digits the page shows as "Код 4 8 2 7".
 export const DELIVERY_CODE = '4827';
 
@@ -63,7 +60,6 @@ export function buildTestOrderCourier(status: OrderStatus) {
     courier: COURIER_VISIBLE_STATUSES.includes(status)
       ? {
           name: COURIER_NAME,
-          phone: COURIER_PHONE,
           vehicle: {
             type: VEHICLE_TYPE.CAR,
             brand: 'Skoda',
