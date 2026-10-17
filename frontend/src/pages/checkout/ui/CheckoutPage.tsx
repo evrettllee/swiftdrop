@@ -7,6 +7,7 @@ import { CheckoutPackage } from './CheckoutPackage';
 import { CheckoutRecipient } from './CheckoutRecipient';
 import { CheckoutRoute } from './CheckoutRoute';
 import { CheckoutSummary } from './CheckoutSummary';
+import { MAIN_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 
 export function CheckoutPage() {
   const {
@@ -24,13 +25,13 @@ export function CheckoutPage() {
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
       <PageTitle>{CHECKOUT_TEXTS.PAGE_TITLE}</PageTitle>
-      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-12">
+      <div className={SIDE_COLUMN_LAYOUT_CLASS}>
         <form
           id={CHECKOUT_FORM_ID}
           ref={formRef}
           noValidate
           onSubmit={handleSubmit}
-          className="flex min-w-0 flex-col gap-6 lg:gap-8"
+          className={`${MAIN_COLUMN_CLASS} flex flex-col gap-6 lg:gap-8`}
         >
           <CheckoutRoute route={route} field={field} addressErrors={addressErrors} />
           <Divider />

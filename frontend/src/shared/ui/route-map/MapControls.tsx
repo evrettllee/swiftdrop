@@ -1,69 +1,90 @@
 import {
-  ArrowsInSimpleIcon,
-  ArrowsOutSimpleIcon,
+  CornersInIcon,
+  CornersOutIcon,
+  GpsFixIcon,
+  type Icon,
   MinusIcon,
   PlusIcon,
 } from '@phosphor-icons/react';
 import type { Map as LeafletMap } from 'leaflet';
-import type { RefObject } from 'react';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { usePrefersReducedMotion } from '@/shared/lib/dom';
 import { MAP_TEXTS } from './map';
 
-const BUTTON_CLASS = `flex size-11 items-center justify-center text-fg hover:bg-selected active:bg-border ${COLOR_TRANSITION_CLASS}`;
+const BUTTON_CLASS = `flex size-11 items-center justify-center rounded-md border border-border bg-surface text-fg shadow-sm hover:bg-selected active:bg-border ${COLOR_TRANSITION_CLASS}`;
 
 type MapControlsProps = {
   map: LeafletMap | null;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
-  expandButtonRef: RefObject<HTMLButtonElement | null>;
-  // A map that does not move in the page shows the zoom buttons only when it is expanded.
-  zoomOnlyWhenExpanded?: boolean;
+  // The button that brings the map back to the user, for a map of their position (a courier).
+  onLocate?: () => void;
+  // The button of the full screen of the browser (Fullscreen API); a browser without the API
+  // gets none.
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 };
 
+// One look of the controls for every map: a column of 44px buttons in the top-right corner, away
+// from the attribution in the bottom-left one. From the top: the zoom, «Ко мне», the full screen.
+// The zoom buttons are on the desktop and in the full screen: a phone zooms by the fingers.
 export function MapControls({
   map,
-  isExpanded,
-  onToggleExpand,
-  expandButtonRef,
-  zoomOnlyWhenExpanded = false,
+  onLocate,
+  isFullscreen = false,
+  onToggleFullscreen,
 }: MapControlsProps) {
-  const ExpandIcon = isExpanded ? ArrowsInSimpleIcon : ArrowsOutSimpleIcon;
   const zoomOptions = { animate: !usePrefersReducedMotion() };
-  const showsZoom = isExpanded || !zoomOnlyWhenExpanded;
+  const zoomClassName = isFullscreen ? '' : 'max-lg:hidden';
 
   return (
-    <div className="absolute end-4 top-4 flex flex-col overflow-hidden rounded-md border border-border bg-surface shadow-md">
-      {showsZoom ? (
-        <>
-          <button
-            type="button"
-            aria-label={MAP_TEXTS.ZOOM_IN}
-            onClick={() => map?.zoomIn(undefined, zoomOptions)}
-            className={`${BUTTON_CLASS} border-b border-border`}
-          >
-            <PlusIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label={MAP_TEXTS.ZOOM_OUT}
-            onClick={() => map?.zoomOut(undefined, zoomOptions)}
-            className={`${BUTTON_CLASS} border-b border-border`}
-          >
-            <MinusIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-          </button>
-        </>
-      ) : null}
-      <button
-        ref={expandButtonRef}
-        type="button"
-        aria-label={isExpanded ? MAP_TEXTS.COLLAPSE : MAP_TEXTS.EXPAND}
-        aria-pressed={isExpanded}
-        onClick={onToggleExpand}
-        className={BUTTON_CLASS}
-      >
-        <ExpandIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
-      </button>
+    <div className="absolute end-3 top-3 flex flex-col gap-2">
+      <MapButton
+        label={MAP_TEXTS.ZOOM_IN}
+        Icon={PlusIcon}
+        onClick={() => map?.zoomIn(undefined, zoomOptions)}
+        className={zoomClassName}
+      />
+      <MapButton
+        label={MAP_TEXTS.ZOOM_OUT}
+        Icon={MinusIcon}
+        onClick={() => map?.zoomOut(undefined, zoomOptions)}
+        className={zoomClassName}
+      />
+      {onLocate === undefined ? null : (
+        <MapButton label={MAP_TEXTS.LOCATE} Icon={GpsFixIcon} onClick={onLocate} />
+      )}
+      {onToggleFullscreen === undefined ? null : (
+        <MapButton
+          label={isFullscreen ? MAP_TEXTS.EXIT_FULLSCREEN : MAP_TEXTS.FULLSCREEN}
+          Icon={isFullscreen ? CornersInIcon : CornersOutIcon}
+          isPressed={isFullscreen}
+          onClick={onToggleFullscreen}
+        />
+      )}
     </div>
+  );
+}
+
+type MapButtonProps = {
+  // Both the name for a screen reader and the tooltip.
+  label: string;
+  Icon: Icon;
+  onClick: () => void;
+  // A toggle button: pressed while its mode is on.
+  isPressed?: boolean;
+  className?: string;
+};
+
+function MapButton({ label, Icon, onClick, isPressed, className = '' }: MapButtonProps) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      aria-pressed={isPressed}
+      onClick={onClick}
+      className={`${BUTTON_CLASS} ${className}`}
+    >
+      <Icon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
+    </button>
   );
 }

@@ -8,7 +8,6 @@ const ROW: ClientOrderCourierRow = {
   otpCode: '4821',
   firstName: 'Дмитрий',
   lastName: 'Соколов',
-  phone: '+375331112233',
   vehicleType: VEHICLE_TYPE.CAR,
   brand: 'Skoda',
   model: 'Octavia',
@@ -22,6 +21,12 @@ describe('toClientOrderCourier', () => {
     expect(view.courier?.name).toBe('Дмитрий С.');
     expect(view.courier?.vehicle?.licensePlate).toBe(ROW.licensePlate);
     expect(view.deliveryCode).toBeNull();
+  });
+
+  it('should give the client the name and the vehicle of the courier, never the phone', () => {
+    const view = toClientOrderCourier(ROW);
+
+    expect(Object.keys(view.courier ?? {})).toEqual(['name', 'vehicle']);
   });
 
   it('should show the code once the parcel is picked up', () => {

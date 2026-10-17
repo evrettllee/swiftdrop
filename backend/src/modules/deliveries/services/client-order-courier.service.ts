@@ -20,7 +20,6 @@ export class ClientOrderCourierService {
         otpCode: orders.otpCode,
         firstName: users.firstName,
         lastName: users.lastName,
-        phone: users.phone,
         vehicleType: vehicles.type,
         brand: vehicles.brand,
         model: vehicles.model,

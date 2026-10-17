@@ -30,6 +30,20 @@ export type CourierOrderRow = {
   sender: { firstName: string; lastName: string; phone: string | null };
   recipient: { name: string; phone: string };
   parcel: PackageSpec;
+  distanceKm: number;
+};
+
+// A finished order of the courier: the places, the parcel and the stages, without the people of the
+// order (no names and no phones).
+export type CourierHistoryOrder = {
+  orderId: number;
+  status: OrderStatus;
+  finishedAt: string | null;
+  pickup: OrderAddress;
+  delivery: OrderAddress;
+  parcel: PackageSpec;
+  distanceKm: number;
+  history: { status: OrderStatus; changedAt: Date }[];
 };
 
 // An order as the courier sees it after accepting.
@@ -57,7 +71,6 @@ export type ClientOrderCourierRow = {
   otpCode: string | null;
   firstName: string | null;
   lastName: string | null;
-  phone: string | null;
   vehicleType: VehicleType | null;
   brand: string | null;
   model: string | null;
@@ -66,7 +79,7 @@ export type ClientOrderCourierRow = {
 
 // What the client sees about the courier of an order.
 export type ClientOrderCourier = {
-  courier: (Contact & { vehicle: CourierVehicle | null }) | null;
+  courier: { name: string; vehicle: CourierVehicle | null } | null;
   deliveryCode: string | null;
 };
 
@@ -80,6 +93,7 @@ export type CourierHistoryRow = {
   pickup: ShortAddress;
   delivery: ShortAddress;
   distanceKm: number;
+  weightKg: number;
 };
 
 export type CourierHistoryItem = Omit<CourierHistoryRow, 'finishedAt'> & {

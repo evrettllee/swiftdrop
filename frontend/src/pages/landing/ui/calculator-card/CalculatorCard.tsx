@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { useEstimate } from '@/features/estimate-price';
 import { PackageFields, usePackageForm } from '@/features/package-form';
-import { useRouteAddresses } from '@/features/route-picker';
+import { useRouteAddresses, useRoutePreview } from '@/features/route-picker';
 import { ADDRESS_PLACEHOLDER, ROUTE_POINT_LABELS, ROUTE_POINT_ORDER } from '@/shared/config';
 import { AddressField } from '@/shared/ui/address-field';
 import { LinkButton } from '@/shared/ui/button';
@@ -16,6 +16,7 @@ import { EstimateResult } from './EstimateResult';
 export function CalculatorCard() {
   const titleId = useId();
   const route = useRouteAddresses();
+  const routeLines = useRoutePreview(route.pickup, route.delivery);
   const packageForm = usePackageForm();
   const estimate = useEstimate(route.pickup, route.delivery, packageForm.params);
   const orderLink = useOrderLink();
@@ -35,6 +36,7 @@ export function CalculatorCard() {
         <RouteMap
           pickup={route.pickup}
           delivery={route.delivery}
+          route={routeLines}
           hint={route.hint}
           onPick={route.pickPoint}
           onMove={route.placePoint}

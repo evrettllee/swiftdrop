@@ -1,55 +1,27 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
-import { getOrderDetails } from '../api/get-order-details';
-import {
-  isValidOrderId,
-  orderRequestKey,
-  toFailedAnswer,
-  toReadyAnswer,
-} from '../lib/order-answer';
-import { NO_ANSWER, type StoredAnswer } from './order-answer';
+import { isValidOrderId, orderRequestKey } from '../lib/order-answer';
+import { type OrderRequest, useOrderAnswer } from './useOrderAnswer';
 
 // One order of the client. `reload` asks the server again (after a cancel or a payment) and keeps
-// the shown order until the new answer comes; a wrong id in the address is a missing order. A
-// request that is not needed any more (another order, a newer reload, the page left) is cancelled.
+// the shown order until the new answer comes. `refresh` asks the same way but quietly: when it
+// fails nothing changes on the page and the next one tries again. A wrong id in the address is a
+// missing order.
 export function useOrderDetails(orderId: number) {
-  const [attempt, setAttempt] = useState(0);
-  const [answer, setAnswer] = useState<StoredAnswer>(NO_ANSWER);
+  const [request, setRequest] = useState<OrderRequest>({ attempt: 0, isSilent: false });
   const isValidId = isValidOrderId(orderId);
-  const currentKey = orderRequestKey(orderId, attempt);
+  const answer = useOrderAnswer(orderId, request, isValidId);
 
-  useEffect(() => {
-    if (!isValidId) {
-      return undefined;
-    }
-
-    const controller = new AbortController();
-    const key = orderRequestKey(orderId, attempt);
-
-    async function load(): Promise<void> {
-      try {
-        const order = await getOrderDetails(orderId, { signal: controller.signal });
-
-        if (!controller.signal.aborted) {
-          setAnswer(toReadyAnswer(key, orderId, order));
-        }
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          setAnswer(toFailedAnswer(key, orderId, error));
-        }
-      }
-    }
-
-    void load();
-
-    return () => controller.abort();
-  }, [orderId, attempt, isValidId]);
-
-  // Stable, so effects that reload the order do not restart on every render.
-  const reload = useCallback(() => setAttempt((current) => current + 1), []);
+  // Stable, so effects that ask for the order do not restart on every render.
+  const ask = useCallback(
+    (isSilent: boolean) => setRequest((current) => ({ attempt: current.attempt + 1, isSilent })),
+    [],
+  );
+  const reload = useCallback(() => ask(false), [ask]);
+  const refresh = useCallback(() => ask(true), [ask]);
 
   const isSameOrder = answer.orderId === orderId;
-  const isAnswered = isSameOrder && answer.key === currentKey;
+  const isAnswered = isSameOrder && answer.key === orderRequestKey(orderId, request.attempt);
   let status: ListStatus = LIST_STATUS.LOADING;
 
   if (!isValidId) {
@@ -64,5 +36,6 @@ export function useOrderDetails(orderId: number) {
     isNotFound: !isValidId || (isAnswered && answer.isNotFound),
     message: isAnswered ? answer.message : null,
     reload,
+    refresh,
   };
 }

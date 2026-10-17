@@ -1,9 +1,5 @@
-import { Spinner } from '@/shared/ui/spinner';
+import { BlockLoader } from './BlockLoader';
 
 export function PageLoader() {
-  return (
-    <div className="flex min-h-dvh items-center justify-center">
-      <Spinner />
-    </div>
-  );
+  return <BlockLoader className="min-h-dvh" />;
 }

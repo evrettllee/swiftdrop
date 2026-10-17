@@ -21,8 +21,6 @@ export const ORDER_DETAILS_TEXTS = {
   FRAGILE: 'Хрупкое',
   YES: 'Да',
   NO: 'Нет',
-  weight: (weight: string) => `${weight} кг`,
-  size: (length: number, width: number, height: number) => `${length} × ${width} × ${height} см`,
 } as const;
 
 const CANCEL_ORDER = 'Отменить заказ';

@@ -51,7 +51,7 @@ export function OrderHeader({ order }: OrderHeaderProps) {
       </div>
       <div className="flex flex-wrap items-baseline gap-4">
         <PageTitle className="tabular-nums">{ORDER_DETAILS_TEXTS.title(orderNumber)}</PageTitle>
-        <span className="hidden lg:inline-flex">
+        <span role="status" className="hidden lg:inline-flex">
           <OrderStatusBadge status={order.status} />
         </span>
       </div>
@@ -59,7 +59,9 @@ export function OrderHeader({ order }: OrderHeaderProps) {
         {ORDER_DETAILS_TEXTS.createdAt(formatFullDateTime(order.createdAt))}
       </p>
       <div className="flex items-center justify-between gap-4 lg:hidden">
-        <OrderStatusBadge status={order.status} />
+        <span role="status">
+          <OrderStatusBadge status={order.status} />
+        </span>
         <span className="text-small text-fg-secondary tabular-nums">
           {formatShortDateTime(order.createdAt)}
         </span>

@@ -10,7 +10,8 @@ import type { ClientOrderCourier, ClientOrderCourierRow } from '../types/deliver
 const courierVisible = new Set<OrderStatus>(COURIER_VISIBLE_STATUSES);
 const codeVisible = new Set<OrderStatus>(DELIVERY_CODE_VISIBLE_STATUSES);
 
-// The client sees the first name and the initial of the last name, as in taxi apps.
+// The client sees the first name and the initial of the last name, as in taxi apps. The phone of the
+// courier is not given to the client: talking to the courier is decided separately.
 function shortName(firstName: string, lastName: string): string {
   return `${firstName} ${lastName.charAt(0)}${LAST_NAME_INITIAL_MARK}`;
 }
@@ -23,7 +24,6 @@ export function toClientOrderCourier(row: ClientOrderCourierRow): ClientOrderCou
     courier: showCourier
       ? {
           name: shortName(firstName, lastName),
-          phone: row.phone,
           vehicle: vehicleType
             ? toCourierVehicle({
                 type: vehicleType,

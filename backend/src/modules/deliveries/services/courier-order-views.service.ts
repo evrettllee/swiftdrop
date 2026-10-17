@@ -44,6 +44,7 @@ export class CourierOrderViewsService {
         sender: { firstName: users.firstName, lastName: users.lastName, phone: users.phone },
         recipient: { name: orders.recipientName, phone: orders.recipientPhone },
         parcel: parcelColumns(),
+        distanceKm: orders.distanceKm,
       })
       .from(orders)
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))

@@ -1,12 +1,7 @@
-import {
-  ClipboardTextIcon,
-  type Icon,
-  MapPinIcon,
-  PlusCircleIcon,
-  UserIcon,
-} from '@phosphor-icons/react';
+import { ClipboardTextIcon, MapPinIcon, PlusCircleIcon, UserIcon } from '@phosphor-icons/react';
 import { UI_TEXTS } from '@/shared/config';
 import { APP_ROUTES } from '@/shared/routes';
+import type { NavItem } from '../account-shell/nav-item';
 
 export const CLIENT_LAYOUT_TEXTS = {
   NAV_LABEL: 'Личный кабинет',
@@ -16,23 +11,7 @@ export const CLIENT_LAYOUT_TEXTS = {
   NAV_PROFILE: UI_TEXTS.PROFILE,
 } as const;
 
-// Where the menu is shown: the sidebar of the desktop or the bottom navigation of a phone.
-export const NAV_VARIANT = {
-  SIDEBAR: 'sidebar',
-  BOTTOM: 'bottom',
-} as const;
-
-export type NavVariant = (typeof NAV_VARIANT)[keyof typeof NAV_VARIANT];
-
-type ClientNavItem = {
-  to: string;
-  label: string;
-  icon: Icon;
-  // The item is active only on its own address, not on the pages below it.
-  isExact: boolean;
-};
-
-export const CLIENT_NAV_ITEMS: readonly ClientNavItem[] = [
+export const CLIENT_NAV_ITEMS: readonly NavItem[] = [
   {
     to: APP_ROUTES.ORDERS,
     label: CLIENT_LAYOUT_TEXTS.NAV_ORDERS,

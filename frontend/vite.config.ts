@@ -22,6 +22,8 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+        // The socket of the courier cabinet (/api/socket.io) goes through the same proxy.
+        ws: true,
       },
     },
   },

@@ -15,7 +15,7 @@ import { createTestApp } from '../../support/app';
 import { addCourierSession, insertOffer } from '../../support/assignment';
 import { COOKIE_HEADER, registerUser } from '../../support/auth';
 import { assignOrder, CAR, COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP, ROUTE } from '../../support/fixtures';
+import { MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../../support/fixtures';
 import { getApi } from '../../support/http';
 import { placeOrders } from '../../support/orders';
 import { resetServiceArea } from '../../support/pricing';
@@ -83,6 +83,7 @@ describe('Courier history and today stats (e2e)', () => {
       status: ORDER_STATUS.DELIVERED,
       finishedAt: expect.any(String),
       distanceKm: ROUTE.distanceKm,
+      weightKg: SMALL_PACKAGE.weightKg,
     });
   });
 

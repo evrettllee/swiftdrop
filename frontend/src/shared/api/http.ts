@@ -122,19 +122,26 @@ function refreshSession(): Promise<boolean> {
   return refreshInFlight;
 }
 
-async function retryAfterRefresh(
-  path: string,
-  options: RequestOptions,
-  failed: Response,
-): Promise<Response> {
+// Refreshes the session after the backend refused an expired one; when the refresh fails too, the
+// session is over and the user is signed out. The socket of the courier uses it as well.
+export async function refreshSessionOrExpire(): Promise<boolean> {
   const isRefreshed = await refreshSession();
-  const result = isRefreshed ? await send(path, options) : failed;
 
   if (!isRefreshed) {
     sessionExpiredHandler?.();
   }
 
-  return result;
+  return isRefreshed;
+}
+
+async function retryAfterRefresh(
+  path: string,
+  options: RequestOptions,
+  failed: Response,
+): Promise<Response> {
+  const isRefreshed = await refreshSessionOrExpire();
+
+  return isRefreshed ? send(path, options) : failed;
 }
 
 async function request(path: string, options: RequestOptions): Promise<unknown> {

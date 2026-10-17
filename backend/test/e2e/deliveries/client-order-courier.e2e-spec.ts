@@ -89,9 +89,26 @@ describe('Order courier for the client (e2e)', () => {
     const response = await getOrderCourier(clientCookies).expect(HttpStatus.OK);
 
     expect(response.body).toEqual({
-      courier: { name: 'Дмитрий С.', phone: COURIER_ACCOUNT.phone, vehicle: CAR },
+      courier: { name: 'Дмитрий С.', vehicle: CAR },
       deliveryCode: null,
     });
+  });
+
+  // The client is not given the phone of the courier: how to reach the courier is decided apart.
+  it('should never give the client the phone of the courier', async () => {
+    await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
+
+    const assigned = await getOrderCourier(clientCookies).expect(HttpStatus.OK);
+
+    expect(assigned.body.courier).not.toHaveProperty('phone');
+    expect(JSON.stringify(assigned.body)).not.toContain(COURIER_ACCOUNT.phone);
+
+    await setOrderStatus(db, orderId, ORDER_STATUS.IN_TRANSIT);
+
+    const inTransit = await getOrderCourier(clientCookies).expect(HttpStatus.OK);
+
+    expect(Object.keys(inTransit.body.courier)).toEqual(['name', 'vehicle']);
+    expect(JSON.stringify(inTransit.body)).not.toContain(COURIER_ACCOUNT.phone);
   });
 
   it('should show the delivery code once the parcel is picked up', async () => {
@@ -100,6 +117,7 @@ describe('Order courier for the client (e2e)', () => {
     const response = await getOrderCourier(clientCookies).expect(HttpStatus.OK);
 
     expect(response.body.deliveryCode).toBe(DELIVERY_CODE);
+    expect(response.body.courier).toEqual({ name: 'Дмитрий С.', vehicle: CAR });
   });
 
   it('should answer not found when the order belongs to another client', async () => {

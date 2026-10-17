@@ -18,6 +18,8 @@ import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.co
 import { SocketAuthService } from '../../realtime/services/socket-auth.service';
 import {
   COURIER_SOCKET_EVENTS,
+  COURIER_SOCKET_PING_INTERVAL_MS,
+  COURIER_SOCKET_PING_TIMEOUT_MS,
   COURIERS_SOCKET_NAMESPACE,
   courierRoom,
   LOCATION_UPDATE_REJECTIONS,
@@ -30,7 +32,13 @@ import { rejectLocationUpdate } from '../utils/location-update';
 
 // The HTTP rate limiter cannot read a socket message; positions have their own limit below.
 @SkipThrottle()
-@WebSocketGateway({ path: SOCKET_PATH, namespace: COURIERS_SOCKET_NAMESPACE, serveClient: false })
+@WebSocketGateway({
+  path: SOCKET_PATH,
+  namespace: COURIERS_SOCKET_NAMESPACE,
+  serveClient: false,
+  pingInterval: COURIER_SOCKET_PING_INTERVAL_MS,
+  pingTimeout: COURIER_SOCKET_PING_TIMEOUT_MS,
+})
 export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(CouriersGateway.name);
   private readonly appOrigin: string;

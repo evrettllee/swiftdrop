@@ -16,9 +16,7 @@ export const PROGRESS_STOP_LABELS: Partial<Record<string, string>> = {
   [ORDER_STATUS.REJECTED]: 'Отклонён',
 };
 
-export const PROGRESS_STATE = {
-  DONE: 'done',
-  CURRENT: 'current',
-  TODO: 'todo',
-  STOPPED: 'stopped',
+// For the client the manual search of a courier is still the "confirmed" step.
+export const PROGRESS_ALIASES = {
+  [ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT]: ORDER_STATUS.CONFIRMED,
 } as const;

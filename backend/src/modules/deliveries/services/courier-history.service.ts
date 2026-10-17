@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { and, count, desc, eq, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory } from '../../../database/schema';
+import { orders, orderStatusHistory, packages } from '../../../database/schema';
 import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
 import { HISTORY_FIRST_PAGE, HISTORY_STATUSES } from '../constants/deliveries.constants';
 import type { CourierHistoryDto } from '../dto/courier-history.dto';
@@ -30,10 +30,13 @@ export class CourierHistoryService {
           pickup: { street: pickup.street, house: pickup.house },
           delivery: { street: delivery.street, house: delivery.house },
           distanceKm: orders.distanceKm,
+          weightKg: packages.weight,
         })
         .from(orders)
         .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))
         .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
+        // Every order has exactly one package (packages.order_id is unique).
+        .innerJoin(packages, eq(packages.orderId, orders.orderId))
         // The final status is written to the history once, so this row is the moment it ended.
         .leftJoin(
           orderStatusHistory,

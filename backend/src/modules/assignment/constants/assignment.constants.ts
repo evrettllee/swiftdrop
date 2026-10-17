@@ -3,6 +3,7 @@ import { MS_PER_MINUTE, MS_PER_SECOND } from '../../../common/constants/time.con
 import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
 import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
 import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
+import { ROUTE_PATH_SEGMENT } from '../../routing/constants/routing.constants';
 
 // Routes
 export const OFFER_ID_ROUTE_PARAM = ':offerId';
@@ -10,6 +11,7 @@ export const OFFER_ID_ROUTE_PARAM = ':offerId';
 export const COURIER_OFFERS_ROUTES = {
   BASE: 'couriers/me/offers',
   CURRENT: 'current',
+  CURRENT_ROUTE: `current/${ROUTE_PATH_SEGMENT}`,
   ACCEPT: `${OFFER_ID_ROUTE_PARAM}/accept`,
   DECLINE: `${OFFER_ID_ROUTE_PARAM}/decline`,
 } as const;

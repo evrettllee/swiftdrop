@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { OsrmModule } from '../../integrations/osrm/osrm.module';
 import { CouriersModule } from '../couriers/couriers.module';
+import { RoutingModule } from '../routing/routing.module';
 import { CourierOffersController } from './controllers/courier-offers.controller';
 import { AssignmentJob } from './jobs/assignment.job';
 import { AssignmentRoundService } from './services/assignment-round.service';
@@ -15,7 +16,7 @@ import { OrderOffersService } from './services/order-offers.service';
 import { StaleOffersService } from './services/stale-offers.service';
 
 @Module({
-  imports: [OsrmModule, CouriersModule],
+  imports: [OsrmModule, CouriersModule, RoutingModule],
   controllers: [CourierOffersController],
   providers: [
     DispatchOrdersService,

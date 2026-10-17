@@ -10,6 +10,12 @@ export function courierRoom(courierProfileId: number): string {
   return `${COURIER_ROOM_PREFIX}${courierProfileId}`;
 }
 
+// Heartbeat
+// A lost courier connection is noticed in about 15 seconds (ping interval + ping timeout) instead
+// of the 45 of socket.io by default: the cabinet tells the courier sooner that offers stopped.
+export const COURIER_SOCKET_PING_INTERVAL_MS = 10 * MS_PER_SECOND;
+export const COURIER_SOCKET_PING_TIMEOUT_MS = 5 * MS_PER_SECOND;
+
 // Events
 export const COURIER_SOCKET_EVENTS = {
   LOCATION_UPDATE: 'location:update',

@@ -77,6 +77,7 @@ describe('Courier current order (e2e)', () => {
       recipient: { name: VALID_ORDER.recipient.name, phone: RECIPIENT_PHONE },
       sender: { name: expect.any(String) },
       parcel: SMALL_PACKAGE,
+      distanceKm: expect.any(Number),
     });
   });
 

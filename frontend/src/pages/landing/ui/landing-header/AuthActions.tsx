@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/shared/routes';
+import { APP_ROUTES, ROLE_HOME_ROUTE } from '@/shared/routes';
 import { AUTH_STATUS, useAuthStore } from '@/shared/session';
 import { LinkButton } from '@/shared/ui/button';
 import { LANDING_SIGN_UP_ROUTE } from '../../config/navigation';
@@ -31,7 +31,8 @@ export function AuthActions({ stacked = false }: AuthActionsProps) {
       {stacked ? signIn : signUp}
     </>
   ) : (
-    <LinkButton to={APP_ROUTES.PROFILE} fullWidth={stacked}>
+    // The account area of the role: the client's orders, the courier's cabinet.
+    <LinkButton to={ROLE_HOME_ROUTE[user.role]} fullWidth={stacked}>
       {LANDING_TEXTS.PROFILE}
     </LinkButton>
   );
