@@ -27,6 +27,13 @@ export type ChatHistoryPage = {
   nextBeforeId: number | null;
 };
 
+// The answer to a sent message.
+export type SentChatMessage = { message: ChatMessage };
+
+// message:new in the order room: both sides and every tab of the sender get it; a tab drops a
+// message it already has by its id.
+export type MessageNewEvent = { orderId: number; message: ChatMessage };
+
 export type ChatHistory = ChatHistoryPage & {
   // Messages to the current user they have not read yet.
   unreadCount: number;

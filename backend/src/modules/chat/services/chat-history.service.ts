@@ -10,7 +10,9 @@ import type { ChatHistoryDto } from '../dto/chat-history.dto';
 import { canSendInOrder, toChatHistoryPage } from '../mappers/chat-message.mapper';
 import type { ChatHistory, ChatMessageRow } from '../types/chat.types';
 
-// Written as in the predicate of messages_unread_idx, so the counter can use that index.
+// Written as in the predicate of messages_unread_idx, so the counter can use that index. A literal,
+// not a parameter: the planner proves that a query fits a partial index from the query text, and
+// with `is_read = $3` a generic plan cannot know the value is false and would skip the index.
 const UNREAD = sql`${messages.isRead} = false`;
 
 @Injectable()

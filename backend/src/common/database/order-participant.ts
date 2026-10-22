@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
-import type { Database } from '../../database/database.module';
+import type { Database, Transaction } from '../../database/database.module';
 import { courierProfiles, orders } from '../../database/schema';
-import { SINGLE_ROW_LIMIT } from '../constants/database.constants';
+import { ROW_LOCK_SHARE, SINGLE_ROW_LIMIT } from '../constants/database.constants';
 import { ROLE, type RoleName } from '../enums/role.enum';
 import type { OrderStatus } from '../enums/order-status.enum';
 
@@ -27,13 +27,17 @@ export function participantActor(role: RoleName, userId: number): OrderParticipa
 
 // The one check of who takes part in an order, for its room and its chat. One query by the
 // primary keys: a foreign order and a missing one look and take the same (null).
+// With `lockOrder` (inside a transaction) the order row is held FOR SHARE until the commit: a
+// status change waits for it, and if the change came first the row is read as it is after it.
+// Only the order row is locked; the courier profile is the nullable side of the join.
 export async function orderParticipant(
-  db: Database,
+  executor: Database | Transaction,
   orderId: number,
   actor: OrderParticipantActor,
+  lockOrder = false,
 ): Promise<OrderParticipant | null> {
   const isClient = actor.role === ROLE.CLIENT;
-  const [row] = await db
+  const query = executor
     .select({
       status: orders.status,
       clientUserId: orders.clientId,
@@ -48,6 +52,7 @@ export async function orderParticipant(
       ),
     )
     .limit(SINGLE_ROW_LIMIT);
+  const [row] = await (lockOrder ? query.for(ROW_LOCK_SHARE, { of: orders }) : query);
 
   return row
     ? {

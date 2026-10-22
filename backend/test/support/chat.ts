@@ -10,7 +10,7 @@ import { CHAT_ROUTES } from '../../src/modules/chat/constants/chat.constants';
 import type { ChatSenderRole } from '../../src/modules/chat/types/chat.types';
 import { ORDER_ID_ROUTE_PARAM } from '../../src/modules/orders/constants/orders.constants';
 import { COOKIE_HEADER } from './auth';
-import { getApi } from './http';
+import { getApi, postApi } from './http';
 import type {
   OrderJoinAck,
   OrderJoinRejection,
@@ -87,15 +87,32 @@ export async function insertOrderMessages(
   return inserted.map(({ id }) => id);
 }
 
+function messagesPath(orderId: number): string {
+  return `${CHAT_ROUTES.BASE}/${CHAT_ROUTES.MESSAGES.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
+}
+
 export function getChatHistory(
   app: NestExpressApplication,
   cookies: Cookies,
   orderId: number,
   query: Record<string, string | number> = {},
 ) {
-  const path = CHAT_ROUTES.MESSAGES.replace(ORDER_ID_ROUTE_PARAM, String(orderId));
+  return getApi(app, messagesPath(orderId)).query(query).set(COOKIE_HEADER, cookies);
+}
 
-  return getApi(app, `${CHAT_ROUTES.BASE}/${path}`).query(query).set(COOKIE_HEADER, cookies);
+// The limit of messages counts per user id in the memory of the app, and the ids start again after
+// a reset: a test file keeps the messages of one user under the limit, the limit has its own app.
+export function sendChatMessage(
+  app: NestExpressApplication,
+  cookies: Cookies,
+  orderId: number,
+  body: object = { content: 'Я у подъезда' },
+) {
+  return postApi(app, messagesPath(orderId)).set(COOKIE_HEADER, cookies).send(body);
+}
+
+export async function countOrderMessages(db: Database, orderId: number): Promise<number> {
+  return db.$count(messages, eq(messages.orderId, orderId));
 }
 
 // A courier on shift who has the order now, with the session cookies of that courier.
