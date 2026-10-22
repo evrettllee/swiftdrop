@@ -1,12 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { ROLE } from '../../../common/enums/role.enum';
+import { orderParticipant } from '../../../common/database/order-participant';
 import { describeError } from '../../../common/utils/describe-error';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { orders } from '../../../database/schema';
 import {
   isOrderRoom,
   ORDER_JOIN_REJECTIONS,
@@ -69,19 +66,14 @@ export class OrderRoomsService {
     }
   }
 
-  // One query by the primary key: a foreign order and a missing one look and take the same.
+  // The same check as the chat: a foreign order and a missing one look and take the same.
   async isParticipant(data: AppSocketData, orderId: number): Promise<boolean> {
-    const participant =
-      data.role === ROLE.COURIER
-        ? eq(orders.courierId, data.courierProfileId)
-        : eq(orders.clientId, data.userId);
-    const [order] = await this.db
-      .select({ orderId: orders.orderId })
-      .from(orders)
-      .where(and(eq(orders.orderId, orderId), participant))
-      .limit(SINGLE_ROW_LIMIT);
+    const participant = await orderParticipant(this.db, orderId, {
+      role: data.role,
+      userId: data.userId,
+    });
 
-    return order !== undefined;
+    return participant !== null;
   }
 
   // The limit is checked again after the query: two joins sent at once both passed the first

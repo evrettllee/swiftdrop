@@ -1,4 +1,4 @@
-import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, type OnApplicationShutdown, type OnModuleInit } from '@nestjs/common';
 import { COURIER_ACTIVE_ORDER_STATUSES } from '../../../common/constants/orders.constants';
 import { MS_PER_SECOND } from '../../../common/constants/time.constants';
 import type { OrderStatusChange } from '../../../common/database/order-status-transition';
@@ -10,9 +10,14 @@ import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
 import { CourierLocationEventsService } from '../../couriers/services/courier-location-events.service';
 import { isPositionStale } from '../../deliveries/utils/courier-position';
 import { DEFAULT_ROUTING_PROFILE } from '../../routing/constants/routing.constants';
-import { ETA_RECALC_INTERVAL_MS, ORDER_ROOM_EVENTS } from '../constants/tracking.constants';
+import {
+  ETA_RECALC_INTERVAL_MS,
+  ETA_SHUTDOWN_WAIT_MS,
+  ORDER_ROOM_EVENTS,
+} from '../constants/tracking.constants';
 import type { CourierLeg, OrderEtaEntry, OrderEtaEvent } from '../types/tracking.types';
 import { etaPlan } from '../utils/eta-points';
+import { PendingTasks } from '../utils/pending-tasks';
 import { OrderEtaDataService } from './order-eta-data.service';
 import { OrderEtaStore } from './order-eta-store.service';
 
@@ -22,8 +27,11 @@ const activeStatuses = new Set<OrderStatus>(COURIER_ACTIVE_ORDER_STATUSES);
 // A new position asks for it at most once per interval; a new status asks at once. One estimate
 // of an order runs at a time. Skips are normal (no fresh position, routing down) and go to debug.
 @Injectable()
-export class OrderEtaService implements OnModuleInit {
+export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(OrderEtaService.name);
+  // Estimates run in the background: nobody awaits them but a shutdown and the tests.
+  private readonly tasks = new PendingTasks();
+  private stopping = false;
 
   constructor(
     private readonly store: OrderEtaStore,
@@ -61,15 +69,31 @@ export class OrderEtaService implements OnModuleInit {
     return leg ? { geometry: leg.geometry, toPoint: leg.toPoint } : null;
   }
 
-  async refresh(orderId: number, force: boolean, nowMs: number = Date.now()): Promise<void> {
-    const entry = this.store.ensure(orderId);
+  // Waits for the estimates already running, then the database can go. No new one starts after.
+  async onApplicationShutdown(): Promise<void> {
+    this.stopping = true;
 
-    if (entry.inFlight) {
+    if (!(await this.tasks.waitForIdle(ETA_SHUTDOWN_WAIT_MS))) {
+      this.logger.warn(`Shutdown did not wait for ${this.tasks.size} running estimates`);
+    }
+  }
+
+  // True once no estimate runs, false when the time is up first.
+  waitForIdle(timeoutMs: number): Promise<boolean> {
+    return this.tasks.waitForIdle(timeoutMs);
+  }
+
+  async refresh(orderId: number, force: boolean, nowMs: number = Date.now()): Promise<void> {
+    const entry = this.stopping ? undefined : this.store.ensure(orderId);
+
+    if (!entry) {
+      this.logger.debug(`Estimate of order ${orderId} skipped: the server is stopping`);
+    } else if (entry.inFlight) {
       entry.forceQueued ||= force;
     } else if (!force && nowMs - entry.computedAtMs < ETA_RECALC_INTERVAL_MS) {
       this.logger.debug(`Estimate of order ${orderId} skipped: asked too soon`);
     } else {
-      await this.run(orderId, entry);
+      await this.tasks.track(this.run(orderId, entry));
     }
   }
 

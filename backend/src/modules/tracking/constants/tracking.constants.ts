@@ -12,6 +12,8 @@ export const ORDER_ROOM_EVENTS = {
 // One estimate per order at most this often: the routing service is shared and external. A new
 // status is estimated at once, as the next point of the courier changes with it.
 export const ETA_RECALC_INTERVAL_MS = 30 * MS_PER_SECOND;
+// A shutdown waits this long for the running estimates before the database is closed.
+export const ETA_SHUTDOWN_WAIT_MS = 5 * MS_PER_SECOND;
 // Taking the parcel from the sender, and handing it to the recipient.
 export const PICKUP_HANDOVER_MS = 3 * MS_PER_MINUTE;
 export const DROPOFF_HANDOVER_MS = 2 * MS_PER_MINUTE;

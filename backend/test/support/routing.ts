@@ -6,7 +6,9 @@ import type { Database } from '../../src/database/database.module';
 import { OsrmGeometryService } from '../../src/integrations/osrm/services/osrm-geometry.service';
 import { OsrmTripService } from '../../src/integrations/osrm/services/osrm-trip.service';
 import { OsrmService } from '../../src/integrations/osrm/services/osrm.service';
+import { ETA_SHUTDOWN_WAIT_MS } from '../../src/modules/tracking/constants/tracking.constants';
 import { OrderEtaStore } from '../../src/modules/tracking/services/order-eta-store.service';
+import { OrderEtaService } from '../../src/modules/tracking/services/order-eta.service';
 import { createTestApp } from './app';
 import { resetServiceArea } from './pricing';
 
@@ -52,12 +54,14 @@ export function createRoutingTestApp(mocks: RoutingMocks): Promise<NestExpressAp
 
 // Clean data, the service area, prices along ROUTE and lines that name their points. The line of
 // the first leg of a trip names its first two points. The estimates in memory go too: the ids of
-// the orders start again after a reset, so an old entry would belong to a new order.
+// the orders start again after a reset, so an old entry would belong to a new order. Estimates
+// a past test started in the background finish first, before their data is gone.
 export async function resetRouting(
   app: NestExpressApplication,
   db: Database,
   mocks: RoutingMocks,
 ): Promise<void> {
+  await app.get(OrderEtaService).waitForIdle(ETA_SHUTDOWN_WAIT_MS);
   await resetServiceArea(db, mocks.getRoute);
   app.get(OrderEtaStore).clear();
   mocks.getRouteGeometry.mockReset();

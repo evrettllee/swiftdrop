@@ -110,6 +110,24 @@ describe('OrderEtaService', () => {
     expect(trips.getTrip).toHaveBeenCalledTimes(2);
   });
 
+  it('should wait for a running estimate on shutdown and start no new one', async () => {
+    let finishTrip: (trip: typeof TRIP) => void = () => undefined;
+    trips.getTrip.mockReturnValueOnce(new Promise((resolve) => (finishTrip = resolve)));
+    void service.refresh(ORDER_ID, false);
+    await new Promise(setImmediate);
+
+    let stopped = false;
+    const shutdown = service.onApplicationShutdown().then(() => (stopped = true));
+    await new Promise(setImmediate);
+    expect(stopped).toBe(false);
+
+    finishTrip(TRIP);
+    await shutdown;
+    await service.refresh(ORDER_ID + 1, true);
+    expect(gateway.emitToOrder).toHaveBeenCalledTimes(1);
+    expect(trips.getTrip).toHaveBeenCalledTimes(1);
+  });
+
   it.each([
     ['the position is stale', () => data.load.mockResolvedValue(source({ positionAgeMs: 60_001 }))],
     ['there is no position', () => data.load.mockResolvedValue(source({ position: null }))],

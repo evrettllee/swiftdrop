@@ -1,7 +1,16 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
+import { MS_PER_SECOND } from '../../src/common/constants/time.constants';
 import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
+import { ROLE } from '../../src/common/enums/role.enum';
 import type { Database } from '../../src/database/database.module';
+import { courierProfiles, messages, orders } from '../../src/database/schema';
+import { CHAT_ROUTES } from '../../src/modules/chat/constants/chat.constants';
+import type { ChatSenderRole } from '../../src/modules/chat/types/chat.types';
+import { ORDER_ID_ROUTE_PARAM } from '../../src/modules/orders/constants/orders.constants';
+import { COOKIE_HEADER } from './auth';
+import { getApi } from './http';
 import type {
   OrderJoinAck,
   OrderJoinRejection,
@@ -44,6 +53,49 @@ export async function placeConfirmedOrder(
   await setOrderStatus(db, orderId, ORDER_STATUS.CONFIRMED);
 
   return orderId;
+}
+
+export type TestMessage = { from: ChatSenderRole; isRead?: boolean };
+
+// Messages of the order chat written straight to the database, one second apart, oldest first.
+// The courier is the one assigned now. Gives the ids in the same order.
+export async function insertOrderMessages(
+  db: Database,
+  orderId: number,
+  list: readonly TestMessage[],
+): Promise<number[]> {
+  const [order] = await db
+    .select({ clientId: orders.clientId, courierUserId: courierProfiles.userId })
+    .from(orders)
+    .innerJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
+    .where(eq(orders.orderId, orderId));
+  const startMs = Date.now() - list.length * MS_PER_SECOND;
+  const rows = list.map(({ from, isRead = false }, index) => {
+    const fromClient = from === ROLE.CLIENT;
+
+    return {
+      orderId,
+      senderId: fromClient ? order.clientId : order.courierUserId,
+      receiverId: fromClient ? order.courierUserId : order.clientId,
+      content: `Сообщение ${index + 1}`,
+      sentAt: new Date(startMs + index * MS_PER_SECOND),
+      isRead,
+    };
+  });
+  const inserted = await db.insert(messages).values(rows).returning({ id: messages.messageId });
+
+  return inserted.map(({ id }) => id);
+}
+
+export function getChatHistory(
+  app: NestExpressApplication,
+  cookies: Cookies,
+  orderId: number,
+  query: Record<string, string | number> = {},
+) {
+  const path = CHAT_ROUTES.MESSAGES.replace(ORDER_ID_ROUTE_PARAM, String(orderId));
+
+  return getApi(app, `${CHAT_ROUTES.BASE}/${path}`).query(query).set(COOKIE_HEADER, cookies);
 }
 
 // A courier on shift who has the order now, with the session cookies of that courier.
