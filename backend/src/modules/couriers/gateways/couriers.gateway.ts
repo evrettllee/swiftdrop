@@ -23,6 +23,7 @@ import {
   LOCATION_UPDATE_REJECTIONS,
   orderRoom,
 } from '../constants/couriers-socket.constants';
+import { CourierLocationEventsService } from '../services/courier-location-events.service';
 import { CourierLocationService } from '../services/courier-location.service';
 import { OrderRoomsService } from '../services/order-rooms.service';
 import { SocketAdmissionService } from '../services/socket-admission.service';
@@ -54,6 +55,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private readonly locations: CourierLocationService,
     private readonly orderRooms: OrderRoomsService,
     private readonly sessionTimers: SocketSessionTimersService,
+    private readonly locationEvents: CourierLocationEventsService,
   ) {}
 
   // Checks run in the handshake, so a refused client never gets a connection at all.
@@ -146,7 +148,11 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const { ack, event } = await this.locations.update(data, body);
 
     if (event) {
-      setImmediate(() => this.emitLocation(data.courierProfileId, event));
+      setImmediate(() => {
+        this.emitLocation(data.courierProfileId, event);
+        // Then the listeners, for example the arrival estimate, also outside the acknowledgement.
+        this.locationEvents.publish(event);
+      });
     }
 
     return ack;

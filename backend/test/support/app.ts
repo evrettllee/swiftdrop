@@ -3,6 +3,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
+import { OsrmTripService } from '../../src/integrations/osrm/services/osrm-trip.service';
 import { TRUST_PROXY_SETTING } from './constants';
 
 // A token is a class, an abstract one is allowed, for example the payment gateway.
@@ -10,6 +11,13 @@ export type ProviderOverride = { token: Type<unknown> | Abstract<unknown>; useVa
 
 // The options of ScheduleModule.forRoot(); @nestjs/schedule does not export the token itself.
 const SCHEDULE_MODULE_OPTIONS = 'SCHEDULE_MODULE_OPTIONS';
+
+// Every position of a courier with an order asks for an arrival estimate. Unless a test gives its
+// own, the trips of the routing service are unavailable, so no test reaches the real service.
+const UNAVAILABLE_TRIPS: ProviderOverride = {
+  token: OsrmTripService,
+  useValue: { isAvailable: () => false, getTrip: () => Promise.resolve(null) },
+};
 
 // Overrides replace real providers, for example an external service that tests must not call.
 export async function createTestApp(
@@ -22,7 +30,7 @@ export async function createTestApp(
     .overrideProvider(SCHEDULE_MODULE_OPTIONS)
     .useValue({ cronJobs: false, intervals: false, timeouts: false });
 
-  for (const { token, useValue } of overrides) {
+  for (const { token, useValue } of [UNAVAILABLE_TRIPS, ...overrides]) {
     builder.overrideProvider(token).useValue(useValue);
   }
 

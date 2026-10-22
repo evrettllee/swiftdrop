@@ -8,6 +8,7 @@ import { courierProfiles } from '../../src/database/schema';
 import { COURIER_SOCKET_EVENTS } from '../../src/modules/couriers/constants/couriers-socket.constants';
 import type { LocationAck } from '../../src/modules/couriers/types/couriers-socket.types';
 import { ORDER_ROOM_EVENTS } from '../../src/modules/tracking/constants/tracking.constants';
+import { OrderEtaDataService } from '../../src/modules/tracking/services/order-eta-data.service';
 import type { OrderStatusEvent } from '../../src/modules/tracking/types/tracking.types';
 import { assignCourier, type OpenSockets } from './chat';
 import { placeCourierAt } from './couriers';
@@ -60,6 +61,25 @@ export async function watchOrderStatus(
 // The order:status events sent before this call have arrived by the time it resolves.
 export async function settle(...watchers: { socket: Socket }[]): Promise<void> {
   await Promise.all(watchers.map(({ socket }) => roundTrip(socket)));
+}
+
+// Resolves once every arrival estimate started so far has read its order and decided what to do
+// next: a skip is taken right after the read.
+export function trackEstimates(app: NestExpressApplication): () => Promise<void> {
+  const data = app.get(OrderEtaDataService);
+  const load = data.load.bind(data);
+  const reads: Promise<unknown>[] = [];
+
+  jest.spyOn(data, 'load').mockImplementation((orderId: number) => {
+    const read = load(orderId);
+    reads.push(read);
+    return read;
+  });
+
+  return async () => {
+    await Promise.all(reads);
+    await new Promise(setImmediate);
+  };
 }
 
 export async function readCourierProfile(db: Database, courierProfileId: number) {

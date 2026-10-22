@@ -26,6 +26,8 @@ export const TRAILING_SLASHES = /\/+$/;
 export const COORDINATE_SEPARATOR = ',';
 export const POINT_SEPARATOR = ';';
 export const METERS_PER_KM = 1000;
+// polyline6: a coordinate is kept in millionths of a degree.
+export const POLYLINE_PRECISION = 1e6;
 
 // Circuit breaker: after this many failures in a row the routing service is not asked for a while,
 // so callers fail at once instead of waiting for a timeout each.

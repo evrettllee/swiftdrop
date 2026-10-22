@@ -29,10 +29,3 @@ export function courierOrderPlans(order: RoutedOrder, position: GeoPoint | null)
 
   return next === null ? rest : [next, ...rest];
 }
-
-// The order of a client: the trip of the parcel, and the way of its courier to the next point.
-export function clientOrderPlans(order: RoutedOrder, position: GeoPoint | null): SegmentPlan[] {
-  const next = nextPointPlan(order, position);
-
-  return next === null ? [parcelPlan(order)] : [parcelPlan(order), next];
-}

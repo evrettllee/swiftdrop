@@ -16,7 +16,7 @@ import type {
   SegmentPlan,
 } from '../types/routing.types';
 import { toRoutingCourier } from '../utils/routing-courier';
-import { clientOrderPlans, courierOrderPlans, parcelPlan } from '../utils/segment-plans';
+import { courierOrderPlans, parcelPlan } from '../utils/segment-plans';
 
 // An address of an order carries its street and house too; only the point goes to routing.
 function toPoint({ latitude, longitude }: GeoPoint): GeoPoint {
@@ -58,14 +58,14 @@ export class RouteLinesService {
     return this.build([parcelPlan(order)], courier.profile);
   }
 
-  // The vehicle of the courier sets the profile once there is a courier.
-  async forClientOrder(order: RoutedOrder & { courierId: number | null }): Promise<RouteLines> {
+  // The trip of the parcel of a client order. The vehicle of the courier sets the profile once
+  // there is a courier; the line of the courier comes with the arrival estimate instead.
+  async forClientParcel(
+    order: Pick<RoutedOrder, 'pickup' | 'delivery'> & { courierId: number | null },
+  ): Promise<RouteLines> {
     const courier = order.courierId === null ? null : await this.findCourier(order.courierId);
 
-    return this.build(
-      clientOrderPlans(order, courier?.position ?? null),
-      courier?.profile ?? DEFAULT_ROUTING_PROFILE,
-    );
+    return this.build([parcelPlan(order)], courier?.profile ?? DEFAULT_ROUTING_PROFILE);
   }
 
   forPreview(pickup: GeoPoint, delivery: GeoPoint): Promise<RouteLines> {
