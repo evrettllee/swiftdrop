@@ -13,7 +13,7 @@ import {
   expectRoadLines,
   PARCEL_SEGMENT,
   routeUnavailableBadge,
-  stubRouteLines,
+  stubClientOrderRoute,
 } from './support/routing';
 
 // How often the map of an order asks for its route. The session, the order and its route all come
@@ -47,9 +47,7 @@ test('should ask for the route of an order without a courier once, without polli
   page,
 }) => {
   await stubOrderDetails(page, ORDER_ID, ORDER_STATUS.CONFIRMED);
-  const requests = await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () => [
-    PARCEL_SEGMENT,
-  ]);
+  const requests = await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT]);
 
   await page.goto(getOrderPath(ORDER_ID));
   await expectRoadLines(orderMap(page), 1);

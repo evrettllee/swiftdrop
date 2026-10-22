@@ -8,6 +8,7 @@ import {
   type LocationAck,
   locationAckSchema,
   LOCATION_UPDATE_REJECTION,
+  type LocationUpdateRejection,
 } from './location-update';
 import {
   COURIERS_NAMESPACE,
@@ -131,16 +132,25 @@ export async function sendCourierLocation(point: GeoPoint): Promise<LocationAck 
     }
   }
 
-  // The access token of the socket has expired: the backend closes it at about the same moment,
-  // and whichever comes first opens it again with a refreshed session.
-  if (
-    current !== null &&
-    ack?.ok === false &&
-    ack.reason === LOCATION_UPDATE_REJECTION.SESSION_EXPIRED
-  ) {
-    current.disconnect();
-    void reconnectWithFreshSession(current);
+  if (current !== null && ack?.ok === false) {
+    handleRefusal(current, ack.reason);
   }
 
   return ack;
+}
+
+function handleRefusal(current: Socket, reason: LocationUpdateRejection): void {
+  if (reason === LOCATION_UPDATE_REJECTION.SESSION_EXPIRED) {
+    // The access token of the socket has expired: the backend closes it at about the same moment,
+    // and whichever comes first opens it again with a refreshed session.
+    current.disconnect();
+    void reconnectWithFreshSession(current);
+  } else if (reason === LOCATION_UPDATE_REJECTION.UNAUTHORIZED) {
+    // The account was blocked: the backend closes the socket after this answer, and a refreshed
+    // session would not let it in again. It stays closed, even when a refresh started by the close
+    // of the backend ends later; the next request of the page signs the user out.
+    isWanted = false;
+    current.disconnect();
+    setConnectionStatus(CONNECTION_STATUS.OFFLINE);
+  }
 }

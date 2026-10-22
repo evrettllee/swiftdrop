@@ -27,6 +27,7 @@ export function buildTestOrderDetails(
     currency: 'BYN',
     priceCoefficient: 1,
     distanceKm: 7.98,
+    estimatedMinutes: null,
     estimatedDeliveryAt: null,
     createdAt,
     recipient: { name: 'Ольга Петрова', phone: '+375291234567' },

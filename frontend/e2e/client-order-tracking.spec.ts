@@ -2,7 +2,6 @@ import { expect, type Page, test } from '@playwright/test';
 import { ORDER_COURIER_TEXTS, ORDER_POLL_INTERVAL_MS } from '../src/pages/order/config/tracking';
 import { AUTH_API_PATHS } from '../src/shared/api/endpoints/auth';
 import { ORDER_STATUS, type OrderStatus } from '../src/shared/api/endpoints/order';
-import { ROUTING_API_PATHS } from '../src/shared/api/endpoints/routing';
 import { API_BASE_PATH } from '../src/shared/api/request-config';
 import { getOrderPath } from '../src/shared/routes/app-routes';
 import { ROLE } from '../src/shared/session/auth-user';
@@ -14,7 +13,7 @@ import {
   DELIVERY_CODE,
   stubOrderCourier,
 } from './support/order-details';
-import { PARCEL_SEGMENT, stubRouteLines } from './support/routing';
+import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
 
 // The client has no socket: the page asks for the order again by itself. The session, the order,
 // the courier and the route come from the stubbed API, and the clock of the page is the test's.
@@ -38,7 +37,7 @@ test.beforeEach(async ({ page }) => {
   isOrderFailing = false;
   await page.clock.install();
   await stubMapbox(page);
-  await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () => [PARCEL_SEGMENT]);
+  await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT]);
   await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.ME}`, (route) =>
     route.fulfill({ json: TEST_CLIENT }),
   );

@@ -13,6 +13,7 @@ import {
   expectTagsInside,
   PARCEL_SEGMENT,
   routeUnavailableBadge,
+  stubClientOrderRoute,
   stubRouteLines,
   withoutLines,
 } from './support/routing';
@@ -88,10 +89,7 @@ test('should draw the route of the order form along the roads', async () => {
 });
 
 test('should draw the trip of the parcel and the way of the courier on the order page', async () => {
-  await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () => [
-    PARCEL_SEGMENT,
-    COURIER_SEGMENT,
-  ]);
+  await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT, COURIER_SEGMENT]);
 
   const map = await openOrder();
 
@@ -100,7 +98,7 @@ test('should draw the trip of the parcel and the way of the courier on the order
 });
 
 test('should keep the trip of the parcel and show the badge when the way of the courier is missing', async () => {
-  await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () => [
+  await stubClientOrderRoute(page, ORDER_ID, () => [
     PARCEL_SEGMENT,
     ...withoutLines([COURIER_SEGMENT]),
   ]);
@@ -112,9 +110,7 @@ test('should keep the trip of the parcel and show the badge when the way of the 
 });
 
 test('should show only the points and the badge on the order page when routing is down', async () => {
-  await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () =>
-    withoutLines([PARCEL_SEGMENT, COURIER_SEGMENT]),
-  );
+  await stubClientOrderRoute(page, ORDER_ID, () => withoutLines([PARCEL_SEGMENT, COURIER_SEGMENT]));
 
   const map = await openOrder();
 

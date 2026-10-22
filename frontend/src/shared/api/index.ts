@@ -1,4 +1,25 @@
 export { AUTH_API_PATHS } from './endpoints/auth';
+export type {
+  ChatHistory,
+  ChatMessage,
+  ChatReadResult,
+  ChatSendFailure,
+  ChatSendFailureKind,
+  ChatSenderRole,
+} from './endpoints/chat';
+export {
+  CHAT_API_PATHS,
+  CHAT_PAGE_SIZE,
+  CHAT_SEND_FAILURE,
+  CHAT_SENDER_ROLE,
+  chatHistorySchema,
+  chatMessageSchema,
+  chatReadResultSchema,
+  getChatHistory,
+  markChatRead,
+  sendChatMessage,
+  toChatSendFailure,
+} from './endpoints/chat';
 export type { CourierOffer } from './endpoints/courier-offer';
 export {
   acceptedOfferSchema,
@@ -52,8 +73,9 @@ export {
 export { PAYMENT_STATUS, startPayment } from './endpoints/payment';
 export type { PackageParams, PriceEstimate } from './endpoints/pricing';
 export { priceEstimateSchema } from './endpoints/pricing';
-export type { RouteLines, RouteSegmentKind } from './endpoints/routing';
+export type { ClientOrderRoute, RouteLines, RouteSegmentKind } from './endpoints/routing';
 export {
+  clientOrderRouteSchema,
   getClientOrderRoute,
   getCourierHistoryOrderRoute,
   getCourierOrderRoute,

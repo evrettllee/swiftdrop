@@ -12,14 +12,16 @@ import { getCurrentPoint } from '../lib/geolocation';
 import { useLatestPosition } from './useLatestPosition';
 import { usePositionWatch } from './usePositionWatch';
 
-// The backend takes one position per 15 seconds from a socket (LOCATION_MIN_INTERVAL_MS in
+// The backend takes a position at most once per 5 seconds per courier (LOCATION_MIN_INTERVAL_MS in
 // backend/src/modules/couriers/constants/couriers-socket.constants.ts) and measures it by the time
-// a position arrives. One second more keeps the network jitter from making it "too frequent".
-const LOCATION_SEND_INTERVAL_MS = 16 * MS_PER_SECOND;
+// a position arrives. One second more leaves room for the jitter of the timer and the network, so a
+// position on schedule is never "too frequent"; the client sees the courier move every 6 seconds.
+const LOCATION_SEND_INTERVAL_MS = 6 * MS_PER_SECOND;
 
 // True when the backend took the position. too_frequent, busy, invalid_location and unavailable are
-// skipped: the next position goes on schedule. session_expired is handled by the socket itself
-// (shared/realtime). off_shift: the backend counts the courier off the line, the profile says so.
+// skipped: the next position goes on schedule. session_expired and unauthorized are handled by the
+// socket itself (shared/realtime); forbidden never comes to a courier. off_shift: the backend
+// counts the courier off the line, the profile says so.
 function isAccepted(ack: LocationAck | null): boolean {
   if (ack?.ok === false && ack.reason === LOCATION_UPDATE_REJECTION.OFF_SHIFT) {
     void refreshCourierProfile();

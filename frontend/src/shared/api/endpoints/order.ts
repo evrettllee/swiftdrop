@@ -61,6 +61,9 @@ export const orderDetailsSchema = z.object({
   currency: z.string(),
   priceCoefficient: z.number(),
   distanceKm: z.number(),
+  // The time of the trip given at the placement, in minutes: it stays the same while the arrival
+  // estimate moves estimatedDeliveryAt. Null for orders placed before the backend kept it.
+  estimatedMinutes: z.number().nullable(),
   estimatedDeliveryAt: dateSchema.nullable(),
   createdAt: dateSchema,
   recipient: z.object({ name: z.string(), phone: z.string() }),
