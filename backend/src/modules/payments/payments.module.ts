@@ -9,9 +9,10 @@ import { PaymentSettlementService } from './services/payment-settlement.service'
 import { PaymentWebhookService } from './services/payment-webhook.service';
 import { PaymentsController } from './controllers/payments.controller';
 import { PaymentsService } from './services/payments.service';
+import { TrackingModule } from '../tracking/tracking.module';
 
 @Module({
-  imports: [StripeModule, NbrbModule],
+  imports: [StripeModule, NbrbModule, TrackingModule],
   controllers: [PaymentsController],
   providers: [
     PaymentsService,

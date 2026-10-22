@@ -49,7 +49,7 @@ describe('Route of the current order of the courier (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetRouting(db, mocks);
+    await resetRouting(app, db, mocks);
     ({ cookies: clientCookies } = await registerUser(app));
     [orderId] = await placeOrders(app, clientCookies, 1);
     ({ courierProfileId: courierId, cookies: courierCookies } = await addCourierSession(

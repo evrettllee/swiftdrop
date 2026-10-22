@@ -1,4 +1,4 @@
-import { SET_TIMEOUT_MAX_MS } from '../constants/couriers-socket.constants';
+import { SET_TIMEOUT_MAX_MS } from '../constants/realtime.constants';
 import { sessionDisconnectDelayMs } from './session-expiry';
 
 const NOW_MS = 1_000_000;

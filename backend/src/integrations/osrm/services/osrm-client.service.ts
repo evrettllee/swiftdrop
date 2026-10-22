@@ -25,7 +25,7 @@ import {
   TRAILING_SLASHES,
 } from '../constants/osrm.constants';
 import { osrmResponseSchema } from '../schemas/osrm-response.schema';
-import type { OsrmAnswerRoute, OsrmProfile } from '../types/osrm.types';
+import type { OsrmAnswer, OsrmAnswerRoute, OsrmProfile } from '../types/osrm.types';
 
 // The HTTP side of the routing service, shared by the times of the trips and the lines on the maps.
 @Injectable()
@@ -73,6 +73,15 @@ export class OsrmClient {
     profile: OsrmProfile,
     query: string,
   ): Promise<OsrmAnswerRoute> {
+    return (await this.requestRouteWithWaypoints(points, profile, query)).route;
+  }
+
+  // The same route and the points as OSRM snapped them to the roads, in the order asked for.
+  async requestRouteWithWaypoints(
+    points: readonly GeoPoint[],
+    profile: OsrmProfile,
+    query: string,
+  ): Promise<{ route: OsrmAnswerRoute; waypoints: NonNullable<OsrmAnswer['waypoints']> }> {
     const payload = await this.fetchPayload(this.buildUrl(points, profile, query));
     const parsed = osrmResponseSchema.safeParse(payload);
 
@@ -81,7 +90,7 @@ export class OsrmClient {
       throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
     }
 
-    const { code, routes } = parsed.data;
+    const { code, routes, waypoints } = parsed.data;
 
     if (code === OSRM_NO_ROUTE_CODE) {
       throw new UnprocessableEntityException(OSRM_ROUTE_NOT_FOUND_MESSAGE);
@@ -94,7 +103,7 @@ export class OsrmClient {
       throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
     }
 
-    return route;
+    return { route, waypoints: waypoints ?? [] };
   }
 
   private onAnswer(): void {

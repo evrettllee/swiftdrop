@@ -23,7 +23,7 @@ import {
 import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE } from '../../support/fixtures';
 import { placeOrders, setOrderStatus } from '../../support/orders';
 import { resetServiceArea } from '../../support/pricing';
-import { connectCourierSocket, listenTestApp, waitForEvent } from '../../support/sockets';
+import { connectAppSocket, listenTestApp, waitForEvent } from '../../support/sockets';
 
 // Every route in these tests is ROUTE: to the pickup point and then to the recipient.
 const ROUTE_SEC = Math.ceil(ROUTE.durationSec);
@@ -77,7 +77,7 @@ describe('Order dispatch offers (e2e)', () => {
   });
 
   it('should offer the order to the courier nearby and send the offer to the socket', async () => {
-    socket = await connectCourierSocket(baseUrl, courierCookies);
+    socket = await connectAppSocket(baseUrl, courierCookies);
     const received = waitForEvent<CourierOffer>(socket, COURIER_SOCKET_EVENTS.OFFER_NEW);
 
     await rounds.run();
@@ -107,7 +107,7 @@ describe('Order dispatch offers (e2e)', () => {
   });
 
   it('should withdraw the open offer when the client cancels the order', async () => {
-    socket = await connectCourierSocket(baseUrl, courierCookies);
+    socket = await connectAppSocket(baseUrl, courierCookies);
     await rounds.run();
     const [offer] = await readOffers();
     await setOrderStatus(db, orderId, ORDER_STATUS.CANCELLED);

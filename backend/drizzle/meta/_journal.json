@@ -36,6 +36,20 @@
       "when": 1791955571175,
       "tag": "0004_add_courier_assignment",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792675171211,
+      "tag": "0005_messages_chat_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792675781424,
+      "tag": "0006_set_random_page_cost",
+      "breakpoints": true
     }
   ]
 }

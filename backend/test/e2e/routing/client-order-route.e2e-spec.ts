@@ -7,6 +7,7 @@ import { OSRM_PROFILE } from '../../../src/integrations/osrm/constants/osrm.cons
 import { CLIENT_ORDER_COURIER_ROUTES } from '../../../src/modules/deliveries/constants/deliveries.constants';
 import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
 import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
+import { OrderEtaService } from '../../../src/modules/tracking/services/order-eta.service';
 import { addCourierSession } from '../../support/assignment';
 import { COOKIE_HEADER, registerUser } from '../../support/auth';
 import { assignOrder, COURIER_ACCOUNT, ON_FOOT, placeCourierAt } from '../../support/couriers';
@@ -46,7 +47,7 @@ describe('Route of an order of the client (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetRouting(db, mocks);
+    await resetRouting(app, db, mocks);
     ({ cookies: clientCookies } = await registerUser(app));
     [orderId] = await placeOrders(app, clientCookies, 1);
     ({ courierProfileId: courierId, cookies: courierCookies } = await addCourierSession(
@@ -67,12 +68,15 @@ describe('Route of an order of the client (e2e)', () => {
 
     expect(response.body).toEqual({
       segments: [{ kind: ROUTE_SEGMENT_KIND.PICKUP_TO_DROPOFF, geometry: PARCEL_LINE }],
+      courierPosition: null,
     });
     expect(mocks.getRouteGeometry).toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.CAR);
   });
 
+  // The line of the courier comes from the arrival estimate, which a position starts in the app.
   it('should add the way of the courier to the pickup point, by their vehicle', async () => {
     await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
+    await app.get(OrderEtaService).refresh(orderId, true);
 
     const response = await getOrderRoute(clientCookies).expect(HttpStatus.OK);
 
@@ -84,13 +88,16 @@ describe('Route of an order of the client (e2e)', () => {
           geometry: lineThrough([COURIER_POINT, MINSK_PICKUP]),
         },
       ],
+      courierPosition: { ...COURIER_POINT, updatedAt: expect.any(String), isStale: false },
     });
     expect(mocks.getRouteGeometry).toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.FOOT);
+    expect(mocks.getTrip).toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.FOOT);
     expect(mocks.getRouteGeometry).not.toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.CAR);
   });
 
   it('should show the way of the courier to the recipient after the pickup', async () => {
     await assignOrder(db, orderId, courierId, ORDER_STATUS.IN_TRANSIT);
+    await app.get(OrderEtaService).refresh(orderId, true);
 
     const response = await getOrderRoute(clientCookies).expect(HttpStatus.OK);
 
@@ -116,6 +123,7 @@ describe('Route of an order of the client (e2e)', () => {
   it('should return no line of the courier when their position is old', async () => {
     await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
     await placeCourierAt(db, courierId, COURIER_POINT, staleTime());
+    await app.get(OrderEtaService).refresh(orderId, true);
 
     const response = await getOrderRoute(clientCookies).expect(HttpStatus.OK);
 

@@ -4,6 +4,8 @@ export const PG_LOCK_NOT_AVAILABLE_CODE = '55P03';
 export const SINGLE_ROW_LIMIT = 1;
 // FOR NO KEY UPDATE: the row is locked for changes, rows that only refer to it are not blocked.
 export const ROW_LOCK_NO_KEY_UPDATE = 'no key update';
+// FOR SHARE: the row cannot change until the commit, other readers that share it are not blocked.
+export const ROW_LOCK_SHARE = 'share';
 // The largest value of an integer column: a bigger id cannot exist and must not reach a query.
 export const DB_INTEGER_MAX = 2_147_483_647;
 

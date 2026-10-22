@@ -11,10 +11,11 @@ import {
 } from '../../../src/modules/couriers/constants/couriers-socket.constants';
 import type { LocationAck } from '../../../src/modules/couriers/types/couriers-socket.types';
 import { createTestApp } from '../../support/app';
+import { registerUser } from '../../support/auth';
 import { CAR, createCourier, putAvailability, putVehicle } from '../../support/couriers';
 import { MINSK_PICKUP } from '../../support/fixtures';
 import { resetServiceArea } from '../../support/pricing';
-import { connectCourierSocket, emitWithAck, listenTestApp } from '../../support/sockets';
+import { connectAppSocket, emitWithAck, listenTestApp } from '../../support/sockets';
 
 const INVALID_LATITUDE = 91;
 
@@ -52,7 +53,7 @@ describe('Courier socket location (e2e)', () => {
 
   it('should save the position when the courier is on shift', async () => {
     await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
-    socket = await connectCourierSocket(baseUrl, cookies);
+    socket = await connectAppSocket(baseUrl, cookies);
 
     const ack = await sendLocation(MINSK_PICKUP);
 
@@ -64,7 +65,7 @@ describe('Courier socket location (e2e)', () => {
   });
 
   it('should not save the position when the courier is off shift', async () => {
-    socket = await connectCourierSocket(baseUrl, cookies);
+    socket = await connectAppSocket(baseUrl, cookies);
 
     const ack = await sendLocation(MINSK_PICKUP);
 
@@ -75,16 +76,28 @@ describe('Courier socket location (e2e)', () => {
 
   it('should reject the position when the latitude is out of range', async () => {
     await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
-    socket = await connectCourierSocket(baseUrl, cookies);
+    socket = await connectAppSocket(baseUrl, cookies);
 
     const ack = await sendLocation({ ...MINSK_PICKUP, latitude: INVALID_LATITUDE });
 
     expect(ack).toEqual({ ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION });
   });
 
+  it('should reject location update when the sender is a client', async () => {
+    await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
+    const client = await registerUser(app);
+    socket = await connectAppSocket(baseUrl, client.cookies);
+
+    const ack = await sendLocation(MINSK_PICKUP);
+
+    const profiles = await db.select().from(courierProfiles);
+    expect(ack).toEqual({ ok: false, reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN });
+    expect(profiles.every((profile) => profile.currentLat === null)).toBe(true);
+  });
+
   it('should reject the second position when it comes too soon after the first', async () => {
     await putAvailability(app, cookies, { isAvailable: true }).expect(HttpStatus.OK);
-    socket = await connectCourierSocket(baseUrl, cookies);
+    socket = await connectAppSocket(baseUrl, cookies);
     await sendLocation(MINSK_PICKUP);
 
     const ack = await sendLocation(MINSK_PICKUP);

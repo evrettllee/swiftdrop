@@ -1,6 +1,6 @@
 import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
 import { ROUTE_SEGMENT_KIND } from '../constants/routing.constants';
-import { clientOrderPlans, courierOrderPlans, parcelPlan } from './segment-plans';
+import { courierOrderPlans, nextPointPlan, parcelPlan } from './segment-plans';
 
 const PICKUP = { latitude: 53.9006, longitude: 27.559 };
 const DELIVERY = { latitude: 53.9075, longitude: 27.457 };
@@ -33,18 +33,19 @@ describe('courierOrderPlans', () => {
   });
 });
 
-describe('clientOrderPlans', () => {
-  it('should show the trip of the parcel first and the way of the courier after it', () => {
-    expect(clientOrderPlans(orderIn(ORDER_STATUS.IN_TRANSIT), COURIER)).toEqual([
-      PARCEL,
-      { kind: ROUTE_SEGMENT_KIND.TO_DROPOFF, from: COURIER, to: DELIVERY },
-    ]);
+describe('nextPointPlan', () => {
+  it('should lead to the recipient once the parcel is on its way', () => {
+    expect(nextPointPlan(orderIn(ORDER_STATUS.IN_TRANSIT), COURIER)).toEqual({
+      kind: ROUTE_SEGMENT_KIND.TO_DROPOFF,
+      from: COURIER,
+      to: DELIVERY,
+    });
   });
 
   it.each([ORDER_STATUS.CONFIRMED, ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED])(
-    'should show the trip of the parcel only when the order is %s',
+    'should lead nowhere when the order is %s',
     (status) => {
-      expect(clientOrderPlans(orderIn(status), COURIER)).toEqual([PARCEL]);
+      expect(nextPointPlan(orderIn(status), COURIER)).toBeNull();
     },
   );
 });

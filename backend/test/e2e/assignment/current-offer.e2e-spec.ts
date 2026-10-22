@@ -22,7 +22,7 @@ import { MINSK_PICKUP, SMALL_PACKAGE, VALID_ORDER } from '../../support/fixtures
 import { getApi } from '../../support/http';
 import { type Cookies, placeOrders, setOrderStatus } from '../../support/orders';
 import { resetServiceArea } from '../../support/pricing';
-import { connectCourierSocket, listenTestApp, waitForEvent } from '../../support/sockets';
+import { connectAppSocket, listenTestApp, waitForEvent } from '../../support/sockets';
 
 const CURRENT_OFFER_PATH = `${COURIER_OFFERS_ROUTES.BASE}/${COURIER_OFFERS_ROUTES.CURRENT}`;
 // MINSK_DELIVERY rounded to the area the courier sees before accepting.
@@ -117,7 +117,7 @@ describe('Current courier offer (e2e)', () => {
   });
 
   it('should send the offer to the courier socket when the offer is announced', async () => {
-    socket = await connectCourierSocket(baseUrl, courierCookies);
+    socket = await connectAppSocket(baseUrl, courierCookies);
     const offerId = await insertOffer(db, orderId, courierId);
     const received = waitForEvent<CourierOffer>(socket, COURIER_SOCKET_EVENTS.OFFER_NEW);
 

@@ -69,4 +69,6 @@ export const SUPPORT_TICKET_FIELD_LENGTH = {
 
 export const MESSAGE_FIELD_LENGTH = {
   ATTACHMENT_URL: 500,
+  // The content is text: a check of the table keeps it to this many characters.
+  CONTENT: 1000,
 } as const;
