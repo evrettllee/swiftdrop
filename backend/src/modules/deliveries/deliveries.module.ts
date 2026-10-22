@@ -12,9 +12,10 @@ import { CourierOrderViewsService } from './services/courier-order-views.service
 import { CourierStatsService } from './services/courier-stats.service';
 import { DeliveryHandoverService } from './services/delivery-handover.service';
 import { DeliveryProgressService } from './services/delivery-progress.service';
+import { TrackingModule } from '../tracking/tracking.module';
 
 @Module({
-  imports: [CouriersModule, RoutingModule],
+  imports: [CouriersModule, RoutingModule, TrackingModule],
   controllers: [CourierOrdersController, ClientOrderCourierController, CourierStatsController],
   providers: [
     CourierOrderViewsService,

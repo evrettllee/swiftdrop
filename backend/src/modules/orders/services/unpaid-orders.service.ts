@@ -8,6 +8,7 @@ import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orders } from '../../../database/schema';
 import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import { UNPAID_ORDER_TTL_MS, UNPAID_ORDERS_BATCH_SIZE } from '../constants/orders.constants';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class UnpaidOrdersService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly paymentCancellation: PaymentCancellationService,
+    private readonly orderTransactions: OrderTransactionsService,
   ) {}
 
   // Cancels the orders that stayed unpaid longer than the allowed time, returns how many were cancelled.
@@ -48,9 +50,9 @@ export class UnpaidOrdersService {
     let isCancelled = false;
 
     try {
-      isCancelled = await this.db.transaction(async (tx) => {
+      isCancelled = await this.orderTransactions.run(async (orderTx) => {
         // The status check is part of the update, so an order paid at this moment is never cancelled.
-        const updated = await transitionOrderStatus(tx, {
+        const updated = await transitionOrderStatus(orderTx, {
           orderId,
           from: ORDER_STATUS.PENDING,
           to: ORDER_STATUS.CANCELLED,

@@ -1,15 +1,18 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import {
   ROW_LOCK_NO_KEY_UPDATE,
   SINGLE_ROW_LIMIT,
 } from '../../../common/constants/database.constants';
 import { withLockConflict } from '../../../common/database/lock-conflict';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
+import {
+  type OrderTransaction,
+  transitionOrderStatus,
+} from '../../../common/database/order-status-transition';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
+import type { Transaction } from '../../../database/database.module';
 import { orders } from '../../../database/schema';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import {
   DELIVERIES_ERROR_MESSAGES,
   DELIVERY_CODE_LOCK_MS,
@@ -26,7 +29,7 @@ export class DeliveryHandoverService {
   private readonly logger = new Logger(DeliveryHandoverService.name);
 
   constructor(
-    @Inject(DRIZZLE) private readonly db: Database,
+    private readonly orderTransactions: OrderTransactionsService,
     private readonly views: CourierOrderViewsService,
   ) {}
 
@@ -37,7 +40,10 @@ export class DeliveryHandoverService {
     now: Date = new Date(),
   ): Promise<CourierOrder> {
     const outcome = await withLockConflict(
-      () => this.db.transaction((tx) => this.checkCode(tx, courier, orderId, code, now)),
+      () =>
+        this.orderTransactions.run((orderTx) =>
+          this.checkCode(orderTx, courier, orderId, code, now),
+        ),
       DELIVERIES_ERROR_MESSAGES.BUSY,
     );
     // A wrong code must stay counted, so its error is thrown only now, after the commit.
@@ -54,12 +60,13 @@ export class DeliveryHandoverService {
 
   // The order row stays locked, so two codes entered at once never spend one attempt twice.
   private async checkCode(
-    tx: Transaction,
+    orderTx: OrderTransaction,
     courier: CourierIdentity,
     orderId: number,
     code: string,
     now: Date,
   ): Promise<HandoverOutcome> {
+    const { tx } = orderTx;
     const [order] = await tx
       .select({
         status: orders.status,
@@ -88,7 +95,7 @@ export class DeliveryHandoverService {
       return this.recordFailure(tx, orderId, order.otpFailedAttempts + 1, now);
     }
 
-    await transitionOrderStatus(tx, {
+    await transitionOrderStatus(orderTx, {
       orderId,
       from: ORDER_STATUS.IN_TRANSIT,
       to: ORDER_STATUS.DELIVERED,

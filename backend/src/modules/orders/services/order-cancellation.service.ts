@@ -18,6 +18,7 @@ import { orders } from '../../../database/schema';
 import { COURIER_SOCKET_EVENTS } from '../../couriers/constants/couriers-socket.constants';
 import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
 import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import {
   CANCELLABLE_STATUSES,
   FINISHED_STATUSES,
@@ -36,6 +37,7 @@ export class OrderCancellationService {
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly paymentCancellation: PaymentCancellationService,
     private readonly couriersGateway: CouriersGateway,
+    private readonly orderTransactions: OrderTransactionsService,
   ) {}
 
   async cancel(clientId: number, orderId: number): Promise<CancelledOrder> {
@@ -67,9 +69,9 @@ export class OrderCancellationService {
   }
 
   private runCancellation(clientId: number, orderId: number): Promise<CancelledRow> {
-    return this.db.transaction(async (tx) => {
+    return this.orderTransactions.run(async (orderTx) => {
       // The status check is part of the update, so a pickup that happens in between is never overwritten.
-      const updated = await transitionOrderStatus(tx, {
+      const updated = await transitionOrderStatus(orderTx, {
         orderId,
         clientId,
         from: CANCELLABLE_STATUSES,

@@ -7,6 +7,7 @@ import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orders, payments } from '../../../database/schema';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
 import { PaymentRefundService } from './payment-refund.service';
 import { PaymentSettlementService } from './payment-settlement.service';
@@ -26,6 +27,7 @@ export class PaymentWebhookService {
     private readonly gateway: PaymentGateway,
     private readonly refunds: PaymentRefundService,
     private readonly settlement: PaymentSettlementService,
+    private readonly orderTransactions: OrderTransactionsService,
   ) {}
 
   async process(rawBody: Buffer | undefined, signature: string | undefined): Promise<void> {
@@ -44,11 +46,11 @@ export class PaymentWebhookService {
 
   // Every step is safe to repeat, because the payment system resends an event until it gets a success.
   private async settlePaid(event: PaidEvent): Promise<void> {
-    await this.db.transaction(async (tx) => {
-      const payment = await this.settlement.markPaid(event.sessionId, event.paymentRef, tx);
+    await this.orderTransactions.run(async (orderTx) => {
+      const payment = await this.settlement.markPaid(event.sessionId, event.paymentRef, orderTx.tx);
 
       if (payment) {
-        const confirmed = await transitionOrderStatus(tx, {
+        const confirmed = await transitionOrderStatus(orderTx, {
           orderId: payment.orderId,
           from: ORDER_STATUS.PENDING,
           to: ORDER_STATUS.CONFIRMED,

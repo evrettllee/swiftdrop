@@ -5,6 +5,7 @@ import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orderOffers, orderStatusHistory } from '../../../database/schema';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import {
   CANDIDATE_SEARCH_TIMEOUT_MS,
   MAX_OFFERS_PER_ORDER,
@@ -27,6 +28,7 @@ export class OrderDispatchService {
     private readonly routes: OfferRoutesService,
     private readonly offers: OrderOffersService,
     private readonly notifier: OfferNotifierService,
+    private readonly orderTransactions: OrderTransactionsService,
   ) {}
 
   // One step of the search for a courier: an offer to the best candidate, or the manual queue
@@ -96,8 +98,8 @@ export class OrderDispatchService {
   }
 
   private async moveToManual(orderId: number, reason: string): Promise<void> {
-    const moved = await this.db.transaction((tx) =>
-      transitionOrderStatus(tx, {
+    const moved = await this.orderTransactions.run((orderTx) =>
+      transitionOrderStatus(orderTx, {
         orderId,
         from: ORDER_STATUS.CONFIRMED,
         to: ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT,

@@ -1,9 +1,8 @@
-import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { withLockConflict } from '../../../common/database/lock-conflict';
 import { transitionOrderStatus } from '../../../common/database/order-status-transition';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import { DELIVERIES_ERROR_MESSAGES } from '../constants/deliveries.constants';
 import type { CourierIdentity, CourierOrder, DeliveryStep } from '../types/deliveries.types';
 import { generateDeliveryCode } from '../utils/delivery-code';
@@ -14,7 +13,7 @@ export class DeliveryProgressService {
   private readonly logger = new Logger(DeliveryProgressService.name);
 
   constructor(
-    @Inject(DRIZZLE) private readonly db: Database,
+    private readonly orderTransactions: OrderTransactionsService,
     private readonly views: CourierOrderViewsService,
   ) {}
 
@@ -43,8 +42,8 @@ export class DeliveryProgressService {
   ): Promise<CourierOrder> {
     const moved = await withLockConflict(
       () =>
-        this.db.transaction((tx) =>
-          transitionOrderStatus(tx, {
+        this.orderTransactions.run((orderTx) =>
+          transitionOrderStatus(orderTx, {
             orderId,
             ...step,
             changedBy: courier.userId,
