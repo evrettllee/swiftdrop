@@ -67,6 +67,7 @@ describe('Route of an order of the client (e2e)', () => {
 
     expect(response.body).toEqual({
       segments: [{ kind: ROUTE_SEGMENT_KIND.PICKUP_TO_DROPOFF, geometry: PARCEL_LINE }],
+      courierPosition: null,
     });
     expect(mocks.getRouteGeometry).toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.CAR);
   });
@@ -84,6 +85,7 @@ describe('Route of an order of the client (e2e)', () => {
           geometry: lineThrough([COURIER_POINT, MINSK_PICKUP]),
         },
       ],
+      courierPosition: { ...COURIER_POINT, updatedAt: expect.any(String), isStale: false },
     });
     expect(mocks.getRouteGeometry).toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.FOOT);
     expect(mocks.getRouteGeometry).not.toHaveBeenCalledWith(expect.any(Array), OSRM_PROFILE.CAR);
