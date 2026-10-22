@@ -111,6 +111,17 @@ export function sendChatMessage(
   return postApi(app, messagesPath(orderId)).set(COOKIE_HEADER, cookies).send(body);
 }
 
+export function markChatRead(
+  app: NestExpressApplication,
+  cookies: Cookies,
+  orderId: number,
+  body: object,
+) {
+  const path = `${CHAT_ROUTES.BASE}/${CHAT_ROUTES.READ.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
+
+  return postApi(app, path).set(COOKIE_HEADER, cookies).send(body);
+}
+
 export async function countOrderMessages(db: Database, orderId: number): Promise<number> {
   return db.$count(messages, eq(messages.orderId, orderId));
 }

@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, count, desc, eq, lt, sql } from 'drizzle-orm';
+import { and, desc, eq, lt } from 'drizzle-orm';
 import { orderParticipant, participantActor } from '../../../common/database/order-participant';
 import type { RoleName } from '../../../common/enums/role.enum';
 import { DRIZZLE } from '../../../database/database.constants';
@@ -9,15 +9,14 @@ import { CHAT_ERROR_MESSAGES } from '../constants/chat.constants';
 import type { ChatHistoryDto } from '../dto/chat-history.dto';
 import { canSendInOrder, toChatHistoryPage } from '../mappers/chat-message.mapper';
 import type { ChatHistory, ChatMessageRow } from '../types/chat.types';
-
-// Written as in the predicate of messages_unread_idx, so the counter can use that index. A literal,
-// not a parameter: the planner proves that a query fits a partial index from the query text, and
-// with `is_read = $3` a generic plan cannot know the value is false and would skip the index.
-const UNREAD = sql`${messages.isRead} = false`;
+import { ChatUnreadService } from './chat-unread.service';
 
 @Injectable()
 export class ChatHistoryService {
-  constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: Database,
+    private readonly unread: ChatUnreadService,
+  ) {}
 
   // Only the owner of the order and its assigned courier read the chat; anyone else gets the
   // answer of a missing order. The history and the counter run together after the check.
@@ -35,7 +34,7 @@ export class ChatHistoryService {
 
     const [rows, unreadCount] = await Promise.all([
       this.readPage(orderId, query),
-      this.countUnread(orderId, user.userId),
+      this.unread.count(orderId, user.userId),
     ]);
 
     return {
@@ -68,14 +67,5 @@ export class ChatHistoryService {
       )
       .orderBy(desc(messages.messageId))
       .limit(limit + 1);
-  }
-
-  private async countUnread(orderId: number, receiverId: number): Promise<number> {
-    const [row] = await this.db
-      .select({ unread: count() })
-      .from(messages)
-      .where(and(eq(messages.receiverId, receiverId), eq(messages.orderId, orderId), UNREAD));
-
-    return row?.unread ?? 0;
   }
 }

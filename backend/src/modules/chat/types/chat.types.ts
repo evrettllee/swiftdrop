@@ -34,6 +34,17 @@ export type SentChatMessage = { message: ChatMessage };
 // message it already has by its id.
 export type MessageNewEvent = { orderId: number; message: ChatMessage };
 
+// The answer to marking messages read: how many changed now and how many are still unread.
+export type ChatReadResult = { readCount: number; unreadCount: number };
+
+// message:read in the order room: the reader read every message to them up to this id, the
+// largest one marked now.
+export type MessageReadEvent = {
+  orderId: number;
+  readerRole: ChatSenderRole;
+  upToMessageId: number;
+};
+
 export type ChatHistory = ChatHistoryPage & {
   // Messages to the current user they have not read yet.
   unreadCount: number;

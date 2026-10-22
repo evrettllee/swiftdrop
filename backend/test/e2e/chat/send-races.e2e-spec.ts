@@ -3,7 +3,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Response } from 'supertest';
 import { ORDER_STATUS, type OrderStatus } from '../../../src/common/enums/order-status.enum';
-import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
+import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
 import { orders } from '../../../src/database/schema';
 import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
@@ -16,16 +16,15 @@ import { COOKIE_HEADER, registerUser } from '../../support/auth';
 import { countOrderMessages, placeConfirmedOrder, sendChatMessage } from '../../support/chat';
 import { assignOrder, CAR, COURIER_ACCOUNT } from '../../support/couriers';
 import { MINSK_PICKUP } from '../../support/fixtures';
-import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
 import { postApi } from '../../support/http';
-import { holdOrder, whileRowsAreHeld } from '../../support/locks';
 import { cancelOrder, type Cookies, readOrderStatus } from '../../support/orders';
 import { resetServiceArea } from '../../support/pricing';
 
 const RIGHT_CODE = '4821';
 // Each round is a new order; the messages of one user stay under the limit of 20 a minute. How much
-// later the message starts than the status change: below zero the change starts later. The rounds
-// so fall on both sides of the change and around it.
+// later the message starts than the status change: below zero the change starts later. Each round
+// checks only that its own outcome is consistent; which side wins is up to timing. Both orders of
+// the two are covered without timing in send-locks.e2e-spec.ts.
 const SEND_OFFSETS_MS = [-20, -5, 0, 2, 5, 20];
 
 function after<T>(delayMs: number, start: () => PromiseLike<T>): Promise<T> {
@@ -98,22 +97,6 @@ describe('Chat messages racing the end of an order (e2e)', () => {
       await expectConsistent(sent, orderId);
     }
   });
-
-  it(
-    'should answer 409 and save nothing when the order row stays held past the lock timeout',
-    async () => {
-      const orderId = await orderWithCourier(ORDER_STATUS.IN_TRANSIT);
-
-      const sent = await whileRowsAreHeld(db, holdOrder(orderId), () =>
-        sendChatMessage(app, courier.cookies, orderId),
-      );
-
-      expect(sent.status).toBe(HttpStatus.CONFLICT);
-      expect(sent.body.message).toBe(CHAT_ERROR_MESSAGES.BUSY);
-      expect(await countOrderMessages(db, orderId)).toBe(0);
-    },
-    DB_LOCK_TIMEOUT_MS + LOCK_TEST_MARGIN_MS,
-  );
 
   it('should save a message sent with the cancellation before it, or refuse it', async () => {
     for (const offsetMs of SEND_OFFSETS_MS) {

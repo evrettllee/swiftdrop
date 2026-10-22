@@ -10,6 +10,7 @@ import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
 export const CHAT_ROUTES = {
   BASE: 'orders',
   MESSAGES: `${ORDER_ID_ROUTE_PARAM}/messages`,
+  READ: `${ORDER_ID_ROUTE_PARAM}/messages/read`,
 } as const;
 
 // History pages, from the newest message back.
@@ -28,6 +29,8 @@ export const NUL_CHARACTER = '\u0000';
 export const CHAT_SOCKET_EVENTS = {
   // A new message of the order chat, sent after it is committed.
   MESSAGE_NEW: 'message:new',
+  // One side read the messages to it up to an id; sent only when something was marked.
+  MESSAGE_READ: 'message:read',
 } as const;
 
 // Validation
@@ -38,6 +41,7 @@ export const CHAT_VALIDATION_MESSAGES = {
   CONTENT_EMPTY: 'Сообщение не может быть пустым',
   CONTENT_TOO_LONG: `Сообщение должно содержать не больше ${MESSAGE_FIELD_LENGTH.CONTENT} символов`,
   CONTENT_FORBIDDEN_CHARACTER: 'Сообщение содержит недопустимый символ',
+  UP_TO_MESSAGE_ID_INVALID: 'Некорректный номер сообщения',
 } as const;
 
 // Errors: a foreign order answers as GET /orders/:id does, so it cannot be told from a missing one.

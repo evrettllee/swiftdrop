@@ -32,6 +32,14 @@ describe('sendMessageSchema', () => {
     expect(refusal({ content: `${LONGEST}ж` })).toBe(CHAT_VALIDATION_MESSAGES.CONTENT_TOO_LONG);
   });
 
+  // An emoji is two units of a JS string and one character for the database.
+  it('should take 1000 emoji and refuse 1001, counting characters as the database does', () => {
+    const emoji = '📦'.repeat(MESSAGE_FIELD_LENGTH.CONTENT);
+
+    expect(sendMessageSchema.parse({ content: emoji }).content).toBe(emoji);
+    expect(refusal({ content: `${emoji}📦` })).toBe(CHAT_VALIDATION_MESSAGES.CONTENT_TOO_LONG);
+  });
+
   it('should refuse the NUL character, which Postgres text cannot hold', () => {
     expect(refusal({ content: 'до\u0000после' })).toBe(
       CHAT_VALIDATION_MESSAGES.CONTENT_FORBIDDEN_CHARACTER,
