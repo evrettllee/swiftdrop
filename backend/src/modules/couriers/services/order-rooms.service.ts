@@ -9,13 +9,20 @@ import {
   ORDER_JOIN_REJECTIONS,
   ORDER_ROOMS_MAX_PER_SOCKET,
   orderRoom,
+  PARTICIPANT_ACCESS,
 } from '../constants/couriers-socket.constants';
 import { orderRoomBodySchema } from '../dto/order-room.dto';
-import type { AppSocketData, OrderJoinAck } from '../types/couriers-socket.types';
+import type {
+  AppSocketData,
+  OrderJoinAck,
+  ParticipantAccess,
+} from '../types/couriers-socket.types';
 import { countJoinAttempt, rejectJoinAttempt } from '../utils/order-join';
+import { closeAfterAnswer } from '../utils/socket-close';
 
 const JOINED: OrderJoinAck = { ok: true };
 const TOO_MANY_ROOMS: OrderJoinAck = { ok: false, reason: ORDER_JOIN_REJECTIONS.TOO_MANY_ROOMS };
+const NOT_FOUND: OrderJoinAck = { ok: false, reason: ORDER_JOIN_REJECTIONS.NOT_FOUND };
 
 // The personal courier room is not an order room and does not count against the limit.
 function isRoomLimitReached(socket: Socket): boolean {
@@ -66,18 +73,29 @@ export class OrderRoomsService {
     }
   }
 
-  // The same check as the chat: a foreign order and a missing one look and take the same.
-  async isParticipant(data: AppSocketData, orderId: number): Promise<boolean> {
-    const participant = await orderParticipant(this.db, orderId, {
-      role: data.role,
-      userId: data.userId,
-    });
+  // The same check as the chat: a foreign order and a missing one look and take the same. The
+  // account may have been blocked after the socket opened, so the same query reads that too.
+  async participantAccess(data: AppSocketData, orderId: number): Promise<ParticipantAccess> {
+    const participant = await orderParticipant(
+      this.db,
+      orderId,
+      { role: data.role, userId: data.userId },
+      { withActorBlocked: true },
+    );
+    let access: ParticipantAccess = PARTICIPANT_ACCESS.MEMBER;
 
-    return participant !== null;
+    if (!participant) {
+      access = PARTICIPANT_ACCESS.OUTSIDER;
+    } else if (participant.actorBlocked !== false) {
+      access = PARTICIPANT_ACCESS.BLOCKED;
+    }
+
+    return access;
   }
 
   // The limit is checked again after the query: two joins sent at once both passed the first
-  // check. A socket closed while the query ran is not put into the room.
+  // check. A socket closed while the query ran is not put into the room. A blocked user gets the
+  // answer of a foreign order, then the socket is closed.
   private async enterIfParticipant(
     socket: Socket,
     data: AppSocketData,
@@ -86,12 +104,18 @@ export class OrderRoomsService {
     let ack = JOINED;
 
     try {
-      if (!(await this.isParticipant(data, orderId))) {
-        ack = { ok: false, reason: ORDER_JOIN_REJECTIONS.NOT_FOUND };
+      const access = await this.participantAccess(data, orderId);
+
+      if (access !== PARTICIPANT_ACCESS.MEMBER) {
+        ack = NOT_FOUND;
       } else if (isRoomLimitReached(socket)) {
         ack = TOO_MANY_ROOMS;
       } else if (socket.connected) {
         await socket.join(orderRoom(orderId));
+      }
+
+      if (access === PARTICIPANT_ACCESS.BLOCKED) {
+        closeAfterAnswer(socket);
       }
     } catch (error) {
       this.logger.error(

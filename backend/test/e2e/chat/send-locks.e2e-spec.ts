@@ -83,7 +83,7 @@ describe('Chat messages and the order row lock (e2e)', () => {
       db,
       async (tx) => {
         const actor = { role: ROLE.CLIENT, userId: clientUserId } as const;
-        const participant = await orderParticipant(tx, orderId, actor, true);
+        const participant = await orderParticipant(tx, orderId, actor, { lockOrder: true });
 
         if (!participant?.counterpartUserId) {
           throw new Error(`Order ${orderId} has no courier to write to`);

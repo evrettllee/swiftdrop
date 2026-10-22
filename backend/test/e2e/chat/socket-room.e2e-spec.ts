@@ -80,7 +80,7 @@ describe('Order room access (e2e)', () => {
   it('should answer ok without a new check when the room is already joined', async () => {
     const socket = await sockets.connect(baseUrl, clientCookies);
     await joinOrderRoom(socket, { orderId });
-    const check = jest.spyOn(app.get(OrderRoomsService), 'isParticipant');
+    const check = jest.spyOn(app.get(OrderRoomsService), 'participantAccess');
 
     await expect(joinOrderRoom(socket, { orderId })).resolves.toEqual(ORDER_JOIN_OK);
     expect(check).not.toHaveBeenCalled();

@@ -52,7 +52,7 @@ export class ChatSendService {
     orderId: number,
     content: string,
   ): Promise<ChatMessage> {
-    const participant = await orderParticipant(tx, orderId, actor, true);
+    const participant = await orderParticipant(tx, orderId, actor, { lockOrder: true });
     const receiverId = participant?.counterpartUserId ?? null;
 
     if (!participant) {

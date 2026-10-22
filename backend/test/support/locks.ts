@@ -53,11 +53,13 @@ async function waitUntilBlockedBy(db: Database, holderPid: number): Promise<void
 }
 
 // Does `hold` in a transaction, starts `action`, and commits only once the action waits for what
-// the transaction holds: the order of the two is fixed, not left to timing.
+// the transaction holds: the order of the two is fixed, not left to timing. `beforeCommit` runs
+// while the action still waits, for example to close its socket.
 export async function commitOnceBlocked<T>(
   db: Database,
   hold: HoldRows,
   action: () => PromiseLike<T>,
+  beforeCommit: () => Promise<void> = () => Promise.resolve(),
 ): Promise<T> {
   const holding = Promise.withResolvers<number>();
   const release = Promise.withResolvers<void>();
@@ -72,6 +74,7 @@ export async function commitOnceBlocked<T>(
 
   try {
     await waitUntilBlockedBy(db, holderPid);
+    await beforeCommit();
   } finally {
     release.resolve();
     await holder;

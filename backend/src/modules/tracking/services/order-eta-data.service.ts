@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import {
   ROW_LOCK_NO_KEY_UPDATE,
   SINGLE_ROW_LIMIT,
 } from '../../../common/constants/database.constants';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
 import type { OrderStatus } from '../../../common/enums/order-status.enum';
+import { positionAgeMsSql } from '../../../common/database/position-age';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { courierProfiles, orders, vehicles } from '../../../database/schema';
@@ -29,9 +29,7 @@ export class OrderEtaDataService {
         currentLat: courierProfiles.currentLat,
         currentLng: courierProfiles.currentLng,
         locationUpdatedAt: courierProfiles.locationUpdatedAt,
-        positionAgeMs: sql<
-          number | null
-        >`(extract(epoch from now() - ${courierProfiles.locationUpdatedAt}) * ${MS_PER_SECOND})::float8`,
+        positionAgeMs: positionAgeMsSql(courierProfiles.locationUpdatedAt),
       })
       .from(orders)
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))

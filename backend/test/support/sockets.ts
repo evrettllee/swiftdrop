@@ -96,3 +96,10 @@ export function collectEvents<TPayload>(socket: Socket, event: string): TPayload
 export async function roundTrip(socket: Socket): Promise<void> {
   await emitWithAck(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, null);
 }
+
+const DISCONNECT_EVENT = 'disconnect';
+
+// Resolves with the reason once the socket is closed; 'io server disconnect' when the server did it.
+export function waitForDisconnect(socket: Socket): Promise<string> {
+  return waitForEvent<string>(socket, DISCONNECT_EVENT);
+}

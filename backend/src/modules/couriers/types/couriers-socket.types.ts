@@ -2,6 +2,7 @@ import type { ROLE } from '../../../common/enums/role.enum';
 import type {
   LOCATION_UPDATE_REJECTIONS,
   ORDER_JOIN_REJECTIONS,
+  PARTICIPANT_ACCESS,
   SOCKET_ROLES,
 } from '../constants/couriers-socket.constants';
 
@@ -36,6 +37,8 @@ export type LocationUpdateRejection =
 export type LocationAck = { ok: true } | { ok: false; reason: LocationUpdateRejection };
 
 export type OrderJoinRejection = (typeof ORDER_JOIN_REJECTIONS)[keyof typeof ORDER_JOIN_REJECTIONS];
+
+export type ParticipantAccess = (typeof PARTICIPANT_ACCESS)[keyof typeof PARTICIPANT_ACCESS];
 
 // The acknowledgement of order:join.
 export type OrderJoinAck = { ok: true } | { ok: false; reason: OrderJoinRejection };

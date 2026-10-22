@@ -15,6 +15,13 @@ export function courierRoom(courierProfileId: number): string {
   return `${COURIER_ROOM_PREFIX}${courierProfileId}`;
 }
 
+const USER_ROOM_PREFIX = 'user:';
+
+// Every socket of a user joins this room, whatever the role, so all of them can be closed at once.
+export function userRoom(userId: number): string {
+  return `${USER_ROOM_PREFIX}${userId}`;
+}
+
 const ORDER_ROOM_PREFIX = 'order:';
 
 // The client who owns the order and its courier join this room; events of the order go there.
@@ -31,6 +38,10 @@ export function isOrderRoom(room: string): boolean {
 // 45 of socket.io by default: the cabinet tells the courier sooner that offers stopped.
 export const COURIER_SOCKET_PING_INTERVAL_MS = 10 * MS_PER_SECOND;
 export const COURIER_SOCKET_PING_TIMEOUT_MS = 5 * MS_PER_SECOND;
+
+// The largest message a socket may send. The bodies of the app are a few dozen bytes; a bigger
+// message closes the socket before it is parsed (socket.io allows 1 MB by default).
+export const SOCKET_MAX_PAYLOAD_BYTES = 16 * 1024;
 
 // Events
 export const COURIER_SOCKET_EVENTS = {
@@ -54,6 +65,15 @@ export const ORDER_ROOMS_MAX_PER_SOCKET = 5;
 export const ORDER_JOIN_MAX_ATTEMPTS = 20;
 export const ORDER_JOIN_WINDOW_MS = 60 * MS_PER_SECOND;
 
+// What the check of an order room found about the user who asks to join it.
+export const PARTICIPANT_ACCESS = {
+  MEMBER: 'member',
+  // Not the owner of the order nor its courier, or no such order.
+  OUTSIDER: 'outsider',
+  // A participant whose account was blocked after the socket opened.
+  BLOCKED: 'blocked',
+} as const;
+
 // Reasons an order room is not joined: the client reads them from the acknowledgement. A foreign
 // order and a missing one get the same not_found.
 export const ORDER_JOIN_REJECTIONS = {
@@ -76,6 +96,8 @@ export const LOCATION_MIN_INTERVAL_MS = 5 * MS_PER_SECOND;
 export const LOCATION_UPDATE_REJECTIONS = {
   // The socket is not a courier's: only couriers send positions.
   FORBIDDEN: 'forbidden',
+  // The account was blocked after the socket opened: the socket is closed after this answer.
+  UNAUTHORIZED: 'unauthorized',
   SESSION_EXPIRED: 'session_expired',
   TOO_FREQUENT: 'too_frequent',
   INVALID_LOCATION: 'invalid_location',

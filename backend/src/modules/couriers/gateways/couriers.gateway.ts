@@ -12,7 +12,7 @@ import {
 import type { Namespace, Socket } from 'socket.io';
 import { ROLE } from '../../../common/enums/role.enum';
 import { describeError } from '../../../common/utils/describe-error';
-import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.constants';
+import { SOCKET_PATH } from '../../realtime/constants/realtime.constants';
 import { SocketSessionTimersService } from '../../realtime/services/socket-session-timers.service';
 import {
   COURIER_SOCKET_EVENTS,
@@ -22,11 +22,15 @@ import {
   courierRoom,
   LOCATION_UPDATE_REJECTIONS,
   orderRoom,
+  SOCKET_MAX_PAYLOAD_BYTES,
+  userRoom,
 } from '../constants/couriers-socket.constants';
 import { CourierLocationEventsService } from '../services/courier-location-events.service';
 import { CourierLocationService } from '../services/courier-location.service';
 import { OrderRoomsService } from '../services/order-rooms.service';
 import { SocketAdmissionService } from '../services/socket-admission.service';
+import { closeAfterAnswer } from '../utils/socket-close';
+import { admitInHandshake } from '../utils/socket-handshake';
 import type {
   AppSocketData,
   CourierLocationEvent,
@@ -45,6 +49,7 @@ import type {
   serveClient: false,
   pingInterval: COURIER_SOCKET_PING_INTERVAL_MS,
   pingTimeout: COURIER_SOCKET_PING_TIMEOUT_MS,
+  maxHttpBufferSize: SOCKET_MAX_PAYLOAD_BYTES,
 })
 export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(CouriersGateway.name);
@@ -58,27 +63,20 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private readonly locationEvents: CourierLocationEventsService,
   ) {}
 
-  // Checks run in the handshake, so a refused client never gets a connection at all.
   afterInit(namespace: Namespace): void {
     this.namespace = namespace;
-    namespace.use((socket, next) => {
-      this.admission.admit(socket).then(
-        (data) => {
-          socket.data = data;
-          next();
-        },
-        (error: unknown) =>
-          next(error instanceof Error ? error : new Error(SOCKET_ERRORS.UNAUTHORIZED)),
-      );
-    });
+    admitInHandshake(namespace, (socket) => this.admission.admit(socket));
   }
 
   async handleConnection(socket: Socket): Promise<void> {
     const data = socket.data as AppSocketData;
+    const rooms = [userRoom(data.userId)];
 
     if (data.role === ROLE.COURIER) {
-      await socket.join(courierRoom(data.courierProfileId));
+      rooms.push(courierRoom(data.courierProfileId));
     }
+
+    await socket.join(rooms);
 
     this.sessionTimers.schedule(socket, data.sessionExpiresAtMs);
     this.logger.log(`User ${data.userId} (${data.role}) connected`);
@@ -116,6 +114,12 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.namespace?.in(courierRoom(courierProfileId)).socketsLeave(orderRoom(orderId));
   }
 
+  // Closes every socket of the user, in every tab. TODO: blocking a user (the admin panel, v0.7.0)
+  // calls this, so a blocked account loses its open sockets at once instead of on the next check.
+  disconnectUser(userId: number): void {
+    this.namespace?.in(userRoom(userId)).disconnectSockets(true);
+  }
+
   @SubscribeMessage(COURIER_SOCKET_EVENTS.ORDER_JOIN)
   joinOrder(
     @ConnectedSocket() socket: Socket,
@@ -138,14 +142,23 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const data = socket.data as AppSocketData;
 
     return data.role === ROLE.COURIER
-      ? this.shareLocation(data, body)
+      ? this.shareLocation(socket, data, body)
       : { ok: false, reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN };
   }
 
   // The acknowledgement goes out when this promise resolves; the room gets the position on the
-  // next turn of the event loop, after it.
-  private async shareLocation(data: CourierSocketData, body: unknown): Promise<LocationAck> {
+  // next turn of the event loop, after it. A courier blocked since the socket opened is told so,
+  // then the socket is closed.
+  private async shareLocation(
+    socket: Socket,
+    data: CourierSocketData,
+    body: unknown,
+  ): Promise<LocationAck> {
     const { ack, event } = await this.locations.update(data, body);
+
+    if (!ack.ok && ack.reason === LOCATION_UPDATE_REJECTIONS.UNAUTHORIZED) {
+      closeAfterAnswer(socket);
+    }
 
     if (event) {
       setImmediate(() => {
