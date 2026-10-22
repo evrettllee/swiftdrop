@@ -12,6 +12,7 @@ import { createTestApp } from '../../support/app';
 import { registerUser, validRegistration } from '../../support/auth';
 import { OpenSockets, orderJoinRefusal, placeConfirmedOrder } from '../../support/chat';
 import { COURIER_ACCOUNT } from '../../support/couriers';
+import { SECOND_CLIENT } from '../../support/orders';
 import { resetServiceArea } from '../../support/pricing';
 import {
   connectAppSocket,
@@ -75,6 +76,19 @@ describe('Blocked users on the app socket (e2e)', () => {
     const closed = waitForDisconnect(socket);
 
     await expect(joinOrderRoom(socket, { orderId })).resolves.toEqual(
+      orderJoinRefusal(ORDER_JOIN_REJECTIONS.NOT_FOUND),
+    );
+    await expect(closed).resolves.toBe(SERVER_DISCONNECT_REASON);
+  });
+
+  it('should close the socket of a client blocked since who asks for a foreign order', async () => {
+    const other = await registerUser(app, SECOND_CLIENT);
+    const foreignOrderId = await placeConfirmedOrder(app, db, other.cookies);
+    const socket = await sockets.connect(baseUrl, clientCookies);
+    await blockUser(db, validRegistration.email);
+    const closed = waitForDisconnect(socket);
+
+    await expect(joinOrderRoom(socket, { orderId: foreignOrderId })).resolves.toEqual(
       orderJoinRefusal(ORDER_JOIN_REJECTIONS.NOT_FOUND),
     );
     await expect(closed).resolves.toBe(SERVER_DISCONNECT_REASON);

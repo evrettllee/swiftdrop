@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Socket } from 'socket.io';
-import { orderParticipant } from '../../../common/database/order-participant';
+import { orderAccess } from '../../../common/database/order-participant';
 import { describeError } from '../../../common/utils/describe-error';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
@@ -76,18 +76,16 @@ export class OrderRoomsService {
   // The same check as the chat: a foreign order and a missing one look and take the same. The
   // account may have been blocked after the socket opened, so the same query reads that too.
   async participantAccess(data: AppSocketData, orderId: number): Promise<ParticipantAccess> {
-    const participant = await orderParticipant(
-      this.db,
-      orderId,
-      { role: data.role, userId: data.userId },
-      { withActorBlocked: true },
-    );
+    const { participant, actorBlocked } = await orderAccess(this.db, orderId, {
+      role: data.role,
+      userId: data.userId,
+    });
     let access: ParticipantAccess = PARTICIPANT_ACCESS.MEMBER;
 
-    if (!participant) {
-      access = PARTICIPANT_ACCESS.OUTSIDER;
-    } else if (participant.actorBlocked !== false) {
+    if (actorBlocked) {
       access = PARTICIPANT_ACCESS.BLOCKED;
+    } else if (!participant) {
+      access = PARTICIPANT_ACCESS.OUTSIDER;
     }
 
     return access;

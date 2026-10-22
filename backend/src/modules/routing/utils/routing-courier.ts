@@ -1,4 +1,6 @@
+import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
 import {
   COURIER_LOCATION_FRESH_MS,
   VEHICLE_ROUTING_PROFILE,
@@ -20,10 +22,15 @@ function freshPosition(row: RoutingCourierRow, now: Date): GeoPoint | null {
     : null;
 }
 
+// The roads a vehicle takes; no vehicle goes by the default profile.
+export function routingProfileOf(vehicleType: VehicleType | null): OsrmProfile {
+  return vehicleType ? VEHICLE_ROUTING_PROFILE[vehicleType] : DEFAULT_ROUTING_PROFILE;
+}
+
 // A courier who is not found or has no vehicle goes by the default profile.
 export function toRoutingCourier(row: RoutingCourierRow | undefined, now: Date): RoutingCourier {
   return {
     position: row === undefined ? null : freshPosition(row, now),
-    profile: row?.vehicleType ? VEHICLE_ROUTING_PROFILE[row.vehicleType] : DEFAULT_ROUTING_PROFILE,
+    profile: routingProfileOf(row?.vehicleType ?? null),
   };
 }

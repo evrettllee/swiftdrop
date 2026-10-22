@@ -4,7 +4,7 @@ import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
 import { positionAgeMsSql } from '../../../common/database/position-age';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { courierProfiles, orders } from '../../../database/schema';
+import { courierProfiles, orders, vehicles } from '../../../database/schema';
 import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
 import { ROUTE_SEGMENT_KIND } from '../../routing/constants/routing.constants';
 import { RouteLinesService } from '../../routing/services/route-lines.service';
@@ -35,8 +35,8 @@ export class ClientOrderRouteService {
     private readonly eta: OrderEtaService,
   ) {}
 
-  // The route of an order of the client and where its courier is; a foreign order looks the same as
-  // a missing one. The age of the position is counted by the clock of the database that stored it.
+  // The route of an order of the client and where its courier is, in one query with the vehicle of
+  // the courier for the profile of the parcel line; a foreign order looks the same as a missing one. The age of the position is counted by the clock of the database that stored it.
   async find(clientId: number, orderId: number): Promise<ClientOrderRoute> {
     const { pickup, delivery } = aliasOrderAddresses();
     const [order] = await this.db
@@ -48,12 +48,14 @@ export class ClientOrderRouteService {
         currentLat: courierProfiles.currentLat,
         currentLng: courierProfiles.currentLng,
         locationUpdatedAt: courierProfiles.locationUpdatedAt,
+        vehicleType: vehicles.type,
         positionAgeMs: positionAgeMsSql(courierProfiles.locationUpdatedAt),
       })
       .from(orders)
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))
       .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
       .leftJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
+      .leftJoin(vehicles, eq(vehicles.courierProfileId, courierProfiles.courierProfileId))
       .where(and(eq(orders.orderId, orderId), eq(orders.clientId, clientId)))
       .limit(SINGLE_ROW_LIMIT);
 

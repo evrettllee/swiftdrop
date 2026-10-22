@@ -141,6 +141,14 @@ describe('OrderEtaService', () => {
     expect(gateway.emitToOrder).not.toHaveBeenCalled();
   });
 
+  it('should not read the order while the breaker is open', async () => {
+    trips.isAvailable.mockReturnValue(false);
+
+    await service.refresh(ORDER_ID, true);
+
+    expect(data.load).not.toHaveBeenCalled();
+  });
+
   it('should skip and forget an order that is no longer active', async () => {
     data.load.mockResolvedValue(source({ status: ORDER_STATUS.DELIVERED }));
 

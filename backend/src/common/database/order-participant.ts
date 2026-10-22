@@ -1,4 +1,4 @@
-import { and, eq, type SQL, sql } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import type { Database, Transaction } from '../../database/database.module';
 import { courierProfiles, orders, users } from '../../database/schema';
 import { ROW_LOCK_SHARE, SINGLE_ROW_LIMIT } from '../constants/database.constants';
@@ -18,16 +18,18 @@ export type OrderParticipant = {
   // The user on the other side: the courier for the client (null before one is assigned), the
   // client for the courier.
   counterpartUserId: number | null;
-  // Whether the account of the actor is blocked; null unless asked with withActorBlocked.
-  actorBlocked: boolean | null;
 };
 
 export type OrderParticipantOptions = {
   // Inside a transaction: hold the order row FOR SHARE until the commit.
   lockOrder?: boolean;
-  // Also read whether the actor is blocked, in the same query. An HTTP request needs no such check:
-  // its session guard reads the user anyway; an open socket was checked only when it connected.
-  withActorBlocked?: boolean;
+};
+
+// What an open socket learns when it asks for an order: whether its user takes part, and whether
+// the account was blocked since the socket opened, known for any order, even a foreign one.
+export type OrderAccess = {
+  participant: OrderParticipant | null;
+  actorBlocked: boolean;
 };
 
 // Only clients and couriers take part in orders; any other role gets null.
@@ -39,8 +41,7 @@ export function participantActor(role: RoleName, userId: number): OrderParticipa
 // primary keys: a foreign order and a missing one look and take the same (null).
 // With `lockOrder` the order row is held FOR SHARE until the commit: a status change waits for
 // it, and if the change came first the row is read as it is after it. Only the order row is
-// locked; the courier profile is the nullable side of the join. With `withActorBlocked` a scalar
-// subquery reads the user row of the actor by its primary key.
+// locked; the courier profile is the nullable side of the join.
 export async function orderParticipant(
   executor: Database | Transaction,
   orderId: number,
@@ -48,15 +49,11 @@ export async function orderParticipant(
   options: OrderParticipantOptions = {},
 ): Promise<OrderParticipant | null> {
   const isClient = actor.role === ROLE.CLIENT;
-  const actorBlocked: SQL<boolean | null> = options.withActorBlocked
-    ? sql`(select ${users.isBlocked} from ${users} where ${users.userId} = ${actor.userId})`
-    : sql`null`;
   const query = executor
     .select({
       status: orders.status,
       clientUserId: orders.clientId,
       courierUserId: courierProfiles.userId,
-      actorBlocked,
     })
     .from(orders)
     .leftJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
@@ -74,7 +71,49 @@ export async function orderParticipant(
         status: row.status,
         clientUserId: row.clientUserId,
         counterpartUserId: isClient ? row.courierUserId : row.clientUserId,
-        actorBlocked: row.actorBlocked,
       }
     : null;
+}
+
+// The same check for an open socket, read from the user: the user row is always found, the order
+// joins only when the user takes part in it, so the block is known for a foreign or a missing
+// order too. One query by primary keys; a courier is matched through their profile by the unique
+// index of its user. A user row that is gone counts as blocked.
+export async function orderAccess(
+  db: Database,
+  orderId: number,
+  actor: OrderParticipantActor,
+): Promise<OrderAccess> {
+  const isClient = actor.role === ROLE.CLIENT;
+  const takesPart = isClient
+    ? eq(orders.clientId, users.userId)
+    : inArray(
+        orders.courierId,
+        db
+          .select({ courierProfileId: courierProfiles.courierProfileId })
+          .from(courierProfiles)
+          .where(eq(courierProfiles.userId, actor.userId)),
+      );
+  const [row] = await db
+    .select({
+      actorBlocked: users.isBlocked,
+      status: orders.status,
+      clientUserId: orders.clientId,
+      courierUserId: courierProfiles.userId,
+    })
+    .from(users)
+    .leftJoin(orders, and(eq(orders.orderId, orderId), takesPart))
+    .leftJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
+    .where(eq(users.userId, actor.userId))
+    .limit(SINGLE_ROW_LIMIT);
+  const participant =
+    row?.status && row.clientUserId !== null
+      ? {
+          status: row.status,
+          clientUserId: row.clientUserId,
+          counterpartUserId: isClient ? row.courierUserId : row.clientUserId,
+        }
+      : null;
+
+  return { participant, actorBlocked: row?.actorBlocked ?? true };
 }

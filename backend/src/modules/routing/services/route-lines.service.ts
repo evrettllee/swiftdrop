@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
+import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
@@ -15,7 +16,7 @@ import type {
   RoutingCourier,
   SegmentPlan,
 } from '../types/routing.types';
-import { toRoutingCourier } from '../utils/routing-courier';
+import { routingProfileOf, toRoutingCourier } from '../utils/routing-courier';
 import { courierOrderPlans, parcelPlan } from '../utils/segment-plans';
 
 // An address of an order carries its street and house too; only the point goes to routing.
@@ -58,14 +59,12 @@ export class RouteLinesService {
     return this.build([parcelPlan(order)], courier.profile);
   }
 
-  // The trip of the parcel of a client order. The vehicle of the courier sets the profile once
-  // there is a courier; the line of the courier comes with the arrival estimate instead.
-  async forClientParcel(
-    order: Pick<RoutedOrder, 'pickup' | 'delivery'> & { courierId: number | null },
+  // The trip of the parcel of a client order. The vehicle of the courier, read by the caller with
+  // the order, sets the profile; the line of the courier comes with the arrival estimate instead.
+  forClientParcel(
+    order: Pick<RoutedOrder, 'pickup' | 'delivery'> & { vehicleType: VehicleType | null },
   ): Promise<RouteLines> {
-    const courier = order.courierId === null ? null : await this.findCourier(order.courierId);
-
-    return this.build([parcelPlan(order)], courier?.profile ?? DEFAULT_ROUTING_PROFILE);
+    return this.build([parcelPlan(order)], routingProfileOf(order.vehicleType));
   }
 
   forPreview(pickup: GeoPoint, delivery: GeoPoint): Promise<RouteLines> {
