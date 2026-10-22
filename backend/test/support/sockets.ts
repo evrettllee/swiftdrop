@@ -1,7 +1,11 @@
 import type { AddressInfo } from 'node:net';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { io, type Socket } from 'socket.io-client';
-import { COURIERS_SOCKET_NAMESPACE } from '../../src/modules/couriers/constants/couriers-socket.constants';
+import {
+  COURIER_SOCKET_EVENTS,
+  COURIERS_SOCKET_NAMESPACE,
+} from '../../src/modules/couriers/constants/couriers-socket.constants';
+import type { OrderJoinAck } from '../../src/modules/couriers/types/couriers-socket.types';
 import { SOCKET_PATH } from '../../src/modules/realtime/constants/realtime.constants';
 import { COOKIE_HEADER } from './auth';
 
@@ -71,4 +75,24 @@ export function waitForEvent<TPayload>(socket: Socket, event: string): Promise<T
       resolve(payload);
     });
   });
+}
+
+export function joinOrderRoom(socket: Socket, body: unknown): Promise<OrderJoinAck> {
+  return emitWithAck<OrderJoinAck>(socket, COURIER_SOCKET_EVENTS.ORDER_JOIN, body);
+}
+
+// Every payload of this event the socket gets from now on.
+export function collectEvents<TPayload>(socket: Socket, event: string): TPayload[] {
+  const payloads: TPayload[] = [];
+
+  socket.on(event, (payload: TPayload) => payloads.push(payload));
+
+  return payloads;
+}
+
+// Waits for one acknowledged message to go to the server and back. Packets of a connection arrive
+// in order, so an event the server sent before it has already arrived. An empty position is
+// refused without changing anything, for a client and a courier alike.
+export async function roundTrip(socket: Socket): Promise<void> {
+  await emitWithAck(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, null);
 }

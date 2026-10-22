@@ -37,6 +37,7 @@ describe('buildSocketData', () => {
       userId: USER_ID,
       courierProfileId: COURIER_PROFILE_ID,
       sessionExpiresAtMs: EXPIRES_AT_MS,
+      orderJoinAttemptsMs: [],
       lastLocationAtMs: null,
     });
     expect(findCourierProfileId).toHaveBeenCalledWith(USER_ID);
@@ -45,7 +46,12 @@ describe('buildSocketData', () => {
   it('should keep only the user and the session end when a client connects', async () => {
     const data = await buildSocketData(session(ROLE.CLIENT), findCourierProfileId);
 
-    expect(data).toEqual({ role: ROLE.CLIENT, userId: USER_ID, sessionExpiresAtMs: EXPIRES_AT_MS });
+    expect(data).toEqual({
+      role: ROLE.CLIENT,
+      userId: USER_ID,
+      sessionExpiresAtMs: EXPIRES_AT_MS,
+      orderJoinAttemptsMs: [],
+    });
     expect(findCourierProfileId).not.toHaveBeenCalled();
   });
 

@@ -1,19 +1,39 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import { isLockTimeout } from '../../../common/database/pg-errors';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import { type GeoPoint, geoPointSchema } from '../../../common/schemas/geo-point.schema';
 import { describeError } from '../../../common/utils/describe-error';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { courierProfiles } from '../../../database/schema';
 import { LOCATION_UPDATE_REJECTIONS } from '../constants/couriers-socket.constants';
-import type { LocationAck } from '../types/couriers-socket.types';
+import type { CourierSocketData, LocationAck } from '../types/couriers-socket.types';
+import { rejectLocationUpdate } from '../utils/location-update';
 
 @Injectable()
 export class CourierLocationService {
   private readonly logger = new Logger(CourierLocationService.name);
 
   constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+
+  // A position sent on the socket of a courier: checked, then saved when the checks pass.
+  async update(data: CourierSocketData, body: unknown): Promise<LocationAck> {
+    const now = new Date();
+    const rejection = rejectLocationUpdate(data, now.getTime());
+    const point = geoPointSchema.safeParse(body);
+    let ack: LocationAck = { ok: true };
+
+    if (rejection) {
+      ack = { ok: false, reason: rejection };
+    } else if (!point.success) {
+      ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION };
+    } else {
+      data.lastLocationAtMs = now.getTime();
+      ack = await this.record(data.courierProfileId, point.data, now);
+    }
+
+    return ack;
+  }
 
   // Saves the position of a courier on shift, returns false when the courier is off shift.
   // The shift check is part of the update, so a position never outlives going off shift.

@@ -17,10 +17,16 @@ export async function buildSocketData(
       userId: user.userId,
       courierProfileId: await findCourierProfileId(user.userId),
       sessionExpiresAtMs: expiresAtMs,
+      orderJoinAttemptsMs: [],
       lastLocationAtMs: null,
     };
   } else if (user.role === ROLE.CLIENT) {
-    data = { role: ROLE.CLIENT, userId: user.userId, sessionExpiresAtMs: expiresAtMs };
+    data = {
+      role: ROLE.CLIENT,
+      userId: user.userId,
+      sessionExpiresAtMs: expiresAtMs,
+      orderJoinAttemptsMs: [],
+    };
   }
 
   return data;

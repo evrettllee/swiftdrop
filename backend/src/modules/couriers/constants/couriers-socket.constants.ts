@@ -15,6 +15,17 @@ export function courierRoom(courierProfileId: number): string {
   return `${COURIER_ROOM_PREFIX}${courierProfileId}`;
 }
 
+const ORDER_ROOM_PREFIX = 'order:';
+
+// The client who owns the order and its courier join this room; events of the order go there.
+export function orderRoom(orderId: number): string {
+  return `${ORDER_ROOM_PREFIX}${orderId}`;
+}
+
+export function isOrderRoom(room: string): boolean {
+  return room.startsWith(ORDER_ROOM_PREFIX);
+}
+
 // Heartbeat
 // A lost connection is noticed in about 15 seconds (ping interval + ping timeout) instead of the
 // 45 of socket.io by default: the cabinet tells the courier sooner that offers stopped.
@@ -29,6 +40,28 @@ export const COURIER_SOCKET_EVENTS = {
   OFFER_CLOSED: 'offer:closed',
   // The client cancelled the order the courier was heading to.
   ORDER_CANCELLED: 'order:cancelled',
+  // The owner of an order or its courier asks for the events of the order, and stops.
+  ORDER_JOIN: 'order:join',
+  ORDER_LEAVE: 'order:leave',
+} as const;
+
+// Order rooms
+// A page shows one order; a few more cover open tabs. The personal courier room is not counted.
+export const ORDER_ROOMS_MAX_PER_SOCKET = 5;
+// Joins a socket may try within the window: enough for a person, too few to probe order ids.
+export const ORDER_JOIN_MAX_ATTEMPTS = 20;
+export const ORDER_JOIN_WINDOW_MS = 60 * MS_PER_SECOND;
+
+// Reasons an order room is not joined: the client reads them from the acknowledgement. A foreign
+// order and a missing one get the same not_found.
+export const ORDER_JOIN_REJECTIONS = {
+  INVALID: 'invalid',
+  SESSION_EXPIRED: 'session_expired',
+  TOO_FREQUENT: 'too_frequent',
+  TOO_MANY_ROOMS: 'too_many_rooms',
+  NOT_FOUND: 'not_found',
+  // The check could not run for an unexpected reason; the next attempt may succeed.
+  UNAVAILABLE: 'unavailable',
 } as const;
 
 // Location

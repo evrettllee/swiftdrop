@@ -12,7 +12,6 @@ import {
 } from '@nestjs/websockets';
 import type { Namespace, Socket } from 'socket.io';
 import { ROLE } from '../../../common/enums/role.enum';
-import { geoPointSchema } from '../../../common/schemas/geo-point.schema';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.constants';
 import { SocketAuthService } from '../../realtime/services/socket-auth.service';
@@ -24,14 +23,21 @@ import {
   COURIERS_SOCKET_NAMESPACE,
   courierRoom,
   LOCATION_UPDATE_REJECTIONS,
+  orderRoom,
 } from '../constants/couriers-socket.constants';
 import { CourierLocationService } from '../services/courier-location.service';
 import { CourierProfilesService } from '../services/courier-profiles.service';
-import type { AppSocketData, CourierSocketData, LocationAck } from '../types/couriers-socket.types';
-import { rejectLocationUpdate } from '../utils/location-update';
+import { OrderRoomsService } from '../services/order-rooms.service';
+import type {
+  AppSocketData,
+  EmitToOrderOptions,
+  LocationAck,
+  OrderJoinAck,
+} from '../types/couriers-socket.types';
 import { buildSocketData } from '../utils/socket-data';
 
-// The HTTP rate limiter cannot read a socket message; positions have their own limit below.
+// The HTTP rate limiter cannot read a socket message: positions and order joins have their own
+// limits.
 @SkipThrottle()
 @WebSocketGateway({
   path: SOCKET_PATH,
@@ -49,6 +55,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private readonly socketAuth: SocketAuthService,
     private readonly profiles: CourierProfilesService,
     private readonly locations: CourierLocationService,
+    private readonly orderRooms: OrderRoomsService,
     private readonly sessionTimers: SocketSessionTimersService,
     config: ConfigService,
   ) {
@@ -87,6 +94,42 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.namespace?.to(courierRoom(courierProfileId)).emit(event, payload);
   }
 
+  // Sends an event to everyone who joined the order room: its client and its courier.
+  emitToOrder(
+    orderId: number,
+    event: string,
+    payload: unknown,
+    options: EmitToOrderOptions = {},
+  ): void {
+    const room = this.namespace?.to(orderRoom(orderId));
+    const { exceptCourierProfileId } = options;
+    const target =
+      exceptCourierProfileId === undefined
+        ? room
+        : room?.except(courierRoom(exceptCourierProfileId));
+
+    target?.emit(event, payload);
+  }
+
+  // Takes every socket of the courier out of the order room. Not called yet: manual reassignment
+  // of a courier (v0.7.0) needs it, so the previous courier stops getting the events of the order.
+  removeCourierFromOrder(orderId: number, courierProfileId: number): void {
+    this.namespace?.in(courierRoom(courierProfileId)).socketsLeave(orderRoom(orderId));
+  }
+
+  @SubscribeMessage(COURIER_SOCKET_EVENTS.ORDER_JOIN)
+  joinOrder(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<OrderJoinAck> {
+    return this.orderRooms.join(socket, body);
+  }
+
+  @SubscribeMessage(COURIER_SOCKET_EVENTS.ORDER_LEAVE)
+  leaveOrder(@ConnectedSocket() socket: Socket, @MessageBody() body: unknown): Promise<void> {
+    return this.orderRooms.leave(socket, body);
+  }
+
   // Only a courier sends positions: a client socket is refused without looking at the body.
   @SubscribeMessage(COURIER_SOCKET_EVENTS.LOCATION_UPDATE)
   updateLocation(
@@ -96,29 +139,8 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const data = socket.data as AppSocketData;
 
     return data.role === ROLE.COURIER
-      ? this.recordCourierLocation(data, body)
+      ? this.locations.update(data, body)
       : { ok: false, reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN };
-  }
-
-  private async recordCourierLocation(
-    data: CourierSocketData,
-    body: unknown,
-  ): Promise<LocationAck> {
-    const now = new Date();
-    const rejection = rejectLocationUpdate(data, now.getTime());
-    const point = geoPointSchema.safeParse(body);
-    let ack: LocationAck = { ok: true };
-
-    if (rejection) {
-      ack = { ok: false, reason: rejection };
-    } else if (!point.success) {
-      ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION };
-    } else {
-      data.lastLocationAtMs = now.getTime();
-      ack = await this.locations.record(data.courierProfileId, point.data, now);
-    }
-
-    return ack;
   }
 
   // The cookie goes with a socket from any page, so the page itself must be ours. Every role that

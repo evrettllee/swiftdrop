@@ -15,6 +15,7 @@ function socketData(overrides: Partial<CourierSocketData> = {}): CourierSocketDa
     userId: 1,
     courierProfileId: 1,
     sessionExpiresAtMs: LATER_MS,
+    orderJoinAttemptsMs: [],
     lastLocationAtMs: null,
     ...overrides,
   };

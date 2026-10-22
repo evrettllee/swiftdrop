@@ -6,6 +6,7 @@ import { CourierAvailabilityService } from './services/courier-availability.serv
 import { CourierLocationService } from './services/courier-location.service';
 import { CourierProfilesService } from './services/courier-profiles.service';
 import { CourierVehiclesService } from './services/courier-vehicles.service';
+import { OrderRoomsService } from './services/order-rooms.service';
 
 @Module({
   imports: [RealtimeModule],
@@ -15,6 +16,7 @@ import { CourierVehiclesService } from './services/courier-vehicles.service';
     CourierVehiclesService,
     CourierAvailabilityService,
     CourierLocationService,
+    OrderRoomsService,
     CouriersGateway,
   ],
   exports: [CourierProfilesService, CouriersGateway],
