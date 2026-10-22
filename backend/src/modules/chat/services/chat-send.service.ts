@@ -12,7 +12,11 @@ import type { Database, Transaction } from '../../../database/database.module';
 import { messages } from '../../../database/schema';
 import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
 import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '../constants/chat.constants';
-import { canSendInOrder, toChatMessage } from '../mappers/chat-message.mapper';
+import {
+  canSendInOrder,
+  sendRefusalMessage,
+  toChatMessage,
+} from '../mappers/chat-message.mapper';
 import type { ChatMessage, MessageNewEvent, SentChatMessage } from '../types/chat.types';
 
 @Injectable()
@@ -60,7 +64,7 @@ export class ChatSendService {
     }
 
     if (receiverId === null || !canSendInOrder(participant.status, true)) {
-      throw new ConflictException(CHAT_ERROR_MESSAGES.CHAT_CLOSED);
+      throw new ConflictException(sendRefusalMessage(participant.status));
     }
 
     const [row] = await tx

@@ -4,6 +4,7 @@ import {
   ORDER_NOT_FOUND_MESSAGE,
 } from '../../../common/constants/orders.constants';
 import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
+import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
 import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
 
 // Routes: the chat of an order lives under the order.
@@ -24,6 +25,13 @@ export const CHAT_SEND_THROTTLE_LIMIT = 20;
 export const CHAT_SEND_THROTTLE_TTL_MS = MS_PER_MINUTE;
 // Postgres text cannot hold this character: the insert would fail with 500.
 export const NUL_CHARACTER = '\u0000';
+
+// The order still waits for its courier: a message is refused as not open yet, not as closed.
+export const CHAT_NOT_OPEN_STATUSES = [
+  ORDER_STATUS.PENDING,
+  ORDER_STATUS.CONFIRMED,
+  ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT,
+] as const;
 
 // Socket events of the order room.
 export const CHAT_SOCKET_EVENTS = {
@@ -48,6 +56,8 @@ export const CHAT_VALIDATION_MESSAGES = {
 export const CHAT_ERROR_MESSAGES = {
   ORDER_NOT_FOUND: ORDER_NOT_FOUND_MESSAGE,
   CHAT_CLOSED: 'Чат закрыт: заказ завершён',
+  // No courier has taken the order yet, so there is no one to write to.
+  CHAT_NOT_OPEN: 'Чат откроется, когда курьер примет заказ',
   // The order row is held by a status change: the same answer as other operations on an order.
   BUSY: ORDER_BUSY_MESSAGE,
   TOO_MANY_MESSAGES: 'Слишком много сообщений. Подождите минуту',

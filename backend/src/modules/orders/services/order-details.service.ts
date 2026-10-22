@@ -48,6 +48,7 @@ export class OrderDetailsService {
         price: orders.price,
         priceCoefficient: orders.priceCoefficient,
         distanceKm: orders.distanceKm,
+        estimatedMinutes: orders.estimatedMinutes,
         estimatedDeliveryAt: orders.estimatedDeliveryAt,
         createdAt: orders.createdAt,
         recipientName: orders.recipientName,

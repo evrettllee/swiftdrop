@@ -18,6 +18,8 @@ export const COURIER_POINT = { latitude: 53.92, longitude: 27.6 };
 export const STALE_POSITION_AGE_MS = COURIER_LOCATION_FRESH_MS + MS_PER_MINUTE;
 // The time of every trip of the courier the replaced routing service gives.
 export const TRIP_DURATION_S = 600;
+// The time of its first leg: to the pickup point before the pickup.
+export const FIRST_LEG_DURATION_S = 240;
 
 // The routing service is replaced: the line of a route names its points, so a test sees what was
 // routed, and nothing hidden can get into an answer unnoticed.
@@ -72,6 +74,7 @@ export async function resetRouting(
   mocks.getTrip.mockImplementation((points: GeoPoint[]) =>
     Promise.resolve({
       durationS: TRIP_DURATION_S,
+      firstLegDurationS: FIRST_LEG_DURATION_S,
       firstLegGeometry: lineThrough(points.slice(0, 2)),
     }),
   );

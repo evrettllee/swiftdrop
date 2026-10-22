@@ -50,6 +50,13 @@
       "when": 1792675781424,
       "tag": "0006_set_random_page_cost",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792702465740,
+      "tag": "0007_add_order_estimated_minutes",
+      "breakpoints": true
     }
   ]
 }

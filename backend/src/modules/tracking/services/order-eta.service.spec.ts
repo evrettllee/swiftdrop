@@ -11,7 +11,8 @@ import { OrderEtaService } from './order-eta.service';
 
 const ORDER_ID = 7;
 const START_MS = Date.parse('2026-10-22T12:00:00Z');
-const TRIP = { durationS: 600, firstLegGeometry: 'leg' };
+// After the pickup the trip is one leg, to the recipient.
+const TRIP = { durationS: 600, firstLegDurationS: 600, firstLegGeometry: 'leg' };
 
 function source(overrides: Partial<EtaSource> = {}): EtaSource {
   return {
@@ -69,6 +70,7 @@ describe('OrderEtaService', () => {
       orderId: ORDER_ID,
       estimatedDeliveryAt: new Date(START_MS + 600_000 + 120_000).toISOString(),
       courierLeg: { geometry: 'leg', toPoint: 'dropoff' },
+      pickupEtaAt: null,
     });
     expect(service.courierLeg(ORDER_ID)).toEqual({ geometry: 'leg', toPoint: 'dropoff' });
   });

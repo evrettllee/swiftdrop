@@ -64,6 +64,9 @@ export type OrderDetails = {
   currency: string;
   priceCoefficient: number;
   distanceKm: number;
+  // The time of the trip given at the placement, in minutes; it does not follow the arrival
+  // estimate. Null for orders placed before it was kept.
+  estimatedMinutes: number | null;
   estimatedDeliveryAt: Date | null;
   createdAt: Date;
   recipient: { name: string; phone: string };
