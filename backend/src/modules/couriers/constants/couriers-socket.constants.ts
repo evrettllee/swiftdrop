@@ -43,6 +43,8 @@ export const COURIER_SOCKET_EVENTS = {
   // The owner of an order or its courier asks for the events of the order, and stops.
   ORDER_JOIN: 'order:join',
   ORDER_LEAVE: 'order:leave',
+  // The position of the courier, sent to the room of their active order.
+  COURIER_LOCATION: 'courier:location',
 } as const;
 
 // Order rooms
@@ -65,8 +67,10 @@ export const ORDER_JOIN_REJECTIONS = {
 } as const;
 
 // Location
-// One position per 15 seconds is enough for assignment and keeps the database calm.
-export const LOCATION_MIN_INTERVAL_MS = 15 * MS_PER_SECOND;
+// One position per 5 seconds per courier: the client follows the courier on the map, and the
+// database still takes at most one write per courier in that time. The same value filters a
+// socket before the query and limits the courier in the query, whatever sockets they have open.
+export const LOCATION_MIN_INTERVAL_MS = 5 * MS_PER_SECOND;
 
 // Reasons a position is not saved: the client reads them from the acknowledgement.
 export const LOCATION_UPDATE_REJECTIONS = {

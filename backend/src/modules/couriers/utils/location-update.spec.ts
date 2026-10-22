@@ -38,6 +38,22 @@ describe('rejectLocationUpdate', () => {
     expect(rejectLocationUpdate(data, NOW_MS)).toBe(LOCATION_UPDATE_REJECTIONS.TOO_FREQUENT);
   });
 
+  it('should keep the interval at five seconds', () => {
+    expect(LOCATION_MIN_INTERVAL_MS).toBe(5_000);
+  });
+
+  it('should reject the position 4999 ms after the previous one', () => {
+    const data = socketData({ lastLocationAtMs: NOW_MS - 4_999 });
+
+    expect(rejectLocationUpdate(data, NOW_MS)).toBe(LOCATION_UPDATE_REJECTIONS.TOO_FREQUENT);
+  });
+
+  it('should accept the position 5000 ms after the previous one', () => {
+    const data = socketData({ lastLocationAtMs: NOW_MS - 5_000 });
+
+    expect(rejectLocationUpdate(data, NOW_MS)).toBeNull();
+  });
+
   it('should accept the position when exactly the interval has passed', () => {
     const data = socketData({ lastLocationAtMs: NOW_MS - LOCATION_MIN_INTERVAL_MS });
 

@@ -39,6 +39,7 @@ export const COURIERS_ERROR_MESSAGES = {
   ON_SHIFT: 'Сначала уйдите с линии, потом меняйте транспорт',
   ON_ORDER: 'Транспорт нельзя менять во время заказа',
   VEHICLE_REQUIRED: 'Укажите транспорт, чтобы выйти на линию',
+  ACTIVE_ORDER: 'Нельзя уйти с линии, пока у вас есть активный заказ',
   // The profile row is held by another operation (going on shift, another vehicle change).
   BUSY: 'Профиль сейчас обновляется. Попробуйте ещё раз',
 } as const;

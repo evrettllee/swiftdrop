@@ -40,6 +40,21 @@ export type OrderJoinRejection = (typeof ORDER_JOIN_REJECTIONS)[keyof typeof ORD
 // The acknowledgement of order:join.
 export type OrderJoinAck = { ok: true } | { ok: false; reason: OrderJoinRejection };
 
+// The payload of courier:location; updatedAt is the time of the database that stored the position.
+export type CourierLocationEvent = {
+  orderId: number;
+  latitude: number;
+  longitude: number;
+  updatedAt: string;
+};
+
+// What a position sent on the socket ended with: the answer to the courier and, when it was
+// stored during an active order, the event for the room of that order.
+export type LocationUpdateResult = {
+  ack: LocationAck;
+  event: CourierLocationEvent | null;
+};
+
 export type EmitToOrderOptions = {
   // The sockets of this courier do not get the event, for example their own position.
   exceptCourierProfileId?: number;

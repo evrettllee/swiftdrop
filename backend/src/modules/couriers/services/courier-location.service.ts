@@ -1,14 +1,31 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, exists, isNull, lte, or, sql } from 'drizzle-orm';
+import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
+import { courierActiveOrder } from '../../../common/database/courier-active-order';
 import { isLockTimeout } from '../../../common/database/pg-errors';
 import { type GeoPoint, geoPointSchema } from '../../../common/schemas/geo-point.schema';
 import { describeError } from '../../../common/utils/describe-error';
 import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
-import { courierProfiles } from '../../../database/schema';
-import { LOCATION_UPDATE_REJECTIONS } from '../constants/couriers-socket.constants';
-import type { CourierSocketData, LocationAck } from '../types/couriers-socket.types';
+import { courierProfiles, orders } from '../../../database/schema';
+import {
+  LOCATION_MIN_INTERVAL_MS,
+  LOCATION_UPDATE_REJECTIONS,
+} from '../constants/couriers-socket.constants';
+import type {
+  CourierSocketData,
+  LocationUpdateRejection,
+  LocationUpdateResult,
+} from '../types/couriers-socket.types';
 import { rejectLocationUpdate } from '../utils/location-update';
+
+// A stored position: the time of the database and the order the courier carries, if any.
+export type SavedLocation = { locationUpdatedAt: Date; activeOrderId: number | null };
+
+const REFUSED = (reason: LocationUpdateRejection): LocationUpdateResult => ({
+  ack: { ok: false, reason },
+  event: null,
+});
 
 @Injectable()
 export class CourierLocationService {
@@ -16,63 +33,114 @@ export class CourierLocationService {
 
   constructor(@Inject(DRIZZLE) private readonly db: Database) {}
 
-  // A position sent on the socket of a courier: checked, then saved when the checks pass.
-  async update(data: CourierSocketData, body: unknown): Promise<LocationAck> {
-    const now = new Date();
-    const rejection = rejectLocationUpdate(data, now.getTime());
+  // A position sent on the socket of a courier: checked, then saved when the checks pass. The
+  // socket check is only a cheap filter; the limit per courier is kept by the query itself.
+  async update(data: CourierSocketData, body: unknown): Promise<LocationUpdateResult> {
+    const nowMs = Date.now();
+    const rejection = rejectLocationUpdate(data, nowMs);
     const point = geoPointSchema.safeParse(body);
-    let ack: LocationAck = { ok: true };
+    let result: LocationUpdateResult;
 
     if (rejection) {
-      ack = { ok: false, reason: rejection };
+      result = REFUSED(rejection);
     } else if (!point.success) {
-      ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION };
+      result = REFUSED(LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION);
     } else {
-      data.lastLocationAtMs = now.getTime();
-      ack = await this.record(data.courierProfileId, point.data, now);
+      data.lastLocationAtMs = nowMs;
+      result = await this.record(data.courierProfileId, point.data);
     }
 
-    return ack;
-  }
-
-  // Saves the position of a courier on shift, returns false when the courier is off shift.
-  // The shift check is part of the update, so a position never outlives going off shift.
-  async save(courierProfileId: number, point: GeoPoint, at: Date): Promise<boolean> {
-    const updated = await this.db
-      .update(courierProfiles)
-      .set({ currentLat: point.latitude, currentLng: point.longitude, locationUpdatedAt: at })
-      .where(
-        and(
-          eq(courierProfiles.courierProfileId, courierProfileId),
-          eq(courierProfiles.isAvailable, true),
-        ),
-      )
-      .returning({ courierProfileId: courierProfiles.courierProfileId });
-
-    return updated.length > 0;
+    return result;
   }
 
   // Saves the position and answers the socket: a failure is a refusal in the acknowledgement,
   // never an error the client does not wait for.
-  async record(courierProfileId: number, point: GeoPoint, at: Date): Promise<LocationAck> {
-    let ack: LocationAck = { ok: true };
+  async record(courierProfileId: number, point: GeoPoint): Promise<LocationUpdateResult> {
+    let result: LocationUpdateResult = { ack: { ok: true }, event: null };
 
     try {
-      if (!(await this.save(courierProfileId, point, at))) {
-        ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.OFF_SHIFT };
+      const saved = await this.save(courierProfileId, point);
+
+      if (!saved) {
+        result = REFUSED(await this.refusalReason(courierProfileId));
+      } else if (saved.activeOrderId !== null) {
+        result.event = {
+          orderId: saved.activeOrderId,
+          latitude: point.latitude,
+          longitude: point.longitude,
+          updatedAt: saved.locationUpdatedAt.toISOString(),
+        };
       }
     } catch (error) {
-      // Going on or off shift holds the profile row: the next position comes in 15 seconds anyway.
-      ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.BUSY };
+      // Going on or off shift holds the profile row: the next position comes in a few seconds.
+      result = REFUSED(LOCATION_UPDATE_REJECTIONS.BUSY);
 
       if (!isLockTimeout(error)) {
         this.logger.error(
           `Position of courier ${courierProfileId} not saved: ${describeError(error)}`,
         );
-        ack = { ok: false, reason: LOCATION_UPDATE_REJECTIONS.UNAVAILABLE };
+        result = REFUSED(LOCATION_UPDATE_REJECTIONS.UNAVAILABLE);
       }
     }
 
-    return ack;
+    return result;
+  }
+
+  // One statement: the position is kept for a courier on shift or with an active order, at most
+  // once per interval whatever sockets the courier has open. The checks run on the locked row, so
+  // a position never outlives going off shift. Null when a check refused it.
+  async save(courierProfileId: number, point: GeoPoint): Promise<SavedLocation | null> {
+    const [saved] = await this.db
+      .update(courierProfiles)
+      .set({
+        currentLat: point.latitude,
+        currentLng: point.longitude,
+        locationUpdatedAt: sql`now()`,
+      })
+      .where(
+        and(
+          eq(courierProfiles.courierProfileId, courierProfileId),
+          or(eq(courierProfiles.isAvailable, true), exists(this.activeOrder())),
+          or(
+            isNull(courierProfiles.locationUpdatedAt),
+            lte(
+              courierProfiles.locationUpdatedAt,
+              sql`now() - ${LOCATION_MIN_INTERVAL_MS}::int * interval '1 millisecond'`,
+            ),
+          ),
+        ),
+      )
+      .returning({
+        locationUpdatedAt: courierProfiles.locationUpdatedAt,
+        activeOrderId: sql<number | null>`(${this.activeOrder()})`,
+      });
+
+    return saved?.locationUpdatedAt
+      ? { ...saved, locationUpdatedAt: saved.locationUpdatedAt }
+      : null;
+  }
+
+  // Why the position was not kept: off shift without an order, otherwise too soon after the last.
+  // Runs only after a refusal, so a stored position costs one query.
+  async refusalReason(courierProfileId: number): Promise<LocationUpdateRejection> {
+    const [profile] = await this.db
+      .select({
+        mayShare: sql<boolean>`${courierProfiles.isAvailable} OR exists(${this.activeOrder()})`,
+      })
+      .from(courierProfiles)
+      .where(eq(courierProfiles.courierProfileId, courierProfileId))
+      .limit(SINGLE_ROW_LIMIT);
+
+    return profile?.mayShare
+      ? LOCATION_UPDATE_REJECTIONS.TOO_FREQUENT
+      : LOCATION_UPDATE_REJECTIONS.OFF_SHIFT;
+  }
+
+  // The order of the courier of the outer row, found by the partial unique index of active orders.
+  private activeOrder() {
+    return this.db
+      .select({ orderId: orders.orderId })
+      .from(orders)
+      .where(courierActiveOrder(courierProfiles.courierProfileId));
   }
 }

@@ -1,5 +1,4 @@
 import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { SkipThrottle } from '@nestjs/throttler';
 import {
   ConnectedSocket,
@@ -12,9 +11,8 @@ import {
 } from '@nestjs/websockets';
 import type { Namespace, Socket } from 'socket.io';
 import { ROLE } from '../../../common/enums/role.enum';
-import { ENV_KEYS } from '../../../config/env.constants';
+import { describeError } from '../../../common/utils/describe-error';
 import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.constants';
-import { SocketAuthService } from '../../realtime/services/socket-auth.service';
 import { SocketSessionTimersService } from '../../realtime/services/socket-session-timers.service';
 import {
   COURIER_SOCKET_EVENTS,
@@ -26,15 +24,16 @@ import {
   orderRoom,
 } from '../constants/couriers-socket.constants';
 import { CourierLocationService } from '../services/courier-location.service';
-import { CourierProfilesService } from '../services/courier-profiles.service';
 import { OrderRoomsService } from '../services/order-rooms.service';
+import { SocketAdmissionService } from '../services/socket-admission.service';
 import type {
   AppSocketData,
+  CourierLocationEvent,
+  CourierSocketData,
   EmitToOrderOptions,
   LocationAck,
   OrderJoinAck,
 } from '../types/couriers-socket.types';
-import { buildSocketData } from '../utils/socket-data';
 
 // The HTTP rate limiter cannot read a socket message: positions and order joins have their own
 // limits.
@@ -48,26 +47,24 @@ import { buildSocketData } from '../utils/socket-data';
 })
 export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(CouriersGateway.name);
-  private readonly appOrigin: string;
   private namespace: Namespace | null = null;
 
   constructor(
-    private readonly socketAuth: SocketAuthService,
-    private readonly profiles: CourierProfilesService,
+    private readonly admission: SocketAdmissionService,
     private readonly locations: CourierLocationService,
     private readonly orderRooms: OrderRoomsService,
     private readonly sessionTimers: SocketSessionTimersService,
-    config: ConfigService,
-  ) {
-    this.appOrigin = new URL(config.getOrThrow<string>(ENV_KEYS.APP_URL)).origin;
-  }
+  ) {}
 
   // Checks run in the handshake, so a refused client never gets a connection at all.
   afterInit(namespace: Namespace): void {
     this.namespace = namespace;
     namespace.use((socket, next) => {
-      this.admit(socket).then(
-        () => next(),
+      this.admission.admit(socket).then(
+        (data) => {
+          socket.data = data;
+          next();
+        },
         (error: unknown) =>
           next(error instanceof Error ? error : new Error(SOCKET_ERRORS.UNAUTHORIZED)),
       );
@@ -139,30 +136,33 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const data = socket.data as AppSocketData;
 
     return data.role === ROLE.COURIER
-      ? this.locations.update(data, body)
+      ? this.shareLocation(data, body)
       : { ok: false, reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN };
   }
 
-  // The cookie goes with a socket from any page, so the page itself must be ours. Every role that
-  // may not connect gets the same refusal as a missing session.
-  private async admit(socket: Socket): Promise<void> {
-    if (socket.handshake.headers.origin !== this.appOrigin) {
-      throw new Error(SOCKET_ERRORS.ORIGIN_NOT_ALLOWED);
+  // The acknowledgement goes out when this promise resolves; the room gets the position on the
+  // next turn of the event loop, after it.
+  private async shareLocation(data: CourierSocketData, body: unknown): Promise<LocationAck> {
+    const { ack, event } = await this.locations.update(data, body);
+
+    if (event) {
+      setImmediate(() => this.emitLocation(data.courierProfileId, event));
     }
 
-    const session = await this.socketAuth.authenticate(socket.handshake.headers.cookie);
+    return ack;
+  }
 
-    // A token with less than a second left still passes the check of its seconds-precise expiry.
-    if (!session || !this.sessionTimers.hasTimeLeft(session.expiresAtMs)) {
-      throw new Error(SOCKET_ERRORS.UNAUTHORIZED);
+  // The courier does not get their own position back. A failed send leaves the position stored;
+  // the log line has no coordinates.
+  private emitLocation(courierProfileId: number, event: CourierLocationEvent): void {
+    try {
+      this.emitToOrder(event.orderId, COURIER_SOCKET_EVENTS.COURIER_LOCATION, event, {
+        exceptCourierProfileId: courierProfileId,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Position of courier ${courierProfileId} not sent to order ${event.orderId}: ${describeError(error)}`,
+      );
     }
-
-    const data = await buildSocketData(session, (userId) => this.profiles.getProfileId(userId));
-
-    if (!data) {
-      throw new Error(SOCKET_ERRORS.UNAUTHORIZED);
-    }
-
-    socket.data = data;
   }
 }
