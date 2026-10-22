@@ -2,11 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import type { Socket } from 'socket.io';
 import { sessionDisconnectDelayMs } from '../utils/session-expiry';
 
-// Closes a courier socket when the access token it was opened with expires: a token cannot be
-// refreshed on an open socket, so the client reconnects with the new cookie.
+// Closes a socket when the access token it was opened with expires, whoever opened it: a token
+// cannot be refreshed on an open socket, so the client reconnects with the new cookie.
 @Injectable()
-export class CourierSessionTimersService {
-  private readonly logger = new Logger(CourierSessionTimersService.name);
+export class SocketSessionTimersService {
+  private readonly logger = new Logger(SocketSessionTimersService.name);
   private readonly timers = new Map<string, NodeJS.Timeout>();
 
   hasTimeLeft(expiresAtMs: number, nowMs: number = Date.now()): boolean {

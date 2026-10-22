@@ -16,6 +16,7 @@ import { geoPointSchema } from '../../../common/schemas/geo-point.schema';
 import { ENV_KEYS } from '../../../config/env.constants';
 import { SOCKET_ERRORS, SOCKET_PATH } from '../../realtime/constants/realtime.constants';
 import { SocketAuthService } from '../../realtime/services/socket-auth.service';
+import { SocketSessionTimersService } from '../../realtime/services/socket-session-timers.service';
 import {
   COURIER_SOCKET_EVENTS,
   COURIER_SOCKET_PING_INTERVAL_MS,
@@ -26,9 +27,9 @@ import {
 } from '../constants/couriers-socket.constants';
 import { CourierLocationService } from '../services/courier-location.service';
 import { CourierProfilesService } from '../services/courier-profiles.service';
-import { CourierSessionTimersService } from '../services/courier-session-timers.service';
-import type { CourierSocketData, LocationAck } from '../types/couriers-socket.types';
+import type { AppSocketData, CourierSocketData, LocationAck } from '../types/couriers-socket.types';
 import { rejectLocationUpdate } from '../utils/location-update';
+import { buildSocketData } from '../utils/socket-data';
 
 // The HTTP rate limiter cannot read a socket message; positions have their own limit below.
 @SkipThrottle()
@@ -48,7 +49,7 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private readonly socketAuth: SocketAuthService,
     private readonly profiles: CourierProfilesService,
     private readonly locations: CourierLocationService,
-    private readonly sessionTimers: CourierSessionTimersService,
+    private readonly sessionTimers: SocketSessionTimersService,
     config: ConfigService,
   ) {
     this.appOrigin = new URL(config.getOrThrow<string>(ENV_KEYS.APP_URL)).origin;
@@ -67,11 +68,14 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   async handleConnection(socket: Socket): Promise<void> {
-    const data = socket.data as CourierSocketData;
+    const data = socket.data as AppSocketData;
 
-    await socket.join(courierRoom(data.courierProfileId));
+    if (data.role === ROLE.COURIER) {
+      await socket.join(courierRoom(data.courierProfileId));
+    }
+
     this.sessionTimers.schedule(socket, data.sessionExpiresAtMs);
-    this.logger.log(`Courier ${data.courierProfileId} connected`);
+    this.logger.log(`User ${data.userId} (${data.role}) connected`);
   }
 
   handleDisconnect(socket: Socket): void {
@@ -83,12 +87,23 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.namespace?.to(courierRoom(courierProfileId)).emit(event, payload);
   }
 
+  // Only a courier sends positions: a client socket is refused without looking at the body.
   @SubscribeMessage(COURIER_SOCKET_EVENTS.LOCATION_UPDATE)
-  async updateLocation(
+  updateLocation(
     @ConnectedSocket() socket: Socket,
     @MessageBody() body: unknown,
+  ): Promise<LocationAck> | LocationAck {
+    const data = socket.data as AppSocketData;
+
+    return data.role === ROLE.COURIER
+      ? this.recordCourierLocation(data, body)
+      : { ok: false, reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN };
+  }
+
+  private async recordCourierLocation(
+    data: CourierSocketData,
+    body: unknown,
   ): Promise<LocationAck> {
-    const data = socket.data as CourierSocketData;
     const now = new Date();
     const rejection = rejectLocationUpdate(data, now.getTime());
     const point = geoPointSchema.safeParse(body);
@@ -106,7 +121,8 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     return ack;
   }
 
-  // The cookie goes with a socket from any page, so the page itself must be ours.
+  // The cookie goes with a socket from any page, so the page itself must be ours. Every role that
+  // may not connect gets the same refusal as a missing session.
   private async admit(socket: Socket): Promise<void> {
     if (socket.handshake.headers.origin !== this.appOrigin) {
       throw new Error(SOCKET_ERRORS.ORIGIN_NOT_ALLOWED);
@@ -115,20 +131,15 @@ export class CouriersGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     const session = await this.socketAuth.authenticate(socket.handshake.headers.cookie);
 
     // A token with less than a second left still passes the check of its seconds-precise expiry.
-    if (
-      !session ||
-      session.user.role !== ROLE.COURIER ||
-      !this.sessionTimers.hasTimeLeft(session.expiresAtMs)
-    ) {
+    if (!session || !this.sessionTimers.hasTimeLeft(session.expiresAtMs)) {
       throw new Error(SOCKET_ERRORS.UNAUTHORIZED);
     }
 
-    const data: CourierSocketData = {
-      userId: session.user.userId,
-      courierProfileId: await this.profiles.getProfileId(session.user.userId),
-      sessionExpiresAtMs: session.expiresAtMs,
-      lastLocationAtMs: null,
-    };
+    const data = await buildSocketData(session, (userId) => this.profiles.getProfileId(userId));
+
+    if (!data) {
+      throw new Error(SOCKET_ERRORS.UNAUTHORIZED);
+    }
 
     socket.data = data;
   }

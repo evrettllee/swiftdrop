@@ -33,8 +33,9 @@ export function appOrigin(): string {
   return new URL(appUrl).origin;
 }
 
-// Resolves with a connected socket, rejects with the server's reason when it refuses.
-export function connectCourierSocket(
+// Opens the app socket as the owner of the cookies, a courier or a client. Resolves with a
+// connected socket, rejects with the server's reason when it refuses.
+export function connectAppSocket(
   baseUrl: string,
   cookies: string,
   origin = appOrigin(),

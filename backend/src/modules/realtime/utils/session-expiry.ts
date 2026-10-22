@@ -1,4 +1,4 @@
-import { SET_TIMEOUT_MAX_MS } from '../constants/couriers-socket.constants';
+import { SET_TIMEOUT_MAX_MS } from '../constants/realtime.constants';
 
 // How long a socket may stay open before its session ends: zero or less when it already has.
 // Capped at what setTimeout can wait, since a longer delay would fire at once.

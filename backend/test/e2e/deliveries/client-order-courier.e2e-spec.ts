@@ -26,7 +26,7 @@ import {
   setOrderStatus,
 } from '../../support/orders';
 import { resetServiceArea } from '../../support/pricing';
-import { connectCourierSocket, listenTestApp, waitForEvent } from '../../support/sockets';
+import { connectAppSocket, listenTestApp, waitForEvent } from '../../support/sockets';
 
 const DELIVERY_CODE = '4821';
 
@@ -132,7 +132,7 @@ describe('Order courier for the client (e2e)', () => {
 
   it('should tell the courier when the client cancels the assigned order', async () => {
     await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
-    socket = await connectCourierSocket(baseUrl, courierCookies);
+    socket = await connectAppSocket(baseUrl, courierCookies);
     const cancelled = waitForEvent<{ orderId: number }>(
       socket,
       COURIER_SOCKET_EVENTS.ORDER_CANCELLED,

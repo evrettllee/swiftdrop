@@ -1,16 +1,14 @@
-import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { hash } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';
 import { ROLE } from '../../src/common/enums/role.enum';
 import { VEHICLE_TYPE } from '../../src/common/enums/vehicle-type.enum';
 import type { GeoPoint } from '../../src/common/schemas/geo-point.schema';
 import type { Database } from '../../src/database/database.module';
-import { courierProfiles, orders, roles, users } from '../../src/database/schema';
-import { AUTH_ROUTES } from '../../src/modules/auth/constants/routes.constants';
+import { courierProfiles, orders, users } from '../../src/database/schema';
 import { COURIERS_ROUTES } from '../../src/modules/couriers/constants/couriers.constants';
-import { COOKIE_HEADER, postAuth, sessionCookieHeader, validRegistration } from './auth';
+import { COOKIE_HEADER, validRegistration } from './auth';
 import { getApi, putApi } from './http';
+import { createUserWithRole } from './users';
 
 export const COURIER_ACCOUNT = {
   firstName: 'Дмитрий',
@@ -38,30 +36,12 @@ export const CAR = {
 
 export const ON_FOOT = { type: VEHICLE_TYPE.FOOT };
 
-// Couriers are not registered through the API, so the account is written straight to the database.
-export async function createCourier(
+export function createCourier(
   app: NestExpressApplication,
   db: Database,
   account = COURIER_ACCOUNT,
 ): Promise<string> {
-  const { password, ...profile } = account;
-  const [courierRole] = await db
-    .select({ roleId: roles.roleId })
-    .from(roles)
-    .where(eq(roles.name, ROLE.COURIER));
-
-  await db.insert(users).values({
-    ...profile,
-    roleId: courierRole.roleId,
-    passwordHash: await hash(password),
-    emailVerifiedAt: new Date(),
-  });
-
-  const response = await postAuth(app, AUTH_ROUTES.LOGIN)
-    .send({ email: account.email, password })
-    .expect(HttpStatus.OK);
-
-  return sessionCookieHeader(response);
+  return createUserWithRole(app, db, account, ROLE.COURIER);
 }
 
 export async function findCourierProfileId(db: Database, email: string): Promise<number> {

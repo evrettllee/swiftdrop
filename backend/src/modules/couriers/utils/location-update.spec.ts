@@ -1,3 +1,4 @@
+import { ROLE } from '../../../common/enums/role.enum';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,
@@ -10,6 +11,7 @@ const LATER_MS = 2_000_000;
 
 function socketData(overrides: Partial<CourierSocketData> = {}): CourierSocketData {
   return {
+    role: ROLE.COURIER,
     userId: 1,
     courierProfileId: 1,
     sessionExpiresAtMs: LATER_MS,
