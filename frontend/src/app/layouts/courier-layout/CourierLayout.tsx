@@ -1,28 +1,20 @@
-import { useLayoutEffect } from 'react';
 import { useCourierProfileLoader } from '@/entities/courier';
 import { OrderOffer } from '@/features/order-offer';
 import { CourierLocationProvider } from '@/features/courier-location';
-import { connectCourierSocket, disconnectCourierSocket } from '@/shared/realtime';
+import { useAppSocket } from '@/shared/realtime';
 import { APP_ROUTES } from '@/shared/routes';
 import { AccountShell } from '../account-shell/AccountShell';
 import { CourierStatusIndicator } from './CourierStatusIndicator';
 import { COURIER_LAYOUT_TEXTS, COURIER_NAV_ITEMS } from './navigation';
+import { useActiveOrderRoom } from './useActiveOrderRoom';
 
-// The socket lives while the cabinet is open: leaving it or signing out (the role route unmounts
-// the cabinet) closes the socket. A layout effect, so the status never shows the closed socket of
-// the previous visit.
-function useCourierSocket(): void {
-  useLayoutEffect(() => {
-    connectCourierSocket();
-
-    return disconnectCourierSocket;
-  }, []);
-}
-
-// The frame of every page of the courier; an offer of an order may come on any of them.
+// The frame of every page of the courier; an offer of an order may come on any of them. The socket
+// lives while the cabinet is open: leaving it or signing out (the role route unmounts the cabinet)
+// closes it.
 export function CourierLayout() {
-  useCourierSocket();
+  useAppSocket();
   useCourierProfileLoader();
+  useActiveOrderRoom();
 
   return (
     <CourierLocationProvider>

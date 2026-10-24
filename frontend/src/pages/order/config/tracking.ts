@@ -1,12 +1,14 @@
 import { MS_PER_SECOND } from '@/shared/config';
 
-// How often the page of an active order asks the backend again: the client has no socket.
-export const ORDER_POLL_INTERVAL_MS = 10 * MS_PER_SECOND;
+// No position of the courier came for this long: the page shows that the connection with the
+// courier is lost. Counted by the clock of the page from when a position came, so the clocks of the
+// page and of the backend need not agree (COURIER_LOCATION_STALE_MS of the backend is the same).
+export const COURIER_POSITION_STALE_MS = 60 * MS_PER_SECOND;
 
 // A failed request for the courier is repeated after this, as the lines of a map are.
 export const ORDER_COURIER_RETRY_MS = 10 * MS_PER_SECOND;
-// A page that does not ask again by itself (a delivered order) repeats it this many times.
-export const ORDER_COURIER_RETRIES_WITHOUT_POLLING = 1;
+// An order that no longer changes (a delivered one) repeats a failed request this many times.
+export const ORDER_COURIER_RETRIES_WHEN_FINISHED = 1;
 
 // The courier of the order and the code for them.
 export const ORDER_COURIER_TEXTS = {

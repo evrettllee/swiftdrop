@@ -13,8 +13,9 @@ import { fetchRouteOutcome, type RouteLinesLoader, type RouteOutcome } from './r
 type RouteLinesOptions = {
   // The courier on the map: a move farther than the threshold asks for the line again.
   movingPoint?: GeoPoint | null;
-  // A route that changes without the page knowing (the courier of an order) is asked for again.
-  refreshIntervalMs?: number | null;
+  // Asks for the same route again each time it changes (the room of the order was joined again
+  // after a lost connection); the lines shown stay until the answer.
+  reloadToken?: number;
 };
 
 type StoredRoute = MapRoute & { key: string };
@@ -64,7 +65,7 @@ function useMoveRefresh(
 export function useRouteLines(
   load: RouteLinesLoader | null,
   requestKey: string,
-  { movingPoint = null, refreshIntervalMs = null }: RouteLinesOptions = {},
+  { movingPoint = null, reloadToken = 0 }: RouteLinesOptions = {},
 ): MapRoute {
   const isEnabled = load !== null && IS_MAPBOX_CONFIGURED;
   const [attempt, setAttempt] = useState(0);
@@ -92,14 +93,9 @@ export function useRouteLines(
       setStored({ ...route, key: requestKey });
       // A final answer leaves no last request, so a move of the courier asks for nothing either.
       lastRequest.current = isFinal ? null : { atMs: Date.now(), point: getMovingPoint() };
-      let delay = isFinal ? null : refreshIntervalMs;
 
       if (shouldRetry) {
-        delay = ROUTE_RETRY_MS;
-      }
-
-      if (delay !== null) {
-        timer = window.setTimeout(() => setAttempt((current) => current + 1), delay);
+        timer = window.setTimeout(() => setAttempt((current) => current + 1), ROUTE_RETRY_MS);
       }
     });
 
@@ -107,7 +103,7 @@ export function useRouteLines(
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [isEnabled, requestKey, attempt, refreshIntervalMs]);
+  }, [isEnabled, requestKey, attempt, reloadToken]);
 
   useMoveRefresh(isEnabled, movingPoint, lastRequest, askAgain);
 

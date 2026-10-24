@@ -15,6 +15,7 @@ import {
   routeUnavailableBadge,
   stubClientOrderRoute,
 } from './support/routing';
+import { stubOrderLive } from './support/app-socket';
 
 // How often the map of an order asks for its route. The session, the order and its route all come
 // from the stubbed API: nothing here needs the backend, and no client is registered, as the
@@ -34,6 +35,7 @@ const TEST_CLIENT = {
 test.beforeEach(async ({ page }) => {
   test.setTimeout(QUIET_WAIT_MS * 3);
   await stubMapbox(page);
+  await stubOrderLive(page);
   await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.ME}`, (route) =>
     route.fulfill({ json: TEST_CLIENT }),
   );

@@ -4,7 +4,8 @@ import { PROFILE_TEXTS } from '../src/pages/profile/config/texts';
 import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { ROLE } from '../src/shared/session/auth-user';
-import { stubCourierSocket, stubSession, STUB_EMAIL } from './support/stub-session';
+import { stubOrderLive } from './support/app-socket';
+import { stubSession, STUB_EMAIL } from './support/stub-session';
 import { buildOrderStubState, buildTestOrder, stubCourierOnOrder } from './support/courier-order';
 
 // The courier opens the same profile page as the client, inside the frame of the cabinet. The
@@ -28,7 +29,7 @@ test('should show the same profile to the courier inside the cabinet with its me
   page,
 }) => {
   await stubSession(page, ROLE.COURIER);
-  await stubCourierSocket(page);
+  await stubOrderLive(page);
   await stubCourierOnOrder(
     page,
     buildOrderStubState(buildTestOrder(990007, ORDER_STATUS.COURIER_ASSIGNED)),

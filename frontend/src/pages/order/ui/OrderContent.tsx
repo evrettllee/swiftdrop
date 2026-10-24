@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ClientOrderCourier, OrderDetails } from '@/shared/api';
 import { Divider } from '@/shared/ui/divider';
+import type { OrderLive } from '../model/useOrderLive';
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { OrderCourier } from './OrderCourier';
 import { OrderDeliveryCode } from './OrderDeliveryCode';
@@ -18,6 +19,8 @@ type OrderContentProps = {
   // Only what the backend gave for this status; null while there is nothing to show.
   deliveryCode: string | null;
   paymentReturn: { isChecking: boolean; isFailed: boolean };
+  // The order as its room changes it: the line of the courier for the map.
+  live: OrderLive;
   onReload: () => void;
 };
 
@@ -29,6 +32,7 @@ export function OrderContent({
   courier,
   deliveryCode,
   paymentReturn,
+  live,
   onReload,
 }: OrderContentProps) {
   const [isCancelOpen, setIsCancelOpen] = useState(false);
@@ -56,7 +60,12 @@ export function OrderContent({
           )}
           <OrderProgress order={order} />
           <Divider />
-          <OrderRoute order={order} />
+          <OrderRoute
+            order={order}
+            tracking={live.tracking}
+            courierLeg={live.trackingState.courierLeg}
+            reloadToken={live.routeReloadToken}
+          />
           <Divider />
           <OrderRecipient order={order} />
         </div>

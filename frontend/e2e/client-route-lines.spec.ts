@@ -17,6 +17,7 @@ import {
   stubRouteLines,
   withoutLines,
 } from './support/routing';
+import { stubOrderLive } from './support/app-socket';
 
 // The routes come from the stubbed API. One client signed in once serves all the tests: the
 // registration of the backend is rate-limited.
@@ -32,6 +33,7 @@ let page: Page;
 
 async function openOrder() {
   await stubOrderDetails(page, ORDER_ID);
+  await stubOrderLive(page);
   await page.goto(getOrderPath(ORDER_ID));
 
   return page.getByRole('region', { name: MAP_TEXTS.VIEW_LABEL });

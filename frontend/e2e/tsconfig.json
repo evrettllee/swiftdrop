@@ -27,5 +27,5 @@
       "@/shared/*": ["../src/shared/*"]
     }
   },
-  "include": [".", "../playwright.config.ts"]
+  "include": [".", "../playwright.config.ts", "../playwright.unit.config.ts"]
 }

@@ -8,6 +8,7 @@ import { stubMapbox } from './support/mapbox';
 import { buildTestOrderDetails, stubOrderCourier } from './support/order-details';
 import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
 import { stubSession } from './support/stub-session';
+import { stubOrderLive } from './support/app-socket';
 
 // The maps of a client have the controls of the maps of a courier: the zoom (on the desktop and in
 // the full screen), the full screen of the browser, and no other way to enlarge the map.
@@ -21,6 +22,7 @@ async function openOrderMap(
 ): Promise<Locator> {
   await page.setViewportSize(viewport);
   await stubSession(page, ROLE.CLIENT);
+  await stubOrderLive(page);
   await stubMapbox(page);
   await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT]);
   await page.route(`**${API_BASE_PATH}/orders/${ORDER_ID}`, (route) =>

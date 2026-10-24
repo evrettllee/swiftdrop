@@ -1,19 +1,20 @@
 import { expect, type Page, test } from '@playwright/test';
 import { VEHICLE_TYPE } from '../src/shared/api/endpoints/courier';
 import { CITY_CENTER } from '../src/shared/config/map';
-import { COURIER_SOCKET_EVENTS } from '../src/shared/realtime/courier-events';
+import { SOCKET_EVENTS } from '../src/shared/realtime/socket-events';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { ROLE } from '../src/shared/session/auth-user';
 import { stubHistory } from './support/courier-history';
 import { type OrderStubState, stubCourierOnOrder } from './support/courier-order';
-import { stubCourierSocket, stubSession } from './support/stub-session';
+import { stubOrderLive } from './support/app-socket';
+import { stubSession } from './support/stub-session';
 
 // The position of a courier on the line goes to the backend from every page of the cabinet, not
 // only from the work page. The session, the cabinet and the socket come from the stubs.
 const [LATITUDE, LONGITUDE] = CITY_CENTER;
 // An event of the /couriers namespace as it goes over the WebSocket, with an optional ack number.
 const EVENT_PREFIX = '42/couriers,';
-const LOCATION_EVENT = `["${COURIER_SOCKET_EVENTS.LOCATION_UPDATE}"`;
+const LOCATION_EVENT = `["${SOCKET_EVENTS.LOCATION_UPDATE}"`;
 
 test.use({
   geolocation: { latitude: LATITUDE, longitude: LONGITUDE },
@@ -32,7 +33,7 @@ async function openCabinet(page: Page, isAvailable: boolean, path: string) {
   };
 
   await stubSession(page, ROLE.COURIER);
-  const socket = await stubCourierSocket(page);
+  const socket = await stubOrderLive(page);
   await stubCourierOnOrder(page, state);
   await stubHistory(page, []);
   await page.goto(path);

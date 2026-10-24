@@ -1,38 +1,50 @@
+import { useMemo } from 'react';
 import { OrderRoutePoints } from '@/entities/order';
 import { getClientOrderRoute, type OrderDetails } from '@/shared/api';
-import { ROUTE_REFRESH_INTERVAL_MS, useRouteLines } from '@/shared/lib/route-lines';
+import { useRouteLines } from '@/shared/lib/route-lines';
+import type { CourierLeg } from '@/shared/realtime';
 import { RouteMapView, SearchPulse } from '@/shared/ui/route-map';
 import { Section } from '@/shared/ui/section';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
 import { ORDER_COURIER_TEXTS } from '../config/tracking';
-import { COURIER_ACTIVE_STATUSES, SEARCHING_STATUSES } from '../model/order-status-groups';
+import { withCourierLine } from '../lib/courier-line';
+import type { OrderTracking } from '../model/order-tracking';
+import { SEARCHING_STATUSES } from '../model/order-status-groups';
 
 type OrderRouteProps = {
   order: OrderDetails;
+  // Takes the position of the courier and their arrival at the pickup point from the route.
+  tracking: OrderTracking;
+  // The line of the courier the page knows now: order:eta changes it without a request.
+  courierLeg: CourierLeg | null;
+  // Asks for the route again after a lost connection.
+  reloadToken: number;
 };
 
-export function OrderRoute({ order }: OrderRouteProps) {
+export function OrderRoute({ order, tracking, courierLeg, reloadToken }: OrderRouteProps) {
   const { orderId, status } = order;
   const isSearching = SEARCHING_STATUSES.includes(status);
-  // The page does not see the courier move, so while the order is with them the route is asked for
-  // again on the interval: the backend knows where the courier is. Otherwise it is asked for once,
-  // and again when the status changes.
+  // The route is asked for when the page opens, when the status changes and after a lost
+  // connection; between those the room of the order brings the line of the courier.
   const routeLines = useRouteLines(
-    (options) => getClientOrderRoute(orderId, options),
-    `${orderId}:${status}`,
-    {
-      refreshIntervalMs: COURIER_ACTIVE_STATUSES.includes(status)
-        ? ROUTE_REFRESH_INTERVAL_MS
-        : null,
+    async (options) => {
+      const route = await getClientOrderRoute(orderId, options);
+      tracking.applyRoute(route);
+
+      return route;
     },
+    `${orderId}:${status}`,
+    { reloadToken },
   );
+  // A new object only when a line changed: the map fits its route again for every new one.
+  const route = useMemo(() => withCourierLine(routeLines, courierLeg), [routeLines, courierLeg]);
 
   return (
     <Section title={ORDER_DETAILS_TEXTS.SECTION_ROUTE}>
       <RouteMapView
         pickup={order.pickup}
         delivery={order.delivery}
-        route={routeLines}
+        route={route}
         className="h-40 lg:h-45"
       >
         {isSearching ? <SearchPulse point={order.pickup} /> : null}

@@ -9,6 +9,7 @@ import { ROLE } from '../src/shared/session/auth-user';
 import { stubMapbox } from './support/mapbox';
 import { buildTestOrderDetails, stubOrderCourier } from './support/order-details';
 import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
+import { stubOrderLive } from './support/app-socket';
 
 // How the order page of a client behaves when a request fails or is refused. The session, the
 // order, the courier and the route come from the stubbed API, the clock of the page is the test's.
@@ -30,6 +31,7 @@ test.beforeEach(async ({ page }) => {
   orderFailure = null;
   await page.clock.install();
   await stubMapbox(page);
+  await stubOrderLive(page);
   await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT]);
   await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.ME}`, (route) =>
     route.fulfill({ json: TEST_CLIENT }),
