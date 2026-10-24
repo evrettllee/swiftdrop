@@ -27,6 +27,8 @@ export type LiveOrder = {
   socket: AppSocketStub;
   status: OrderStatus;
   requests: number;
+  // When each request of the order came, by the clock of the test.
+  requestedAt: number[];
   isFailing: boolean;
 };
 
@@ -40,6 +42,7 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
     ),
     status: ORDER_STATUS.CONFIRMED,
     requests: 0,
+    requestedAt: [],
     isFailing: false,
   };
 
@@ -50,6 +53,7 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
   );
   await page.route(`**${API_BASE_PATH}/orders/${LIVE_ORDER_ID}`, (route) => {
     order.requests += 1;
+    order.requestedAt.push(Date.now());
 
     return order.isFailing
       ? route.fulfill({ status: 500, json: { message: 'Failure' } })
@@ -60,11 +64,15 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
   return order;
 }
 
-// Opens the order and waits until the page is in its room.
+// Opens the order and waits until the page is in its room and has loaded the order after the join.
 export async function openLiveOrder(page: Page, order: LiveOrder): Promise<void> {
   await page.goto(getOrderPath(LIVE_ORDER_ID));
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect.poll(() => order.socket.joins).toContain(LIVE_ORDER_ID);
+  const joinedAt = order.socket.joinedAt[order.socket.joins.indexOf(LIVE_ORDER_ID)];
+  await expect
+    .poll(() => order.requestedAt.some((requestedAt) => requestedAt >= joinedAt))
+    .toBe(true);
 }
 
 // The backend changes the status of the order and tells its room.

@@ -1,4 +1,5 @@
 import type { ClientOrderRoute, OrderStatus } from '@/shared/api';
+import { type Clock, PAGE_CLOCK } from '@/shared/lib/clock';
 import type { GeoPoint } from '@/shared/lib/geo';
 import type { CourierLeg } from '@/shared/realtime';
 import { COURIER_POSITION_STALE_MS } from '../config/tracking';
@@ -7,8 +8,6 @@ import {
   isFinishedStatus,
   NO_TRACKING,
   type OrderTrackingState,
-  PAGE_CLOCK,
-  type TrackingClock,
   withStatus,
 } from './tracking-state';
 
@@ -19,9 +18,9 @@ export class OrderTracking {
   private state: OrderTrackingState = NO_TRACKING;
   private readonly listeners = new Set<() => void>();
   private staleTimer: number | null = null;
-  private readonly clock: TrackingClock;
+  private readonly clock: Clock;
 
-  constructor(clock: TrackingClock = PAGE_CLOCK) {
+  constructor(clock: Clock = PAGE_CLOCK) {
     this.clock = clock;
   }
 

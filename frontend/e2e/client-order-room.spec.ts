@@ -3,6 +3,7 @@ import { ORDER_COURIER_TEXTS } from '../src/pages/order/config/tracking';
 import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { ORDER_JOIN_RETRY_FIRST_MS } from '../src/shared/realtime/order-join';
 import { SOCKET_EVENTS } from '../src/shared/realtime/socket-events';
+import { getOrderPath } from '../src/shared/routes/app-routes';
 import { LIVE_ORDER_ID, openLiveOrder, pushStatus, stubLiveOrder } from './support/live-order';
 
 // The room of the order: the page takes the valid events of its own order only, joins the room again
@@ -45,7 +46,8 @@ test('should join the room again and load the order after a lost connection', as
 
 test('should not ask again for a room of an order the backend does not find', async ({ page }) => {
   const order = await stubLiveOrder(page, { ok: false, reason: 'not_found' });
-  await openLiveOrder(page, order);
+  await page.goto(getOrderPath(LIVE_ORDER_ID));
+  await expect.poll(() => order.socket.joins).toContain(LIVE_ORDER_ID);
 
   // Past the first retry of a join that may pass.
   await page.waitForTimeout(ORDER_JOIN_RETRY_FIRST_MS + EVENT_WAIT_MS);
@@ -55,7 +57,7 @@ test('should not ask again for a room of an order the backend does not find', as
 
 test('should ask again later for a room the backend could not check', async ({ page }) => {
   const order = await stubLiveOrder(page, { ok: false, reason: 'unavailable' });
-  await openLiveOrder(page, order);
+  await page.goto(getOrderPath(LIVE_ORDER_ID));
 
   await expect
     .poll(() => order.socket.joins.length, { timeout: ORDER_JOIN_RETRY_FIRST_MS * 2 })

@@ -9,6 +9,12 @@ export function formatCourierVehicle(vehicle: CourierVehicle): string {
     .join(ORDER_COURIER_TEXTS.VEHICLE_SEPARATOR);
 }
 
+export function formatCourierVehicleShort(vehicle: CourierVehicle): string {
+  return [VEHICLE_TYPE_META[vehicle.type].label, vehicle.licensePlate ?? '']
+    .filter((part) => part !== '')
+    .join(ORDER_COURIER_TEXTS.VEHICLE_SEPARATOR);
+}
+
 // The first letters of the first two words: "Дмитрий С." is "ДС".
 export function getCourierInitials(name: string): string {
   return name

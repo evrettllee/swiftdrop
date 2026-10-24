@@ -17,21 +17,19 @@ type OrderLiveSource = {
 // The order as it changes while the page is open: the page is in the room of the order, and its
 // events reach the tracking and the chat. A new status loads the order and its courier again (the
 // event does not carry the history or the code). After a lost connection the events sent meanwhile
-// are gone, so the room is joined again and the order, its courier, its route (`reloadToken`) and
-// the newest page of the chat are loaded again. The chat exists from the assignment of a courier on.
+// are gone, so after every join of the room (the first one too) the order, its route and the
+// newest page of the chat are loaded again; the courier follows a new status of the order. The chat
+// exists from the assignment on.
 export function useOrderLive(orderId: number, { order, refresh, refreshCourier }: OrderLiveSource) {
-  const rejoins = useOrderRoom(isValidOrderId(orderId) ? orderId : null);
-  const reloadAfterRejoin = useEffectEvent(() => {
-    refresh();
-    refreshCourier();
-  });
+  const joins = useOrderRoom(isValidOrderId(orderId) ? orderId : null);
+  const reloadAfterJoin = useEffectEvent(refresh);
   const { tracking, state } = useOrderTracking(orderId, () => {
     refresh();
     refreshCourier();
   });
   const status = order?.status ?? null;
   const hasChat = status !== null && COURIER_VISIBLE_STATUSES.includes(status);
-  const chat = useOrderChat(hasChat ? orderId : null, CHAT_SENDER_ROLE.CLIENT, rejoins);
+  const chat = useOrderChat(hasChat ? orderId : null, CHAT_SENDER_ROLE.CLIENT, joins);
 
   useEffect(() => {
     if (order !== null) {
@@ -40,12 +38,12 @@ export function useOrderLive(orderId: number, { order, refresh, refreshCourier }
   }, [order, tracking]);
 
   useEffect(() => {
-    if (rejoins > 0) {
-      reloadAfterRejoin();
+    if (joins > 0) {
+      reloadAfterJoin();
     }
-  }, [rejoins]);
+  }, [joins]);
 
-  return { tracking, trackingState: state, routeReloadToken: rejoins, chat };
+  return { tracking, trackingState: state, routeReloadToken: joins, chat };
 }
 
 export type OrderLive = ReturnType<typeof useOrderLive>;

@@ -35,19 +35,6 @@ export const NO_TRACKING: OrderTrackingState = {
   isPositionStale: false,
 };
 
-// The time of the page; a test gives its own.
-export type TrackingClock = {
-  now: () => number;
-  setTimeout: (callback: () => void, delayMs: number) => number;
-  clearTimeout: (timer: number) => void;
-};
-
-export const PAGE_CLOCK: TrackingClock = {
-  now: () => Date.now(),
-  setTimeout: (callback, delayMs) => window.setTimeout(callback, delayMs),
-  clearTimeout: (timer) => window.clearTimeout(timer),
-};
-
 // The order is over: no courier moves for it any more (FINISHED_STATUSES of the backend).
 const FINISHED: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,

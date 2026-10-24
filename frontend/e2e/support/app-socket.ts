@@ -20,6 +20,8 @@ export type AppSocketStub = {
   sent: string[];
   // The orders the page asked to join, in the order of the requests, after reconnections too.
   joins: number[];
+  // When each join was answered, by the clock of the test.
+  joinedAt: number[];
   // Sends an event of the backend to the page.
   push: (event: string, payload: object) => void;
   // Closes the connection as a lost network does: socket.io opens it again by itself.
@@ -55,6 +57,7 @@ export async function stubAppSocket(
   const socket: AppSocketStub = {
     sent: [],
     joins: [],
+    joinedAt: [],
     push: (event, payload) => route?.send(`${EVENT_PREFIX}${JSON.stringify([event, payload])}`),
     drop: async () => route?.close(),
   };
@@ -75,6 +78,7 @@ export async function stubAppSocket(
       } else if (withAck?.event === SOCKET_EVENTS.ORDER_JOIN) {
         const { orderId } = withAck.payload as { orderId: number };
         socket.joins.push(orderId);
+        socket.joinedAt.push(Date.now());
         opened.send(`${ACK_PREFIX}${withAck.ackId}${JSON.stringify([answerJoin(orderId)])}`);
       }
     });

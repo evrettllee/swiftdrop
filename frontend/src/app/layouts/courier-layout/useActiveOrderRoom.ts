@@ -8,7 +8,7 @@ import { useOrderRoom } from '@/shared/realtime';
 // The chat of the order is kept from its newest page on and loaded again after a lost connection.
 export function useActiveOrderRoom(): void {
   const activeOrderId = useCourierProfile()?.activeOrderId ?? null;
-  const rejoins = useOrderRoom(activeOrderId);
+  const joins = useOrderRoom(activeOrderId);
 
-  useOrderChat(activeOrderId, CHAT_SENDER_ROLE.COURIER, rejoins);
+  useOrderChat(activeOrderId, CHAT_SENDER_ROLE.COURIER, joins);
 }

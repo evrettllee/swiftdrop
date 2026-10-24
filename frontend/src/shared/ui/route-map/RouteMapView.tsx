@@ -17,6 +17,7 @@ type RouteMapViewProps = {
   delivery: GeoPoint;
   // The trip of the parcel and the way of its courier, along the roads, when they are there.
   route: MapRoute;
+  courierPoint?: GeoPoint | null;
   // The parent sets the height of the map.
   className: string;
   // More layers of the map, for example a pulse under the pickup point (SearchPulse).
@@ -26,14 +27,21 @@ type RouteMapViewProps = {
 // The route of an order to look at: the points cannot be moved. It is a map like the others of the
 // cabinet (MovableMapFrame): it moves, zooms and takes the full screen, and the route fills it when
 // it opens and in or out of the full screen.
-export function RouteMapView({ pickup, delivery, route, className, children }: RouteMapViewProps) {
+export function RouteMapView({
+  pickup,
+  delivery,
+  route,
+  courierPoint = null,
+  className,
+  children,
+}: RouteMapViewProps) {
   const frame = useMovableMap();
   // After useMovableMap: the route is fitted to the map once Leaflet knows its new size.
   useFitRoute(
     frame.map,
     pickup,
     delivery,
-    null,
+    courierPoint,
     frame.isFullscreen,
     route.lines,
     MAP_VIEW_CONTROLS_FIT_PADDING,

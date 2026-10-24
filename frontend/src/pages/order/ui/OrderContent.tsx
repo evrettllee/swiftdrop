@@ -1,32 +1,28 @@
 import { useState } from 'react';
 import type { ClientOrderCourier, OrderDetails } from '@/shared/api';
+import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 import { Divider } from '@/shared/ui/divider';
+import { useChatParam } from '../model/useChatParam';
 import type { OrderLive } from '../model/useOrderLive';
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { OrderCourier } from './OrderCourier';
 import { OrderDeliveryCode } from './OrderDeliveryCode';
 import { OrderHeader } from './OrderHeader';
-import { OrderPaymentAlert } from './OrderPaymentAlert';
 import { OrderPaymentPanel } from './OrderPaymentPanel';
 import { OrderProgress } from './OrderProgress';
 import { OrderRecipient } from './OrderRecipient';
 import { OrderRoute } from './OrderRoute';
-import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
+import { OrderStatusLine } from './OrderStatusLine';
 
 type OrderContentProps = {
   order: OrderDetails;
   courier: ClientOrderCourier['courier'];
-  // Only what the backend gave for this status; null while there is nothing to show.
   deliveryCode: string | null;
   paymentReturn: { isChecking: boolean; isFailed: boolean };
-  // The order as its room changes it: the line of the courier for the map.
   live: OrderLive;
   onReload: () => void;
 };
 
-// The order of the client. A phone has one column: the code and the courier come first, as what
-// the client needs when the courier is near. The desktop has the details on the left and the code
-// with the payment on the right.
 export function OrderContent({
   order,
   courier,
@@ -36,6 +32,7 @@ export function OrderContent({
   onReload,
 }: OrderContentProps) {
   const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const { openChat } = useChatParam();
 
   function handleCancelled(): void {
     setIsCancelOpen(false);
@@ -45,32 +42,29 @@ export function OrderContent({
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
       <OrderHeader order={order} />
-      <OrderPaymentAlert
-        order={order}
-        isChecking={paymentReturn.isChecking}
-        isFailed={paymentReturn.isFailed}
-      />
       <div className={SIDE_COLUMN_LAYOUT_CLASS}>
-        <div className={`${MAIN_COLUMN_CLASS} flex flex-col gap-6 lg:gap-8`}>
+        <div className={`contents lg:flex lg:flex-col lg:gap-8 ${MAIN_COLUMN_CLASS}`}>
+          <OrderStatusLine
+            order={order}
+            paymentReturn={paymentReturn}
+            tracking={live.trackingState}
+          />
+          <OrderRoute order={order} live={live} vehicleType={courier?.vehicle?.type ?? null} />
           {courier === null ? null : (
             <>
-              <OrderCourier courier={courier} />
               <Divider />
+              <OrderCourier
+                courier={courier}
+                unreadCount={live.chat.unreadCount}
+                onChat={openChat}
+              />
             </>
           )}
-          <OrderProgress order={order} />
           <Divider />
-          <OrderRoute
-            order={order}
-            tracking={live.tracking}
-            courierLeg={live.trackingState.courierLeg}
-            reloadToken={live.routeReloadToken}
-          />
+          <OrderProgress order={order} />
           <Divider />
           <OrderRecipient order={order} />
         </div>
-        {/* On a phone the column does not exist: the code (first) and the payment are placed in
-            the one column of the page. */}
         <div className={`contents lg:flex lg:flex-col lg:gap-6 ${SIDE_COLUMN_CLASS}`}>
           {deliveryCode === null ? null : <OrderDeliveryCode code={deliveryCode} />}
           <OrderPaymentPanel

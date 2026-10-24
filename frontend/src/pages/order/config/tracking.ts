@@ -16,6 +16,11 @@ export const ORDER_COURIER_TEXTS = {
   SEARCHING: 'Ищем курьера рядом с точкой забора',
   // The type of the transport and its details are one line: "Легковой, Skoda Octavia, 1234 AB-7".
   VEHICLE_SEPARATOR: ', ',
+  CALL: 'Позвонить курьеру',
+  CHAT: 'Чат с курьером',
+  chatUnread: (count: number) => `Чат с курьером, непрочитанных сообщений: ${count}`,
+  markerMinutes: (minutes: number) => `${minutes} мин`,
+  MARKER_OFFLINE: 'нет связи',
   CODE_SECTION: 'Код для курьера',
   CODE_HINT: 'Курьер спросит код при вручении. Не называйте его заранее.',
   // For example "Код 4 8 2 7": the digits are read one by one.

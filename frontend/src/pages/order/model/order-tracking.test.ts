@@ -2,44 +2,12 @@ import { expect, test } from '@playwright/test';
 import { type ClientOrderRoute, ORDER_STATUS, ROUTE_SEGMENT_KIND } from '@/shared/api';
 import { COURIER_LEG_TARGET } from '@/shared/realtime';
 import { COURIER_POSITION_STALE_MS } from '../config/tracking';
+import { FakeClock } from '@/shared/lib/clock';
 import { OrderTracking } from './order-tracking';
-import type { TrackingClock } from './tracking-state';
 
 const START_MS = Date.parse('2026-10-24T12:00:00Z');
 const POINT = { latitude: 53.9, longitude: 27.55 };
 const LEG = { geometry: 'leg', toPoint: COURIER_LEG_TARGET.PICKUP };
-
-// A clock the test moves by hand: timers fire only when the time passes them.
-class FakeClock implements TrackingClock {
-  private nowMs = START_MS;
-  private nextId = 1;
-  private readonly timers = new Map<number, { atMs: number; callback: () => void }>();
-
-  now = (): number => this.nowMs;
-
-  setTimeout = (callback: () => void, delayMs: number): number => {
-    const id = this.nextId;
-    this.nextId += 1;
-    this.timers.set(id, { atMs: this.nowMs + delayMs, callback });
-
-    return id;
-  };
-
-  clearTimeout = (timer: number): void => {
-    this.timers.delete(timer);
-  };
-
-  advance(ms: number): void {
-    this.nowMs += ms;
-
-    for (const [id, { atMs, callback }] of this.timers) {
-      if (atMs <= this.nowMs) {
-        this.timers.delete(id);
-        callback();
-      }
-    }
-  }
-}
 
 function at(offsetMs: number): Date {
   return new Date(START_MS + offsetMs);
@@ -53,7 +21,10 @@ function route(courierPosition: ClientOrderRoute['courierPosition']): ClientOrde
   };
 }
 
-function assigned(clock = new FakeClock()): { tracking: OrderTracking; clock: FakeClock } {
+function assigned(clock = new FakeClock(START_MS)): {
+  tracking: OrderTracking;
+  clock: FakeClock;
+} {
   const tracking = new OrderTracking(clock);
   tracking.applyStatus(ORDER_STATUS.COURIER_ASSIGNED, at(30 * 60_000));
 

@@ -42,12 +42,18 @@ export function buildTestOrderDetails(
 export const COURIER_NAME = 'Дмитрий С.';
 // Four digits the page shows as "Код 4 8 2 7".
 export const DELIVERY_CODE = '4827';
+export const COURIER_PHONE = '+375295551234';
 
 const COURIER_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.COURIER_ASSIGNED,
   ORDER_STATUS.PICKED_UP,
   ORDER_STATUS.IN_TRANSIT,
   ORDER_STATUS.DELIVERED,
+];
+const CONTACT_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
 ];
 const CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.PICKED_UP,
@@ -67,6 +73,7 @@ export function buildTestOrderCourier(status: OrderStatus) {
             model: 'Octavia',
             licensePlate: '1234 AB-7',
           },
+          ...(CONTACT_STATUSES.includes(status) ? { phone: COURIER_PHONE } : {}),
         }
       : null,
     deliveryCode: CODE_VISIBLE_STATUSES.includes(status) ? DELIVERY_CODE : null,

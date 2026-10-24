@@ -71,6 +71,68 @@
   stroke-linejoin: miter;
 }
 
+.route-line--live {
+  stroke-dasharray: none;
+}
+
+.courier-eta {
+  background: none;
+  border: none;
+  transition: transform 1s linear;
+}
+
+.leaflet-zoom-anim .courier-eta {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .courier-eta {
+    transition: none;
+  }
+}
+
+.courier-eta__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  white-space: nowrap;
+  background: var(--surface);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-md-value);
+}
+
+.courier-eta__pill:has(.courier-eta__text) {
+  padding-inline-end: 16px;
+}
+
+.courier-eta__circle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--on-primary);
+  background: var(--primary);
+  border-radius: 9999px;
+}
+
+.courier-eta__text {
+  color: var(--fg);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.courier-eta--offline .courier-eta__circle {
+  background: var(--fg-muted);
+}
+
+.courier-eta--offline .courier-eta__text {
+  color: var(--fg-secondary);
+  font-weight: 400;
+}
+
 /* The attribution is required by the licenses of the data and the tiles, so it is only restyled. */
 .leaflet-container .leaflet-control.leaflet-control-attribution {
   margin: 0 16px 16px 0;

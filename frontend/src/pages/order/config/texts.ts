@@ -51,7 +51,7 @@ export const PAYMENT_TEXTS = {
   pay: (amount: string) => `Оплатить ${amount}`,
 } as const;
 
-export const PAYMENT_ALERT_TEXTS = {
+export const STATUS_LINE_TEXTS = {
   WAITING_TITLE: 'Заказ ждёт оплаты',
   waiting: (time: string) => `Оплатите до ${time}, иначе заказ отменится автоматически.`,
   FAILED_TITLE: 'Платёж не прошёл',
@@ -59,4 +59,22 @@ export const PAYMENT_ALERT_TEXTS = {
     `Деньги не списаны. Попробуйте ещё раз до ${time}, иначе заказ отменится автоматически.`,
   CHECKING_TITLE: 'Проверяем оплату',
   CHECKING: 'Это займёт несколько секунд.',
+  SEARCHING: 'Как только курьер примет заказ, он появится на карте.',
+  pickupIn: (minutes: number) => `Курьер приедет за посылкой через ${minutes} мин`,
+  deliveryIn: (minutes: number) => `Курьер привезёт посылку через ${minutes} мин`,
+  deliveryBy: (time: string) => `Доставка ориентировочно к ${time}`,
+  HEADING_TO_PICKUP: 'Курьер едет за посылкой',
+  CARRYING: 'Курьер везёт посылку',
+  OFFLINE_TITLE: 'Нет связи с курьером',
+  offline: (minutes: number) =>
+    `Обновлено ${minutes} мин назад. Время уточнится, когда связь вернётся.`,
+  deliveredAt: (time: string) => `Доставлен в ${time}`,
+  DELIVERED: 'Доставлен',
+  recipient: (name: string) => `Получатель: ${name}`,
+  CANCELLED_TITLE: 'Заказ отменён',
+  REFUNDED: 'Оплата возвращена на карту.',
+  UNPAID_EXPIRED: (minutes: number) => `Не оплачен за ${minutes} минут`,
+  UNPAID_CANCELLED: 'Деньги не списаны.',
+  REJECTED_TITLE: 'Заказ отклонён',
+  REJECTED_REFUND: 'Деньги вернутся на карту',
 } as const;

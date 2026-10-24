@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { MAP_FRAME_CLASS } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { Skeleton } from '@/shared/ui/skeleton';
 
@@ -7,10 +8,6 @@ import { Skeleton } from '@/shared/ui/skeleton';
 const PositionMap = lazy(() =>
   import('@/shared/ui/route-map').then((module) => ({ default: module.PositionMap })),
 );
-
-// The size of the map block, the same for the map and for its placeholder: the nearest steps of the
-// scale to the 163.2 and 280.8px of the design.
-const MAP_FRAME_CLASS = 'h-40.75 lg:h-70.25';
 
 type CourierLocationMapProps = {
   // Null until the backend took the first position.
