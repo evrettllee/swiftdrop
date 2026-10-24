@@ -2,16 +2,13 @@ import { ChatTextIcon, PhoneIcon } from '@phosphor-icons/react';
 import { type Ref, useId } from 'react';
 import type { ClientOrderCourier } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { getNameInitials } from '@/shared/lib/format';
 import { Avatar } from '@/shared/ui/avatar';
 import { CountBadge } from '@/shared/ui/badge';
 import { OutlineIconButton, OutlineIconLink } from '@/shared/ui/icon-button';
 import { Section } from '@/shared/ui/section';
 import { ORDER_COURIER_TEXTS } from '../config/tracking';
-import {
-  formatCourierVehicle,
-  formatCourierVehicleShort,
-  getCourierInitials,
-} from '../lib/courier';
+import { formatCourierVehicle, formatCourierVehicleShort } from '../lib/courier';
 
 type OrderCourierProps = {
   courier: NonNullable<ClientOrderCourier['courier']>;
@@ -37,7 +34,7 @@ export function OrderCourier({
   return (
     <Section title={ORDER_COURIER_TEXTS.SECTION}>
       <div className="flex items-center gap-3">
-        <Avatar initials={getCourierInitials(courier.name)} />
+        <Avatar initials={getNameInitials(courier.name)} />
         <div className="flex min-w-0 flex-1 flex-col">
           <span>{courier.name}</span>
           {vehicle === null ? null : (

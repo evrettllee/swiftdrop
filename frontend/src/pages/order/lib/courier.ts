@@ -14,14 +14,3 @@ export function formatCourierVehicleShort(vehicle: CourierVehicle): string {
     .filter((part) => part !== '')
     .join(ORDER_COURIER_TEXTS.VEHICLE_SEPARATOR);
 }
-
-// The first letters of the first two words: "Дмитрий С." is "ДС".
-export function getCourierInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter((word) => word !== '')
-    .slice(0, 2)
-    .map((word) => word.charAt(0))
-    .join('')
-    .toUpperCase();
-}

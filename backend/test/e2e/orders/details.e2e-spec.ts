@@ -87,6 +87,7 @@ describe('Order details (e2e)', () => {
         ...MINSK_DELIVERY,
       },
       history: [{ status: ORDER_STATUS.PENDING, changedAt: expect.any(String) }],
+      cancelledBy: null,
       payment: null,
     });
   });
@@ -109,7 +110,10 @@ describe('Order details (e2e)', () => {
     const { cookies } = await registerUser(app);
     const [orderId] = await placeOrders(app, cookies, 1);
     const movedAt = new Date(Date.now() + 90 * MS_PER_MINUTE);
-    await db.update(orders).set({ estimatedDeliveryAt: movedAt }).where(eq(orders.orderId, orderId));
+    await db
+      .update(orders)
+      .set({ estimatedDeliveryAt: movedAt })
+      .where(eq(orders.orderId, orderId));
 
     const response = await getOrder(cookies, orderId).expect(HttpStatus.OK);
 

@@ -64,6 +64,7 @@ export type { OrderDetails, OrderListItem, OrderStatus } from './endpoints/order
 export {
   dateSchema,
   ORDER_CANCEL_SEGMENT,
+  ORDER_CANCELLED_BY,
   ORDER_STATUS,
   orderDetailsSchema,
   orderListItemSchema,

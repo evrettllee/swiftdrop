@@ -6,11 +6,11 @@ import {
   type ChatPerson,
   ChatScreen,
   type OrderChat as OrderChatModel,
+  type OrderChatView,
 } from '@/features/order-chat';
 import type { ClientOrderCourier } from '@/shared/api';
+import { getNameInitials } from '@/shared/lib/format';
 import { ORDER_COURIER_TEXTS } from '../config/tracking';
-import { getCourierInitials } from '../lib/courier';
-import type { OrderChatView } from '../model/useOrderChatView';
 
 type OrderChatProps = {
   chat: OrderChatModel;
@@ -27,7 +27,7 @@ function toPerson(courier: OrderChatProps['courier']): ChatPerson {
   ].filter((part) => part !== '');
 
   return {
-    initials: getCourierInitials(courier.name),
+    initials: getNameInitials(courier.name),
     name: courier.name,
     details: details.join(ORDER_COURIER_TEXTS.VEHICLE_SEPARATOR),
   };

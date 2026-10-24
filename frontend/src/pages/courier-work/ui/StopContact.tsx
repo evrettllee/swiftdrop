@@ -1,4 +1,5 @@
 import { NavigationArrowIcon, PhoneIcon } from '@phosphor-icons/react';
+import type { ReactNode } from 'react';
 import { useCourierPosition } from '@/entities/courier';
 import type { VehicleType } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
@@ -16,11 +17,19 @@ type StopContactProps = {
   callLabel: string;
   point: GeoPoint;
   vehicle: VehicleType;
+  chatButton: ReactNode;
 };
 
 // The person at the point and the two ways to reach it: the navigator from where the courier is,
 // and a call. Without a phone there is nothing to show or to call.
-export function StopContact({ role, contact, callLabel, point, vehicle }: StopContactProps) {
+export function StopContact({
+  role,
+  contact,
+  callLabel,
+  point,
+  vehicle,
+  chatButton,
+}: StopContactProps) {
   const { phone } = contact;
   const position = useCourierPosition();
 
@@ -60,6 +69,7 @@ export function StopContact({ role, contact, callLabel, point, vehicle }: StopCo
             {ORDER_TEXTS.CALL}
           </LinkButton>
         )}
+        {chatButton}
       </div>
     </>
   );

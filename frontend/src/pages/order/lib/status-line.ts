@@ -1,4 +1,9 @@
-import { ORDER_STATUS, type OrderDetails, type OrderStatus } from '@/shared/api';
+import {
+  ORDER_CANCELLED_BY,
+  ORDER_STATUS,
+  type OrderDetails,
+  type OrderStatus,
+} from '@/shared/api';
 import { MS_PER_MINUTE } from '@/shared/config';
 import { formatTime } from '@/shared/lib/format';
 import { PAYMENT_VIEW } from '../config/payment';
@@ -77,16 +82,11 @@ function courierLine({ order, tracking, nowMs }: StatusLineSource): StatusLine {
 }
 
 function cancelledLine(order: OrderDetails): StatusLine {
-  const view = getPaymentView(order);
-  const cancelledAt = reachedAt(order, ORDER_STATUS.CANCELLED);
-  const isExpired =
-    cancelledAt !== null &&
-    cancelledAt.getTime() - order.createdAt.getTime() >= UNPAID_ORDER_TTL_MINUTES * MS_PER_MINUTE;
   let text: string = T.UNPAID_CANCELLED;
 
-  if (view !== PAYMENT_VIEW.UNPAID) {
+  if (getPaymentView(order) !== PAYMENT_VIEW.UNPAID) {
     text = T.REFUNDED;
-  } else if (isExpired) {
+  } else if (order.cancelledBy === ORDER_CANCELLED_BY.SYSTEM) {
     text = T.UNPAID_EXPIRED(UNPAID_ORDER_TTL_MINUTES);
   }
 

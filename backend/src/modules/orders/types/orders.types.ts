@@ -1,5 +1,6 @@
 import type { OrderStatus } from '../../../common/enums/order-status.enum';
 import type { PaymentStatus } from '../../../common/enums/payment-status.enum';
+import type { ORDER_CANCELLED_BY } from '../constants/orders.constants';
 
 export type CreatedOrder = {
   orderId: number;
@@ -52,6 +53,17 @@ export type OrderHistoryEntry = {
   changedAt: Date;
 };
 
+export type OrderHistoryRow = OrderHistoryEntry & {
+  changedBy: number | null;
+};
+
+export type OrderCancelledBy = (typeof ORDER_CANCELLED_BY)[keyof typeof ORDER_CANCELLED_BY];
+
+export type OrderHistoryView = {
+  history: OrderHistoryEntry[];
+  cancelledBy: OrderCancelledBy | null;
+};
+
 export type OrderPaymentView = {
   status: PaymentStatus;
   amountUsd: number;
@@ -74,6 +86,7 @@ export type OrderDetails = {
   pickup: OrderPointView;
   delivery: OrderPointView;
   history: OrderHistoryEntry[];
+  cancelledBy: OrderCancelledBy | null;
   payment: OrderPaymentView | null;
 };
 

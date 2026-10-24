@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { useOrderChatView } from '@/features/order-chat';
 import type { ClientOrderCourier, OrderDetails } from '@/shared/api';
 import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 import { Divider } from '@/shared/ui/divider';
-import { useOrderChatView } from '../model/useOrderChatView';
 import type { OrderLive } from '../model/useOrderLive';
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { OrderChat } from './OrderChat';

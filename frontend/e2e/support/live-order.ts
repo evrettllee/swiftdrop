@@ -1,6 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 import { AUTH_API_PATHS } from '../../src/shared/api/endpoints/auth';
-import { ORDER_STATUS, type OrderStatus } from '../../src/shared/api/endpoints/order';
+import {
+  ORDER_STATUS,
+  type OrderDetails,
+  type OrderStatus,
+} from '../../src/shared/api/endpoints/order';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';
 import { SOCKET_EVENTS } from '../../src/shared/realtime/socket-events';
 import { getOrderPath } from '../../src/shared/routes/app-routes';
@@ -26,6 +30,7 @@ const TEST_CLIENT = {
 export type LiveOrder = {
   socket: AppSocketStub;
   status: OrderStatus;
+  cancelledBy: OrderDetails['cancelledBy'];
   requests: number;
   // When each request of the order came, by the clock of the test.
   requestedAt: number[];
@@ -41,6 +46,7 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
       joinAnswer === undefined ? {} : { answerJoin: () => joinAnswer },
     ),
     status: ORDER_STATUS.CONFIRMED,
+    cancelledBy: null,
     requests: 0,
     requestedAt: [],
     isFailing: false,
@@ -57,7 +63,12 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
 
     return order.isFailing
       ? route.fulfill({ status: 500, json: { message: 'Failure' } })
-      : route.fulfill({ json: buildTestOrderDetails(LIVE_ORDER_ID, order.status) });
+      : route.fulfill({
+          json: {
+            ...buildTestOrderDetails(LIVE_ORDER_ID, order.status),
+            cancelledBy: order.cancelledBy,
+          },
+        });
   });
   await stubOrderCourier(page, LIVE_ORDER_ID, () => order.status);
 

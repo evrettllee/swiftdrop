@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { ORDER_COURIER_TEXTS } from '../src/pages/order/config/tracking';
-import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
+import { ORDER_CANCELLED_BY, ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { MAP_CLASS, MAP_TEXTS } from '../src/shared/ui/route-map/map';
 import { LIVE_ORDER_ID, openLiveOrder, stubLiveOrder } from './support/live-order';
 import { COURIER_PHONE } from './support/order-details';
@@ -76,6 +76,19 @@ test('should show when the order was delivered and to whom, the addresses and no
   await expect(page.getByText('Откуда')).toBeVisible();
   await expect(page.getByRole('link', { name: ORDER_COURIER_TEXTS.CALL })).toHaveCount(0);
   await expect(page.getByRole('button', { name: ORDER_COURIER_TEXTS.CHAT })).toBeVisible();
+});
+
+test('should say the unpaid order was cancelled by the time limit only when the system did it', async ({
+  page,
+}) => {
+  const order = await stubLiveOrder(page);
+  order.status = ORDER_STATUS.CANCELLED;
+  order.cancelledBy = ORDER_CANCELLED_BY.SYSTEM;
+  await openLiveOrder(page, order);
+
+  await expect(statusLine(page, 'Заказ отменён')).toBeVisible();
+  await expect(page.getByText('Не оплачен за 30 минут')).toBeVisible();
+  await expect(orderMap(page)).toHaveCount(0);
 });
 
 test('should call the courier and open the chat with the unread messages counted', async ({

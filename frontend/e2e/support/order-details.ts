@@ -35,6 +35,7 @@ export function buildTestOrderDetails(
     pickup: { ...SVERDLOVA, city: CITY, apartment: null },
     delivery: { ...PRITYTSKOGO, city: CITY, apartment: '4' },
     history: [{ status, changedAt: createdAt }],
+    cancelledBy: null,
     payment: null,
   };
 }

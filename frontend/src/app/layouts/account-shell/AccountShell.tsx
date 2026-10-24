@@ -30,7 +30,7 @@ export function AccountShell({ homeTo, navLabel, navItems, headerEnd }: AccountS
       <SkipLink />
       <AccountSidebar homeTo={homeTo} navLabel={navLabel} items={navItems} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <AccountMobileHeader homeTo={homeTo} end={headerEnd} />
+        <AccountMobileHeader homeTo={homeTo} end={isChatOpen ? undefined : headerEnd} />
         {/* A column, so that a loader of a page can fill the space between the header and the
             bottom navigation (flex-1) and stand in its center. */}
         <main id={MAIN_CONTENT_ID} className="flex flex-1 flex-col px-4 pt-4 pb-24 lg:p-12">
