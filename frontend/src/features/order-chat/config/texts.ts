@@ -1,0 +1,15 @@
+export const CHAT_TEXTS = {
+  MESSAGES: 'Сообщения',
+  TODAY: 'Сегодня',
+  EMPTY: 'Сообщений пока нет',
+  QUICK_REPLIES: 'Быстрые ответы',
+  PLACEHOLDER: 'Сообщение',
+  SEND: 'Отправить',
+  CLOSE: 'Закрыть чат',
+  BACK: 'К заказу',
+  CLOSED: 'Заказ завершён, писать больше нельзя',
+  READ: 'Прочитано',
+  SENT: 'Отправлено',
+  SEND_FAILED: 'Не удалось отправить сообщение. Попробуйте ещё раз',
+  incoming: (text: string) => `Новое сообщение: ${text}`,
+} as const;

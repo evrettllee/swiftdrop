@@ -2,9 +2,10 @@ import { useState } from 'react';
 import type { ClientOrderCourier, OrderDetails } from '@/shared/api';
 import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 import { Divider } from '@/shared/ui/divider';
-import { useChatParam } from '../model/useChatParam';
+import { useOrderChatView } from '../model/useOrderChatView';
 import type { OrderLive } from '../model/useOrderLive';
 import { CancelOrderDialog } from './CancelOrderDialog';
+import { OrderChat } from './OrderChat';
 import { OrderCourier } from './OrderCourier';
 import { OrderDeliveryCode } from './OrderDeliveryCode';
 import { OrderHeader } from './OrderHeader';
@@ -32,11 +33,15 @@ export function OrderContent({
   onReload,
 }: OrderContentProps) {
   const [isCancelOpen, setIsCancelOpen] = useState(false);
-  const { openChat } = useChatParam();
+  const chatView = useOrderChatView(courier !== null);
 
   function handleCancelled(): void {
     setIsCancelOpen(false);
     onReload();
+  }
+
+  if (courier !== null && chatView.isScreenOpen) {
+    return <OrderChat chat={live.chat} courier={courier} view={chatView} />;
   }
 
   return (
@@ -56,7 +61,10 @@ export function OrderContent({
               <OrderCourier
                 courier={courier}
                 unreadCount={live.chat.unreadCount}
-                onChat={openChat}
+                chatButtonRef={chatView.chatButtonRef}
+                isChatOpen={chatView.isOpen}
+                chatId={chatView.chatId}
+                onChatToggle={chatView.isOpen ? chatView.closeChat : chatView.openChat}
               />
             </>
           )}
@@ -80,6 +88,9 @@ export function OrderContent({
         onClose={() => setIsCancelOpen(false)}
         onCancelled={handleCancelled}
       />
+      {courier !== null && chatView.isDrawerOpen ? (
+        <OrderChat chat={live.chat} courier={courier} view={chatView} />
+      ) : null}
     </div>
   );
 }

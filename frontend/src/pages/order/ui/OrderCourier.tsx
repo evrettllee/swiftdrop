@@ -1,4 +1,5 @@
 import { ChatTextIcon, PhoneIcon } from '@phosphor-icons/react';
+import { type Ref, useId } from 'react';
 import type { ClientOrderCourier } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { Avatar } from '@/shared/ui/avatar';
@@ -15,10 +16,21 @@ import {
 type OrderCourierProps = {
   courier: NonNullable<ClientOrderCourier['courier']>;
   unreadCount: number;
-  onChat: () => void;
+  chatButtonRef: Ref<HTMLButtonElement>;
+  isChatOpen: boolean;
+  chatId: string;
+  onChatToggle: () => void;
 };
 
-export function OrderCourier({ courier, unreadCount, onChat }: OrderCourierProps) {
+export function OrderCourier({
+  courier,
+  unreadCount,
+  chatButtonRef,
+  isChatOpen,
+  chatId,
+  onChatToggle,
+}: OrderCourierProps) {
+  const unreadId = useId();
   const vehicle = courier.vehicle === null ? null : formatCourierVehicle(courier.vehicle);
   const shortVehicle = courier.vehicle === null ? null : formatCourierVehicleShort(courier.vehicle);
 
@@ -41,14 +53,21 @@ export function OrderCourier({ courier, unreadCount, onChat }: OrderCourierProps
           </OutlineIconLink>
         )}
         <OutlineIconButton
-          aria-label={
-            unreadCount > 0 ? ORDER_COURIER_TEXTS.chatUnread(unreadCount) : ORDER_COURIER_TEXTS.CHAT
-          }
-          onClick={onChat}
+          ref={chatButtonRef}
+          aria-label={ORDER_COURIER_TEXTS.CHAT}
+          aria-describedby={unreadCount > 0 ? unreadId : undefined}
+          aria-expanded={isChatOpen}
+          aria-controls={isChatOpen ? chatId : undefined}
+          onClick={onChatToggle}
         >
           <ChatTextIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
           <CountBadge count={unreadCount} />
         </OutlineIconButton>
+        {unreadCount > 0 ? (
+          <span id={unreadId} className="sr-only">
+            {ORDER_COURIER_TEXTS.chatUnread(unreadCount)}
+          </span>
+        ) : null}
       </div>
     </Section>
   );

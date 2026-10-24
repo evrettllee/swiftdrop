@@ -92,10 +92,13 @@ test('should call the courier and open the chat with the unread messages counted
     'href',
     `tel:${COURIER_PHONE}`,
   );
-  const chat = page.getByRole('button', { name: ORDER_COURIER_TEXTS.chatUnread(2) });
+  const chat = page.getByRole('button', { name: ORDER_COURIER_TEXTS.CHAT });
   await expect(chat).toHaveText('2');
+  await expect(chat).toHaveAccessibleDescription(ORDER_COURIER_TEXTS.chatUnread(2));
+  await expect(chat).toHaveAttribute('aria-expanded', 'false');
   await chat.click();
   await expect(page).toHaveURL(/[?&]chat=1(&|$)/);
+  await expect(chat).toHaveAttribute('aria-expanded', 'true');
 });
 
 test('should put the code right after the status line and the payment last on a phone', async ({

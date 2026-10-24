@@ -5,7 +5,8 @@ import {
   WifiXIcon,
   XCircleIcon,
 } from '@phosphor-icons/react';
-import type { OrderDetails } from '@/shared/api';
+import { useState } from 'react';
+import type { OrderDetails, OrderStatus } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { getStatusLine, STATUS_LINE_ICON, type StatusLineIcon } from '../lib/status-line';
 import { getStatusLineAnchorMs } from '../lib/status-line-anchor';
@@ -25,13 +26,24 @@ type OrderStatusLineProps = {
   tracking: OrderTrackingState;
 };
 
+function useStatusAnnouncement(status: OrderStatus, title: string): string {
+  const [announced, setAnnounced] = useState({ status, text: '' });
+
+  if (announced.status !== status) {
+    setAnnounced({ status, text: title });
+  }
+
+  return announced.text;
+}
+
 export function OrderStatusLine({ order, paymentReturn, tracking }: OrderStatusLineProps) {
   const nowMs = useMinuteNow(getStatusLineAnchorMs({ order, tracking }));
   const line = getStatusLine({ order, payment: paymentReturn, tracking, nowMs });
   const look = line.icon === null ? null : ICONS[line.icon];
+  const announcement = useStatusAnnouncement(order.status, line.title);
 
   return (
-    <section aria-live="polite" className="order-first flex flex-col gap-1 lg:order-none">
+    <section className="order-first flex flex-col gap-1 lg:order-none">
       <div className="flex items-center gap-2">
         {look === null ? null : (
           <look.icon
@@ -46,6 +58,9 @@ export function OrderStatusLine({ order, paymentReturn, tracking }: OrderStatusL
       {line.text === null ? null : (
         <p className="text-small text-pretty text-fg-secondary tabular-nums">{line.text}</p>
       )}
+      <p aria-live="polite" className="sr-only">
+        {announcement}
+      </p>
     </section>
   );
 }

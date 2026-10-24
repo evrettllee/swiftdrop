@@ -1,14 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { type ChatMessage, type ChatSenderRole, getChatHistory } from '@/shared/api';
+import { type ChatSenderRole, getChatHistory } from '@/shared/api';
 import { onOrderEvent, SOCKET_EVENTS } from '@/shared/realtime';
-import {
-  type ChatState,
-  EMPTY_CHAT,
-  withLatestPage,
-  withMessage,
-  withRead,
-  withReadResult,
-} from './chat-store';
+import { type ChatState, EMPTY_CHAT, withLatestPage, withMessage, withRead } from './chat-store';
+import { useChatReadMarking, useChatSending, useOlderPages } from './useChatActions';
 
 type StoredChat = ChatState & { orderId: number | null };
 type ChatUpdate = (change: (state: ChatState) => ChatState) => void;
@@ -79,22 +73,28 @@ export function useOrderChat(orderId: number | null, ownRole: ChatSenderRole, re
     [orderId],
   );
 
-  useLatestPage(orderId, reloadToken, update);
+  const [conflicts, setConflicts] = useState(0);
+
+  useLatestPage(orderId, reloadToken + conflicts, update);
   useChatEvents(orderId, ownRole, update);
 
   const chat = stored.orderId === orderId ? stored : NO_CHAT;
+  const older = useOlderPages(orderId, chat.nextBeforeId, update);
+  const sending = useChatSending(orderId, ownRole, update, () =>
+    setConflicts((count) => count + 1),
+  );
+  const markRead = useChatReadMarking(orderId, ownRole, update);
 
   return {
+    ownRole,
     messages: chat.messages,
     unreadCount: chat.unreadCount,
     canSend: chat.canSend,
     hasOlder: chat.nextBeforeId !== null,
     isLoaded: chat.isLoaded,
-    // The answer to a message sent from this tab: kept in the same place as message:new.
-    addSent: (message: ChatMessage) => update((state) => withMessage(state, message, ownRole)),
-    // The answer to marking read from this tab.
-    applyRead: (upToMessageId: number, unreadCount: number) =>
-      update((state) => withReadResult(state, upToMessageId, unreadCount, ownRole)),
+    ...older,
+    ...sending,
+    markRead,
   };
 }
 

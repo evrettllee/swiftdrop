@@ -59,6 +59,17 @@ test('should order the messages by id whatever order they come in', () => {
   expect(withOlder.nextBeforeId).toBeNull();
 });
 
+test('should keep one copy of a message an older page repeats and the newer state of it', () => {
+  const loaded = withLatestPage(EMPTY_CHAT, page([message(5, CLIENT, true), message(6)], 5));
+
+  const older = withOlderPage(loaded, page([message(3), message(4), message(5, CLIENT)], 3));
+  const oldest = withOlderPage(older, page([message(1), message(2), message(3)], null));
+
+  expect(ids(oldest.messages)).toEqual([1, 2, 3, 4, 5, 6]);
+  expect(oldest.messages.find(({ messageId }) => messageId === 5)?.isRead).toBe(true);
+  expect(oldest.nextBeforeId).toBeNull();
+});
+
 test('should count a new incoming message once and never an own one', () => {
   const loaded = withLatestPage(EMPTY_CHAT, page([message(1)], null, 1));
 

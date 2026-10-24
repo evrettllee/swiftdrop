@@ -1,5 +1,6 @@
 export { ADDRESS_TEXT_MAX_LENGTH, APARTMENT_MAX_LENGTH } from './address';
 export {
+  DESKTOP_MEDIA_QUERY,
   DOM_EVENT,
   ESCAPE_KEY,
   ID_PART,

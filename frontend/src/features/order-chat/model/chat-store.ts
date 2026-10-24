@@ -69,7 +69,7 @@ export function withLatestPage(state: ChatState, page: ChatHistory): ChatState {
 export function withOlderPage(state: ChatState, page: ChatHistory): ChatState {
   return {
     ...state,
-    messages: mergeMessages(state.messages, page.items),
+    messages: mergeMessages(page.items, state.messages),
     nextBeforeId: page.nextBeforeId,
   };
 }
