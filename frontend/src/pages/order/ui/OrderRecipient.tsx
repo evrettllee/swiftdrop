@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { formatParcelSize, formatParcelWeight } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
 import { formatPhone } from '@/shared/lib/format';
@@ -24,7 +25,7 @@ type OrderRecipientProps = {
   order: OrderDetails;
 };
 
-export function OrderRecipient({ order }: OrderRecipientProps) {
+export const OrderRecipient = memo(function OrderRecipient({ order }: OrderRecipientProps) {
   const { recipient, parcel } = order;
 
   return (
@@ -41,4 +42,4 @@ export function OrderRecipient({ order }: OrderRecipientProps) {
       </dl>
     </Section>
   );
-}
+});

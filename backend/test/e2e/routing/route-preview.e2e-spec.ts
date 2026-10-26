@@ -47,7 +47,7 @@ describe('Route preview of the calculator (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await resetRouting(db, mocks);
+    await resetRouting(app, db, mocks);
     ({ cookies } = await registerUser(app));
   });
 

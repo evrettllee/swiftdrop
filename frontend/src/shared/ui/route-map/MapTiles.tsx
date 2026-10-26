@@ -1,4 +1,5 @@
 import type { ControlPosition } from 'leaflet';
+import { memo } from 'react';
 import { AttributionControl, TileLayer } from 'react-leaflet';
 import { MAPBOX_TOKEN, MAPBOX_TOKEN_PARAM } from '@/shared/config';
 import { THEME, useThemeStore } from '@/shared/lib/theme';
@@ -13,7 +14,9 @@ type MapTilesProps = {
   attributionPosition?: ControlPosition;
 };
 
-export function MapTiles({ attributionPosition = MAP_ATTRIBUTION_POSITION.PLACED }: MapTilesProps) {
+export const MapTiles = memo(function MapTiles({
+  attributionPosition = MAP_ATTRIBUTION_POSITION.PLACED,
+}: MapTilesProps) {
   const theme = useThemeStore((state) => state.theme);
   const tileUrl = buildTileUrl(theme === THEME.DARK ? MAP_TILES.DARK_STYLE : MAP_TILES.LIGHT_STYLE);
 
@@ -30,4 +33,4 @@ export function MapTiles({ attributionPosition = MAP_ATTRIBUTION_POSITION.PLACED
       <AttributionControl position={attributionPosition} prefix={false} />
     </>
   );
-}
+});

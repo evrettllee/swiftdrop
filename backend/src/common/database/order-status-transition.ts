@@ -22,15 +22,46 @@ export type OrderStatusTransition = {
   changes?: OrderTransitionChanges;
 };
 
+// A status an order got, as it is right after the change.
+export type OrderStatusChange = {
+  orderId: number;
+  status: OrderStatus;
+  estimatedDeliveryAt: Date | null;
+};
+
+// A transaction that keeps the status changes made in it, to announce them once it commits. Only
+// runOrderTransaction() makes one, so a status cannot change without being announced.
+export type OrderTransaction = {
+  readonly tx: Transaction;
+  readonly statusChanges: OrderStatusChange[];
+};
+
+// Runs the work in a transaction and hands its status changes, in the order they were made, to
+// `publish` after the commit. A rolled back transaction publishes nothing. Savepoints (nested
+// transactions) are not supported: a change rolled back to one would still be published.
+export async function runOrderTransaction<T>(
+  db: Database,
+  work: (orderTx: OrderTransaction) => Promise<T>,
+  publish: (changes: readonly OrderStatusChange[]) => void,
+): Promise<T> {
+  const statusChanges: OrderStatusChange[] = [];
+  const result = await db.transaction((tx) => work({ tx, statusChanges }));
+
+  publish(statusChanges);
+
+  return result;
+}
+
 // Moves an order to a new status and writes the change to its history. The current status is
 // checked in the UPDATE itself, so a change that happens in between is never overwritten. Returns
-// the order, or nothing when its status or its owner did not allow the change.
+// the order, or nothing when its status or its owner did not allow the change. A made change is
+// kept in the transaction to be announced after the commit.
 export async function transitionOrderStatus(
-  executor: Database | Transaction,
+  orderTx: OrderTransaction,
   transition: OrderStatusTransition,
 ): Promise<{ orderId: number } | undefined> {
   const { orderId, from, to, changedBy, clientId, courierId, changes } = transition;
-  const [updated] = await executor
+  const [updated] = await orderTx.tx
     .update(orders)
     .set({ ...changes, status: to })
     .where(
@@ -41,11 +72,16 @@ export async function transitionOrderStatus(
         typeof from === 'string' ? eq(orders.status, from) : inArray(orders.status, [...from]),
       ),
     )
-    .returning({ orderId: orders.orderId });
+    .returning({
+      orderId: orders.orderId,
+      status: orders.status,
+      estimatedDeliveryAt: orders.estimatedDeliveryAt,
+    });
 
   if (updated) {
-    await executor.insert(orderStatusHistory).values({ orderId, status: to, changedBy });
+    await orderTx.tx.insert(orderStatusHistory).values({ orderId, status: to, changedBy });
+    orderTx.statusChanges.push(updated);
   }
 
-  return updated;
+  return updated ? { orderId: updated.orderId } : undefined;
 }

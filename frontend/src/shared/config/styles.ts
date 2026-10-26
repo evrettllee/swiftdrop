@@ -16,3 +16,5 @@ export const ICON_SIZE = {
   LARGE: 24,
   XLARGE: 32,
 } as const;
+
+export const MAP_FRAME_CLASS = 'h-40.75 lg:h-70.25';

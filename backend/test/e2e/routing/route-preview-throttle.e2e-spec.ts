@@ -36,7 +36,7 @@ describe('Route preview limits (e2e)', () => {
   beforeAll(async () => {
     app = await createRoutingTestApp(mocks);
     db = app.get<Database>(DRIZZLE);
-    await resetRouting(db, mocks);
+    await resetRouting(app, db, mocks);
   });
 
   afterAll(async () => {

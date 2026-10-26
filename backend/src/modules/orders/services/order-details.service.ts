@@ -6,7 +6,8 @@ import { DRIZZLE } from '../../../database/database.constants';
 import type { Database } from '../../../database/database.module';
 import { orders, orderStatusHistory, packages, payments } from '../../../database/schema';
 import { ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';
-import type { OrderDetails, OrderHistoryEntry, OrderPaymentView } from '../types/orders.types';
+import { toOrderHistory } from '../mappers/order-history.mapper';
+import type { OrderDetails, OrderHistoryRow, OrderPaymentView } from '../types/orders.types';
 import { addressPointColumns, aliasOrderAddresses } from '../utils/order-address-columns';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class OrderDetailsService {
     }
 
     // Read only after the order proved to be the client's, and at once: they do not depend on each other.
-    const [history, payment] = await Promise.all([
+    const [historyRows, payment] = await Promise.all([
       this.findHistory(orderId),
       this.findLatestPayment(orderId),
     ]);
@@ -33,7 +34,7 @@ export class OrderDetailsService {
       price: Number(price),
       currency: CURRENCY,
       recipient: { name: recipientName, phone: recipientPhone },
-      history,
+      ...toOrderHistory(historyRows, clientId),
       payment,
     };
   }
@@ -48,6 +49,7 @@ export class OrderDetailsService {
         price: orders.price,
         priceCoefficient: orders.priceCoefficient,
         distanceKm: orders.distanceKm,
+        estimatedMinutes: orders.estimatedMinutes,
         estimatedDeliveryAt: orders.estimatedDeliveryAt,
         createdAt: orders.createdAt,
         recipientName: orders.recipientName,
@@ -72,9 +74,13 @@ export class OrderDetailsService {
     return row;
   }
 
-  private findHistory(orderId: number): Promise<OrderHistoryEntry[]> {
+  private findHistory(orderId: number): Promise<OrderHistoryRow[]> {
     return this.db
-      .select({ status: orderStatusHistory.status, changedAt: orderStatusHistory.changedAt })
+      .select({
+        status: orderStatusHistory.status,
+        changedAt: orderStatusHistory.changedAt,
+        changedBy: orderStatusHistory.changedBy,
+      })
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, orderId))
       .orderBy(asc(orderStatusHistory.changedAt), asc(orderStatusHistory.statusHistoryId));

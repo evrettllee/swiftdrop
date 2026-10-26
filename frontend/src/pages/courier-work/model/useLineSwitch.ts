@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { setCourierProfile } from '@/entities/courier';
+import { refreshCourierProfile, setCourierProfile } from '@/entities/courier';
 import { type GeoProblem, getCurrentPoint } from '@/features/courier-location';
-import { API_ERROR_MESSAGES, getApiErrorMessage } from '@/shared/api';
+import { API_ERROR_MESSAGES, ApiError, getApiErrorMessage, HTTP_STATUS } from '@/shared/api';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { setAvailability } from '../api/set-availability';
 
@@ -63,9 +63,21 @@ export function useLineSwitch({ sendPoint, onSwitched }: LineSwitchOptions) {
       void sendPoint(point);
     });
 
+  // A conflict means the courier has an order the page did not know of yet (accepted in another
+  // tab): the profile is loaded again and its order replaces the line. The text of the backend
+  // stays for a conflict of another kind (the profile was busy).
   const goOffline = () =>
     run(LINE_SWITCH.OFF, async () => {
-      setCourierProfile(await setAvailability(false));
+      try {
+        setCourierProfile(await setAvailability(false));
+      } catch (failure) {
+        if (failure instanceof ApiError && failure.status === HTTP_STATUS.CONFLICT) {
+          await refreshCourierProfile();
+        }
+
+        throw failure;
+      }
+
       onSwitched(false);
     });
 

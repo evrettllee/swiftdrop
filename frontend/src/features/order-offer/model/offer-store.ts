@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 import type { CourierOffer } from '@/shared/api';
+import { hideToast, showToast } from '@/shared/ui/toast';
 import {
+  OFFER_NOTICE,
+  OFFER_NOTICE_MS,
   OFFER_TTL_MS,
   OFFER_VIBRATION_PATTERN,
   type OfferNotice,
   type OfferResponse,
 } from '../config/offer';
+import { OFFER_NOTICE_TEXTS } from '../config/texts';
+
+const OFFER_TOAST_KEY = 'offer';
 
 type OfferState = {
   // The offer in the window; null when the window is closed.
@@ -16,9 +22,6 @@ type OfferState = {
   response: OfferResponse | null;
   // Why the last answer was not sent, other than a closed offer.
   error: string | null;
-  notice: OfferNotice | null;
-  // A new message restarts the time it stays, even when it is the same message.
-  noticeId: number;
 };
 
 const INITIAL_STATE: OfferState = {
@@ -26,8 +29,6 @@ const INITIAL_STATE: OfferState = {
   deadline: 0,
   response: null,
   error: null,
-  notice: null,
-  noticeId: 0,
 };
 
 // One offer for the whole cabinet: it may come on any page.
@@ -49,8 +50,8 @@ export function showOffer(offer: CourierOffer): void {
     deadline: getDeadline(offer.expiresAt, Date.now()),
     response: null,
     error: null,
-    notice: null,
   });
+  hideToast(OFFER_TOAST_KEY);
 
   // A phone in a pocket: a short series, where the device can vibrate. The browser allows it only
   // after the person has touched the page.
@@ -61,13 +62,19 @@ export function showOffer(offer: CourierOffer): void {
 
 // Closes the window, with a message about why or without one.
 export function closeOffer(notice: OfferNotice | null): void {
-  useOfferStore.setState(({ noticeId }) => ({
-    offer: null,
-    response: null,
-    error: null,
-    notice,
-    noticeId: notice === null ? noticeId : noticeId + 1,
-  }));
+  useOfferStore.setState({ offer: null, response: null, error: null });
+
+  if (notice === null) {
+    hideToast(OFFER_TOAST_KEY);
+  } else {
+    showToast({
+      key: OFFER_TOAST_KEY,
+      variant: notice === OFFER_NOTICE.EXPIRED ? 'warning' : 'info',
+      title: OFFER_NOTICE_TEXTS[notice].title,
+      text: OFFER_NOTICE_TEXTS[notice].text,
+      durationMs: OFFER_NOTICE_MS,
+    });
+  }
 }
 
 // The offer was closed by the backend or by its time. An answer being sent decides by itself what
@@ -80,10 +87,7 @@ export function closeOfferWithNotice(offerId: number, notice: OfferNotice): void
   }
 }
 
-export function hideOfferNotice(): void {
-  useOfferStore.setState({ notice: null });
-}
-
 export function resetOffer(): void {
   useOfferStore.setState(INITIAL_STATE);
+  hideToast(OFFER_TOAST_KEY);
 }

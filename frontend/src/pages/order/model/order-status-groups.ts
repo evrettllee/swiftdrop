@@ -37,14 +37,6 @@ export const COURIER_VISIBLE_STATUSES: readonly OrderStatus[] = [
 // The code for the courier is shown while the parcel is on its way and can be asked for.
 export const CODE_VISIBLE_STATUSES: readonly OrderStatus[] = TRACKABLE_STATUSES;
 
-// The page asks for the order again while it can still change under the eyes of the client. Not
-// while it waits for the payment (the return from the payment has its own checks) and not once it
-// is over.
-export const POLLED_STATUSES: readonly OrderStatus[] = [
-  ...SEARCHING_STATUSES,
-  ...COURIER_ACTIVE_STATUSES,
-];
-
 // Finished orders: the order page offers to repeat them (matches FINISHED_STATUSES of the backend).
 export const FINISHED_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,

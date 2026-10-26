@@ -178,6 +178,7 @@ docker exec swiftdrop-postgres createdb -U swiftdrop swiftdrop_test
 npm run lint       # oxlint
 npm run lint:fsd   # Steiger, правила FSD
 npm run build      # проверка типов и сборка
+npm run test:unit  # unit-тесты моделей (src/**/*.test.ts) в Node через Playwright Test, без браузера и серверов
 npm run test:e2e   # сквозные тесты Playwright: нужны поднятый в Docker PostgreSQL, миграции и db:seed
 ```
 

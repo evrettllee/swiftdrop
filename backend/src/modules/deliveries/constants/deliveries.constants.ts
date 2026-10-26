@@ -1,4 +1,5 @@
 import {
+  COURIER_ACTIVE_ORDER_STATUSES,
   ORDER_BUSY_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
 } from '../../../common/constants/orders.constants';
@@ -61,6 +62,14 @@ export const COURIER_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.IN_TRANSIT,
   ORDER_STATUS.DELIVERED,
 ];
+
+// The phone of the courier and where they are: only while the order is with them. After the
+// delivery the client keeps the name, but can no longer call or follow the courier.
+export const COURIER_CONTACT_STATUSES: readonly OrderStatus[] = COURIER_ACTIVE_ORDER_STATUSES;
+
+// A position older than this is shown to the client as lost connection. Only the client view uses
+// it: assignment keeps its own freshness (COURIER_LOCATION_FRESH_MS).
+export const COURIER_LOCATION_STALE_MS = MS_PER_MINUTE;
 
 // The code is shown only once the parcel is picked up, when the order can no longer be cancelled.
 export const DELIVERY_CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [

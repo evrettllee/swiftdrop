@@ -4,6 +4,7 @@ import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
 import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
 import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
 import type { CourierVehicle } from '../../couriers/types/couriers.types';
+import type { RouteLines } from '../../routing/types/routing.types';
 import type { HANDOVER_OUTCOME } from '../constants/deliveries.constants';
 
 // The courier making a request: the user writes the history, the profile owns the order.
@@ -66,21 +67,43 @@ export type HandoverOutcome =
   | { kind: typeof HANDOVER_OUTCOME.WRONG_CODE; attemptsLeft: number };
 
 // An order with its courier as the query returns it: the courier columns are null when there is none.
+// The phone is read only while the client may get it, otherwise it is null.
 export type ClientOrderCourierRow = {
   status: OrderStatus;
   otpCode: string | null;
   firstName: string | null;
   lastName: string | null;
+  phone: string | null;
   vehicleType: VehicleType | null;
   brand: string | null;
   model: string | null;
   licensePlate: string | null;
 };
 
-// What the client sees about the courier of an order.
+// What the client sees about the courier of an order. The phone key is absent, not null, when the
+// client may not call the courier or the courier has no phone.
 export type ClientOrderCourier = {
-  courier: { name: string; vehicle: CourierVehicle | null } | null;
+  courier: { name: string; vehicle: CourierVehicle | null; phone?: string } | null;
   deliveryCode: string | null;
+};
+
+// The position of the courier as the query returns it; the age is counted by the database clock.
+export type ClientCourierPositionRow = {
+  status: OrderStatus;
+  currentLat: number | null;
+  currentLng: number | null;
+  locationUpdatedAt: Date | null;
+  positionAgeMs: number | null;
+};
+
+// The last known position of the courier for the client; isStale means lost connection.
+export type ClientCourierPosition = GeoPoint & { updatedAt: string; isStale: boolean };
+
+// The route of an order for the client: the lines, where the courier is and, while they go to the
+// pickup point, when they reach it (ISO, as pickupEtaAt of order:eta).
+export type ClientOrderRoute = RouteLines & {
+  courierPosition: ClientCourierPosition | null;
+  pickupEtaAt: string | null;
 };
 
 type ShortAddress = { street: string; house: string };

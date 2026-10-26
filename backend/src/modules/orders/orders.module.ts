@@ -9,9 +9,10 @@ import { OrdersController } from './controllers/orders.controller';
 import { OrdersQueryService } from './services/orders-query.service';
 import { UnpaidOrdersJob } from './jobs/unpaid-orders.job';
 import { UnpaidOrdersService } from './services/unpaid-orders.service';
+import { TrackingModule } from '../tracking/tracking.module';
 
 @Module({
-  imports: [PricingModule, PaymentsModule, CouriersModule],
+  imports: [PricingModule, PaymentsModule, CouriersModule, TrackingModule],
   controllers: [OrdersController],
   providers: [
     OrderPlacementService,

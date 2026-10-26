@@ -5,7 +5,10 @@ import {
   SINGLE_ROW_LIMIT,
 } from '../../../common/constants/database.constants';
 import { withLockConflict } from '../../../common/database/lock-conflict';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
+import {
+  type OrderTransaction,
+  transitionOrderStatus,
+} from '../../../common/database/order-status-transition';
 import { getUniqueViolationConstraint } from '../../../common/database/pg-errors';
 import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
 import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
@@ -13,6 +16,7 @@ import { DRIZZLE } from '../../../database/database.constants';
 import type { Database, Transaction } from '../../../database/database.module';
 import { orderOffers } from '../../../database/schema';
 import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
+import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
 import { ASSIGNMENT_ERROR_MESSAGES } from '../constants/assignment.constants';
 import { openOfferOf } from '../utils/open-offer';
 import { OfferNotifierService } from './offer-notifier.service';
@@ -25,6 +29,7 @@ export class OfferResponsesService {
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly notifier: OfferNotifierService,
     private readonly profiles: CourierProfilesService,
+    private readonly orderTransactions: OrderTransactionsService,
   ) {}
 
   // The courier takes the order of the offer; the order is theirs once this returns.
@@ -39,7 +44,9 @@ export class OfferResponsesService {
     try {
       accepted = await withLockConflict(
         () =>
-          this.db.transaction((tx) => this.takeOrder(tx, userId, courierProfileId, offerId, now)),
+          this.orderTransactions.run((orderTx) =>
+            this.takeOrder(orderTx, userId, courierProfileId, offerId, now),
+          ),
         ASSIGNMENT_ERROR_MESSAGES.BUSY,
       );
     } catch (error) {
@@ -78,12 +85,13 @@ export class OfferResponsesService {
 
   // All changes commit together: an offer is never accepted for an order the courier did not get.
   private async takeOrder(
-    tx: Transaction,
+    orderTx: OrderTransaction,
     userId: number,
     courierProfileId: number,
     offerId: number,
     now: Date,
   ): Promise<{ orderId: number }> {
+    const { tx } = orderTx;
     const [offer] = await tx
       .update(orderOffers)
       .set({ status: ORDER_OFFER_STATUS.ACCEPTED, respondedAt: now })
@@ -94,7 +102,7 @@ export class OfferResponsesService {
       return this.rejectClosed(tx, courierProfileId, offerId);
     }
 
-    const assigned = await transitionOrderStatus(tx, {
+    const assigned = await transitionOrderStatus(orderTx, {
       orderId: offer.orderId,
       from: ORDER_STATUS.CONFIRMED,
       to: ORDER_STATUS.COURIER_ASSIGNED,

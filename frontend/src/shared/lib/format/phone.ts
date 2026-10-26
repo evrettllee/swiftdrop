@@ -6,3 +6,12 @@ const BY_PHONE_FORMAT = '+375 $1 $2-$3-$4';
 export function formatPhone(phone: string): string {
   return phone.replace(BY_PHONE_PATTERN, BY_PHONE_FORMAT);
 }
+
+const TEL_SCHEME = 'tel:';
+const NOT_PHONE_CHARS = /[^+\d]/g;
+
+export function buildTelHref(phone: string): string | null {
+  const digits = phone.replace(NOT_PHONE_CHARS, '');
+
+  return digits.replace('+', '') === '' ? null : `${TEL_SCHEME}${digits}`;
+}

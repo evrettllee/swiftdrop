@@ -3,7 +3,9 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
 import { DRIZZLE } from '../../../src/database/database.constants';
 import type { Database } from '../../../src/database/database.module';
-import { orderStatusHistory } from '../../../src/database/schema';
+import { eq } from 'drizzle-orm';
+import { MS_PER_MINUTE } from '../../../src/common/constants/time.constants';
+import { orders, orderStatusHistory } from '../../../src/database/schema';
 import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
 import {
   ORDERS_ERROR_MESSAGES,
@@ -17,6 +19,7 @@ import {
   MINSK_DELIVERY,
   MINSK_PICKUP,
   SMALL_PACKAGE,
+  VALID_ORDER_ESTIMATED_MINUTES,
   VALID_ORDER_PRICE,
 } from '../../support/fixtures';
 import { getApi } from '../../support/http';
@@ -58,6 +61,7 @@ describe('Order details (e2e)', () => {
       currency: 'BYN',
       priceCoefficient: 1,
       distanceKm: 7.98,
+      estimatedMinutes: VALID_ORDER_ESTIMATED_MINUTES,
       estimatedDeliveryAt: expect.any(String),
       createdAt: expect.any(String),
       recipient: { name: 'Ирина Козлова', phone: '+375291234567' },
@@ -83,6 +87,7 @@ describe('Order details (e2e)', () => {
         ...MINSK_DELIVERY,
       },
       history: [{ status: ORDER_STATUS.PENDING, changedAt: expect.any(String) }],
+      cancelledBy: null,
       payment: null,
     });
   });
@@ -98,6 +103,22 @@ describe('Order details (e2e)', () => {
       ORDER_STATUS.PENDING,
       ORDER_STATUS.CONFIRMED,
     ]);
+  });
+
+  // The arrival estimate of a tracked order moves the delivery time, not the time of the trip.
+  it('should keep the time of the trip when the delivery estimate moves', async () => {
+    const { cookies } = await registerUser(app);
+    const [orderId] = await placeOrders(app, cookies, 1);
+    const movedAt = new Date(Date.now() + 90 * MS_PER_MINUTE);
+    await db
+      .update(orders)
+      .set({ estimatedDeliveryAt: movedAt })
+      .where(eq(orders.orderId, orderId));
+
+    const response = await getOrder(cookies, orderId).expect(HttpStatus.OK);
+
+    expect(response.body.estimatedDeliveryAt).toBe(movedAt.toISOString());
+    expect(response.body.estimatedMinutes).toBe(VALID_ORDER_ESTIMATED_MINUTES);
   });
 
   it('should return 404 when the order belongs to another client', async () => {

@@ -4,8 +4,8 @@ import { refreshCourierProfile } from '@/entities/courier';
 import { courierOfferSchema } from '@/shared/api';
 import {
   CONNECTION_STATUS,
-  COURIER_SOCKET_EVENTS,
-  onCourierSocketEvent,
+  SOCKET_EVENTS,
+  onSocketEvent,
   useConnectionStatus,
 } from '@/shared/realtime';
 import { getCurrentOffer } from '../api/offers';
@@ -37,14 +37,14 @@ export function useOfferSync(): void {
 
   useEffect(() => {
     const unsubscribers = [
-      onCourierSocketEvent(COURIER_SOCKET_EVENTS.OFFER_NEW, (payload) => {
+      onSocketEvent(SOCKET_EVENTS.OFFER_NEW, (payload) => {
         const parsed = courierOfferSchema.safeParse(payload);
 
         if (parsed.success) {
           showOffer(parsed.data);
         }
       }),
-      onCourierSocketEvent(COURIER_SOCKET_EVENTS.OFFER_CLOSED, (payload) => {
+      onSocketEvent(SOCKET_EVENTS.OFFER_CLOSED, (payload) => {
         const parsed = offerClosedSchema.safeParse(payload);
 
         if (parsed.success) {
@@ -52,7 +52,7 @@ export function useOfferSync(): void {
         }
       }),
       // The active order of the courier is gone.
-      onCourierSocketEvent(COURIER_SOCKET_EVENTS.ORDER_CANCELLED, () => {
+      onSocketEvent(SOCKET_EVENTS.ORDER_CANCELLED, () => {
         void refreshCourierProfile();
       }),
     ];

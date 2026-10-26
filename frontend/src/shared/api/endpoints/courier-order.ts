@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { http } from '../http';
 import { orderStatusSchema } from './order';
 
 const COURIER_ORDERS_PATH = '/couriers/me/orders';
@@ -45,3 +46,11 @@ export type CourierOrder = z.infer<typeof courierOrderSchema>;
 
 // Response of GET /api/couriers/me/orders/current
 export const currentCourierOrderSchema = z.object({ order: courierOrderSchema.nullable() });
+
+export async function getCurrentCourierOrder(signal?: AbortSignal): Promise<CourierOrder | null> {
+  const { order } = currentCourierOrderSchema.parse(
+    await http.get(COURIER_ORDERS_API_PATHS.CURRENT, { signal }),
+  );
+
+  return order;
+}

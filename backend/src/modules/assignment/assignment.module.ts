@@ -14,9 +14,10 @@ import { OfferViewsService } from './services/offer-views.service';
 import { OrderDispatchService } from './services/order-dispatch.service';
 import { OrderOffersService } from './services/order-offers.service';
 import { StaleOffersService } from './services/stale-offers.service';
+import { TrackingModule } from '../tracking/tracking.module';
 
 @Module({
-  imports: [OsrmModule, CouriersModule, RoutingModule],
+  imports: [OsrmModule, CouriersModule, RoutingModule, TrackingModule],
   controllers: [CourierOffersController],
   providers: [
     DispatchOrdersService,

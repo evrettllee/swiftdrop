@@ -12,6 +12,17 @@ export type OsrmRoute = {
 // One route of the OSRM answer as it comes.
 export type OsrmAnswerRoute = NonNullable<z.infer<typeof osrmResponseSchema>['routes']>[number];
 
+// The whole OSRM answer as it comes, with the snapped waypoints.
+export type OsrmAnswer = z.infer<typeof osrmResponseSchema>;
+
+// A trip of a courier through several points: its whole time, and the time and the line of its
+// first leg only.
+export type OsrmTrip = {
+  durationS: number;
+  firstLegDurationS: number;
+  firstLegGeometry: string;
+};
+
 // The line of a route along the roads: an encoded polyline with 6 digits after the point.
 export type OsrmRouteGeometry = {
   geometry: string;

@@ -55,6 +55,17 @@ export const ORDER_TEXTS = {
   orderNumber: (number: string) => `Заказ ${number}`,
 } as const;
 
+export const COURIER_CHAT_TEXTS = {
+  CHAT: 'Чат',
+  CHAT_LABEL: 'Чат с отправителем',
+  CALL: ORDER_TEXTS.CALL_SENDER,
+  MESSAGE_LABEL: 'Сообщение отправителю',
+  BEFORE_PICKUP_REPLIES: ['Я на месте', 'Подъезжаю через 5 минут', 'Не могу дозвониться'],
+  AFTER_PICKUP_REPLIES: ['Я у двери', 'Не могу дозвониться', 'Подскажите, как пройти?'],
+  unread: (count: number) => `Непрочитанных сообщений: ${count}`,
+  details: (orderNumber: string) => `Отправитель, заказ ${orderNumber}`,
+} as const;
+
 // The screen where the courier enters the code of the recipient.
 export const DELIVERY_CODE_TEXTS = {
   BACK: 'К заказу',

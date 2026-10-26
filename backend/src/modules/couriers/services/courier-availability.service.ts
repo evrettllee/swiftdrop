@@ -30,7 +30,8 @@ export class CourierAvailabilityService {
   }
 
   // The profile row is locked like in a vehicle change, so a courier never ends up on shift
-  // without a vehicle when both requests come at once.
+  // without a vehicle when both requests come at once. Accepting an offer locks the same row, so
+  // an order cannot be taken between the check of active orders and going off shift.
   private async applyAvailability(
     tx: Transaction,
     userId: number,
@@ -42,7 +43,16 @@ export class CourierAvailabilityService {
       throw new ConflictException(COURIERS_ERROR_MESSAGES.VEHICLE_REQUIRED);
     }
 
-    // A courier off shift keeps no position: assignment must never use a stale one.
+    // The client follows the courier until the order is over, so the courier stays on the line.
+    if (
+      !isAvailable &&
+      (await this.profiles.findActiveOrderId(profile.courierProfileId, tx)) !== null
+    ) {
+      throw new ConflictException(COURIERS_ERROR_MESSAGES.ACTIVE_ORDER);
+    }
+
+    // A courier off shift keeps no position: assignment must never use a stale one. Only reached
+    // without an active order, so a tracked courier never loses the position.
     const location = isAvailable
       ? {}
       : { currentLat: null, currentLng: null, locationUpdatedAt: null };

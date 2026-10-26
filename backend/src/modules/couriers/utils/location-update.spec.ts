@@ -1,3 +1,4 @@
+import { ROLE } from '../../../common/enums/role.enum';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,
@@ -10,9 +11,11 @@ const LATER_MS = 2_000_000;
 
 function socketData(overrides: Partial<CourierSocketData> = {}): CourierSocketData {
   return {
+    role: ROLE.COURIER,
     userId: 1,
     courierProfileId: 1,
     sessionExpiresAtMs: LATER_MS,
+    orderJoinAttemptsMs: [],
     lastLocationAtMs: null,
     ...overrides,
   };
@@ -33,6 +36,22 @@ describe('rejectLocationUpdate', () => {
     const data = socketData({ lastLocationAtMs: NOW_MS - LOCATION_MIN_INTERVAL_MS + 1 });
 
     expect(rejectLocationUpdate(data, NOW_MS)).toBe(LOCATION_UPDATE_REJECTIONS.TOO_FREQUENT);
+  });
+
+  it('should keep the interval at five seconds', () => {
+    expect(LOCATION_MIN_INTERVAL_MS).toBe(5_000);
+  });
+
+  it('should reject the position 4999 ms after the previous one', () => {
+    const data = socketData({ lastLocationAtMs: NOW_MS - 4_999 });
+
+    expect(rejectLocationUpdate(data, NOW_MS)).toBe(LOCATION_UPDATE_REJECTIONS.TOO_FREQUENT);
+  });
+
+  it('should accept the position 5000 ms after the previous one', () => {
+    const data = socketData({ lastLocationAtMs: NOW_MS - 5_000 });
+
+    expect(rejectLocationUpdate(data, NOW_MS)).toBeNull();
   });
 
   it('should accept the position when exactly the interval has passed', () => {

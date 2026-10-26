@@ -3,8 +3,8 @@ import { API_BASE_PATH } from '@/shared/api';
 // Under the API prefix, because the session cookies are only sent to /api.
 export const SOCKET_PATH = `${API_BASE_PATH}/socket.io`;
 
-// Must match the namespace of the courier gateway of the backend.
-export const COURIERS_NAMESPACE = '/couriers';
+// Must match the namespace of the gateway of the backend: clients and couriers share it.
+export const APP_SOCKET_NAMESPACE = '/couriers';
 
 // WebSocket from the first request, without the long-polling start.
 export const SOCKET_TRANSPORTS = ['websocket'];

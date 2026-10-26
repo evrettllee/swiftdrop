@@ -1,5 +1,6 @@
 export { ADDRESS_TEXT_MAX_LENGTH, APARTMENT_MAX_LENGTH } from './address';
 export {
+  DESKTOP_MEDIA_QUERY,
   DOM_EVENT,
   ESCAPE_KEY,
   ID_PART,
@@ -7,6 +8,7 @@ export {
   REDUCED_MOTION_QUERY,
   SCROLL_LOCK_OVERFLOW,
 } from './dom';
+export { CHAT_MESSAGE_MAX_LENGTH } from './chat';
 export { DELIVERY_CODE_LENGTH } from './delivery-code';
 export { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from './env';
 export { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE, INVALID_FIELD_SELECTOR } from './forms';
@@ -28,6 +30,7 @@ export {
   ICON_SIZE,
   ICON_WEIGHT,
   MAIN_COLUMN_CLASS,
+  MAP_FRAME_CLASS,
   SIDE_COLUMN_CLASS,
   SIDE_COLUMN_LAYOUT_CLASS,
 } from './styles';

@@ -7,10 +7,9 @@ import { Button, LinkButton } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { ContentLoader } from '@/shared/ui/page-loader';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
-import { POLLED_STATUSES } from '../model/order-status-groups';
 import { useOrderCourier } from '../model/useOrderCourier';
 import { useOrderDetails } from '../model/useOrderDetails';
-import { useOrderPolling } from '../model/useOrderPolling';
+import { useOrderLive } from '../model/useOrderLive';
 import { usePaymentReturn } from '../model/usePaymentReturn';
 import { OrderContent } from './OrderContent';
 
@@ -21,10 +20,11 @@ export function OrderPage() {
   const paymentReturn = usePaymentReturn(details.order, details.reload);
   const status = details.order?.status ?? null;
   const { courier, deliveryCode, refresh: refreshCourier } = useOrderCourier(orderId, status);
-  // The client has no socket: while the order can still change, the page asks for it by itself.
-  useOrderPolling(status !== null && POLLED_STATUSES.includes(status), () => {
-    details.refresh();
-    refreshCourier();
+  // The events of the room of the order keep the page in step: no polling.
+  const live = useOrderLive(orderId, {
+    order: details.order,
+    refresh: details.refresh,
+    refreshCourier,
   });
   let content: ReactNode;
 
@@ -35,6 +35,7 @@ export function OrderPage() {
         courier={courier}
         deliveryCode={deliveryCode}
         paymentReturn={paymentReturn}
+        live={live}
         onReload={details.reload}
       />
     );

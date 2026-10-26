@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { useCourierPosition } from '@/entities/courier';
 import { type CourierOrder, getCourierOrderRoute } from '@/shared/api';
+import { MAP_FRAME_CLASS } from '@/shared/config';
 import { useRouteLines } from '@/shared/lib/route-lines';
 import { Skeleton } from '@/shared/ui/skeleton';
 
@@ -8,11 +9,6 @@ import { Skeleton } from '@/shared/ui/skeleton';
 const CourierRouteMap = lazy(() =>
   import('@/shared/ui/route-map').then((module) => ({ default: module.CourierRouteMap })),
 );
-
-// The size of the map block, the same for the map and for its placeholder: as high as the map of
-// the work page, not the 160 and 180px of the design, so the maps of the cabinet are alike and the
-// four buttons of the controls (zoom, «Ко мне», the full screen) fit on the desktop.
-const MAP_FRAME_CLASS = 'h-40.75 lg:h-70.25';
 
 type OrderMapProps = {
   order: CourierOrder;

@@ -17,6 +17,7 @@ import { ENV_FILE_PATH } from './config/env.constants';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { AssignmentModule } from './modules/assignment/assignment.module';
+import { ChatModule } from './modules/chat/chat.module';
 import { CouriersModule } from './modules/couriers/couriers.module';
 import { DeliveriesModule } from './modules/deliveries/deliveries.module';
 import { OrdersModule } from './modules/orders/orders.module';
@@ -47,6 +48,7 @@ import { ZonesModule } from './modules/zones/zones.module';
     AssignmentModule,
     DeliveriesModule,
     RoutingModule,
+    ChatModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

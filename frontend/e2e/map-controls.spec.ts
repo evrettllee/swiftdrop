@@ -1,14 +1,14 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
-import { ROUTING_API_PATHS } from '../src/shared/api/endpoints/routing';
 import { API_BASE_PATH } from '../src/shared/api/request-config';
 import { getOrderPath } from '../src/shared/routes/app-routes';
 import { ROLE } from '../src/shared/session/auth-user';
 import { MAP_TEXTS } from '../src/shared/ui/route-map/map';
 import { stubMapbox } from './support/mapbox';
 import { buildTestOrderDetails, stubOrderCourier } from './support/order-details';
-import { PARCEL_SEGMENT, stubRouteLines } from './support/routing';
+import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
 import { stubSession } from './support/stub-session';
+import { stubOrderLive } from './support/app-socket';
 
 // The maps of a client have the controls of the maps of a courier: the zoom (on the desktop and in
 // the full screen), the full screen of the browser, and no other way to enlarge the map.
@@ -22,8 +22,9 @@ async function openOrderMap(
 ): Promise<Locator> {
   await page.setViewportSize(viewport);
   await stubSession(page, ROLE.CLIENT);
+  await stubOrderLive(page);
   await stubMapbox(page);
-  await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () => [PARCEL_SEGMENT]);
+  await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT]);
   await page.route(`**${API_BASE_PATH}/orders/${ORDER_ID}`, (route) =>
     route.fulfill({ json: buildTestOrderDetails(ORDER_ID, ORDER_STATUS.COURIER_ASSIGNED) }),
   );

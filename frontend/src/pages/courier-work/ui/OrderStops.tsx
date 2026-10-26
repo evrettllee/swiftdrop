@@ -1,4 +1,5 @@
 import { formatFullAddress } from '@/entities/order';
+import type { ReactNode } from 'react';
 import type { CourierOrder, VehicleType } from '@/shared/api';
 import { ROUTE_POINT, type RoutePointKind } from '@/shared/config';
 import { Divider } from '@/shared/ui/divider';
@@ -29,11 +30,12 @@ type OrderStopsProps = {
   order: CourierOrder;
   step: OrderStep;
   vehicle: VehicleType;
+  chatButton: ReactNode;
 };
 
 // Before the pickup: where to pick up with the sender, then where it goes. After it: where to
 // deliver with the recipient.
-export function OrderStops({ order, step, vehicle }: OrderStopsProps) {
+export function OrderStops({ order, step, vehicle, chatButton }: OrderStopsProps) {
   if (step.target === ROUTE_POINT.DELIVERY) {
     return (
       <Section title={ORDER_TEXTS.DELIVERY}>
@@ -44,13 +46,14 @@ export function OrderStops({ order, step, vehicle }: OrderStopsProps) {
           callLabel={ORDER_TEXTS.CALL_RECIPIENT}
           point={order.delivery}
           vehicle={vehicle}
+          chatButton={chatButton}
         />
       </Section>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 lg:gap-8">
       <Section title={ORDER_TEXTS.PICKUP}>
         <StopAddress kind={ROUTE_POINT.PICKUP} address={order.pickup} />
         <StopContact
@@ -59,6 +62,7 @@ export function OrderStops({ order, step, vehicle }: OrderStopsProps) {
           callLabel={ORDER_TEXTS.CALL_SENDER}
           point={order.pickup}
           vehicle={vehicle}
+          chatButton={chatButton}
         />
       </Section>
       <Divider />

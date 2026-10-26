@@ -1,7 +1,11 @@
 import { Skeleton } from '@/shared/ui/skeleton';
-import { MAP_FRAME_CLASS } from '../config/map';
 import { HISTORY_ORDER_TEXTS } from '../config/texts';
-import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
+import {
+  MAIN_COLUMN_CLASS,
+  MAP_FRAME_CLASS,
+  SIDE_COLUMN_CLASS,
+  SIDE_COLUMN_LAYOUT_CLASS,
+} from '@/shared/config';
 
 // The header, the map with the points and the card of the parcel, as high as the real page.
 export function HistoryOrderSkeleton() {

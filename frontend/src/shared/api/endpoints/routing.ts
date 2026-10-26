@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { http, type HttpOptions } from '../http';
+import { dateSchema } from './order';
 
 export const ROUTING_API_PATHS = {
   PREVIEW: '/routing/preview',
@@ -31,6 +32,24 @@ export const routeLinesSchema = z.object({
 
 export type RouteLines = z.infer<typeof routeLinesSchema>;
 
+// Response of GET /api/orders/:orderId/route (the ClientOrderRoute of the backend): the lines, the
+// last known position of the courier while the order is with them, and while they go to the pickup
+// point, when they reach it. isStale: the position is older than a minute when it was answered
+// (by the clock of the database, as updatedAt); pickupEtaAt is null after the pickup.
+export const clientOrderRouteSchema = routeLinesSchema.extend({
+  courierPosition: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      updatedAt: dateSchema,
+      isStale: z.boolean(),
+    })
+    .nullable(),
+  pickupEtaAt: dateSchema.nullable(),
+});
+
+export type ClientOrderRoute = z.infer<typeof clientOrderRouteSchema>;
+
 // The calculator and the order form: the route before an order exists, for a guest too.
 export async function getRoutePreview(
   points: { pickup: GeoPoint; delivery: GeoPoint },
@@ -49,12 +68,15 @@ export async function getCourierOrderRoute(options: HttpOptions = {}): Promise<R
   return routeLinesSchema.parse(await http.get(ROUTING_API_PATHS.COURIER_ORDER, options));
 }
 
-// An order of the client, with the way of its courier while they carry it.
+// An order of the client, with the way of its courier, where they are and their arrival at the
+// pickup point while they carry it.
 export async function getClientOrderRoute(
   orderId: number,
   options: HttpOptions = {},
-): Promise<RouteLines> {
-  return routeLinesSchema.parse(await http.get(ROUTING_API_PATHS.clientOrder(orderId), options));
+): Promise<ClientOrderRoute> {
+  return clientOrderRouteSchema.parse(
+    await http.get(ROUTING_API_PATHS.clientOrder(orderId), options),
+  );
 }
 
 // A finished order of the courier: the trip of the parcel by the vehicle of the courier.

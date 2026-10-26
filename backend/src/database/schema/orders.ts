@@ -48,6 +48,9 @@ export const orders = pgTable(
     price: numeric({ precision: 10, scale: 2 }).notNull(),
     priceCoefficient: numeric({ precision: 4, scale: 2, mode: 'number' }).notNull().default(1),
     distanceKm: numeric({ precision: 8, scale: 2, mode: 'number' }).notNull(),
+    // The time of the trip given when the order was placed, in minutes; it never changes, while the
+    // arrival estimate moves estimatedDeliveryAt. Null for orders placed before it was kept.
+    estimatedMinutes: integer(),
     estimatedDeliveryAt: timestamp({ withTimezone: true }),
     otpCode: varchar({ length: ORDER_FIELD_LENGTH.OTP_CODE }),
     // Wrong delivery codes in a row; entering is locked until otpLockedUntil after too many.
@@ -65,5 +68,6 @@ export const orders = pgTable(
       .where(sql`${table.status} IN (${sqlLiteralList(COURIER_ACTIVE_ORDER_STATUSES)})`),
     check('orders_otp_code_check', sql`${table.otpCode} ~ '^[0-9]{4}$'`),
     check('orders_otp_failed_attempts_check', sql`${table.otpFailedAttempts} >= 0`),
+    check('orders_estimated_minutes_check', sql`${table.estimatedMinutes} >= 0`),
   ],
 );

@@ -47,6 +47,12 @@ export const FINISHED_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.REJECTED,
 ];
 
+export const ORDER_CANCELLED_BY = {
+  CLIENT: 'client',
+  SYSTEM: 'system',
+  STAFF: 'staff',
+} as const;
+
 // List
 export const ORDER_LIST_FILTER = {
   ALL: 'all',
