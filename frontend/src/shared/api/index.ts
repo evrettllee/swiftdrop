@@ -40,6 +40,7 @@ export {
   COURIER_ORDERS_API_PATHS,
   courierOrderSchema,
   currentCourierOrderSchema,
+  getCurrentCourierOrder,
 } from './endpoints/courier-order';
 export type {
   CourierMe,

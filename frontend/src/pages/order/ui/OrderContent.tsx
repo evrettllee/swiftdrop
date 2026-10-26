@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useOrderChatView } from '@/features/order-chat';
-import type { ClientOrderCourier, OrderDetails } from '@/shared/api';
+import { useIncomingMessageToast, useOrderChatView } from '@/features/order-chat';
+import { CHAT_SENDER_ROLE, type ClientOrderCourier, type OrderDetails } from '@/shared/api';
 import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
+import { getOrderPath } from '@/shared/routes';
 import { Divider } from '@/shared/ui/divider';
 import type { OrderLive } from '../model/useOrderLive';
 import { CancelOrderDialog } from './CancelOrderDialog';
@@ -34,6 +35,12 @@ export function OrderContent({
 }: OrderContentProps) {
   const [isCancelOpen, setIsCancelOpen] = useState(false);
   const chatView = useOrderChatView(courier !== null);
+  useIncomingMessageToast({
+    orderId: courier === null ? null : order.orderId,
+    ownRole: CHAT_SENDER_ROLE.CLIENT,
+    senderName: courier?.name ?? '',
+    chatPath: getOrderPath(order.orderId),
+  });
 
   function handleCancelled(): void {
     setIsCancelOpen(false);

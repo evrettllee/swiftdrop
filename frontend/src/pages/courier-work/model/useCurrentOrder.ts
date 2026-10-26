@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { refreshCourierProfile } from '@/entities/courier';
-import type { CourierOrder } from '@/shared/api';
+import { type CourierOrder, getCurrentCourierOrder } from '@/shared/api';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
 import { CONNECTION_STATUS, useConnectionStatus } from '@/shared/realtime';
-import { getCurrentOrder } from '../api/courier-order';
 
 type CurrentOrderState = {
   status: ListStatus;
@@ -48,7 +47,7 @@ export function useCurrentOrder(activeOrderId: number) {
   useEffect(() => {
     const controller = new AbortController();
 
-    getCurrentOrder(controller.signal).then(
+    getCurrentCourierOrder(controller.signal).then(
       async (order) => {
         if (order !== null) {
           setState({ status: LIST_STATUS.READY, order });

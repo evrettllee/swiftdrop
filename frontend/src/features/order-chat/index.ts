@@ -1,6 +1,7 @@
 export { useActiveOrderChat } from './model/active-chat-context';
 export type { ChatState } from './model/chat-store';
 export { useChatParamCleanup } from './model/useChatParam';
+export { useIncomingMessageToast } from './model/useIncomingMessageToast';
 export type { OrderChat } from './model/useOrderChat';
 export { useOrderChat } from './model/useOrderChat';
 export type { OrderChatView } from './model/useOrderChatView';

@@ -1,14 +1,16 @@
 import { useCourierProfileLoader } from '@/entities/courier';
 import { OrderOffer } from '@/features/order-offer';
 import { CourierLocationProvider } from '@/features/courier-location';
-import { ActiveOrderChatProvider } from '@/features/order-chat';
+import { ActiveOrderChatProvider, useIncomingMessageToast } from '@/features/order-chat';
 import { CHAT_SENDER_ROLE } from '@/shared/api';
 import { useAppSocket } from '@/shared/realtime';
 import { APP_ROUTES } from '@/shared/routes';
+import { ToastViewport } from '@/shared/ui/toast';
 import { AccountShell } from '../account-shell/AccountShell';
 import { CourierStatusIndicator } from './CourierStatusIndicator';
 import { COURIER_LAYOUT_TEXTS, COURIER_NAV_ITEMS } from './navigation';
 import { useActiveOrderRoom } from './useActiveOrderRoom';
+import { useActiveOrderSender } from './useActiveOrderSender';
 
 // The frame of every page of the courier; an offer of an order may come on any of them. The socket
 // lives while the cabinet is open: leaving it or signing out (the role route unmounts the cabinet)
@@ -17,6 +19,13 @@ export function CourierLayout() {
   useAppSocket();
   useCourierProfileLoader();
   const { activeOrderId, joins } = useActiveOrderRoom();
+  const senderName = useActiveOrderSender(activeOrderId);
+  useIncomingMessageToast({
+    orderId: activeOrderId,
+    ownRole: CHAT_SENDER_ROLE.COURIER,
+    senderName: senderName ?? COURIER_LAYOUT_TEXTS.SENDER,
+    chatPath: APP_ROUTES.COURIER_WORK,
+  });
 
   return (
     <CourierLocationProvider>
@@ -32,6 +41,7 @@ export function CourierLayout() {
           headerEnd={<CourierStatusIndicator />}
         />
         <OrderOffer />
+        <ToastViewport />
       </ActiveOrderChatProvider>
     </CourierLocationProvider>
   );

@@ -11,5 +11,6 @@ export const CHAT_TEXTS = {
   READ: 'Прочитано',
   SENT: 'Отправлено',
   SEND_FAILED: 'Не удалось отправить сообщение. Попробуйте ещё раз',
+  REPLY: 'Ответить',
   incoming: (text: string) => `Новое сообщение: ${text}`,
 } as const;
