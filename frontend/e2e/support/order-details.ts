@@ -11,6 +11,29 @@ import { TEST_ADDRESSES } from './mapbox';
 
 const CITY = 'Минск';
 const { SVERDLOVA, PRITYTSKOGO } = TEST_ADDRESSES;
+const MINUTE = 60_000;
+
+const DELIVERY_PATH: readonly OrderStatus[] = [
+  ORDER_STATUS.PENDING,
+  ORDER_STATUS.CONFIRMED,
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
+  ORDER_STATUS.DELIVERED,
+];
+
+function buildTestHistory(status: OrderStatus, createdAt: Date): OrderDetails['history'] {
+  const reached = DELIVERY_PATH.indexOf(status);
+  const path =
+    reached === -1
+      ? [ORDER_STATUS.PENDING, ORDER_STATUS.CONFIRMED, status]
+      : DELIVERY_PATH.slice(0, reached + 1);
+
+  return path.map((pathStatus, index) => ({
+    status: pathStatus,
+    changedAt: new Date(createdAt.getTime() + index * MINUTE),
+  }));
+}
 
 // An order of the test addresses, by default with a courier assigned, as GET /api/orders/:orderId
 // answers it.
@@ -34,7 +57,7 @@ export function buildTestOrderDetails(
     parcel: { weightKg: 2.5, lengthCm: 40, widthCm: 30, heightCm: 20, isFragile: false },
     pickup: { ...SVERDLOVA, city: CITY, apartment: null },
     delivery: { ...PRITYTSKOGO, city: CITY, apartment: '4' },
-    history: [{ status, changedAt: createdAt }],
+    history: buildTestHistory(status, createdAt),
     cancelledBy: null,
     payment: null,
   };

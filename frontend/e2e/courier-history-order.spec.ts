@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { COURIER_LAYOUT_TEXTS } from '../src/app/layouts/courier-layout/navigation';
 import { ORDER_STATUS_LABELS } from '../src/entities/order/config/texts';
+import { COURIER_PROGRESS_STEPS } from '../src/pages/courier-history-order/config/progress';
 import { HISTORY_ORDER_TEXTS } from '../src/pages/courier-history-order/config/texts';
 import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { ROUTING_API_PATHS } from '../src/shared/api/endpoints/routing';
@@ -87,8 +88,11 @@ test('should open the order from its card with the route, the stages and the par
   await expect(route).toContainText('улица Свердлова, 13а, Минск');
   await expect(route).toContainText('проспект Притыцкого, 83, кв. 47, Минск');
   const steps = section(HISTORY_ORDER_TEXTS.SECTION_PROGRESS).getByRole('listitem');
-  await expect(steps).toHaveText([/Назначен/, /Забрал посылку/, /В пути/, /Доставлен/]);
-  await expect(steps.first()).toContainText(/\d{2}:\d{2}/);
+  await expect(steps).toHaveText(
+    COURIER_PROGRESS_STEPS.map((step) => new RegExp(`^${step.label}\\d{2}:\\d{2}$`)),
+  );
+  await expect(steps.and(page.locator('[aria-current]'))).toHaveCount(1);
+  await expect(steps.last()).toHaveAttribute('aria-current', 'step');
   const parcel = section(HISTORY_ORDER_TEXTS.SECTION_PARCEL);
   await expect(parcel).toContainText('2,5 кг');
   await expect(parcel).toContainText('40 × 30 × 20 см');
@@ -106,6 +110,8 @@ test('should end the stages of a cancelled order with the cancellation', async (
 
   await expect(steps).toHaveCount(3);
   await expect(steps.last()).toHaveText(new RegExp(ORDER_STATUS_LABELS[ORDER_STATUS.CANCELLED]));
+  await expect(steps.and(page.locator('[aria-current]'))).toHaveCount(1);
+  await expect(steps.last()).toHaveAttribute('aria-current', 'step');
 });
 
 test('should lead back to the same page of the history', async () => {
