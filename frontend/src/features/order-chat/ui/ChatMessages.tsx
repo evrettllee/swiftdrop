@@ -40,6 +40,7 @@ export function ChatMessages() {
       <div
         ref={scroller}
         role="log"
+        tabIndex={0}
         aria-live="off"
         aria-label={CHAT_TEXTS.MESSAGES}
         aria-busy={!chat.isLoaded || chat.isLoadingOlder}

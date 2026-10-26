@@ -2,7 +2,7 @@ import { ChatTextIcon, PhoneIcon } from '@phosphor-icons/react';
 import { type Ref, useId } from 'react';
 import type { ClientOrderCourier } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
-import { getNameInitials } from '@/shared/lib/format';
+import { buildTelHref, getNameInitials } from '@/shared/lib/format';
 import { Avatar } from '@/shared/ui/avatar';
 import { CountBadge } from '@/shared/ui/badge';
 import { OutlineIconButton, OutlineIconLink } from '@/shared/ui/icon-button';
@@ -30,6 +30,7 @@ export function OrderCourier({
   const unreadId = useId();
   const vehicle = courier.vehicle === null ? null : formatCourierVehicle(courier.vehicle);
   const shortVehicle = courier.vehicle === null ? null : formatCourierVehicleShort(courier.vehicle);
+  const telHref = courier.phone === undefined ? null : buildTelHref(courier.phone);
 
   return (
     <Section title={ORDER_COURIER_TEXTS.SECTION}>
@@ -44,8 +45,8 @@ export function OrderCourier({
             </span>
           )}
         </div>
-        {courier.phone === undefined ? null : (
-          <OutlineIconLink href={`tel:${courier.phone}`} aria-label={ORDER_COURIER_TEXTS.CALL}>
+        {telHref === null ? null : (
+          <OutlineIconLink href={telHref} aria-label={ORDER_COURIER_TEXTS.CALL}>
             <PhoneIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
           </OutlineIconLink>
         )}

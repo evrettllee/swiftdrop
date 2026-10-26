@@ -1,4 +1,5 @@
 import { CheckIcon, ChecksIcon } from '@phosphor-icons/react';
+import { memo } from 'react';
 import type { ChatMessage } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
@@ -15,7 +16,7 @@ type ChatBubbleProps = {
   isOwn: boolean;
 };
 
-export function ChatBubble({ message, isOwn }: ChatBubbleProps) {
+export const ChatBubble = memo(function ChatBubble({ message, isOwn }: ChatBubbleProps) {
   const ReadIcon = message.isRead ? ChecksIcon : CheckIcon;
 
   return (
@@ -35,4 +36,4 @@ export function ChatBubble({ message, isOwn }: ChatBubbleProps) {
       </span>
     </div>
   );
-}
+});

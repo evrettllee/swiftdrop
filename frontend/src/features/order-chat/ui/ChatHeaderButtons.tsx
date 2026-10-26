@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, PhoneIcon, XIcon } from '@phosphor-icons/react';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { buildTelHref } from '@/shared/lib/format';
 import { IconButton } from '@/shared/ui/icon-button';
 import { CHAT_TEXTS } from '../config/texts';
 
@@ -9,9 +10,15 @@ type ChatCallLinkProps = {
 };
 
 export function ChatCallLink({ phone, label }: ChatCallLinkProps) {
+  const href = buildTelHref(phone);
+
+  if (href === null) {
+    return null;
+  }
+
   return (
     <a
-      href={`tel:${phone}`}
+      href={href}
       aria-label={label}
       className={`flex size-11 shrink-0 items-center justify-center rounded-md text-accent hover:bg-selected ${COLOR_TRANSITION_CLASS}`}
     >

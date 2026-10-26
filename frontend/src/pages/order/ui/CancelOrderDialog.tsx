@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { formatOrderNumber } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
 import { formatMoney } from '@/shared/lib/format';
@@ -16,7 +17,12 @@ type CancelOrderDialogProps = {
   onCancelled: () => void;
 };
 
-export function CancelOrderDialog({ order, isOpen, onClose, onCancelled }: CancelOrderDialogProps) {
+export const CancelOrderDialog = memo(function CancelOrderDialog({
+  order,
+  isOpen,
+  onClose,
+  onCancelled,
+}: CancelOrderDialogProps) {
   const cancellation = useCancelOrder(order.orderId, onCancelled);
   const isPaid = getPaymentView(order) === PAYMENT_VIEW.PAID;
 
@@ -61,4 +67,4 @@ export function CancelOrderDialog({ order, isOpen, onClose, onCancelled }: Cance
       )}
     </Dialog>
   );
-}
+});

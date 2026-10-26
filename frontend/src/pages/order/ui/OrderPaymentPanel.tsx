@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { memo, useId } from 'react';
 import { DeliveryPriceRows, formatDistanceKm, PRICE_TEXTS, PriceTotal } from '@/entities/price';
 import type { OrderDetails } from '@/shared/api';
 import { formatMoney } from '@/shared/lib/format';
@@ -18,7 +18,11 @@ type OrderPaymentPanelProps = {
   onCancel?: () => void;
 };
 
-export function OrderPaymentPanel({ order, isPayFailed, onCancel }: OrderPaymentPanelProps) {
+export const OrderPaymentPanel = memo(function OrderPaymentPanel({
+  order,
+  isPayFailed,
+  onCancel,
+}: OrderPaymentPanelProps) {
   const headingId = useId();
   const minutes = getTravelMinutes(order);
   const total = formatMoney(order.price, order.currency);
@@ -55,4 +59,4 @@ export function OrderPaymentPanel({ order, isPayFailed, onCancel }: OrderPayment
       <RepeatOrderAction order={order} />
     </aside>
   );
-}
+});

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useIncomingMessageToast, useOrderChatView } from '@/features/order-chat';
 import { CHAT_SENDER_ROLE, type ClientOrderCourier, type OrderDetails } from '@/shared/api';
 import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
@@ -42,10 +42,12 @@ export function OrderContent({
     chatPath: getOrderPath(order.orderId),
   });
 
-  function handleCancelled(): void {
+  const openCancel = useCallback(() => setIsCancelOpen(true), []);
+  const closeCancel = useCallback(() => setIsCancelOpen(false), []);
+  const handleCancelled = useCallback(() => {
     setIsCancelOpen(false);
     onReload();
-  }
+  }, [onReload]);
 
   if (courier !== null && chatView.isScreenOpen) {
     return <OrderChat chat={live.chat} courier={courier} view={chatView} />;
@@ -85,14 +87,14 @@ export function OrderContent({
           <OrderPaymentPanel
             order={order}
             isPayFailed={paymentReturn.isFailed}
-            onCancel={() => setIsCancelOpen(true)}
+            onCancel={openCancel}
           />
         </div>
       </div>
       <CancelOrderDialog
         order={order}
         isOpen={isCancelOpen}
-        onClose={() => setIsCancelOpen(false)}
+        onClose={closeCancel}
         onCancelled={handleCancelled}
       />
       {courier !== null && chatView.isDrawerOpen ? (

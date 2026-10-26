@@ -1,4 +1,5 @@
 import { ArrowLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
+import { memo } from 'react';
 import { Link } from 'react-router';
 import { formatOrderNumber, OrderStatusBadge } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
@@ -15,7 +16,7 @@ type OrderHeaderProps = {
 
 // The desktop shows the breadcrumbs and the full date under the title, a phone shows the back
 // button above the title and the status with the short date under it.
-export function OrderHeader({ order }: OrderHeaderProps) {
+export const OrderHeader = memo(function OrderHeader({ order }: OrderHeaderProps) {
   const orderNumber = formatOrderNumber(order.orderId);
 
   return (
@@ -68,4 +69,4 @@ export function OrderHeader({ order }: OrderHeaderProps) {
       </div>
     </header>
   );
-}
+});

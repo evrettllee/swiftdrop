@@ -44,6 +44,25 @@ test('should join the room again and load the order after a lost connection', as
   await expect(page.getByRole('group', { name: 'Код 4 8 2 7' })).toBeVisible();
 });
 
+test('should take an event once after the connection was lost twice', async ({ page }) => {
+  const order = await stubLiveOrder(page);
+  order.status = ORDER_STATUS.COURIER_ASSIGNED;
+  await openLiveOrder(page, order);
+
+  for (const round of [1, 2]) {
+    const joined = order.socket.joins.length;
+    await order.socket.drop();
+    await expect.poll(() => order.socket.joins.length).toBeGreaterThan(joined);
+    await expect.poll(() => order.requests).toBeGreaterThan(round);
+  }
+  const asked = order.requests;
+
+  pushStatus(order, LIVE_ORDER_ID, ORDER_STATUS.PICKED_UP);
+
+  await expect(page.getByRole('group', { name: 'Код 4 8 2 7' })).toBeVisible();
+  expect(order.requests - asked).toBe(1);
+});
+
 test('should not ask again for a room of an order the backend does not find', async ({ page }) => {
   const order = await stubLiveOrder(page, { ok: false, reason: 'not_found' });
   await page.goto(getOrderPath(LIVE_ORDER_ID));
