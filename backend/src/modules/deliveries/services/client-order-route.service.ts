@@ -64,17 +64,22 @@ export class ClientOrderRouteService {
     }
 
     const parcel = await this.routes.forClientParcel(order);
-    const courierSegment = this.courierSegment(orderId, order);
+    const courier = this.courierWay(orderId, order);
 
     return {
-      segments: courierSegment ? [...parcel.segments, courierSegment] : parcel.segments,
+      segments: courier ? [...parcel.segments, courier.segment] : parcel.segments,
       courierPosition: toClientCourierPosition(order),
+      pickupEtaAt: courier?.pickupEtaAt ?? null,
     };
   }
 
-  // The way of the courier to the next point, as the last arrival estimate drew it. A line made for
-  // another point (the status has just changed) is not shown.
-  private courierSegment(orderId: number, order: RoutedOrder): RouteSegment | null {
+  // The way of the courier to the next point and their arrival at the pickup point, as the last
+  // arrival estimate made them. What was made for another point (the status has just changed) is
+  // not shown.
+  private courierWay(
+    orderId: number,
+    order: RoutedOrder,
+  ): { segment: RouteSegment; pickupEtaAt: string | null } | null {
     const next = nextPointPlan(order, null);
 
     if (next === null) {
@@ -84,6 +89,9 @@ export class ClientOrderRouteService {
     const leg = this.eta.courierLeg(orderId);
     const isForThisPoint = leg !== null && SEGMENT_OF_LEG[leg.toPoint] === next.kind;
 
-    return { kind: next.kind, geometry: isForThisPoint ? leg.geometry : null };
+    return {
+      segment: { kind: next.kind, geometry: isForThisPoint ? leg.geometry : null },
+      pickupEtaAt: isForThisPoint ? this.eta.pickupEtaAt(orderId) : null,
+    };
   }
 }

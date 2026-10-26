@@ -52,6 +52,7 @@ export class OrderPlacementService {
           price: estimate.price.toFixed(MONEY_FRACTION_DIGITS),
           priceCoefficient: estimate.coefficient,
           distanceKm: estimate.distanceKm,
+          estimatedMinutes: estimate.estimatedMinutes,
           estimatedDeliveryAt,
         })
         .returning({ orderId: orders.orderId });

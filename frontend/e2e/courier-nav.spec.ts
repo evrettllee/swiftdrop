@@ -8,7 +8,8 @@ import { stubMapbox } from './support/mapbox';
 import { buildOrderStubState, buildTestOrder, stubCourierOnOrder } from './support/courier-order';
 import { answerAs, stubHistoryOrder } from './support/courier-history-order';
 import { PARCEL_SEGMENT, stubRouteLines } from './support/routing';
-import { stubCourierSocket, stubSession } from './support/stub-session';
+import { stubOrderLive } from './support/app-socket';
+import { stubSession } from './support/stub-session';
 
 // The menu of the cabinet on pages that stand for one of its items: the item is highlighted and
 // tells it to assistive technology too. The session and the answers come from the stubs.
@@ -16,7 +17,7 @@ const HISTORY_ORDER_ID = 990008;
 
 test.beforeEach(async ({ page }) => {
   await stubSession(page, ROLE.COURIER);
-  await stubCourierSocket(page);
+  await stubOrderLive(page);
   await stubMapbox(page);
   await stubCourierOnOrder(
     page,

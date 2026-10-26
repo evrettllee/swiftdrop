@@ -11,6 +11,29 @@ import { TEST_ADDRESSES } from './mapbox';
 
 const CITY = 'Минск';
 const { SVERDLOVA, PRITYTSKOGO } = TEST_ADDRESSES;
+const MINUTE = 60_000;
+
+const DELIVERY_PATH: readonly OrderStatus[] = [
+  ORDER_STATUS.PENDING,
+  ORDER_STATUS.CONFIRMED,
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
+  ORDER_STATUS.DELIVERED,
+];
+
+function buildTestHistory(status: OrderStatus, createdAt: Date): OrderDetails['history'] {
+  const reached = DELIVERY_PATH.indexOf(status);
+  const path =
+    reached === -1
+      ? [ORDER_STATUS.PENDING, ORDER_STATUS.CONFIRMED, status]
+      : DELIVERY_PATH.slice(0, reached + 1);
+
+  return path.map((pathStatus, index) => ({
+    status: pathStatus,
+    changedAt: new Date(createdAt.getTime() + index * MINUTE),
+  }));
+}
 
 // An order of the test addresses, by default with a courier assigned, as GET /api/orders/:orderId
 // answers it.
@@ -27,13 +50,15 @@ export function buildTestOrderDetails(
     currency: 'BYN',
     priceCoefficient: 1,
     distanceKm: 7.98,
+    estimatedMinutes: null,
     estimatedDeliveryAt: null,
     createdAt,
     recipient: { name: 'Ольга Петрова', phone: '+375291234567' },
     parcel: { weightKg: 2.5, lengthCm: 40, widthCm: 30, heightCm: 20, isFragile: false },
     pickup: { ...SVERDLOVA, city: CITY, apartment: null },
     delivery: { ...PRITYTSKOGO, city: CITY, apartment: '4' },
-    history: [{ status, changedAt: createdAt }],
+    history: buildTestHistory(status, createdAt),
+    cancelledBy: null,
     payment: null,
   };
 }
@@ -41,12 +66,18 @@ export function buildTestOrderDetails(
 export const COURIER_NAME = 'Дмитрий С.';
 // Four digits the page shows as "Код 4 8 2 7".
 export const DELIVERY_CODE = '4827';
+export const COURIER_PHONE = '+375295551234';
 
 const COURIER_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.COURIER_ASSIGNED,
   ORDER_STATUS.PICKED_UP,
   ORDER_STATUS.IN_TRANSIT,
   ORDER_STATUS.DELIVERED,
+];
+const CONTACT_STATUSES: readonly OrderStatus[] = [
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.PICKED_UP,
+  ORDER_STATUS.IN_TRANSIT,
 ];
 const CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.PICKED_UP,
@@ -66,6 +97,7 @@ export function buildTestOrderCourier(status: OrderStatus) {
             model: 'Octavia',
             licensePlate: '1234 AB-7',
           },
+          ...(CONTACT_STATUSES.includes(status) ? { phone: COURIER_PHONE } : {}),
         }
       : null,
     deliveryCode: CODE_VISIBLE_STATUSES.includes(status) ? DELIVERY_CODE : null,

@@ -9,8 +9,12 @@ import {
 } from '../../../src/modules/deliveries/constants/deliveries.constants';
 import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
 import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
-import { ORDER_ROOM_EVENTS } from '../../../src/modules/tracking/constants/tracking.constants';
+import {
+  ETA_SHUTDOWN_WAIT_MS,
+  ORDER_ROOM_EVENTS,
+} from '../../../src/modules/tracking/constants/tracking.constants';
 import { OrderEtaStore } from '../../../src/modules/tracking/services/order-eta-store.service';
+import { OrderEtaService } from '../../../src/modules/tracking/services/order-eta.service';
 import type { OrderEtaEvent } from '../../../src/modules/tracking/types/tracking.types';
 import { COOKIE_HEADER, registerUser } from '../../support/auth';
 import { OpenSockets, placeConfirmedOrder } from '../../support/chat';
@@ -99,6 +103,41 @@ describe('Arrival estimate and the route of the client (e2e)', () => {
     });
   });
 
+  it('should give the arrival at the pickup point of the last estimate in the route', async () => {
+    const { pickupEtaAt } = await firstEstimate();
+
+    const response = await getOrderRoute();
+
+    expect(pickupEtaAt).toEqual(expect.any(String));
+    expect(response.body.pickupEtaAt).toBe(pickupEtaAt);
+  });
+
+  it('should give no arrival at the pickup point in the route after the pickup', async () => {
+    await firstEstimate();
+    const afterPickup = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const path = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.PICKUP.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
+    await postApi(app, path).set(COOKIE_HEADER, courier.cookies).expect(HttpStatus.OK);
+    await afterPickup;
+
+    const response = await getOrderRoute();
+
+    expect(response.body.pickupEtaAt).toBeNull();
+  });
+
+  // The status changed and its estimate has not come yet: the stored arrival belongs to the old
+  // point and is not given.
+  it('should not give the arrival at the pickup point of the previous status', async () => {
+    await firstEstimate();
+    mocks.getTrip.mockResolvedValue(null);
+    const path = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.PICKUP.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
+    await postApi(app, path).set(COOKIE_HEADER, courier.cookies).expect(HttpStatus.OK);
+    await app.get(OrderEtaService).waitForIdle(ETA_SHUTDOWN_WAIT_MS);
+
+    const response = await getOrderRoute();
+
+    expect(response.body.pickupEtaAt).toBeNull();
+  });
+
   it('should answer without the line after a restart and estimate in the background', async () => {
     await firstEstimate();
     app.get(OrderEtaStore).clear();
@@ -110,6 +149,7 @@ describe('Arrival estimate and the route of the client (e2e)', () => {
       kind: ROUTE_SEGMENT_KIND.TO_PICKUP,
       geometry: null,
     });
+    expect(response.body.pickupEtaAt).toBeNull();
     expect((await estimate).courierLeg).toEqual({ geometry: LEG_TO_PICKUP, toPoint: 'pickup' });
   });
 });

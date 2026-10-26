@@ -7,9 +7,11 @@ import { OsrmClient } from './osrm-client.service';
 
 // The index of the waypoint that ends the first leg: the second point of the trip.
 const FIRST_LEG_END = 1;
+const FIRST_LEG = 0;
 
 // The trip of a courier through several points in one request: the whole time for the arrival
-// estimate and the line of the first leg for the map. Nothing is cached: the callers ask rarely.
+// estimate, the time of the first leg for the arrival at the next point and its line for the map.
+// Nothing is cached: the callers ask rarely.
 @Injectable()
 export class OsrmTripService {
   private readonly logger = new Logger(OsrmTripService.name);
@@ -42,10 +44,12 @@ export class OsrmTripService {
       OSRM_GEOMETRY_QUERY,
     );
     const legEnd = waypoints[FIRST_LEG_END]?.location;
+    const firstLeg = route.legs?.[FIRST_LEG];
 
-    // Asked for and missing: the answer is broken, which counts as a failure of the service.
-    if (route.geometry === undefined || legEnd === undefined) {
-      this.logger.error('OSRM returned a trip without the geometry or the waypoints');
+    // Asked for and missing: the answer is broken, which counts as a failure of the service. OSRM
+    // gives the legs with every route.
+    if (route.geometry === undefined || legEnd === undefined || firstLeg === undefined) {
+      this.logger.error('OSRM returned a trip without the geometry, the waypoints or the legs');
       throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
     }
 
@@ -54,6 +58,7 @@ export class OsrmTripService {
 
     return {
       durationS: route.duration,
+      firstLegDurationS: firstLeg.duration,
       firstLegGeometry: isOneLeg
         ? route.geometry
         : polylineUntil(route.geometry, { latitude, longitude }),

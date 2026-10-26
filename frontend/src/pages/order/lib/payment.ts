@@ -1,5 +1,4 @@
 import { ORDER_STATUS, type OrderDetails, PAYMENT_STATUS } from '@/shared/api';
-import { MS_PER_MINUTE } from '@/shared/config';
 import { PAYMENT_VIEW } from '../config/payment';
 import type { PaymentView } from '../model/payment-view';
 
@@ -39,9 +38,8 @@ export function getPaymentTime(order: OrderDetails, view: PaymentView): Date | n
   return time;
 }
 
-// The minutes of the trip given at the order: the expected delivery minus the creation time.
+// The minutes of the trip given at the order. Not counted from estimatedDeliveryAt: the arrival
+// estimate moves it while the courier carries the order.
 export function getTravelMinutes(order: OrderDetails): number | null {
-  return order.estimatedDeliveryAt === null
-    ? null
-    : Math.round((order.estimatedDeliveryAt.getTime() - order.createdAt.getTime()) / MS_PER_MINUTE);
+  return order.estimatedMinutes;
 }

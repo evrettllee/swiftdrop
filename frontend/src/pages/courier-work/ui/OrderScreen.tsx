@@ -1,10 +1,13 @@
 import type { LocationSharing } from '@/features/courier-location';
+import { useActiveOrderChat, useOrderChatView } from '@/features/order-chat';
 import type { CourierOrder, CourierVehicle } from '@/shared/api';
 import { Divider } from '@/shared/ui/divider';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { ORDER_ACTION, type OrderStep } from '../config/order-steps';
 import { useOrderStep } from '../model/useOrderStep';
 import { ConnectionAlert } from './ConnectionAlert';
+import { CourierChat } from './CourierChat';
+import { CourierChatButton } from './CourierChatButton';
 import { GeoAlert } from './GeoAlert';
 import { OrderActionBar } from './OrderActionBar';
 import { OrderHeader } from './OrderHeader';
@@ -41,6 +44,8 @@ export function OrderScreen({
   onEnterCode,
 }: OrderScreenProps) {
   const orderStep = useOrderStep({ onDone: onChanged, onStale });
+  const chat = useActiveOrderChat();
+  const chatView = useOrderChatView(true);
   const error = orderStep.error ?? deliveryError;
   const button = (
     <OrderStepButton
@@ -48,11 +53,21 @@ export function OrderScreen({
       isPending={orderStep.isPending}
       onPress={
         step.action === ORDER_ACTION.ENTER_CODE
-          ? onEnterCode
+          ? () => {
+              if (chatView.isOpen) {
+                chatView.closeChat();
+              }
+
+              onEnterCode();
+            }
           : () => void orderStep.run(order.orderId, step.action)
       }
     />
   );
+
+  if (chatView.isScreenOpen) {
+    return <CourierChat chat={chat} order={order} view={chatView} />;
+  }
 
   return (
     // On a phone the end of the page stays clear of the bar with the button (24px above it).
@@ -70,7 +85,20 @@ export function OrderScreen({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-12">
         <div className="flex min-w-0 flex-col gap-6 lg:flex-1 lg:gap-8">
           <OrderMap order={order} />
-          <OrderStops order={order} step={step} vehicle={vehicle.type} />
+          <OrderStops
+            order={order}
+            step={step}
+            vehicle={vehicle.type}
+            chatButton={
+              <CourierChatButton
+                buttonRef={chatView.chatButtonRef}
+                unreadCount={chat.unreadCount}
+                isChatOpen={chatView.isOpen}
+                chatId={chatView.chatId}
+                onToggle={chatView.isOpen ? chatView.closeChat : chatView.openChat}
+              />
+            }
+          />
         </div>
         <div className="lg:hidden">
           <Divider />
@@ -78,6 +106,7 @@ export function OrderScreen({
         <OrderParcel order={order} step={step} button={button} />
       </div>
       <OrderActionBar>{button}</OrderActionBar>
+      {chatView.isDrawerOpen ? <CourierChat chat={chat} order={order} view={chatView} /> : null}
     </div>
   );
 }

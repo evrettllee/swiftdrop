@@ -13,8 +13,9 @@ import {
   expectRoadLines,
   PARCEL_SEGMENT,
   routeUnavailableBadge,
-  stubRouteLines,
+  stubClientOrderRoute,
 } from './support/routing';
+import { stubOrderLive } from './support/app-socket';
 
 // How often the map of an order asks for its route. The session, the order and its route all come
 // from the stubbed API: nothing here needs the backend, and no client is registered, as the
@@ -34,6 +35,7 @@ const TEST_CLIENT = {
 test.beforeEach(async ({ page }) => {
   test.setTimeout(QUIET_WAIT_MS * 3);
   await stubMapbox(page);
+  await stubOrderLive(page);
   await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.ME}`, (route) =>
     route.fulfill({ json: TEST_CLIENT }),
   );
@@ -47,9 +49,7 @@ test('should ask for the route of an order without a courier once, without polli
   page,
 }) => {
   await stubOrderDetails(page, ORDER_ID, ORDER_STATUS.CONFIRMED);
-  const requests = await stubRouteLines(page, ROUTING_API_PATHS.clientOrder(ORDER_ID), () => [
-    PARCEL_SEGMENT,
-  ]);
+  const requests = await stubClientOrderRoute(page, ORDER_ID, () => [PARCEL_SEGMENT]);
 
   await page.goto(getOrderPath(ORDER_ID));
   await expectRoadLines(orderMap(page), 1);

@@ -14,10 +14,13 @@ export const ESCAPE_KEY = 'Escape';
 
 export const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
+export const DESKTOP_MEDIA_QUERY = '(min-width: 64rem)';
+
 export const DOM_EVENT = {
   CHANGE: 'change',
   KEY_DOWN: 'keydown',
   PAGE_HIDE: 'pagehide',
+  VISIBILITY_CHANGE: 'visibilitychange',
 } as const;
 
 // The `overflow` of the body while a dialog or the expanded map covers the page.

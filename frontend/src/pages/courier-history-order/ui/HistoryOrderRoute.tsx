@@ -1,10 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { OrderRoutePoints } from '@/entities/order';
 import { type CourierHistoryOrder, getCourierHistoryOrderRoute } from '@/shared/api';
+import { MAP_FRAME_CLASS } from '@/shared/config';
 import { useRouteLines } from '@/shared/lib/route-lines';
 import { Section } from '@/shared/ui/section';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { MAP_FRAME_CLASS } from '../config/map';
 import { HISTORY_ORDER_TEXTS } from '../config/texts';
 
 // Leaflet comes with the first map of the cabinet, not with the page.

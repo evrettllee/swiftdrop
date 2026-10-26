@@ -79,6 +79,12 @@ export const MAP_CLASS = {
   TAG_PICKUP: 'route-tag--pickup',
   TAG_DELIVERY: 'route-tag--delivery',
   LINE: 'route-line',
+  LINE_LIVE: 'route-line--live',
+  COURIER_ETA: 'courier-eta',
+  COURIER_ETA_PILL: 'courier-eta__pill',
+  COURIER_ETA_CIRCLE: 'courier-eta__circle',
+  COURIER_ETA_TEXT: 'courier-eta__text',
+  COURIER_ETA_OFFLINE: 'courier-eta--offline',
   VIEW: 'route-map-view',
   POSITION: 'position-marker',
   POSITION_DOT: 'position-marker__dot',
@@ -89,6 +95,8 @@ export const MAP_CLASS = {
 
 // The dot of the position of the courier, 16px across (position-marker in route-map.css).
 export const POSITION_MARKER_SIZE = 16;
+
+export const COURIER_ETA_ANCHOR = 24;
 
 export const MAP_TEXTS = {
   REGION_LABEL: 'Карта города: отметьте точки «Откуда» и «Куда»',

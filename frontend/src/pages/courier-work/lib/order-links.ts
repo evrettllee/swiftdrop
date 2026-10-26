@@ -9,15 +9,6 @@ import {
   NAVIGATOR_URL,
 } from '../config/order-steps';
 
-const TEL_SCHEME = 'tel:';
-// A phone keeps only the plus and the digits in a link, whatever else came with it.
-const NOT_PHONE_CHARS = /[^+\d]/g;
-
-// For example "tel:+375291234567"
-export function buildTelHref(phone: string): string {
-  return `${TEL_SCHEME}${phone.replace(NOT_PHONE_CHARS, '')}`;
-}
-
 // For example "53.8945,27.5486": rounded, without the zeros at the end.
 function formatNavigatorPoint({ latitude, longitude }: GeoPoint): string {
   return [latitude, longitude]

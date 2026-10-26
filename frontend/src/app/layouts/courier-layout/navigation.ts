@@ -8,6 +8,7 @@ export const COURIER_LAYOUT_TEXTS = {
   NAV_WORK: UI_TEXTS.COURIER_WORK,
   NAV_HISTORY: UI_TEXTS.COURIER_HISTORY,
   NAV_PROFILE: UI_TEXTS.PROFILE,
+  SENDER: 'Отправитель',
 } as const;
 
 export const COURIER_NAV_ITEMS: readonly NavItem[] = [

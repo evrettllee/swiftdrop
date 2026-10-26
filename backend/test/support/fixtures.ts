@@ -13,6 +13,8 @@ export const ROUTE = { distanceKm: 7.98, durationSec: 704.8 };
 
 // The price of VALID_ORDER with ROUTE in BYN, as a number and as a numeric column keeps it.
 export const VALID_ORDER_PRICE = 9.23;
+// The time of the trip of VALID_ORDER with ROUTE: 704.8 s is 12 minutes up, and 10 for the pickup.
+export const VALID_ORDER_ESTIMATED_MINUTES = 22;
 export const VALID_ORDER_PRICE_TEXT = '9.23';
 
 // A valid order body for the test service area, its price is VALID_ORDER_PRICE with ROUTE.

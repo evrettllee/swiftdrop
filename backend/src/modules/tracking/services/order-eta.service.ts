@@ -15,7 +15,7 @@ import {
   ORDER_ROOM_EVENTS,
 } from '../constants/tracking.constants';
 import type { CourierLeg, OrderEtaEntry, OrderEtaEvent } from '../types/tracking.types';
-import { etaPlan } from '../utils/eta-points';
+import { etaPlan, pickupArrival } from '../utils/eta-points';
 import { PendingTasks } from '../utils/pending-tasks';
 import { OrderEtaDataService } from './order-eta-data.service';
 import { OrderEtaStore } from './order-eta-store.service';
@@ -66,6 +66,13 @@ export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
     }
 
     return leg ? { geometry: leg.geometry, toPoint: leg.toPoint } : null;
+  }
+
+  // When the courier reaches the pickup point (ISO), estimated with the stored line; null when the
+  // line leads to the recipient or nothing was estimated yet. Asks for no estimate by itself: the
+  // route asks for the line first.
+  pickupEtaAt(orderId: number): string | null {
+    return this.store.get(orderId)?.courierLeg?.pickupEtaAt?.toISOString() ?? null;
   }
 
   // Waits for the estimates already running, then the database can go. No new one starts after.
@@ -131,15 +138,27 @@ export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
       entry.computedAtMs = Date.now();
       const profile = routingProfileOf(source.vehicleType);
       const trip = await this.trips.getTrip(plan.points, profile);
-      const eta = trip && new Date(Date.now() + trip.durationS * MS_PER_SECOND + plan.handoverMs);
+      // Both times are counted from the same moment, once the routing service has answered.
+      const answeredAtMs = Date.now();
+      const eta = trip && new Date(answeredAtMs + trip.durationS * MS_PER_SECOND + plan.handoverMs);
       const saved = eta && (await this.data.save(orderId, source.status, eta));
 
       if (!trip || !saved || !source.locationUpdatedAt) {
         this.logger.debug(`Estimate of order ${orderId} not saved: no route or the order changed`);
       } else {
         const courierLeg = { geometry: trip.firstLegGeometry, toPoint: plan.toPoint };
-        entry.courierLeg = { ...courierLeg, basedOnUpdatedAt: source.locationUpdatedAt };
-        this.emit({ orderId, estimatedDeliveryAt: saved.toISOString(), courierLeg });
+        const pickupEtaAt = pickupArrival(plan, trip.firstLegDurationS, answeredAtMs);
+        entry.courierLeg = {
+          ...courierLeg,
+          basedOnUpdatedAt: source.locationUpdatedAt,
+          pickupEtaAt,
+        };
+        this.emit({
+          orderId,
+          estimatedDeliveryAt: saved.toISOString(),
+          courierLeg,
+          pickupEtaAt: pickupEtaAt?.toISOString() ?? null,
+        });
       }
     }
   }

@@ -7,7 +7,7 @@ import {
 import { COURIER_ORDERS_API_PATHS } from '../src/shared/api/endpoints/courier-order';
 import { ORDER_STATUS, type OrderStatus } from '../src/shared/api/endpoints/order';
 import { ROUTING_API_PATHS } from '../src/shared/api/endpoints/routing';
-import { COURIER_SOCKET_EVENTS } from '../src/shared/realtime/courier-events';
+import { SOCKET_EVENTS } from '../src/shared/realtime/socket-events';
 import { UI_TEXTS } from '../src/shared/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { ROLE } from '../src/shared/session/auth-user';
@@ -20,7 +20,8 @@ import {
 } from './support/courier-order';
 import { stubMapbox } from './support/mapbox';
 import { PARCEL_SEGMENT, stubRouteLines } from './support/routing';
-import { stubCourierSocket, stubSession } from './support/stub-session';
+import { stubOrderLive } from './support/app-socket';
+import { stubSession } from './support/stub-session';
 
 // The screen of the closed order stays until the courier presses «К работе», whatever the profile
 // of the cabinet is refreshed by meanwhile. The session, the order and the socket are stubbed.
@@ -33,7 +34,7 @@ test('should keep the delivered screen when the profile is refreshed without an 
 }) => {
   const state = buildOrderStubState(buildTestOrder(ORDER_ID, ORDER_STATUS.IN_TRANSIT));
   await stubSession(page, ROLE.COURIER);
-  const socket = await stubCourierSocket(page);
+  const socket = await stubOrderLive(page);
   await stubMapbox(page);
   await stubRouteLines(page, ROUTING_API_PATHS.COURIER_ORDER, () => [PARCEL_SEGMENT]);
   await stubCourierOnOrder(page, state);
@@ -59,7 +60,7 @@ test('should keep the delivered screen when the profile is refreshed without an 
 
   // Another event refreshes the profile, which has no order now.
   const profileLoads = page.waitForResponse((response) => response.url().endsWith('/couriers/me'));
-  socket.push(COURIER_SOCKET_EVENTS.ORDER_CANCELLED, {});
+  socket.push(SOCKET_EVENTS.ORDER_CANCELLED, {});
   await profileLoads;
 
   await expect(delivered).toBeVisible();
@@ -72,7 +73,7 @@ test('should keep the delivered screen when the profile is refreshed without an 
 async function openOrderAt(page: Page, status: OrderStatus): Promise<OrderStubState> {
   const state = buildOrderStubState(buildTestOrder(ORDER_ID, status));
   await stubSession(page, ROLE.COURIER);
-  await stubCourierSocket(page);
+  await stubOrderLive(page);
   await stubMapbox(page);
   await stubRouteLines(page, ROUTING_API_PATHS.COURIER_ORDER, () => [PARCEL_SEGMENT]);
   await stubCourierOnOrder(page, state);

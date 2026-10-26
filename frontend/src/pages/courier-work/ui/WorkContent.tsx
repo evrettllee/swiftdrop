@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCourierLocation } from '@/features/courier-location';
+import { useChatParamCleanup } from '@/features/order-chat';
 import type { CourierMe, CourierVehicle } from '@/shared/api';
 import { CONNECTION_STATUS, useConnectionStatus } from '@/shared/realtime';
 import { CurrentOrder } from './CurrentOrder';
@@ -23,6 +24,7 @@ export function WorkContent({ profile, vehicle }: WorkContentProps) {
   // be refreshed without an order (the line, a cancelled order) and the screen must stay until the
   // courier presses «К работе».
   const [closed, setClosed] = useState<ClosedOrder | null>(null);
+  useChatParamCleanup(closed === null && profile.activeOrderId !== null);
 
   if (closed !== null) {
     return (

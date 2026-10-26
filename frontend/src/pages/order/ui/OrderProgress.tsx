@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { buildOrderProgress, OrderProgressSteps } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
 import { PROGRESS_ALIASES, PROGRESS_STEPS, PROGRESS_STOP_LABELS } from '../config/progress';
@@ -8,7 +9,7 @@ type OrderProgressProps = {
 };
 
 // "Ход заказа" with the steps of the client.
-export function OrderProgress({ order }: OrderProgressProps) {
+export const OrderProgress = memo(function OrderProgress({ order }: OrderProgressProps) {
   const steps = buildOrderProgress(order, {
     steps: PROGRESS_STEPS,
     stopLabels: PROGRESS_STOP_LABELS,
@@ -16,4 +17,4 @@ export function OrderProgress({ order }: OrderProgressProps) {
   });
 
   return <OrderProgressSteps title={ORDER_DETAILS_TEXTS.SECTION_PROGRESS} steps={steps} />;
-}
+});

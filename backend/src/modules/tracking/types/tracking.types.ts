@@ -15,11 +15,13 @@ export type CourierLegTarget = (typeof COURIER_LEG_TARGET)[keyof typeof COURIER_
 // The line along the roads from the courier to the point they go to now (polyline6).
 export type CourierLeg = { geometry: string; toPoint: CourierLegTarget };
 
-// The payload of order:eta.
+// The payload of order:eta. pickupEtaAt is when the courier reaches the pickup point (ISO), only
+// while they go there (courier_assigned); null after the pickup.
 export type OrderEtaEvent = {
   orderId: number;
   estimatedDeliveryAt: string;
   courierLeg: CourierLeg | null;
+  pickupEtaAt: string | null;
 };
 
 // What is kept in memory for an order with a courier.
@@ -29,7 +31,8 @@ export type OrderEtaEntry = {
   inFlight: boolean;
   // A new status came while an estimate was running: one more runs right after it.
   forceQueued: boolean;
-  courierLeg: (CourierLeg & { basedOnUpdatedAt: Date }) | null;
+  // The last line of the courier with the arrival at the pickup point estimated with it.
+  courierLeg: (CourierLeg & { basedOnUpdatedAt: Date; pickupEtaAt: Date | null }) | null;
 };
 
 // The points of the trip left for the courier and the time of the handovers on the way.

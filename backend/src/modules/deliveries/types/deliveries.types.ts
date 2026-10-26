@@ -99,8 +99,12 @@ export type ClientCourierPositionRow = {
 // The last known position of the courier for the client; isStale means lost connection.
 export type ClientCourierPosition = GeoPoint & { updatedAt: string; isStale: boolean };
 
-// The route of an order for the client: the lines and where the courier is.
-export type ClientOrderRoute = RouteLines & { courierPosition: ClientCourierPosition | null };
+// The route of an order for the client: the lines, where the courier is and, while they go to the
+// pickup point, when they reach it (ISO, as pickupEtaAt of order:eta).
+export type ClientOrderRoute = RouteLines & {
+  courierPosition: ClientCourierPosition | null;
+  pickupEtaAt: string | null;
+};
 
 type ShortAddress = { street: string; house: string };
 

@@ -3,7 +3,7 @@ import { OFFER_NOTICE } from '../src/features/order-offer/config/offer';
 import { OFFER_NOTICE_TEXTS, OFFER_TEXTS } from '../src/features/order-offer/config/texts';
 import { COURIER_OFFERS_API_PATHS } from '../src/shared/api/endpoints/courier-offer';
 import { HTTP_STATUS } from '../src/shared/api/request-config';
-import { COURIER_SOCKET_EVENTS } from '../src/shared/realtime/courier-events';
+import { SOCKET_EVENTS } from '../src/shared/realtime/socket-events';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { CITY_CENTER } from '../src/shared/config/map';
 import { MAP_CLASS, MAP_TEXTS } from '../src/shared/ui/route-map/map';
@@ -145,7 +145,7 @@ test('should close the offer when the backend closes it over the socket', async 
     throw new Error('The cabinet opened no socket');
   }
 
-  sendCourierEvent(socket, COURIER_SOCKET_EVENTS.OFFER_CLOSED, { offerId: OFFER_ID });
+  sendCourierEvent(socket, SOCKET_EVENTS.OFFER_CLOSED, { offerId: OFFER_ID });
 
   await expect(offerWindow()).toBeHidden();
   await expect(takenNotice()).toBeVisible();

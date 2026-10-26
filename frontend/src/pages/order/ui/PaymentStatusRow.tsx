@@ -18,7 +18,11 @@ const STATUS_ROWS: Record<PaymentView, StatusRowLook> = {
     iconClass: 'text-fg-secondary',
     label: PAYMENT_TEXTS.UNPAID,
   },
-  [PAYMENT_VIEW.PAID]: { icon: CheckCircleIcon, iconClass: 'text-success', label: PAYMENT_TEXTS.PAID },
+  [PAYMENT_VIEW.PAID]: {
+    icon: CheckCircleIcon,
+    iconClass: 'text-success',
+    label: PAYMENT_TEXTS.PAID,
+  },
   // The money goes back when the order is cancelled.
   [PAYMENT_VIEW.REFUNDED]: {
     icon: ArrowsClockwiseIcon,

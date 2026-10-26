@@ -1,6 +1,11 @@
 import { expect, type Locator, type Page, type Request } from '@playwright/test';
 import { MAP_CLASS, MAP_TEXTS } from '../../src/shared/ui/route-map/map';
-import { type RouteLines, ROUTE_SEGMENT_KIND } from '../../src/shared/api/endpoints/routing';
+import {
+  type ClientOrderRoute,
+  type RouteLines,
+  ROUTE_SEGMENT_KIND,
+  ROUTING_API_PATHS,
+} from '../../src/shared/api/endpoints/routing';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';
 import type { GeoPoint } from '../../src/shared/lib/geo/geo-point';
 import { TEST_ADDRESSES } from './mapbox';
@@ -123,20 +128,42 @@ export function routeUnavailableBadge(map: Locator): Locator {
   return map.getByRole('status').filter({ hasText: MAP_TEXTS.ROUTE_UNAVAILABLE });
 }
 
-// Answers a route endpoint with the segments `answer` gives at the moment of the request, and
-// keeps the requests, so a test can change the answer and count the attempts.
-export async function stubRouteLines(
-  page: Page,
-  path: string,
-  answer: () => Segments,
-): Promise<Request[]> {
+// Answers a route endpoint with the body `answer` gives at the moment of the request, and keeps the
+// requests, so a test can change the answer and count the attempts.
+async function stubRouteAnswer(page: Page, path: string, answer: () => object): Promise<Request[]> {
   const requests: Request[] = [];
 
   await page.route(`**${API_BASE_PATH}${path}`, (route) => {
     requests.push(route.request());
 
-    return route.fulfill({ json: { segments: answer() } });
+    return route.fulfill({ json: answer() });
   });
 
   return requests;
+}
+
+// A route endpoint that answers with the lines alone (the preview, the offer, the courier).
+export function stubRouteLines(
+  page: Page,
+  path: string,
+  answer: () => Segments,
+): Promise<Request[]> {
+  return stubRouteAnswer(page, path, () => ({ segments: answer() }));
+}
+
+// The route of an order of the client: the lines, and no position of the courier or arrival at the
+// pickup point unless the test gives them, as GET /api/orders/:orderId/route answers.
+export function stubClientOrderRoute(
+  page: Page,
+  orderId: number,
+  answer: () => Segments,
+  courier: Pick<ClientOrderRoute, 'courierPosition' | 'pickupEtaAt'> = {
+    courierPosition: null,
+    pickupEtaAt: null,
+  },
+): Promise<Request[]> {
+  return stubRouteAnswer(page, ROUTING_API_PATHS.clientOrder(orderId), () => ({
+    segments: answer(),
+    ...courier,
+  }));
 }
