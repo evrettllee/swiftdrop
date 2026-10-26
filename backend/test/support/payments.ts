@@ -1,14 +1,14 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { payments } from '../../src/database/schema';
-import type { Database } from '../../src/database/database.module';
+import { payments } from '@/database/schema';
+import type { Database } from '@/database/database.module';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENTS_ROUTES,
   SESSION_EXPIRE_RESULT,
   WEBHOOK_SIGNATURE_HEADER,
-} from '../../src/modules/payments/constants/payments.constants';
-import type { CheckoutSessionState } from '../../src/modules/payments/types/payments.types';
+} from '@/modules/payments/constants/payments.constants';
+import type { CheckoutSessionState } from '@/modules/payments/types/payments.types';
 import { COOKIE_HEADER } from './auth';
 import { CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE } from './constants';
 import { VALID_ORDER_PRICE_TEXT } from './fixtures';

@@ -1,6 +1,6 @@
 import type { Request } from 'express';
-import type { OAuthProvider } from '../../../common/enums/oauth-provider.enum';
-import type { RoleName } from '../../../common/enums/role.enum';
+import type { OAuthProvider } from '@/common/enums/oauth-provider.enum';
+import type { RoleName } from '@/common/enums/role.enum';
 
 export type AccessTokenPayload = {
   sub: string;

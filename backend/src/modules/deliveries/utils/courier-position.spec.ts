@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { COURIER_LOCATION_STALE_MS } from '../constants/deliveries.constants';
 import type { ClientCourierPositionRow } from '../types/deliveries.types';
 import { isPositionStale, toClientCourierPosition } from './courier-position';

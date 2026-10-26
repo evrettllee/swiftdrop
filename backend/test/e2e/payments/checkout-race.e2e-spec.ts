@@ -2,25 +2,25 @@ import { HttpStatus } from '@nestjs/common';
 import { setTimeout as delay } from 'node:timers/promises';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { and, eq } from 'drizzle-orm';
-import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { payments } from '../../../src/database/schema';
-import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { PAYMENTS_ERROR_MESSAGES } from '../../../src/modules/payments/constants/payments.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { type Cookies, placeOrders } from '../../support/orders';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { payments } from '@/database/schema';
+import { NbrbService } from '@/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENTS_ERROR_MESSAGES } from '@/modules/payments/constants/payments.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { type Cookies, placeOrders } from '@test/support/orders';
 import {
   createGatewayMock,
   insertPayment,
   postPayment,
   resetGatewayMock,
   USD_RATE,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 const PARALLEL_ATTEMPTS = 2;
 // Long enough for both requests to pass the check of open attempts before either saves its own.

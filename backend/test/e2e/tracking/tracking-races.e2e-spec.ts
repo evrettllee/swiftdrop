@@ -1,22 +1,22 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database, Transaction } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { ORDER_ROOM_EVENTS } from '../../../src/modules/tracking/constants/tracking.constants';
-import { OrderEtaService } from '../../../src/modules/tracking/services/order-eta.service';
-import { registerUser } from '../../support/auth';
-import { OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { placeCourierAt } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { whileRowsAreHeld } from '../../support/locks';
-import { readOrderStatus } from '../../support/orders';
-import { createRoutingMocks, createRoutingTestApp, resetRouting } from '../../support/routing';
-import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '../../support/sockets';
-import { assignTrackedCourier, sendLocation } from '../../support/tracking';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { ORDER_ROOM_EVENTS } from '@/modules/tracking/constants/tracking.constants';
+import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { placeCourierAt } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { whileRowsAreHeld } from '@test/support/locks';
+import { readOrderStatus } from '@test/support/orders';
+import { createRoutingMocks, createRoutingTestApp, resetRouting } from '@test/support/routing';
+import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '@test/support/sockets';
+import { assignTrackedCourier, sendLocation } from '@test/support/tracking';
 
 // Older than the limit of positions per courier, so the next one is stored.
 const PAST_POSITION_MS = 10_000;

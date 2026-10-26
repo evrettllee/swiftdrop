@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CouriersModule } from '../couriers/couriers.module';
+import { CouriersModule } from '@/modules/couriers/couriers.module';
 import { ChatMessagesController } from './controllers/chat-messages.controller';
 import { ChatSendThrottleGuard } from './guards/chat-send-throttle.guard';
 import { ChatHistoryService } from './services/chat-history.service';

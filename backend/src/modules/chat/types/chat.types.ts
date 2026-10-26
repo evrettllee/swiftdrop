@@ -1,4 +1,4 @@
-import type { ROLE } from '../../../common/enums/role.enum';
+import type { ROLE } from '@/common/enums/role.enum';
 
 export type ChatSenderRole = typeof ROLE.CLIENT | typeof ROLE.COURIER;
 

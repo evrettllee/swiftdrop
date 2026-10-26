@@ -11,7 +11,7 @@ import {
 import {
   ORDER_OFFER_STATUS,
   ORDER_OFFER_STATUS_VALUES,
-} from '../../common/enums/order-offer-status.enum';
+} from '@/common/enums/order-offer-status.enum';
 import { sqlLiteral } from '../sql-literal';
 import { courierProfiles } from './courier-profiles';
 import { orders } from './orders';

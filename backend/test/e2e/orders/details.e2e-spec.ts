@@ -1,30 +1,30 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import { eq } from 'drizzle-orm';
-import { MS_PER_MINUTE } from '../../../src/common/constants/time.constants';
-import { orders, orderStatusHistory } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { orders, orderStatusHistory } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ORDERS_ERROR_MESSAGES,
   ORDERS_ROUTES,
   ORDERS_VALIDATION_MESSAGES,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { MISSING_ORDER_ID } from '../../support/constants';
+} from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { MISSING_ORDER_ID } from '@test/support/constants';
 import {
   MINSK_DELIVERY,
   MINSK_PICKUP,
   SMALL_PACKAGE,
   VALID_ORDER_ESTIMATED_MINUTES,
   VALID_ORDER_PRICE,
-} from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { type Cookies, placeOrders, SECOND_CLIENT } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { type Cookies, placeOrders, SECOND_CLIENT } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Order details (e2e)', () => {
   let app: NestExpressApplication;

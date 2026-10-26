@@ -10,10 +10,10 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import type { Namespace, Socket } from 'socket.io';
-import { ROLE } from '../../../common/enums/role.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { SOCKET_PATH } from '../../realtime/constants/realtime.constants';
-import { SocketSessionTimersService } from '../../realtime/services/socket-session-timers.service';
+import { ROLE } from '@/common/enums/role.enum';
+import { describeError } from '@/common/utils/describe-error';
+import { SOCKET_PATH } from '@/modules/realtime/constants/realtime.constants';
+import { SocketSessionTimersService } from '@/modules/realtime/services/socket-session-timers.service';
 import {
   COURIER_SOCKET_EVENTS,
   COURIER_SOCKET_PING_INTERVAL_MS,

@@ -7,21 +7,21 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
-import { describeError } from '../../../common/utils/describe-error';
-import { ENV_KEYS } from '../../../config/env.constants';
-import { PaymentGateway } from '../../../modules/payments/contracts/payment-gateway.contract';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { describeError } from '@/common/utils/describe-error';
+import { ENV_KEYS } from '@/config/env.constants';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
 import {
   PAYMENTS_ERROR_MESSAGES,
   SESSION_EXPIRE_RESULT,
-} from '../../../modules/payments/constants/payments.constants';
+} from '@/modules/payments/constants/payments.constants';
 import type {
   CheckoutSession,
   CheckoutSessionInput,
   CheckoutSessionState,
   PaymentEvent,
   SessionExpireResult,
-} from '../../../modules/payments/types/payments.types';
+} from '@/modules/payments/types/payments.types';
 import { mapStripeEvent, mapStripeSession } from '../mappers/stripe-event.mapper';
 import {
   SINGLE_ITEM_QUANTITY,

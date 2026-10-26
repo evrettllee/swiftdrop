@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from '../common/constants/time.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
 
 export const PG_POOL = Symbol('PG_POOL');
 export const DRIZZLE = Symbol('DRIZZLE');

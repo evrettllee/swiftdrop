@@ -1,13 +1,13 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, exists, isNull, lte, or, sql } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { courierActiveOrder } from '../../../common/database/courier-active-order';
-import { isLockTimeout } from '../../../common/database/pg-errors';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orders, users } from '../../../database/schema';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { courierActiveOrder } from '@/common/database/courier-active-order';
+import { isLockTimeout } from '@/common/database/pg-errors';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orders, users } from '@/database/schema';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,

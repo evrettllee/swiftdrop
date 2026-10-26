@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RealtimeModule } from '../realtime/realtime.module';
+import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { CouriersController } from './controllers/couriers.controller';
 import { CouriersGateway } from './gateways/couriers.gateway';
 import { CourierAvailabilityService } from './services/courier-availability.service';

@@ -1,11 +1,11 @@
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import {
   COURIER_LEG_TARGET,
   DROPOFF_HANDOVER_MS,
   PICKUP_HANDOVER_MS,
 } from '../constants/tracking.constants';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
 import type { EtaPlan } from '../types/tracking.types';
 
 // When the courier reaches the pickup point: the first leg of the trip leads there before the

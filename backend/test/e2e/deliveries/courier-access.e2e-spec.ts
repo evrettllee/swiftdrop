@@ -1,26 +1,26 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { DB_INTEGER_MAX } from '../../../src/common/constants/database.constants';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   CLIENT_ORDER_COURIER_ROUTES,
   COURIER_ORDERS_ROUTES,
   COURIER_STATS_ROUTES,
-} from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierOnShift, addCourierSession } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { getApi, postApi } from '../../support/http';
-import { type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierOnShift, addCourierSession } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { getApi, postApi } from '@test/support/http';
+import { type Cookies, placeOrders, readOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 const RIGHT_CODE = '4821';
 // One more than an integer column holds: such an id must be refused before the query.

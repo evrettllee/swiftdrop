@@ -1,21 +1,21 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { sql } from 'drizzle-orm';
 import { Socket as ServerSocket } from 'socket.io';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   COURIER_SOCKET_EVENTS,
   orderRoom,
-} from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { OrderRoomsService } from '../../../src/modules/couriers/services/order-rooms.service';
-import { SocketSessionTimersService } from '../../../src/modules/realtime/services/socket-session-timers.service';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { placeConfirmedOrder } from '../../support/chat';
-import { commitOnceBlocked } from '../../support/locks';
-import { resetServiceArea } from '../../support/pricing';
-import { connectAppSocket, listenTestApp } from '../../support/sockets';
+} from '@/modules/couriers/constants/couriers-socket.constants';
+import { OrderRoomsService } from '@/modules/couriers/services/order-rooms.service';
+import { SocketSessionTimersService } from '@/modules/realtime/services/socket-session-timers.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { placeConfirmedOrder } from '@test/support/chat';
+import { commitOnceBlocked } from '@test/support/locks';
+import { resetServiceArea } from '@test/support/pricing';
+import { connectAppSocket, listenTestApp } from '@test/support/sockets';
 
 describe('Joining an order room while the socket closes (e2e)', () => {
   let app: NestExpressApplication;

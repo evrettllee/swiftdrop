@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { VEHICLE_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
-import { VEHICLE_TYPE_VALUES } from '../../../common/enums/vehicle-type.enum';
+import { VEHICLE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
+import { VEHICLE_TYPE_VALUES } from '@/common/enums/vehicle-type.enum';
 import {
   COURIERS_VALIDATION_MESSAGES as MESSAGES,
   LICENSE_PLATE_MIN_LENGTH,

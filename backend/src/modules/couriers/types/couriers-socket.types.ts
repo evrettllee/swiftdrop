@@ -1,4 +1,4 @@
-import type { ROLE } from '../../../common/enums/role.enum';
+import type { ROLE } from '@/common/enums/role.enum';
 import type {
   LOCATION_UPDATE_REJECTIONS,
   ORDER_JOIN_REJECTIONS,

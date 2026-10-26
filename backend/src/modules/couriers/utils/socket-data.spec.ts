@@ -1,5 +1,5 @@
-import { ROLE, type RoleName } from '../../../common/enums/role.enum';
-import type { SocketSession } from '../../realtime/types/realtime.types';
+import { ROLE, type RoleName } from '@/common/enums/role.enum';
+import type { SocketSession } from '@/modules/realtime/types/realtime.types';
 import { buildSocketData } from './socket-data';
 
 const USER_ID = 7;

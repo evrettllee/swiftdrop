@@ -1,5 +1,5 @@
 import { type AnyColumn, type SQL, sql } from 'drizzle-orm';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { KM_PER_DEGREE } from '../constants/assignment.constants';
 
 // The straight-line distance in kilometres from a stored position to a point, by the

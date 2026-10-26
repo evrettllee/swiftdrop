@@ -1,14 +1,14 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
-import { AUTH_VALIDATION_MESSAGES } from '../../../src/modules/auth/constants/validation.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/database/schema';
-import { createTestApp } from '../../support/app';
-import { postAuth, validRegistration } from '../../support/auth';
-import { resetTestData } from '../../support/database';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
+import { AUTH_VALIDATION_MESSAGES } from '@/modules/auth/constants/validation.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { users } from '@/database/schema';
+import { createTestApp } from '@test/support/app';
+import { postAuth, validRegistration } from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
 
 const INVALID_NAMES = ['Иван123', '-Иван', 'Иван--Петров', 'Иван!', '<b>Иван</b>', '😀Иван'];
 const VALID_NAMES = ['Анна-Мария', "О'Брайен", 'Jean Paul', 'Ёлкин'];

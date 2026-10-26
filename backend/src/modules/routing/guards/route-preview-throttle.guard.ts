@@ -1,11 +1,8 @@
 import { type CanActivate, type ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { ThrottlerException, ThrottlerStorage } from '@nestjs/throttler';
 import type { Request } from 'express';
-import {
-  DEFAULT_THROTTLER_NAME,
-  THROTTLE_ERROR_MESSAGE,
-} from '../../../common/constants/http.constants';
-import type { AuthUser } from '../../auth/types/auth.types';
+import { DEFAULT_THROTTLER_NAME, THROTTLE_ERROR_MESSAGE } from '@/common/constants/http.constants';
+import type { AuthUser } from '@/modules/auth/types/auth.types';
 import {
   ROUTE_PREVIEW_GUEST_THROTTLE_LIMIT,
   ROUTE_PREVIEW_THROTTLE_KEY,

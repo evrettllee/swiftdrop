@@ -1,34 +1,34 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Socket } from 'socket.io-client';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import {
   CLIENT_ORDER_COURIER_ROUTES,
   COURIER_ORDERS_ROUTES,
-} from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
+} from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
 import {
   ETA_SHUTDOWN_WAIT_MS,
   ORDER_ROOM_EVENTS,
-} from '../../../src/modules/tracking/constants/tracking.constants';
-import { OrderEtaStore } from '../../../src/modules/tracking/services/order-eta-store.service';
-import { OrderEtaService } from '../../../src/modules/tracking/services/order-eta.service';
-import type { OrderEtaEvent } from '../../../src/modules/tracking/types/tracking.types';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { getApi, postApi } from '../../support/http';
-import type { Cookies } from '../../support/orders';
+} from '@/modules/tracking/constants/tracking.constants';
+import { OrderEtaStore } from '@/modules/tracking/services/order-eta-store.service';
+import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
+import type { OrderEtaEvent } from '@/modules/tracking/types/tracking.types';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { getApi, postApi } from '@test/support/http';
+import type { Cookies } from '@test/support/orders';
 import {
   createRoutingMocks,
   createRoutingTestApp,
   lineThrough,
   resetRouting,
-} from '../../support/routing';
-import { joinOrderRoom, listenTestApp, waitForEvent } from '../../support/sockets';
-import { assignTrackedCourier, REPORTED_POINT, sendLocation } from '../../support/tracking';
+} from '@test/support/routing';
+import { joinOrderRoom, listenTestApp, waitForEvent } from '@test/support/sockets';
+import { assignTrackedCourier, REPORTED_POINT, sendLocation } from '@test/support/tracking';
 
 // The line of the courier from the reported position to the pickup point, as the mock draws it.
 const LEG_TO_PICKUP = lineThrough([REPORTED_POINT, MINSK_PICKUP]);

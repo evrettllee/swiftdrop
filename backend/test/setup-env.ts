@@ -1,3 +1,3 @@
-import { loadTestEnv } from './support/env';
+import { loadTestEnv } from '@test/support/env';
 
 loadTestEnv();

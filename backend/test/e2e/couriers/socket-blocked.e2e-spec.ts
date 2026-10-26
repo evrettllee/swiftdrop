@@ -1,28 +1,28 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   LOCATION_UPDATE_REJECTIONS,
   ORDER_JOIN_REJECTIONS,
-} from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '../../../src/modules/couriers/gateways/couriers.gateway';
-import { SOCKET_ERRORS } from '../../../src/modules/realtime/constants/realtime.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser, validRegistration } from '../../support/auth';
-import { OpenSockets, orderJoinRefusal, placeConfirmedOrder } from '../../support/chat';
-import { COURIER_ACCOUNT } from '../../support/couriers';
-import { SECOND_CLIENT } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/couriers/constants/couriers-socket.constants';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { SOCKET_ERRORS } from '@/modules/realtime/constants/realtime.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser, validRegistration } from '@test/support/auth';
+import { OpenSockets, orderJoinRefusal, placeConfirmedOrder } from '@test/support/chat';
+import { COURIER_ACCOUNT } from '@test/support/couriers';
+import { SECOND_CLIENT } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 import {
   connectAppSocket,
   joinOrderRoom,
   listenTestApp,
   roundTrip,
   waitForDisconnect,
-} from '../../support/sockets';
-import { assignTrackedCourier, readCourierProfile, sendLocation } from '../../support/tracking';
-import { blockUser } from '../../support/users';
+} from '@test/support/sockets';
+import { assignTrackedCourier, readCourierProfile, sendLocation } from '@test/support/tracking';
+import { blockUser } from '@test/support/users';
 
 // The reason socket.io gives when the server itself closed the connection.
 const SERVER_DISCONNECT_REASON = 'io server disconnect';

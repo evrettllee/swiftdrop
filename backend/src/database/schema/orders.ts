@@ -14,9 +14,9 @@ import {
 import {
   ORDER_FIELD_LENGTH,
   PERSON_FIELD_LENGTH,
-} from '../../common/constants/field-lengths.constants';
-import { COURIER_ACTIVE_ORDER_STATUSES } from '../../common/constants/orders.constants';
-import { ORDER_STATUS, ORDER_STATUS_VALUES } from '../../common/enums/order-status.enum';
+} from '@/common/constants/field-lengths.constants';
+import { COURIER_ACTIVE_ORDER_STATUSES } from '@/common/constants/orders.constants';
+import { ORDER_STATUS, ORDER_STATUS_VALUES } from '@/common/enums/order-status.enum';
 import { sqlLiteralList } from '../sql-literal';
 import { addresses } from './addresses';
 import { courierProfiles } from './courier-profiles';

@@ -1,18 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import {
-  ROW_LOCK_NO_KEY_UPDATE,
-  SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { withLockConflict } from '../../../common/database/lock-conflict';
+import { ROW_LOCK_NO_KEY_UPDATE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { withLockConflict } from '@/common/database/lock-conflict';
 import {
   type OrderTransaction,
   transitionOrderStatus,
-} from '../../../common/database/order-status-transition';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import type { Transaction } from '../../../database/database.module';
-import { orders } from '../../../database/schema';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+} from '@/common/database/order-status-transition';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import type { Transaction } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import {
   DELIVERIES_ERROR_MESSAGES,
   DELIVERY_CODE_LOCK_MS,

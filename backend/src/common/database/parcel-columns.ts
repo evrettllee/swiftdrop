@@ -1,4 +1,4 @@
-import { packages } from '../../database/schema';
+import { packages } from '@/database/schema';
 
 // The package of an order in the shape of PackageSpec.
 export function parcelColumns() {

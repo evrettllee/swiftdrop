@@ -1,16 +1,16 @@
 import { ServiceUnavailableException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { type Cookies, placeOrders, readOrderStatus, cancelOrder } from '../../support/orders';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { type Cookies, placeOrders, readOrderStatus, cancelOrder } from '@test/support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
@@ -18,8 +18,8 @@ import {
   readPaymentStatus,
   resetGatewayMock,
   PAYMENT_REF,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Order cancellation with payments (e2e)', () => {
   let app: NestExpressApplication;

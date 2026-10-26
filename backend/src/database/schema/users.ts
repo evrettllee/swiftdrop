@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { boolean, integer, pgTable, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { roles } from './roles';
-import { PERSON_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const users = pgTable(
   'users',

@@ -1,10 +1,10 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { payments } from '../../../database/schema';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { payments } from '@/database/schema';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
 import { PAYMENTS_ERROR_MESSAGES } from '../constants/payments.constants';
 

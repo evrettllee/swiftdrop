@@ -1,5 +1,5 @@
 import type { Namespace, Socket } from 'socket.io';
-import { SOCKET_ERRORS } from '../../realtime/constants/realtime.constants';
+import { SOCKET_ERRORS } from '@/modules/realtime/constants/realtime.constants';
 import type { AppSocketData } from '../types/couriers-socket.types';
 
 // Runs the admission in the handshake, so a refused client never gets a connection at all. The

@@ -1,10 +1,10 @@
-import type { OrderTransitionChanges } from '../../../common/database/order-status-transition';
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
-import type { CourierVehicle } from '../../couriers/types/couriers.types';
-import type { RouteLines } from '../../routing/types/routing.types';
+import type { OrderTransitionChanges } from '@/common/database/order-status-transition';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { PackageSpec } from '@/common/schemas/package-spec.schema';
+import type { CourierVehicle } from '@/modules/couriers/types/couriers.types';
+import type { RouteLines } from '@/modules/routing/types/routing.types';
 import type { HANDOVER_OUTCOME } from '../constants/deliveries.constants';
 
 // The courier making a request: the user writes the history, the profile owns the order.

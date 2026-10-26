@@ -1,17 +1,17 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OSRM_PROFILE } from '../../../src/integrations/osrm/constants/osrm.constants';
-import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
-import { addCourierSession } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, CAR, COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_DELIVERY, MINSK_PICKUP } from '../../support/fixtures';
-import { finishOrder, historyOrderRoutePath } from '../../support/history-orders';
-import { getApi } from '../../support/http';
-import { placeOrders } from '../../support/orders';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
+import { addCourierSession } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, CAR, COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_DELIVERY, MINSK_PICKUP } from '@test/support/fixtures';
+import { finishOrder, historyOrderRoutePath } from '@test/support/history-orders';
+import { getApi } from '@test/support/http';
+import { placeOrders } from '@test/support/orders';
 import {
   COURIER_POINT,
   createRoutingMocks,
@@ -19,7 +19,7 @@ import {
   failRouting,
   lineThrough,
   resetRouting,
-} from '../../support/routing';
+} from '@test/support/routing';
 
 describe('Route of a finished order of the courier (e2e)', () => {
   let app: NestExpressApplication;

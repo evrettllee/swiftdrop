@@ -1,13 +1,13 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { VEHICLE_TYPE } from '../../../src/common/enums/vehicle-type.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { courierProfiles, vehicles } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { VEHICLE_TYPE } from '@/common/enums/vehicle-type.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, vehicles } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   assignOrder,
   CAR,
@@ -16,9 +16,9 @@ import {
   findCourierProfileId,
   getCourierMe,
   putVehicle,
-} from '../../support/couriers';
-import { placeOrders } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/couriers';
+import { placeOrders } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Courier vehicle (e2e)', () => {
   let app: NestExpressApplication;

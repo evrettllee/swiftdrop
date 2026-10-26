@@ -1,8 +1,8 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
-import { withLockConflict } from '../../../common/database/lock-conflict';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+import { withLockConflict } from '@/common/database/lock-conflict';
+import { transitionOrderStatus } from '@/common/database/order-status-transition';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import { DELIVERIES_ERROR_MESSAGES } from '../constants/deliveries.constants';
 import type { CourierIdentity, CourierOrder, DeliveryStep } from '../types/deliveries.types';
 import { generateDeliveryCode } from '../utils/delivery-code';

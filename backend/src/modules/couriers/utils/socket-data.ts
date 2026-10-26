@@ -1,5 +1,5 @@
-import { ROLE } from '../../../common/enums/role.enum';
-import type { SocketSession } from '../../realtime/types/realtime.types';
+import { ROLE } from '@/common/enums/role.enum';
+import type { SocketSession } from '@/modules/realtime/types/realtime.types';
 import type { AppSocketData } from '../types/couriers-socket.types';
 
 // What a socket keeps about who opened it, or null when the role may not open one. The courier

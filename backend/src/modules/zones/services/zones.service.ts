@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { serviceZones, tariffs } from '../../../database/schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { serviceZones, tariffs } from '@/database/schema';
 import type { ServiceZoneMatch } from '../types/zones.types';
 import { selectZoneForPoint } from '../utils/zone-selection';
 

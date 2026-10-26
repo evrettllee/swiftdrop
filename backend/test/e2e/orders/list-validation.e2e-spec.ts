@@ -1,18 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ORDERS_PAGE_SIZE_MAX,
   ORDERS_ROUTES,
   ORDERS_VALIDATION_MESSAGES,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { getApi } from '../../support/http';
-import { getOrders } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { getApi } from '@test/support/http';
+import { getOrders } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Orders list (e2e)', () => {
   let app: NestExpressApplication;

@@ -1,5 +1,5 @@
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
-import { ROLE } from '../../../common/enums/role.enum';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { ROLE } from '@/common/enums/role.enum';
 
 // Clients and couriers connect to this one namespace; what each of them gets is decided by the
 // rooms they are in.

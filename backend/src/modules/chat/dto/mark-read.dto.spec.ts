@@ -1,4 +1,4 @@
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import { CHAT_VALIDATION_MESSAGES } from '../constants/chat.constants';
 import { markReadSchema } from './mark-read.dto';
 

@@ -1,5 +1,5 @@
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import { toCourierVehicle } from '../../couriers/mappers/courier-profile.mapper';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import { toCourierVehicle } from '@/modules/couriers/mappers/courier-profile.mapper';
 import {
   COURIER_CONTACT_STATUSES,
   COURIER_VISIBLE_STATUSES,

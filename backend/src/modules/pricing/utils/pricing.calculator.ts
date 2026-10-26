@@ -1,4 +1,4 @@
-import { MINOR_UNITS_PER_MAJOR } from '../../../common/constants/money.constants';
+import { MINOR_UNITS_PER_MAJOR } from '@/common/constants/money.constants';
 import {
   CLASS_MULTIPLIERS,
   COEFFICIENT_MAX,

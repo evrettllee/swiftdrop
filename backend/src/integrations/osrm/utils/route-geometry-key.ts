@@ -1,4 +1,4 @@
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import {
   COORDINATE_SEPARATOR,
   POINT_SEPARATOR,

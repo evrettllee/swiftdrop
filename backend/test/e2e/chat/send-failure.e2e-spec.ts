@@ -1,19 +1,19 @@
 import { HttpStatus, Logger } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DrizzleQueryError } from 'drizzle-orm';
-import { INTERNAL_ERROR_MESSAGE } from '../../../src/common/constants/http.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+import { INTERNAL_ERROR_MESSAGE } from '@/common/constants/http.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   assignCourier,
   countOrderMessages,
   placeConfirmedOrder,
   sendChatMessage,
-} from '../../support/chat';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/chat';
+import { resetServiceArea } from '@test/support/pricing';
 
 const SECRET_TEXT = 'Код домофона 4821, ключ под ковриком';
 const FAILED_INSERT = 'insert into "messages" ("sender_id", "receiver_id", "order_id", "content")';

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { describeError } from '../../../common/utils/describe-error';
+import { describeError } from '@/common/utils/describe-error';
 import { ASSIGNMENT_INTERVAL_MS } from '../constants/assignment.constants';
 import { AssignmentRoundService } from '../services/assignment-round.service';
 

@@ -1,10 +1,10 @@
 import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { withLockConflict } from '../../../common/database/lock-conflict';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { courierProfiles, vehicles } from '../../../database/schema';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { withLockConflict } from '@/common/database/lock-conflict';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { courierProfiles, vehicles } from '@/database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import type { CourierMe } from '../types/couriers.types';
 import { CourierProfilesService } from './courier-profiles.service';

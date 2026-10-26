@@ -1,18 +1,18 @@
 import {
   ADDRESS_FIELD_LENGTH,
   PERSON_FIELD_LENGTH,
-} from '../../../common/constants/field-lengths.constants';
+} from '@/common/constants/field-lengths.constants';
 import {
   ORDER_ID_INVALID_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
-} from '../../../common/constants/orders.constants';
+} from '@/common/constants/orders.constants';
 import {
   NAME_ALLOWED_CHARACTERS,
   NAME_MIN_LENGTH,
-} from '../../../common/constants/person-validation.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
+} from '@/common/constants/person-validation.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
 import { CronExpression } from '@nestjs/schedule';
 
 // Routes

@@ -6,15 +6,15 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { CURRENCY } from '../../../common/constants/money.constants';
-import { SECONDS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { findLightestVehicle } from '../../../common/utils/vehicle-fit';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { tariffs } from '../../../database/schema';
-import { OsrmService } from '../../../integrations/osrm/services/osrm.service';
-import { ZonesService } from '../../zones/services/zones.service';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { CURRENCY } from '@/common/constants/money.constants';
+import { SECONDS_PER_MINUTE } from '@/common/constants/time.constants';
+import { findLightestVehicle } from '@/common/utils/vehicle-fit';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { tariffs } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ZonesService } from '@/modules/zones/services/zones.service';
 import type { EstimatePriceDto } from '../dto/estimate-price.dto';
 import { calculatePrice } from '../utils/pricing.calculator';
 import {

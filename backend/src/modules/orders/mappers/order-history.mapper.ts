@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { ORDER_CANCELLED_BY } from '../constants/orders.constants';
 import type { OrderCancelledBy, OrderHistoryRow, OrderHistoryView } from '../types/orders.types';
 

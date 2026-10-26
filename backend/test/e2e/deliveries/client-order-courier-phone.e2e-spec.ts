@@ -1,18 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS, type OrderStatus } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { CLIENT_ORDER_COURIER_ROUTES } from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignCourier, placeConfirmedOrder } from '../../support/chat';
-import { COURIER_ACCOUNT } from '../../support/couriers';
-import { getApi } from '../../support/http';
-import { type Cookies, SECOND_CLIENT, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CLIENT_ORDER_COURIER_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignCourier, placeConfirmedOrder } from '@test/support/chat';
+import { COURIER_ACCOUNT } from '@test/support/couriers';
+import { getApi } from '@test/support/http';
+import { type Cookies, SECOND_CLIENT, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Phone of the courier for the client (e2e)', () => {
   let app: NestExpressApplication;

@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { OAUTH_PROVIDER, type OAuthProvider } from '../../../common/enums/oauth-provider.enum';
+import { OAUTH_PROVIDER, type OAuthProvider } from '@/common/enums/oauth-provider.enum';
 import type { AuthCookiesService } from './auth-cookies.service';
 import { OAuthStateService } from './oauth-state.service';
 

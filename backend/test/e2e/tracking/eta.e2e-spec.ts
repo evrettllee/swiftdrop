@@ -1,37 +1,37 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { MS_PER_SECOND } from '../../../src/common/constants/time.constants';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import {
   DROPOFF_HANDOVER_MS,
   ORDER_ROOM_EVENTS,
   PICKUP_HANDOVER_MS,
-} from '../../../src/modules/tracking/constants/tracking.constants';
-import type { OrderEtaEvent } from '../../../src/modules/tracking/types/tracking.types';
-import { registerUser } from '../../support/auth';
-import { OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { placeCourierAt } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
+} from '@/modules/tracking/constants/tracking.constants';
+import type { OrderEtaEvent } from '@/modules/tracking/types/tracking.types';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { placeCourierAt } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
 import {
   createRoutingMocks,
   createRoutingTestApp,
   FIRST_LEG_DURATION_S,
   resetRouting,
   TRIP_DURATION_S,
-} from '../../support/routing';
+} from '@test/support/routing';
 import {
   collectEvents,
   joinOrderRoom,
   listenTestApp,
   roundTrip,
   waitForEvent,
-} from '../../support/sockets';
-import { assignTrackedCourier, sendLocation, trackEstimates } from '../../support/tracking';
+} from '@test/support/sockets';
+import { assignTrackedCourier, sendLocation, trackEstimates } from '@test/support/tracking';
 
 // Older than the limit of positions per courier, so the next one is stored.
 const PAST_POSITION_MS = 10_000;

@@ -1,14 +1,14 @@
 import { Injectable, Logger, type OnApplicationShutdown, type OnModuleInit } from '@nestjs/common';
-import { COURIER_ACTIVE_ORDER_STATUSES } from '../../../common/constants/orders.constants';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
-import type { OrderStatusChange } from '../../../common/database/order-status-transition';
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { OsrmTripService } from '../../../integrations/osrm/services/osrm-trip.service';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
-import { CourierLocationEventsService } from '../../couriers/services/courier-location-events.service';
-import { isPositionStale } from '../../deliveries/utils/courier-position';
-import { routingProfileOf } from '../../routing/utils/routing-courier';
+import { COURIER_ACTIVE_ORDER_STATUSES } from '@/common/constants/orders.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import type { OrderStatusChange } from '@/common/database/order-status-transition';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import { describeError } from '@/common/utils/describe-error';
+import { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { CourierLocationEventsService } from '@/modules/couriers/services/courier-location-events.service';
+import { isPositionStale } from '@/modules/deliveries/utils/courier-position';
+import { routingProfileOf } from '@/modules/routing/utils/routing-courier';
 import {
   ETA_RECALC_INTERVAL_MS,
   ETA_SHUTDOWN_WAIT_MS,

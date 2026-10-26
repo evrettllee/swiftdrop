@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Socket } from 'socket.io';
-import { orderAccess } from '../../../common/database/order-participant';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
+import { orderAccess } from '@/common/database/order-participant';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import {
   isOrderRoom,
   ORDER_JOIN_REJECTIONS,

@@ -1,21 +1,21 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { CHAT_ERROR_MESSAGES } from '../../../src/modules/chat/constants/chat.constants';
-import type { ChatHistory } from '../../../src/modules/chat/types/chat.types';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CHAT_ERROR_MESSAGES } from '@/modules/chat/constants/chat.constants';
+import type { ChatHistory } from '@/modules/chat/types/chat.types';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   countOrderMessages,
   getChatHistory,
   placeConfirmedOrder,
   sendChatMessage,
-} from '../../support/chat';
-import { type Cookies, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/chat';
+import { type Cookies, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 // The client writes before any courier took the order: the chat is not open yet, which is not the
 // same as a finished order.
@@ -41,20 +41,21 @@ describe('Sending a chat message before a courier (e2e)', () => {
     await app.close();
   });
 
-  it.each([
-    ORDER_STATUS.PENDING,
-    ORDER_STATUS.CONFIRMED,
-    ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT,
-  ])('should refuse with 409 saying the chat opens with a courier while %s', async (status) => {
-    await setOrderStatus(db, orderId, status);
+  it.each([ORDER_STATUS.PENDING, ORDER_STATUS.CONFIRMED, ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT])(
+    'should refuse with 409 saying the chat opens with a courier while %s',
+    async (status) => {
+      await setOrderStatus(db, orderId, status);
 
-    const response = await sendChatMessage(app, clientCookies, orderId).expect(HttpStatus.CONFLICT);
+      const response = await sendChatMessage(app, clientCookies, orderId).expect(
+        HttpStatus.CONFLICT,
+      );
 
-    expect(response.body.message).toBe(CHAT_ERROR_MESSAGES.CHAT_NOT_OPEN);
-    expect(await countOrderMessages(db, orderId)).toBe(0);
-    const history = await getChatHistory(app, clientCookies, orderId).expect(HttpStatus.OK);
-    expect((history.body as ChatHistory).canSend).toBe(false);
-  });
+      expect(response.body.message).toBe(CHAT_ERROR_MESSAGES.CHAT_NOT_OPEN);
+      expect(await countOrderMessages(db, orderId)).toBe(0);
+      const history = await getChatHistory(app, clientCookies, orderId).expect(HttpStatus.OK);
+      expect((history.body as ChatHistory).canSend).toBe(false);
+    },
+  );
 
   it.each([ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED])(
     'should refuse with 409 saying the chat is closed once the order is %s without a courier',

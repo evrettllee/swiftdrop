@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
-import { ROW_LOCK_NO_KEY_UPDATE } from '../../src/common/constants/database.constants';
-import type { Database, Transaction } from '../../src/database/database.module';
-import { orderOffers, orders } from '../../src/database/schema';
+import { ROW_LOCK_NO_KEY_UPDATE } from '@/common/constants/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { orderOffers, orders } from '@/database/schema';
 
 export type HoldRows = (tx: Transaction) => Promise<unknown>;
 

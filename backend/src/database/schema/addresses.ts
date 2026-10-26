@@ -1,6 +1,6 @@
 import { doublePrecision, index, integer, pgTable, varchar } from 'drizzle-orm/pg-core';
 import { users } from './users';
-import { ADDRESS_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { ADDRESS_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const addresses = pgTable(
   'addresses',

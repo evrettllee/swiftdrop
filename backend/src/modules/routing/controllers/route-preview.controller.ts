@@ -1,8 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
-import { Public } from '../../auth/decorators/public.decorator';
-import { OptionalJwtAuthGuard } from '../../auth/guards/optional-jwt-auth.guard';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
+import { Public } from '@/modules/auth/decorators/public.decorator';
+import { OptionalJwtAuthGuard } from '@/modules/auth/guards/optional-jwt-auth.guard';
 import { ROUTE_PREVIEW_ROUTES } from '../constants/routing.constants';
 import { type RoutePreviewDto, routePreviewSchema } from '../dto/route-preview.dto';
 import { RoutePreviewThrottleGuard } from '../guards/route-preview-throttle.guard';

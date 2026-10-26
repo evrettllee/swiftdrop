@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import {
   AUTH_VALIDATION_MESSAGES,
   PASSWORD_DIGIT_REGEX,

@@ -1,7 +1,7 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { OAuthProvider } from '../../../common/enums/oauth-provider.enum';
+import type { OAuthProvider } from '@/common/enums/oauth-provider.enum';
 import { AuthCookiesService } from './auth-cookies.service';
 import { OAUTH_STATE_BYTES, OAUTH_STATE_ENCODING } from '../constants/oauth.constants';
 

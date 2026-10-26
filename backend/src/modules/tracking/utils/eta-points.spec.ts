@@ -1,4 +1,4 @@
-import { ORDER_STATUS, ORDER_STATUS_VALUES } from '../../../common/enums/order-status.enum';
+import { ORDER_STATUS, ORDER_STATUS_VALUES } from '@/common/enums/order-status.enum';
 import {
   COURIER_LEG_TARGET,
   DROPOFF_HANDOVER_MS,

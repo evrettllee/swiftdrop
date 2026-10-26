@@ -12,7 +12,7 @@ import {
 import { orders } from './orders';
 import { supportTickets } from './support-tickets';
 import { users } from './users';
-import { MESSAGE_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { MESSAGE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { sqlIntegerLiteral } from '../sql-literal';
 
 export const messages = pgTable(

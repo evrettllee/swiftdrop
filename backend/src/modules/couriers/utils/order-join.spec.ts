@@ -1,4 +1,4 @@
-import { ROLE } from '../../../common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import {
   ORDER_JOIN_MAX_ATTEMPTS,
   ORDER_JOIN_REJECTIONS,

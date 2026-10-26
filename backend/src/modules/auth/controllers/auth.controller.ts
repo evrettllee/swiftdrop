@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { AuthCookiesService } from '../services/auth-cookies.service';
 import { AUTH_THROTTLE } from '../constants/access.constants';
 import { OAUTH_SUCCESS_REDIRECT } from '../constants/oauth.constants';

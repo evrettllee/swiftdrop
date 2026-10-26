@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { OrderStatusChange } from '../../../common/database/order-status-transition';
-import { describeError } from '../../../common/utils/describe-error';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
+import type { OrderStatusChange } from '@/common/database/order-status-transition';
+import { describeError } from '@/common/utils/describe-error';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { ORDER_ROOM_EVENTS } from '../constants/tracking.constants';
 import type { OrderStatusEvent } from '../types/tracking.types';
 

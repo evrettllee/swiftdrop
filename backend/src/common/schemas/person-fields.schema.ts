@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PERSON_FIELD_LENGTH } from '../constants/field-lengths.constants';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import {
   NAME_MIN_LENGTH,
   NAME_PATTERN,
@@ -7,7 +7,7 @@ import {
   PHONE_REGEX,
   PHONE_SEPARATOR_REPLACEMENT,
   PHONE_SEPARATORS_REGEX,
-} from '../constants/person-validation.constants';
+} from '@/common/constants/person-validation.constants';
 
 // The pattern is checked only after the length passes, so each field gets a single message.
 export const buildNameSchema = (

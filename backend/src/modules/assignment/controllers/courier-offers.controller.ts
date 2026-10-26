@@ -8,15 +8,15 @@ import {
   Post,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { ROLE } from '../../../common/enums/role.enum';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
-import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import type { AuthUser } from '../../auth/types/auth.types';
-import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
-import { ROUTING_THROTTLE } from '../../routing/constants/routing.constants';
-import { RouteLinesService } from '../../routing/services/route-lines.service';
-import type { RouteLines } from '../../routing/types/routing.types';
+import { ROLE } from '@/common/enums/role.enum';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
+import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
+import type { AuthUser } from '@/modules/auth/types/auth.types';
+import { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
+import { ROUTING_THROTTLE } from '@/modules/routing/constants/routing.constants';
+import { RouteLinesService } from '@/modules/routing/services/route-lines.service';
+import type { RouteLines } from '@/modules/routing/types/routing.types';
 import {
   ASSIGNMENT_ERROR_MESSAGES,
   COURIER_OFFERS_ROUTES,

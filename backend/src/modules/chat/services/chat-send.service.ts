@@ -1,22 +1,18 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { withLockConflict } from '../../../common/database/lock-conflict';
+import { withLockConflict } from '@/common/database/lock-conflict';
 import {
   orderParticipant,
   type OrderParticipantActor,
   participantActor,
-} from '../../../common/database/order-participant';
-import type { RoleName } from '../../../common/enums/role.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { messages } from '../../../database/schema';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
+} from '@/common/database/order-participant';
+import type { RoleName } from '@/common/enums/role.enum';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { messages } from '@/database/schema';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '../constants/chat.constants';
-import {
-  canSendInOrder,
-  sendRefusalMessage,
-  toChatMessage,
-} from '../mappers/chat-message.mapper';
+import { canSendInOrder, sendRefusalMessage, toChatMessage } from '../mappers/chat-message.mapper';
 import type { ChatMessage, MessageNewEvent, SentChatMessage } from '../types/chat.types';
 
 @Injectable()

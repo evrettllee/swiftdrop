@@ -1,5 +1,5 @@
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import type { PaymentStatus } from '../../../common/enums/payment-status.enum';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { PaymentStatus } from '@/common/enums/payment-status.enum';
 import type { ORDER_CANCELLED_BY } from '../constants/orders.constants';
 
 export type CreatedOrder = {

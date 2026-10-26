@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 
 // The body of order:join and order:leave. A socket message keeps its JSON types, so the id is a
 // number, never coerced; any other field makes the body invalid.

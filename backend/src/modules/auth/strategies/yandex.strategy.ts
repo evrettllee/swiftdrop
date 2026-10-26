@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
-import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
-import { OAUTH_PROVIDER } from '../../../common/enums/oauth-provider.enum';
-import { ENV_KEYS } from '../../../config/env.constants';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
+import { OAUTH_PROVIDER } from '@/common/enums/oauth-provider.enum';
+import { ENV_KEYS } from '@/config/env.constants';
 import {
   OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,

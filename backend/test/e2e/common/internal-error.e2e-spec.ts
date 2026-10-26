@@ -1,16 +1,16 @@
 import { NotFoundException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { INTERNAL_ERROR_MESSAGE } from '../../../src/common/constants/http.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OrdersQueryService } from '../../../src/modules/orders/services/orders-query.service';
-import { ORDER_NOT_FOUND_MESSAGE } from '../../../src/common/constants/orders.constants';
-import { ORDERS_ROUTES } from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { resetTestData } from '../../support/database';
-import { postApi } from '../../support/http';
-import { getOrders } from '../../support/orders';
+import { INTERNAL_ERROR_MESSAGE } from '@/common/constants/http.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OrdersQueryService } from '@/modules/orders/services/orders-query.service';
+import { ORDER_NOT_FOUND_MESSAGE } from '@/common/constants/orders.constants';
+import { ORDERS_ROUTES } from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
+import { postApi } from '@test/support/http';
+import { getOrders } from '@test/support/orders';
 
 const MALFORMED_JSON = '{"pickup":';
 // What an unexpected failure may carry: SQL with a column name, a file path of the server.

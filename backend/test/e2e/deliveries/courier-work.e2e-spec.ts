@@ -1,24 +1,24 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { MS_PER_DAY } from '../../../src/common/constants/time.constants';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS, type OrderStatus } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orderStatusHistory } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { MS_PER_DAY } from '@/common/constants/time.constants';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderStatusHistory } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   COURIER_ORDERS_ROUTES,
   COURIER_STATS_ROUTES,
-} from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierSession, insertOffer } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, CAR, COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { placeOrders } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/deliveries/constants/deliveries.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierSession, insertOffer } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, CAR, COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { placeOrders } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 const HISTORY_PATH = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.HISTORY}`;
 const TODAY_PATH = `${COURIER_STATS_ROUTES.BASE}/${COURIER_STATS_ROUTES.TODAY}`;

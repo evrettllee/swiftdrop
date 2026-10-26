@@ -1,10 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, lt } from 'drizzle-orm';
-import { orderParticipant, participantActor } from '../../../common/database/order-participant';
-import type { RoleName } from '../../../common/enums/role.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { messages } from '../../../database/schema';
+import { orderParticipant, participantActor } from '@/common/database/order-participant';
+import type { RoleName } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { messages } from '@/database/schema';
 import { CHAT_ERROR_MESSAGES } from '../constants/chat.constants';
 import type { ChatHistoryDto } from '../dto/chat-history.dto';
 import { canSendInOrder, toChatHistoryPage } from '../mappers/chat-message.mapper';

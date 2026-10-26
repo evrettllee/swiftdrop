@@ -1,7 +1,7 @@
 import { InternalServerErrorException, Logger, UnprocessableEntityException } from '@nestjs/common';
-import type { Database } from '../../../database/database.module';
-import type { OsrmService } from '../../../integrations/osrm/services/osrm.service';
-import type { ZonesService } from '../../zones/services/zones.service';
+import type { Database } from '@/database/database.module';
+import type { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import type { ZonesService } from '@/modules/zones/services/zones.service';
 import type { EstimatePriceDto } from '../dto/estimate-price.dto';
 import { PRICING_ERROR_MESSAGES } from '../constants/pricing.constants';
 import { PricingService } from './pricing.service';

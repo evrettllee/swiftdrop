@@ -1,24 +1,24 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { MS_PER_MINUTE } from '../../../src/common/constants/time.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ORDER_CANCELLED_BY,
   ORDERS_ROUTES,
   UNPAID_ORDER_TTL_MS,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { UnpaidOrdersService } from '../../../src/modules/orders/services/unpaid-orders.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { createTestApp } from '../../support/app';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { getApi } from '../../support/http';
-import { cancelOrder, type Cookies, placeOrders } from '../../support/orders';
-import { createGatewayMock, resetGatewayMock } from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/orders/constants/orders.constants';
+import { UnpaidOrdersService } from '@/modules/orders/services/unpaid-orders.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { createTestApp } from '@test/support/app';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { getApi } from '@test/support/http';
+import { cancelOrder, type Cookies, placeOrders } from '@test/support/orders';
+import { createGatewayMock, resetGatewayMock } from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Order details, who cancelled the order (e2e)', () => {
   let app: NestExpressApplication;

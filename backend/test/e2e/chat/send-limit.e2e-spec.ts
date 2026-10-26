@@ -1,22 +1,22 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   CHAT_ERROR_MESSAGES,
   CHAT_SEND_THROTTLE_LIMIT,
-} from '../../../src/modules/chat/constants/chat.constants';
-import { ChatSendService } from '../../../src/modules/chat/services/chat-send.service';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+} from '@/modules/chat/constants/chat.constants';
+import { ChatSendService } from '@/modules/chat/services/chat-send.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   assignCourier,
   countOrderMessages,
   placeConfirmedOrder,
   sendChatMessage,
-} from '../../support/chat';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/chat';
+import { resetServiceArea } from '@test/support/pricing';
 
 // Its own app: the limit counts per user id in memory, and ids start again after a reset.
 describe('Chat message limit (e2e)', () => {

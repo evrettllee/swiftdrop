@@ -1,18 +1,12 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
-import { ROLE } from '../../src/common/enums/role.enum';
-import type { GeoPoint } from '../../src/common/schemas/geo-point.schema';
-import type { Database } from '../../src/database/database.module';
-import {
-  courierProfiles,
-  orderOffers,
-  orderStatusHistory,
-  roles,
-  users,
-} from '../../src/database/schema';
-import { OFFER_TTL_MS } from '../../src/modules/assignment/constants/assignment.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orderOffers, orderStatusHistory, roles, users } from '@/database/schema';
+import { OFFER_TTL_MS } from '@/modules/assignment/constants/assignment.constants';
 import {
   type COURIER_ACCOUNT,
   createCourier,

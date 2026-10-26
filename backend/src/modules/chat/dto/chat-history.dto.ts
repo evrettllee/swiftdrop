@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import {
   CHAT_PAGE_SIZE_DEFAULT,
   CHAT_PAGE_SIZE_MAX,

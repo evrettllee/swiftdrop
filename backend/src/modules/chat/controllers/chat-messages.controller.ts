@@ -9,12 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ROLE } from '../../../common/enums/role.enum';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
-import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import type { AuthUser } from '../../auth/types/auth.types';
-import { type OrderIdParamDto, orderIdParamSchema } from '../../orders/dto/order-id-param.dto';
+import { ROLE } from '@/common/enums/role.enum';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
+import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
+import type { AuthUser } from '@/modules/auth/types/auth.types';
+import { type OrderIdParamDto, orderIdParamSchema } from '@/modules/orders/dto/order-id-param.dto';
 import { CHAT_ROUTES } from '../constants/chat.constants';
 import { type ChatHistoryDto, chatHistorySchema } from '../dto/chat-history.dto';
 import { type MarkReadDto, markReadSchema } from '../dto/mark-read.dto';

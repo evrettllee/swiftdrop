@@ -1,14 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, lt } from 'drizzle-orm';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { isLockTimeout } from '../../../common/database/pg-errors';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders } from '../../../database/schema';
-import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+import { transitionOrderStatus } from '@/common/database/order-status-transition';
+import { isLockTimeout } from '@/common/database/pg-errors';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { PaymentCancellationService } from '@/modules/payments/services/payment-cancellation.service';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import { UNPAID_ORDER_TTL_MS, UNPAID_ORDERS_BATCH_SIZE } from '../constants/orders.constants';
 
 @Injectable()

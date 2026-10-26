@@ -3,11 +3,11 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import {
   AUTH_ERROR_MESSAGES,
   AUTH_THROTTLE_LIMIT,
-} from '../../../src/modules/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { createTestApp } from '../../support/app';
+} from '@/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { createTestApp } from '@test/support/app';
 import {
   extractAccessToken,
   extractRefreshToken,
@@ -16,11 +16,11 @@ import {
   validRegistration,
   WRONG_PASSWORD,
   UNKNOWN_EMAIL,
-} from '../../support/auth';
-import { CLIENT_IP_HEADER } from '../../support/constants';
-import { resetTestData } from '../../support/database';
-import { nextClientIp } from '../../support/http';
-import { blockUser } from '../../support/users';
+} from '@test/support/auth';
+import { CLIENT_IP_HEADER } from '@test/support/constants';
+import { resetTestData } from '@test/support/database';
+import { nextClientIp } from '@test/support/http';
+import { blockUser } from '@test/support/users';
 
 describe('Auth (e2e)', () => {
   let app: NestExpressApplication;

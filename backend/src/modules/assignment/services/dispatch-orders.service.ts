@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { parcelColumns } from '../../../common/database/parcel-columns';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders, packages } from '../../../database/schema';
-import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { parcelColumns } from '@/common/database/parcel-columns';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, packages } from '@/database/schema';
+import { aliasOrderAddresses } from '@/modules/orders/utils/order-address-columns';
 import type { DispatchOrder } from '../types/assignment.types';
 
 @Injectable()

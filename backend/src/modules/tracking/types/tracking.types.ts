@@ -1,6 +1,6 @@
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import type { COURIER_LEG_TARGET } from '../constants/tracking.constants';
 
 // The payload of order:status; estimatedDeliveryAt is an ISO time or null, as in GET /orders/:id.

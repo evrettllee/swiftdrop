@@ -1,22 +1,22 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { PaymentRefundService } from '../../../src/modules/payments/services/payment-refund.service';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { placeOrders } from '../../support/orders';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { PaymentRefundService } from '@/modules/payments/services/payment-refund.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { placeOrders } from '@test/support/orders';
 import {
   createGatewayMock,
   insertPayment,
   readPaymentStatus,
   resetGatewayMock,
   PAYMENT_REF,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Payment refund (e2e)', () => {
   let app: NestExpressApplication;

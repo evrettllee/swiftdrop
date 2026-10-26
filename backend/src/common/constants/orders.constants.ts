@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from '../enums/order-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 
 // Both orders and payments find an order by its id, so they answer with the same texts.
 export const ORDER_ID_INVALID_MESSAGE = 'Некорректный номер заказа';

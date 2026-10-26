@@ -1,12 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, eq, type SQL } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { courierActiveOrder } from '../../../common/database/courier-active-order';
-import { parcelColumns } from '../../../common/database/parcel-columns';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders, packages, users } from '../../../database/schema';
-import { addressPointColumns, aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { courierActiveOrder } from '@/common/database/courier-active-order';
+import { parcelColumns } from '@/common/database/parcel-columns';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, packages, users } from '@/database/schema';
+import {
+  addressPointColumns,
+  aliasOrderAddresses,
+} from '@/modules/orders/utils/order-address-columns';
 import { DELIVERIES_ERROR_MESSAGES } from '../constants/deliveries.constants';
 import { toCourierOrder } from '../mappers/courier-order.mapper';
 import type { CourierOrder } from '../types/deliveries.types';

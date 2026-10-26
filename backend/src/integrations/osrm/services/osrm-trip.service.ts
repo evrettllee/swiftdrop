@@ -1,5 +1,5 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { OSRM_GEOMETRY_QUERY, OSRM_UNAVAILABLE_MESSAGE } from '../constants/osrm.constants';
 import type { OsrmProfile, OsrmTrip } from '../types/osrm.types';
 import { polylineUntil } from '../utils/polyline';

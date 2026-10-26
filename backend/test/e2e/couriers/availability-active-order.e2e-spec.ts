@@ -1,17 +1,17 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { COURIERS_ERROR_MESSAGES } from '../../../src/modules/couriers/constants/couriers.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { assignCourier, placeConfirmedOrder } from '../../support/chat';
-import { putAvailability } from '../../support/couriers';
-import { setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { readCourierProfile } from '../../support/tracking';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { COURIERS_ERROR_MESSAGES } from '@/modules/couriers/constants/couriers.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { assignCourier, placeConfirmedOrder } from '@test/support/chat';
+import { putAvailability } from '@test/support/couriers';
+import { setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { readCourierProfile } from '@test/support/tracking';
 
 describe('Courier availability with an active order (e2e)', () => {
   let app: NestExpressApplication;

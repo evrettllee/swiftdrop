@@ -1,6 +1,6 @@
 import { index, integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { users } from './users';
-import { TOKEN_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { TOKEN_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const passwordResetTokens = pgTable(
   'password_reset_tokens',

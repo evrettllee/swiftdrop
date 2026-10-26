@@ -1,29 +1,29 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orderOffers, orderStatusHistory } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers, orderStatusHistory } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   CANDIDATE_SEARCH_TIMEOUT_MS,
   MAX_OFFERS_PER_ORDER,
-} from '../../../src/modules/assignment/constants/assignment.constants';
-import { AssignmentRoundService } from '../../../src/modules/assignment/services/assignment-round.service';
-import { OrderDispatchService } from '../../../src/modules/assignment/services/order-dispatch.service';
-import { createTestApp } from '../../support/app';
+} from '@/modules/assignment/constants/assignment.constants';
+import { AssignmentRoundService } from '@/modules/assignment/services/assignment-round.service';
+import { OrderDispatchService } from '@/modules/assignment/services/order-dispatch.service';
+import { createTestApp } from '@test/support/app';
 import {
   addCourierOnShift,
   insertBareCouriers,
   insertOffer,
   recordConfirmation,
-} from '../../support/assignment';
-import { registerUser } from '../../support/auth';
-import { CAR, COURIER_ACCOUNT, placeCourierAt } from '../../support/couriers';
-import { MINSK_PICKUP, MOSCOW } from '../../support/fixtures';
-import { placeOrders, readOrderStatus, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/assignment';
+import { registerUser } from '@test/support/auth';
+import { CAR, COURIER_ACCOUNT, placeCourierAt } from '@test/support/couriers';
+import { MINSK_PICKUP, MOSCOW } from '@test/support/fixtures';
+import { placeOrders, readOrderStatus, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 const MARGIN_MS = 1000;
 

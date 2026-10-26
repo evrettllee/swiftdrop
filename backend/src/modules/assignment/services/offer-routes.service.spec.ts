@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
-import { VEHICLE_TYPE } from '../../../common/enums/vehicle-type.enum';
-import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
-import { OsrmService } from '../../../integrations/osrm/services/osrm.service';
+import { VEHICLE_TYPE } from '@/common/enums/vehicle-type.enum';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import type { CourierCandidate, DispatchOrder } from '../types/assignment.types';
 import { OfferRoutesService } from './offer-routes.service';
 

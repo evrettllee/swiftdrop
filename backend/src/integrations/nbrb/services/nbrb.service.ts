@@ -1,5 +1,5 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
-import { describeError } from '../../../common/utils/describe-error';
+import { describeError } from '@/common/utils/describe-error';
 import { nbrbRateSchema } from '../schemas/nbrb-rate.schema';
 import {
   NBRB_CACHE_TTL_MS,

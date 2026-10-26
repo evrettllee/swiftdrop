@@ -1,20 +1,20 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { CouriersGateway } from '../../../src/modules/couriers/gateways/couriers.gateway';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { assignCourier, OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { type Cookies, SECOND_CLIENT } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { assignCourier, OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { type Cookies, SECOND_CLIENT } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 import {
   collectEvents,
   joinOrderRoom,
   listenTestApp,
   roundTrip,
   waitForEvent,
-} from '../../support/sockets';
+} from '@test/support/sockets';
 
 // An event no part of the app sends: only the test emits it through the gateway.
 const TEST_EVENT = 'test:order-event';

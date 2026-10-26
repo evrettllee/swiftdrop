@@ -3,9 +3,9 @@ import {
   type OrderStatusChange,
   type OrderTransaction,
   runOrderTransaction,
-} from '../../../common/database/order-status-transition';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
+} from '@/common/database/order-status-transition';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import { OrderEtaService } from './order-eta.service';
 import { OrderEventsService } from './order-events.service';
 

@@ -1,4 +1,4 @@
-import { ROLE } from '../../../common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,

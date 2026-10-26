@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from '../users/users.module';
+import { UsersModule } from '@/modules/users/users.module';
 import { SocketAuthService } from './services/socket-auth.service';
 import { SocketSessionTimersService } from './services/socket-session-timers.service';
 

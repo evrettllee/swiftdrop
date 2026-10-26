@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Socket } from 'socket.io';
-import { ENV_KEYS } from '../../../config/env.constants';
-import { SOCKET_ERRORS } from '../../realtime/constants/realtime.constants';
-import { SocketAuthService } from '../../realtime/services/socket-auth.service';
-import { SocketSessionTimersService } from '../../realtime/services/socket-session-timers.service';
+import { ENV_KEYS } from '@/config/env.constants';
+import { SOCKET_ERRORS } from '@/modules/realtime/constants/realtime.constants';
+import { SocketAuthService } from '@/modules/realtime/services/socket-auth.service';
+import { SocketSessionTimersService } from '@/modules/realtime/services/socket-session-timers.service';
 import type { AppSocketData } from '../types/couriers-socket.types';
 import { buildSocketData } from '../utils/socket-data';
 import { CourierProfilesService } from './courier-profiles.service';

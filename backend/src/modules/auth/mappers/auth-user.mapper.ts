@@ -1,5 +1,5 @@
-import type { RoleName } from '../../../common/enums/role.enum';
-import type { User } from '../../users/types/users.types';
+import type { RoleName } from '@/common/enums/role.enum';
+import type { User } from '@/modules/users/types/users.types';
 import type { AuthUser } from '../types/auth.types';
 
 export function toAuthUser(user: User, role: RoleName): AuthUser {

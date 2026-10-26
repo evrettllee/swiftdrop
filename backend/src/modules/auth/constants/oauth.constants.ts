@@ -1,5 +1,5 @@
-import { GLOBAL_PREFIX } from '../../../common/constants/http.constants';
-import { MS_PER_MINUTE, MS_PER_SECOND } from '../../../common/constants/time.constants';
+import { GLOBAL_PREFIX } from '@/common/constants/http.constants';
+import { MS_PER_MINUTE, MS_PER_SECOND } from '@/common/constants/time.constants';
 import { AUTH_ROUTES } from './routes.constants';
 import { URL_SAFE_ENCODING } from './tokens.constants';
 

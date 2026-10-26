@@ -1,21 +1,21 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Socket } from 'socket.io-client';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { courierProfiles } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   COURIER_SOCKET_EVENTS,
   LOCATION_UPDATE_REJECTIONS,
-} from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import type { LocationAck } from '../../../src/modules/couriers/types/couriers-socket.types';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { CAR, createCourier, putAvailability, putVehicle } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { resetServiceArea } from '../../support/pricing';
-import { connectAppSocket, emitWithAck, listenTestApp } from '../../support/sockets';
+} from '@/modules/couriers/constants/couriers-socket.constants';
+import type { LocationAck } from '@/modules/couriers/types/couriers-socket.types';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { CAR, createCourier, putAvailability, putVehicle } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { resetServiceArea } from '@test/support/pricing';
+import { connectAppSocket, emitWithAck, listenTestApp } from '@test/support/sockets';
 
 const INVALID_LATITUDE = 91;
 

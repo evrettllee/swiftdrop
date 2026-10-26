@@ -1,29 +1,29 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Socket } from 'socket.io-client';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orderOffers } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { OFFER_TTL_MS } from '../../../src/modules/assignment/constants/assignment.constants';
-import { AssignmentRoundService } from '../../../src/modules/assignment/services/assignment-round.service';
-import type { CourierOffer } from '../../../src/modules/assignment/types/assignment.types';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierOnShift, addCourierSession } from '../../support/assignment';
-import { registerUser } from '../../support/auth';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { OFFER_TTL_MS } from '@/modules/assignment/constants/assignment.constants';
+import { AssignmentRoundService } from '@/modules/assignment/services/assignment-round.service';
+import type { CourierOffer } from '@/modules/assignment/types/assignment.types';
+import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierOnShift, addCourierSession } from '@test/support/assignment';
+import { registerUser } from '@test/support/auth';
 import {
   CAR,
   COURIER_ACCOUNT,
   putAvailability,
   SECOND_COURIER_ACCOUNT,
-} from '../../support/couriers';
-import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE } from '../../support/fixtures';
-import { placeOrders, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { connectAppSocket, listenTestApp, waitForEvent } from '../../support/sockets';
+} from '@test/support/couriers';
+import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE } from '@test/support/fixtures';
+import { placeOrders, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { connectAppSocket, listenTestApp, waitForEvent } from '@test/support/sockets';
 
 // Every route in these tests is ROUTE: to the pickup point and then to the recipient.
 const ROUTE_SEC = Math.ceil(ROUTE.durationSec);

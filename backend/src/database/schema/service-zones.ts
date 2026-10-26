@@ -1,6 +1,6 @@
 import { boolean, integer, jsonb, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { tariffs } from './tariffs';
-import { SERVICE_ZONE_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { SERVICE_ZONE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const serviceZones = pgTable('service_zones', {
   zoneId: integer().primaryKey().generatedAlwaysAsIdentity(),

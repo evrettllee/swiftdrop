@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
-import { describeError } from '../../../common/utils/describe-error';
-import { ENV_KEYS } from '../../../config/env.constants';
-import { ACCESS_COOKIE_NAME } from '../../auth/constants/tokens.constants';
-import { toAuthUser } from '../../auth/mappers/auth-user.mapper';
-import type { AccessTokenPayload } from '../../auth/types/auth.types';
-import { UsersService } from '../../users/services/users.service';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { describeError } from '@/common/utils/describe-error';
+import { ENV_KEYS } from '@/config/env.constants';
+import { ACCESS_COOKIE_NAME } from '@/modules/auth/constants/tokens.constants';
+import { toAuthUser } from '@/modules/auth/mappers/auth-user.mapper';
+import type { AccessTokenPayload } from '@/modules/auth/types/auth.types';
+import { UsersService } from '@/modules/users/services/users.service';
 import type { SocketSession } from '../types/realtime.types';
 import { parseCookieHeader } from '../utils/cookie-header';
 

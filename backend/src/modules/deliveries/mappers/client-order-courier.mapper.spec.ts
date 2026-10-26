@@ -1,5 +1,5 @@
-import { ORDER_STATUS, ORDER_STATUS_VALUES } from '../../../common/enums/order-status.enum';
-import { VEHICLE_TYPE } from '../../../common/enums/vehicle-type.enum';
+import { ORDER_STATUS, ORDER_STATUS_VALUES } from '@/common/enums/order-status.enum';
+import { VEHICLE_TYPE } from '@/common/enums/vehicle-type.enum';
 import type { ClientOrderCourierRow } from '../types/deliveries.types';
 import { toClientOrderCourier } from './client-order-courier.mapper';
 

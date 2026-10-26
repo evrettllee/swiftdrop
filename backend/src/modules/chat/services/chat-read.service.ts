@@ -1,10 +1,10 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { orderParticipant, participantActor } from '../../../common/database/order-participant';
-import type { RoleName } from '../../../common/enums/role.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
+import { orderParticipant, participantActor } from '@/common/database/order-participant';
+import type { RoleName } from '@/common/enums/role.enum';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '../constants/chat.constants';
 import type { ChatReadResult, MessageReadEvent } from '../types/chat.types';
 import { ChatUnreadService } from './chat-unread.service';
