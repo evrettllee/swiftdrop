@@ -14,9 +14,7 @@ function usePopupState() {
   function moveActive(step: number, count: number): void {
     if (count > 0) {
       setActiveIndex((current) =>
-        current === NO_ACTIVE_INDEX
-          ? (step > 0 ? 0 : count - 1)
-          : (current + step + count) % count,
+        current === NO_ACTIVE_INDEX ? (step > 0 ? 0 : count - 1) : (current + step + count) % count,
       );
     }
   }
