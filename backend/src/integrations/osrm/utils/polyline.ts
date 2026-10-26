@@ -1,4 +1,4 @@
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { POLYLINE_PRECISION } from '../constants/osrm.constants';
 
 // A point of a polyline in whole millionths of a degree, as the encoding keeps it.

@@ -2,7 +2,7 @@ import type Stripe from 'stripe';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENT_EVENT,
-} from '../../../modules/payments/constants/payments.constants';
+} from '@/modules/payments/constants/payments.constants';
 import { mapStripeEvent, mapStripeSession } from './stripe-event.mapper';
 import { STRIPE_EVENT } from '../constants/stripe.constants';
 

@@ -1,11 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, asc, eq, inArray } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { parcelColumns } from '../../../common/database/parcel-columns';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory, packages } from '../../../database/schema';
-import { addressPointColumns, aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { parcelColumns } from '@/common/database/parcel-columns';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, orderStatusHistory, packages } from '@/database/schema';
+import {
+  addressPointColumns,
+  aliasOrderAddresses,
+} from '@/modules/orders/utils/order-address-columns';
 import {
   COURIER_STAGE_STATUSES,
   DELIVERIES_ERROR_MESSAGES,

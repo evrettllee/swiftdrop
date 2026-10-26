@@ -1,5 +1,5 @@
-import type { RoleName } from '../../../common/enums/role.enum';
-import type { users } from '../../../database/schema';
+import type { RoleName } from '@/common/enums/role.enum';
+import type { users } from '@/database/schema';
 
 export type User = typeof users.$inferSelect;
 

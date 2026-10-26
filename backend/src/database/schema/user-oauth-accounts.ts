@@ -1,7 +1,7 @@
 import { integer, pgEnum, pgTable, timestamp, unique, varchar } from 'drizzle-orm/pg-core';
-import { OAUTH_PROVIDER_VALUES } from '../../common/enums/oauth-provider.enum';
+import { OAUTH_PROVIDER_VALUES } from '@/common/enums/oauth-provider.enum';
 import { users } from './users';
-import { OAUTH_ACCOUNT_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { OAUTH_ACCOUNT_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const oauthProviderEnum = pgEnum('oauth_provider', OAUTH_PROVIDER_VALUES);
 

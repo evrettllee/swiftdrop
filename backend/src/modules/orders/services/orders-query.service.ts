@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, inArray, type SQL } from 'drizzle-orm';
-import { CURRENCY } from '../../../common/constants/money.constants';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders } from '../../../database/schema';
+import { CURRENCY } from '@/common/constants/money.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
 import type { ListOrdersDto } from '../dto/list-orders.dto';
 import {
   ACTIVE_STATUSES,

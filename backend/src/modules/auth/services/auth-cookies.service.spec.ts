@@ -1,6 +1,6 @@
 import type { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Response } from 'express';
-import { ENV_KEYS, NODE_ENV_PRODUCTION } from '../../../config/env.constants';
+import { ENV_KEYS, NODE_ENV_PRODUCTION } from '@/config/env.constants';
 import {
   ACCESS_COOKIE_NAME,
   AUTH_COOKIE_SAME_SITE,

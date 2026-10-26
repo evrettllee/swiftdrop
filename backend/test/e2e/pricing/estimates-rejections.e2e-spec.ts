@@ -1,18 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { serviceZones, tariffs } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { serviceZones, tariffs } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   PRICING_ERROR_MESSAGES,
   PRICING_THROTTLE_LIMIT,
-} from '../../../src/modules/pricing/constants/pricing.constants';
-import { createTestApp } from '../../support/app';
-import { CLIENT_IP_HEADER } from '../../support/constants';
-import { MINSK_DELIVERY, MINSK_PICKUP, MOSCOW, SMALL_PACKAGE } from '../../support/fixtures';
-import { nextClientIp } from '../../support/http';
-import { postEstimate, validEstimate, resetServiceArea } from '../../support/pricing';
+} from '@/modules/pricing/constants/pricing.constants';
+import { createTestApp } from '@test/support/app';
+import { CLIENT_IP_HEADER } from '@test/support/constants';
+import { MINSK_DELIVERY, MINSK_PICKUP, MOSCOW, SMALL_PACKAGE } from '@test/support/fixtures';
+import { nextClientIp } from '@test/support/http';
+import { postEstimate, validEstimate, resetServiceArea } from '@test/support/pricing';
 
 describe('Pricing (e2e)', () => {
   let app: NestExpressApplication;

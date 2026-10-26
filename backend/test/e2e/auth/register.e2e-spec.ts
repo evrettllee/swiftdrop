@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
 import {
   ACCESS_COOKIE_NAME,
   ACCESS_COOKIE_PATH,
@@ -10,17 +10,17 @@ import {
   REFRESH_COOKIE_NAME,
   REFRESH_COOKIE_PATH,
   REFRESH_TOKEN_TTL_MS,
-} from '../../../src/modules/auth/constants/tokens.constants';
-import { MS_PER_SECOND } from '../../../src/common/constants/time.constants';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/database/schema';
-import { USERS_ERROR_MESSAGES } from '../../../src/modules/users/constants/users.constants';
-import { createTestApp } from '../../support/app';
-import { findSetCookie, postAuth, registerUser, validRegistration } from '../../support/auth';
-import { resetTestData } from '../../support/database';
-import { sortedStatuses } from '../../support/http';
+} from '@/modules/auth/constants/tokens.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { ROLE } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { users } from '@/database/schema';
+import { USERS_ERROR_MESSAGES } from '@/modules/users/constants/users.constants';
+import { createTestApp } from '@test/support/app';
+import { findSetCookie, postAuth, registerUser, validRegistration } from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
+import { sortedStatuses } from '@test/support/http';
 
 const SECOND_USER = {
   ...validRegistration,

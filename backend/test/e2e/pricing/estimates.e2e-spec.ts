@@ -1,11 +1,11 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { createTestApp } from '../../support/app';
-import { SMALL_PACKAGE, VALID_ORDER_PRICE } from '../../support/fixtures';
-import { postEstimate, validEstimate, resetServiceArea } from '../../support/pricing';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { createTestApp } from '@test/support/app';
+import { SMALL_PACKAGE, VALID_ORDER_PRICE } from '@test/support/fixtures';
+import { postEstimate, validEstimate, resetServiceArea } from '@test/support/pricing';
 
 describe('Pricing (e2e)', () => {
   let app: NestExpressApplication;

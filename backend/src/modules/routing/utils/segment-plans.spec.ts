@@ -1,4 +1,4 @@
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 import { ROUTE_SEGMENT_KIND } from '../constants/routing.constants';
 import { courierOrderPlans, nextPointPlan, parcelPlan } from './segment-plans';
 

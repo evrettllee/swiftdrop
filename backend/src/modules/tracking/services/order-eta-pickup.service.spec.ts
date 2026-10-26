@@ -1,8 +1,8 @@
 import { Logger } from '@nestjs/common';
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
-import type { OsrmTripService } from '../../../integrations/osrm/services/osrm-trip.service';
-import type { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
-import type { CourierLocationEventsService } from '../../couriers/services/courier-location-events.service';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import type { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
+import type { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import type { CourierLocationEventsService } from '@/modules/couriers/services/courier-location-events.service';
 import { ORDER_ROOM_EVENTS } from '../constants/tracking.constants';
 import type { EtaSource } from '../types/tracking.types';
 import type { OrderEtaDataService } from './order-eta-data.service';

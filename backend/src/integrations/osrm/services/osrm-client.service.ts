@@ -5,11 +5,11 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { CircuitBreaker } from '../../../common/utils/circuit-breaker';
-import { describeError } from '../../../common/utils/describe-error';
-import { ENV_KEYS } from '../../../config/env.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { CircuitBreaker } from '@/common/utils/circuit-breaker';
+import { describeError } from '@/common/utils/describe-error';
+import { ENV_KEYS } from '@/config/env.constants';
 import {
   COORDINATE_SEPARATOR,
   OSRM_COOLDOWN_MS,

@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, eq, gte, type SQL, sql } from 'drizzle-orm';
-import { APP_TIME_ZONE } from '../../../common/constants/time.constants';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orderOffers, orders, orderStatusHistory } from '../../../database/schema';
+import { APP_TIME_ZONE } from '@/common/constants/time.constants';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers, orders, orderStatusHistory } from '@/database/schema';
 import type { CourierTodayStats } from '../types/deliveries.types';
 
 @Injectable()

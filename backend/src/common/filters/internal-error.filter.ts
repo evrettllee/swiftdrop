@@ -1,7 +1,7 @@
 import { type ArgumentsHost, Catch, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
-import { INTERNAL_ERROR_MESSAGE } from '../constants/http.constants';
-import { describeError, describeErrorStack } from '../utils/describe-error';
+import { INTERNAL_ERROR_MESSAGE } from '@/common/constants/http.constants';
+import { describeError, describeErrorStack } from '@/common/utils/describe-error';
 
 // An unexpected failure answers 500 with a general message: its text, stack or SQL never reach the
 // client and go to the log instead. HTTP errors of the app (validation, 401, 403, 404, 409, 429)

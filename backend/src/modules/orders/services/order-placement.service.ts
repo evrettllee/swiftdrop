@@ -1,11 +1,11 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { MONEY_FRACTION_DIGITS } from '../../../common/constants/money.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { addresses, orders, orderStatusHistory, packages } from '../../../database/schema';
-import { PricingService } from '../../pricing/services/pricing.service';
+import { MONEY_FRACTION_DIGITS } from '@/common/constants/money.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { addresses, orders, orderStatusHistory, packages } from '@/database/schema';
+import { PricingService } from '@/modules/pricing/services/pricing.service';
 import type { CreateOrderDto } from '../dto/create-order.dto';
 import { toAddressRow, toPackageRow } from '../mappers/order-rows.mapper';
 import { ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';

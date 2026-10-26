@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { OsrmService } from '../../../integrations/osrm/services/osrm.service';
-import type { OsrmProfile, OsrmRoute } from '../../../integrations/osrm/types/osrm.types';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import type { OsrmProfile, OsrmRoute } from '@/integrations/osrm/types/osrm.types';
 import { VEHICLE_ROUTING_PROFILE } from '../constants/assignment.constants';
 import type {
   CandidatePickup,

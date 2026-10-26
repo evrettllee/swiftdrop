@@ -1,5 +1,5 @@
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { buildThrottleOverride } from '../../../common/utils/throttle';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { buildThrottleOverride } from '@/common/utils/throttle';
 
 // Errors
 export const AUTH_ERROR_MESSAGES = {

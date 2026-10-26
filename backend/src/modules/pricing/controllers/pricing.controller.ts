@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { Public } from '../../auth/decorators/public.decorator';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
+import { Public } from '@/modules/auth/decorators/public.decorator';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { type EstimatePriceDto, estimatePriceSchema } from '../dto/estimate-price.dto';
 import { PRICING_ROUTES, PRICING_THROTTLE } from '../constants/pricing.constants';
 import { PricingService } from '../services/pricing.service';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import { ORDERS_VALIDATION_MESSAGES } from '../constants/orders.constants';
 
 // Route params arrive as strings, so the id is coerced.

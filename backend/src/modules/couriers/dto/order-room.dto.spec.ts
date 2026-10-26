@@ -1,4 +1,4 @@
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import { orderRoomBodySchema } from './order-room.dto';
 
 describe('orderRoomBodySchema', () => {

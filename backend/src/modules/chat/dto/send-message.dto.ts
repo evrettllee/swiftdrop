@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MESSAGE_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
+import { MESSAGE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { CHAT_VALIDATION_MESSAGES, NUL_CHARACTER } from '../constants/chat.constants';
 
 // The length in characters (code points), as char_length counts it in the database: an emoji is

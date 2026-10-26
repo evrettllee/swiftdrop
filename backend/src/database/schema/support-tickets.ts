@@ -1,7 +1,7 @@
 import { index, integer, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { orders } from './orders';
 import { users } from './users';
-import { SUPPORT_TICKET_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { SUPPORT_TICKET_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const supportTicketStatusEnum = pgEnum('support_ticket_status', [
   'open',

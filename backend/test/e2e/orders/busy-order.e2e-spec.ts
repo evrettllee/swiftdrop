@@ -1,20 +1,20 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { ORDERS_ERROR_MESSAGES } from '../../../src/modules/orders/constants/orders.constants';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { PAYMENTS_ERROR_MESSAGES } from '../../../src/modules/payments/constants/payments.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
-import { holdOrder, whileRowsAreHeld } from '../../support/locks';
-import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
-import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { NbrbService } from '@/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ORDERS_ERROR_MESSAGES } from '@/modules/orders/constants/orders.constants';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENTS_ERROR_MESSAGES } from '@/modules/payments/constants/payments.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { LOCK_TEST_MARGIN_MS } from '@test/support/constants';
+import { holdOrder, whileRowsAreHeld } from '@test/support/locks';
+import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '@test/support/orders';
+import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 // Each test waits for the lock timeout itself, so it gets this much more than the timeout.
 

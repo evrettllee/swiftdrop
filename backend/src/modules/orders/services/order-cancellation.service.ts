@@ -7,18 +7,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { isLockTimeout } from '../../../common/database/pg-errors';
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders } from '../../../database/schema';
-import { COURIER_SOCKET_EVENTS } from '../../couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
-import { PaymentCancellationService } from '../../payments/services/payment-cancellation.service';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { transitionOrderStatus } from '@/common/database/order-status-transition';
+import { isLockTimeout } from '@/common/database/pg-errors';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { PaymentCancellationService } from '@/modules/payments/services/payment-cancellation.service';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import {
   CANCELLABLE_STATUSES,
   FINISHED_STATUSES,

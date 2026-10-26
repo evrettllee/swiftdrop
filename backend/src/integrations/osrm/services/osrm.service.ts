@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { METERS_PER_KM, OSRM_PROFILE, OSRM_QUERY } from '../constants/osrm.constants';
 import type { OsrmProfile, OsrmRoute } from '../types/osrm.types';
 import { OsrmClient } from './osrm-client.service';

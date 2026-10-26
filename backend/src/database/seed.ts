@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { ENV_FILE_PATH, ENV_KEYS } from '../config/env.constants';
+import { ENV_FILE_PATH, ENV_KEYS } from '@/config/env.constants';
 import { DB_CASING } from './database.constants';
 import * as schema from './schema';
 import { seedCourier } from './seed-courier';

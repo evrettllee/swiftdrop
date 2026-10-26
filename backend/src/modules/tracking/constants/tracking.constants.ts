@@ -1,4 +1,4 @@
-import { MS_PER_MINUTE, MS_PER_SECOND } from '../../../common/constants/time.constants';
+import { MS_PER_MINUTE, MS_PER_SECOND } from '@/common/constants/time.constants';
 
 // Events of the order room, for the client who owns the order and its courier.
 export const ORDER_ROOM_EVENTS = {

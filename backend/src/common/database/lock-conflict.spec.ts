@@ -3,7 +3,7 @@ import { DatabaseError } from 'pg';
 import {
   PG_LOCK_NOT_AVAILABLE_CODE,
   PG_UNIQUE_VIOLATION_CODE,
-} from '../constants/database.constants';
+} from '@/common/constants/database.constants';
 import { withLockConflict } from './lock-conflict';
 
 const BUSY_MESSAGE = 'busy';

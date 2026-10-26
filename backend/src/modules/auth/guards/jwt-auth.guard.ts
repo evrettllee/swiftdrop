@@ -1,7 +1,7 @@
 import { type ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { HTTP_CONTEXT_TYPE } from '../../../common/constants/http.constants';
+import { HTTP_CONTEXT_TYPE } from '@/common/constants/http.constants';
 import {
   AUTH_ERROR_MESSAGES,
   IS_PUBLIC_KEY,

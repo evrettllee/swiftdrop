@@ -1,4 +1,4 @@
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 
 export type CourierVehicle = {
   type: VehicleType;

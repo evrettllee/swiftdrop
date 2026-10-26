@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { payments } from '../../../database/schema';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { payments } from '@/database/schema';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
 import {
   CHECKOUT_SESSION_STATUS,

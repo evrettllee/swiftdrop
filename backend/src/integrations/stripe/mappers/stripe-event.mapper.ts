@@ -2,14 +2,14 @@ import type Stripe from 'stripe';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENT_EVENT,
-} from '../../../modules/payments/constants/payments.constants';
+} from '@/modules/payments/constants/payments.constants';
 import type {
   CheckoutSessionState,
   CheckoutSessionStatus,
   ExpiredEvent,
   PaidEvent,
   PaymentEvent,
-} from '../../../modules/payments/types/payments.types';
+} from '@/modules/payments/types/payments.types';
 import {
   STRIPE_EVENT,
   STRIPE_METADATA_ORDER_ID_KEY,

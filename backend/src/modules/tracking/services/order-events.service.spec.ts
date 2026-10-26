@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import type { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import type { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { ORDER_ROOM_EVENTS } from '../constants/tracking.constants';
 import { OrderEventsService } from './order-events.service';
 

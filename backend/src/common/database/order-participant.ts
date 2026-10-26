@@ -1,9 +1,9 @@
 import { and, eq, inArray } from 'drizzle-orm';
-import type { Database, Transaction } from '../../database/database.module';
-import { courierProfiles, orders, users } from '../../database/schema';
-import { ROW_LOCK_SHARE, SINGLE_ROW_LIMIT } from '../constants/database.constants';
-import { ROLE, type RoleName } from '../enums/role.enum';
-import type { OrderStatus } from '../enums/order-status.enum';
+import type { Database, Transaction } from '@/database/database.module';
+import { courierProfiles, orders, users } from '@/database/schema';
+import { ROW_LOCK_SHARE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { ROLE, type RoleName } from '@/common/enums/role.enum';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
 
 // The two sides of an order: its owner and its assigned courier, both as users.
 export type OrderParticipantActor = {

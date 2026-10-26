@@ -1,20 +1,20 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import {
   CLIENT_ORDER_COURIER_ROUTES,
   COURIER_ORDERS_ROUTES,
-} from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
-import { addCourierSession } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, COURIER_ACCOUNT, ON_FOOT, placeCourierAt } from '../../support/couriers';
-import { MINSK_DELIVERY } from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { type Cookies, placeOrders } from '../../support/orders';
+} from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
+import { addCourierSession } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, COURIER_ACCOUNT, ON_FOOT, placeCourierAt } from '@test/support/couriers';
+import { MINSK_DELIVERY } from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { type Cookies, placeOrders } from '@test/support/orders';
 import {
   COURIER_POINT,
   createRoutingMocks,
@@ -22,8 +22,8 @@ import {
   lineThrough,
   resetRouting,
   staleTime,
-} from '../../support/routing';
-import { readCourierProfile } from '../../support/tracking';
+} from '@test/support/routing';
+import { readCourierProfile } from '@test/support/tracking';
 
 describe('Courier position in the route of the client (e2e)', () => {
   let app: NestExpressApplication;

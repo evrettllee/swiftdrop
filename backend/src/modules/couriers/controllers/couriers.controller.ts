@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
-import { ROLE } from '../../../common/enums/role.enum';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
-import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import type { AuthUser } from '../../auth/types/auth.types';
+import { ROLE } from '@/common/enums/role.enum';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
+import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
+import type { AuthUser } from '@/modules/auth/types/auth.types';
 import { COURIERS_ROUTES } from '../constants/couriers.constants';
 import {
   type UpdateAvailabilityDto,

@@ -1,5 +1,5 @@
-import { PACKAGE_VALIDATION_MESSAGES } from '../../../common/constants/package.constants';
-import { PHONE_INVALID_MESSAGE } from '../../../common/constants/person-validation.constants';
+import { PACKAGE_VALIDATION_MESSAGES } from '@/common/constants/package.constants';
+import { PHONE_INVALID_MESSAGE } from '@/common/constants/person-validation.constants';
 import { ORDERS_VALIDATION_MESSAGES } from '../constants/orders.constants';
 import { createOrderSchema } from './create-order.dto';
 

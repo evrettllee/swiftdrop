@@ -1,6 +1,6 @@
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { buildThrottleOverride } from '../../../common/utils/throttle';
-import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { buildThrottleOverride } from '@/common/utils/throttle';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
 
 // Routes
 // The route of an offer or of an order lives under it, for example /orders/:orderId/route.

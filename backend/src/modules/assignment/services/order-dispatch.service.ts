@@ -1,11 +1,11 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, count, eq, max } from 'drizzle-orm';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orderOffers, orderStatusHistory } from '../../../database/schema';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+import { transitionOrderStatus } from '@/common/database/order-status-transition';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers, orderStatusHistory } from '@/database/schema';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import {
   CANDIDATE_SEARCH_TIMEOUT_MS,
   MAX_OFFERS_PER_ORDER,

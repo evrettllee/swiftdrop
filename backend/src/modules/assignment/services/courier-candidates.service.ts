@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, gte, inArray, lte, notExists, sql } from 'drizzle-orm';
-import { courierActiveOrder } from '../../../common/database/courier-active-order';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orderOffers, orders, users, vehicles } from '../../../database/schema';
+import { courierActiveOrder } from '@/common/database/courier-active-order';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orderOffers, orders, users, vehicles } from '@/database/schema';
 import {
   ASSIGNMENT_RADIUS_KM,
   COURIER_LOCATION_FRESH_MS,

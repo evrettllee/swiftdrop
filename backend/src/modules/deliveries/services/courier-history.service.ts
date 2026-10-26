@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, desc, eq, inArray } from 'drizzle-orm';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory, packages } from '../../../database/schema';
-import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, orderStatusHistory, packages } from '@/database/schema';
+import { aliasOrderAddresses } from '@/modules/orders/utils/order-address-columns';
 import { HISTORY_FIRST_PAGE, HISTORY_STATUSES } from '../constants/deliveries.constants';
 import type { CourierHistoryDto } from '../dto/courier-history.dto';
 import type { CourierHistoryPage } from '../types/deliveries.types';

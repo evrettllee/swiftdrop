@@ -1,9 +1,9 @@
-import { ORDER_BUSY_MESSAGE } from '../../../common/constants/orders.constants';
-import { MS_PER_MINUTE, MS_PER_SECOND } from '../../../common/constants/time.constants';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
-import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
-import { ROUTE_PATH_SEGMENT } from '../../routing/constants/routing.constants';
+import { ORDER_BUSY_MESSAGE } from '@/common/constants/orders.constants';
+import { MS_PER_MINUTE, MS_PER_SECOND } from '@/common/constants/time.constants';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import type { OsrmProfile } from '@/integrations/osrm/types/osrm.types';
+import { ROUTE_PATH_SEGMENT } from '@/modules/routing/constants/routing.constants';
 
 // Routes
 export const OFFER_ID_ROUTE_PARAM = ':offerId';

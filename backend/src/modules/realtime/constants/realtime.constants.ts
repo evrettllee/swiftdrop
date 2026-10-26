@@ -1,4 +1,4 @@
-import { GLOBAL_PREFIX } from '../../../common/constants/http.constants';
+import { GLOBAL_PREFIX } from '@/common/constants/http.constants';
 
 // Under the API prefix, because the session cookie is only sent to /api.
 export const SOCKET_PATH = `/${GLOBAL_PREFIX}/socket.io`;

@@ -6,12 +6,12 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '../../../common/constants/database.constants';
-import { getUniqueViolationConstraint } from '../../../common/database/pg-errors';
-import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import type { Transaction } from '../../../database/database.module';
-import { payments } from '../../../database/schema';
+import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '@/common/constants/database.constants';
+import { getUniqueViolationConstraint } from '@/common/database/pg-errors';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { describeError } from '@/common/utils/describe-error';
+import type { Transaction } from '@/database/database.module';
+import { payments } from '@/database/schema';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
 import { PAYMENTS_ERROR_MESSAGES, SESSION_EXPIRE_RESULT } from '../constants/payments.constants';
 

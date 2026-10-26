@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, vehicles } from '../../../database/schema';
-import { OsrmGeometryService } from '../../../integrations/osrm/services/osrm-geometry.service';
-import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, vehicles } from '@/database/schema';
+import { OsrmGeometryService } from '@/integrations/osrm/services/osrm-geometry.service';
+import type { OsrmProfile } from '@/integrations/osrm/types/osrm.types';
 import { DEFAULT_ROUTING_PROFILE, ROUTE_SEGMENT_KIND } from '../constants/routing.constants';
 import type {
   RoutedOrder,

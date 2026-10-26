@@ -1,5 +1,5 @@
-import { VEHICLE_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
-import { VEHICLE_TYPE, type VehicleType } from '../../../common/enums/vehicle-type.enum';
+import { VEHICLE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
+import { VEHICLE_TYPE, type VehicleType } from '@/common/enums/vehicle-type.enum';
 
 // Routes
 export const COURIERS_ROUTES = {

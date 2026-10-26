@@ -1,7 +1,7 @@
 import { type ExecutionContext, ForbiddenException } from '@nestjs/common';
 import type { Reflector } from '@nestjs/core';
 import { FORBIDDEN_MESSAGE } from '../constants/access.constants';
-import { ROLE, type RoleName } from '../../../common/enums/role.enum';
+import { ROLE, type RoleName } from '@/common/enums/role.enum';
 import { RolesGuard } from './roles.guard';
 
 function createGuard(requiredRoles: RoleName[] | undefined): RolesGuard {

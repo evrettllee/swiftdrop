@@ -1,21 +1,21 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ORDER_LIST_FILTER,
   ORDERS_FIRST_PAGE,
   ORDERS_PAGE_SIZE_DEFAULT,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { VALID_ORDER_PRICE } from '../../support/fixtures';
-import { getOrders, placeOrders, SECOND_CLIENT } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { VALID_ORDER_PRICE } from '@test/support/fixtures';
+import { getOrders, placeOrders, SECOND_CLIENT } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 type ListBody = { items: { orderId: number }[] };
 

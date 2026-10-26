@@ -1,5 +1,5 @@
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { ROUTE_SEGMENT_KIND } from '../constants/routing.constants';
 import type { RoutedOrder, SegmentPlan } from '../types/routing.types';
 

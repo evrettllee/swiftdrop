@@ -1,7 +1,4 @@
-import {
-  MINOR_UNITS_PER_MAJOR,
-  MONEY_FRACTION_DIGITS,
-} from '../../../common/constants/money.constants';
+import { MINOR_UNITS_PER_MAJOR, MONEY_FRACTION_DIGITS } from '@/common/constants/money.constants';
 
 // US cents to charge for a price in BYN, the result is rounded up, so the shop never loses on rounding.
 export function convertBynToUsdMinor(amountByn: number, bynPerUsd: number): number {

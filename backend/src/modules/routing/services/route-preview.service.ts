@@ -1,6 +1,6 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { PRICING_ERROR_MESSAGES } from '../../pricing/constants/pricing.constants';
-import { ZonesService } from '../../zones/services/zones.service';
+import { PRICING_ERROR_MESSAGES } from '@/modules/pricing/constants/pricing.constants';
+import { ZonesService } from '@/modules/zones/services/zones.service';
 import type { RoutePreviewDto } from '../dto/route-preview.dto';
 import type { RouteLines } from '../types/routing.types';
 import { RouteLinesService } from './route-lines.service';

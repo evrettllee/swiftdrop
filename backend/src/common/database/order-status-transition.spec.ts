@@ -1,5 +1,5 @@
-import type { Database, Transaction } from '../../database/database.module';
-import { ORDER_STATUS, type OrderStatus } from '../enums/order-status.enum';
+import type { Database, Transaction } from '@/database/database.module';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 import {
   type OrderStatusChange,
   runOrderTransaction,

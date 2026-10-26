@@ -3,28 +3,28 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { AuthModule } from './modules/auth/auth.module';
-import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
-import { RolesGuard } from './modules/auth/guards/roles.guard';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import {
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL_MS,
   THROTTLE_ERROR_MESSAGE,
-} from './common/constants/http.constants';
-import { InternalErrorFilter } from './common/filters/internal-error.filter';
-import { CsrfGuard } from './common/guards/csrf.guard';
-import { ENV_FILE_PATH } from './config/env.constants';
-import { validateEnv } from './config/env.validation';
-import { DatabaseModule } from './database/database.module';
-import { AssignmentModule } from './modules/assignment/assignment.module';
-import { ChatModule } from './modules/chat/chat.module';
-import { CouriersModule } from './modules/couriers/couriers.module';
-import { DeliveriesModule } from './modules/deliveries/deliveries.module';
-import { OrdersModule } from './modules/orders/orders.module';
-import { PaymentsModule } from './modules/payments/payments.module';
-import { PricingModule } from './modules/pricing/pricing.module';
-import { RoutingModule } from './modules/routing/routing.module';
-import { ZonesModule } from './modules/zones/zones.module';
+} from '@/common/constants/http.constants';
+import { InternalErrorFilter } from '@/common/filters/internal-error.filter';
+import { CsrfGuard } from '@/common/guards/csrf.guard';
+import { ENV_FILE_PATH } from '@/config/env.constants';
+import { validateEnv } from '@/config/env.validation';
+import { DatabaseModule } from '@/database/database.module';
+import { AssignmentModule } from '@/modules/assignment/assignment.module';
+import { ChatModule } from '@/modules/chat/chat.module';
+import { CouriersModule } from '@/modules/couriers/couriers.module';
+import { DeliveriesModule } from '@/modules/deliveries/deliveries.module';
+import { OrdersModule } from '@/modules/orders/orders.module';
+import { PaymentsModule } from '@/modules/payments/payments.module';
+import { PricingModule } from '@/modules/pricing/pricing.module';
+import { RoutingModule } from '@/modules/routing/routing.module';
+import { ZonesModule } from '@/modules/zones/zones.module';
 
 @Module({
   imports: [

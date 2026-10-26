@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
-import type { AuthUser } from '../../auth/types/auth.types';
-import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import { ROLE } from '../../../common/enums/role.enum';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
+import type { AuthUser } from '@/modules/auth/types/auth.types';
+import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
+import { ROLE } from '@/common/enums/role.enum';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { type CreateOrderDto, createOrderSchema } from '../dto/create-order.dto';
 import { type ListOrdersDto, listOrdersSchema } from '../dto/list-orders.dto';
 import { type OrderIdParamDto, orderIdParamSchema } from '../dto/order-id-param.dto';

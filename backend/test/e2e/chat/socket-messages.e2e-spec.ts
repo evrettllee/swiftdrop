@@ -1,17 +1,17 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { CHAT_SOCKET_EVENTS } from '../../../src/modules/chat/constants/chat.constants';
+import { ROLE } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CHAT_SOCKET_EVENTS } from '@/modules/chat/constants/chat.constants';
 import type {
   ChatHistory,
   MessageNewEvent,
   MessageReadEvent,
-} from '../../../src/modules/chat/types/chat.types';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+} from '@/modules/chat/types/chat.types';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   assignCourier,
   getChatHistory,
@@ -19,9 +19,9 @@ import {
   OpenSockets,
   placeConfirmedOrder,
   sendChatMessage,
-} from '../../support/chat';
-import { resetServiceArea } from '../../support/pricing';
-import { joinOrderRoom, listenTestApp, waitForEvent } from '../../support/sockets';
+} from '@test/support/chat';
+import { resetServiceArea } from '@test/support/pricing';
+import { joinOrderRoom, listenTestApp, waitForEvent } from '@test/support/sockets';
 
 describe('Chat over the order room (e2e)', () => {
   let app: NestExpressApplication;

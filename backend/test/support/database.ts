@@ -2,10 +2,10 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
-import { DB_CASING } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import * as schema from '../../src/database/schema';
-import { seedRoles } from '../../src/database/seed-steps';
+import { DB_CASING } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import * as schema from '@/database/schema';
+import { seedRoles } from '@/database/seed-steps';
 import {
   MIGRATIONS_FOLDER,
   TEST_DB_NAME_SUFFIX,

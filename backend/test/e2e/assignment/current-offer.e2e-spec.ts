@@ -1,28 +1,28 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Socket } from 'socket.io-client';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { COURIER_OFFERS_ROUTES } from '../../../src/modules/assignment/constants/assignment.constants';
-import { OfferNotifierService } from '../../../src/modules/assignment/services/offer-notifier.service';
-import type { CourierOffer } from '../../../src/modules/assignment/types/assignment.types';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { createTestApp } from '../../support/app';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { COURIER_OFFERS_ROUTES } from '@/modules/assignment/constants/assignment.constants';
+import { OfferNotifierService } from '@/modules/assignment/services/offer-notifier.service';
+import type { CourierOffer } from '@/modules/assignment/types/assignment.types';
+import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { createTestApp } from '@test/support/app';
 import {
   addCourierOnShift,
   addCourierSession,
   insertOffer,
   OFFER_ETA,
-} from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP, SMALL_PACKAGE, VALID_ORDER } from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { type Cookies, placeOrders, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { connectAppSocket, listenTestApp, waitForEvent } from '../../support/sockets';
+} from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_PICKUP, SMALL_PACKAGE, VALID_ORDER } from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { type Cookies, placeOrders, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { connectAppSocket, listenTestApp, waitForEvent } from '@test/support/sockets';
 
 const CURRENT_OFFER_PATH = `${COURIER_OFFERS_ROUTES.BASE}/${COURIER_OFFERS_ROUTES.CURRENT}`;
 // MINSK_DELIVERY rounded to the area the courier sees before accepting.

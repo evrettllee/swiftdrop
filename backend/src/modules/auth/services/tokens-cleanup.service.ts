@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { lt } from 'drizzle-orm';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { refreshTokens } from '../../../database/schema';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { refreshTokens } from '@/database/schema';
 
 @Injectable()
 export class TokensCleanupService {

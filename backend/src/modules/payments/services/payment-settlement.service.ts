@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, inArray } from 'drizzle-orm';
-import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { payments } from '../../../database/schema';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { payments } from '@/database/schema';
 
 // The changes of a payment that follow its session in the payment system, shared by the webhook and
 // the reconciliation of a cancelled order. Each change is safe to repeat: a payment already settled

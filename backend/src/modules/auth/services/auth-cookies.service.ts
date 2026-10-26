@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Request, Response } from 'express';
-import { ENV_KEYS, NODE_ENV_PRODUCTION } from '../../../config/env.constants';
-import type { OAuthProvider } from '../../../common/enums/oauth-provider.enum';
+import { ENV_KEYS, NODE_ENV_PRODUCTION } from '@/config/env.constants';
+import type { OAuthProvider } from '@/common/enums/oauth-provider.enum';
 import {
   OAUTH_STATE_COOKIE_BASE_PATH,
   OAUTH_STATE_COOKIE_PREFIX,

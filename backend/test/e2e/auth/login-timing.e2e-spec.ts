@@ -1,19 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 import { performance } from 'node:perf_hooks';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { createTestApp } from '../../support/app';
+import { AUTH_ERROR_MESSAGES } from '@/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { createTestApp } from '@test/support/app';
 import {
   postAuth,
   registerUser,
   validRegistration,
   WRONG_PASSWORD,
   UNKNOWN_EMAIL,
-} from '../../support/auth';
-import { resetTestData } from '../../support/database';
+} from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
 
 const ROUNDS = 5;
 // An unknown email still costs a full password check, so it takes about as long as a wrong

@@ -1,4 +1,4 @@
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
 
 export const STRIPE_REQUEST_TIMEOUT_MS = 10 * MS_PER_SECOND;
 

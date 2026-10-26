@@ -2,11 +2,11 @@ import {
   COURIER_ACTIVE_ORDER_STATUSES,
   ORDER_BUSY_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
-} from '../../../common/constants/orders.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
-import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
-import { ROUTE_PATH_SEGMENT } from '../../routing/constants/routing.constants';
+} from '@/common/constants/orders.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { ROUTE_PATH_SEGMENT } from '@/modules/routing/constants/routing.constants';
 
 // Routes
 export const COURIER_ORDERS_ROUTES = {

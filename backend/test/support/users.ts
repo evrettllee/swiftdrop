@@ -2,10 +2,10 @@ import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { hash } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';
-import type { ROLE, RoleName } from '../../src/common/enums/role.enum';
-import type { Database } from '../../src/database/database.module';
-import { roles, userOauthAccounts, users } from '../../src/database/schema';
-import { AUTH_ROUTES } from '../../src/modules/auth/constants/routes.constants';
+import type { ROLE, RoleName } from '@/common/enums/role.enum';
+import type { Database } from '@/database/database.module';
+import { roles, userOauthAccounts, users } from '@/database/schema';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
 import { postAuth, sessionCookieHeader, validRegistration } from './auth';
 
 type Account = {

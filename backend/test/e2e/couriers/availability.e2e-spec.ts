@@ -1,19 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { courierProfiles } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { createTestApp } from '../../support/app';
-import { MINSK_PICKUP } from '../../support/fixtures';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { createTestApp } from '@test/support/app';
+import { MINSK_PICKUP } from '@test/support/fixtures';
 import {
   CAR,
   createCourier,
   getCourierMe,
   putAvailability,
   putVehicle,
-} from '../../support/couriers';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/couriers';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Courier availability (e2e)', () => {
   let app: NestExpressApplication;

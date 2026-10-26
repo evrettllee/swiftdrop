@@ -1,19 +1,19 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ORDER_JOIN_MAX_ATTEMPTS,
   ORDER_JOIN_REJECTIONS,
   ORDER_ROOMS_MAX_PER_SOCKET,
-} from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { OpenSockets, ORDER_JOIN_OK, orderJoinRefusal } from '../../support/chat';
-import { MISSING_ORDER_ID } from '../../support/constants';
-import { type Cookies, placeOrders } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { joinOrderRoom, listenTestApp } from '../../support/sockets';
+} from '@/modules/couriers/constants/couriers-socket.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets, ORDER_JOIN_OK, orderJoinRefusal } from '@test/support/chat';
+import { MISSING_ORDER_ID } from '@test/support/constants';
+import { type Cookies, placeOrders } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { joinOrderRoom, listenTestApp } from '@test/support/sockets';
 
 describe('Order room limits (e2e)', () => {
   let app: NestExpressApplication;

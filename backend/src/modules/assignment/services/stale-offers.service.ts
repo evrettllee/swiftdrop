@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, lte, notExists, or } from 'drizzle-orm';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orderOffers, orders } from '../../../database/schema';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orderOffers, orders } from '@/database/schema';
 import { OfferNotifierService } from './offer-notifier.service';
 
 @Injectable()

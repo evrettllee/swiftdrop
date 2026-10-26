@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { OsrmModule } from '../../integrations/osrm/osrm.module';
-import { ZonesModule } from '../zones/zones.module';
+import { OsrmModule } from '@/integrations/osrm/osrm.module';
+import { ZonesModule } from '@/modules/zones/zones.module';
 import { RoutePreviewController } from './controllers/route-preview.controller';
 import { RouteLinesService } from './services/route-lines.service';
 import { RoutePreviewService } from './services/route-preview.service';

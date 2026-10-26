@@ -1,23 +1,23 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OSRM_PROFILE } from '../../../src/integrations/osrm/constants/osrm.constants';
-import { COURIER_OFFERS_ROUTES } from '../../../src/modules/assignment/constants/assignment.constants';
-import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
-import { addCourierOnShift, addCourierSession, insertOffer } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import { COURIER_OFFERS_ROUTES } from '@/modules/assignment/constants/assignment.constants';
+import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
+import { addCourierOnShift, addCourierSession, insertOffer } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
 import {
   CAR,
   COURIER_ACCOUNT,
   ON_FOOT,
   placeCourierAt,
   SECOND_COURIER_ACCOUNT,
-} from '../../support/couriers';
-import { MINSK_DELIVERY, MINSK_PICKUP } from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { type Cookies, placeOrders, setOrderStatus } from '../../support/orders';
+} from '@test/support/couriers';
+import { MINSK_DELIVERY, MINSK_PICKUP } from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { type Cookies, placeOrders, setOrderStatus } from '@test/support/orders';
 import {
   COURIER_POINT,
   createRoutingMocks,
@@ -26,7 +26,7 @@ import {
   lineThrough,
   resetRouting,
   staleTime,
-} from '../../support/routing';
+} from '@test/support/routing';
 
 const OFFER_ROUTE_PATH = `${COURIER_OFFERS_ROUTES.BASE}/${COURIER_OFFERS_ROUTES.CURRENT_ROUTE}`;
 

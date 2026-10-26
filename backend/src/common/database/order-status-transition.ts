@@ -1,7 +1,7 @@
 import { and, eq, inArray } from 'drizzle-orm';
-import type { Database, Transaction } from '../../database/database.module';
-import { orders, orderStatusHistory } from '../../database/schema';
-import type { OrderStatus } from '../enums/order-status.enum';
+import type { Database, Transaction } from '@/database/database.module';
+import { orders, orderStatusHistory } from '@/database/schema';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
 
 // Columns that change together with the status, for example the courier who took the order.
 export type OrderTransitionChanges = Partial<

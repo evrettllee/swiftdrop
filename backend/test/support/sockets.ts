@@ -4,9 +4,9 @@ import { io, type Socket } from 'socket.io-client';
 import {
   COURIER_SOCKET_EVENTS,
   COURIERS_SOCKET_NAMESPACE,
-} from '../../src/modules/couriers/constants/couriers-socket.constants';
-import type { OrderJoinAck } from '../../src/modules/couriers/types/couriers-socket.types';
-import { SOCKET_PATH } from '../../src/modules/realtime/constants/realtime.constants';
+} from '@/modules/couriers/constants/couriers-socket.constants';
+import type { OrderJoinAck } from '@/modules/couriers/types/couriers-socket.types';
+import { SOCKET_PATH } from '@/modules/realtime/constants/realtime.constants';
 import { COOKIE_HEADER } from './auth';
 
 const LOOPBACK_URL = 'http://127.0.0.1';

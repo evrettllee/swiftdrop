@@ -1,8 +1,8 @@
-import { ORDER_STATUS, type OrderStatus } from '../../src/common/enums/order-status.enum';
-import type { Database } from '../../src/database/database.module';
-import { orderStatusHistory } from '../../src/database/schema';
-import { COURIER_ORDERS_ROUTES } from '../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../src/modules/orders/constants/orders.constants';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import type { Database } from '@/database/database.module';
+import { orderStatusHistory } from '@/database/schema';
+import { COURIER_ORDERS_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { assignOrder } from './couriers';
 
 // The stages a courier went through before the end of an order, oldest first.

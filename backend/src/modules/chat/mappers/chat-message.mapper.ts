@@ -1,6 +1,6 @@
-import { CHAT_WRITABLE_STATUSES } from '../../../common/constants/orders.constants';
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import { ROLE } from '../../../common/enums/role.enum';
+import { CHAT_WRITABLE_STATUSES } from '@/common/constants/orders.constants';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import { CHAT_ERROR_MESSAGES, CHAT_NOT_OPEN_STATUSES } from '../constants/chat.constants';
 import type { ChatHistoryPage, ChatMessage, ChatMessageRow } from '../types/chat.types';
 

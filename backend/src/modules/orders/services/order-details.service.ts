@@ -1,10 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, asc, desc, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { CURRENCY } from '../../../common/constants/money.constants';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory, packages, payments } from '../../../database/schema';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { CURRENCY } from '@/common/constants/money.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, orderStatusHistory, packages, payments } from '@/database/schema';
 import { ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';
 import { toOrderHistory } from '../mappers/order-history.mapper';
 import type { OrderDetails, OrderHistoryRow, OrderPaymentView } from '../types/orders.types';

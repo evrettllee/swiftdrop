@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
-import { ENV_FILE_PATH } from '../../src/config/env.constants';
+import { ENV_FILE_PATH } from '@/config/env.constants';
 import { TEST_DATABASE_ENV_NAME, TEST_DB_NAME_SUFFIX } from './constants';
 
 // Loads the root .env without overriding variables already set, then points the app at the test database.

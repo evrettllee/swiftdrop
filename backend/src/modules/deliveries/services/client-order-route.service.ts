@@ -1,22 +1,22 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { positionAgeMsSql } from '../../../common/database/position-age';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orders, vehicles } from '../../../database/schema';
-import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
-import { ROUTE_SEGMENT_KIND } from '../../routing/constants/routing.constants';
-import { RouteLinesService } from '../../routing/services/route-lines.service';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { positionAgeMsSql } from '@/common/database/position-age';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orders, vehicles } from '@/database/schema';
+import { aliasOrderAddresses } from '@/modules/orders/utils/order-address-columns';
+import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
+import { RouteLinesService } from '@/modules/routing/services/route-lines.service';
 import type {
   RoutedOrder,
   RouteSegment,
   RouteSegmentKind,
-} from '../../routing/types/routing.types';
-import { nextPointPlan } from '../../routing/utils/segment-plans';
-import { COURIER_LEG_TARGET } from '../../tracking/constants/tracking.constants';
-import { OrderEtaService } from '../../tracking/services/order-eta.service';
-import type { CourierLegTarget } from '../../tracking/types/tracking.types';
+} from '@/modules/routing/types/routing.types';
+import { nextPointPlan } from '@/modules/routing/utils/segment-plans';
+import { COURIER_LEG_TARGET } from '@/modules/tracking/constants/tracking.constants';
+import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
+import type { CourierLegTarget } from '@/modules/tracking/types/tracking.types';
 import { DELIVERIES_ERROR_MESSAGES } from '../constants/deliveries.constants';
 import type { ClientOrderRoute } from '../types/deliveries.types';
 import { toClientCourierPosition } from '../utils/courier-position';

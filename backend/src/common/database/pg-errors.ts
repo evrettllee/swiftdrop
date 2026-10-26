@@ -2,7 +2,7 @@ import { DatabaseError } from 'pg';
 import {
   PG_LOCK_NOT_AVAILABLE_CODE,
   PG_UNIQUE_VIOLATION_CODE,
-} from '../constants/database.constants';
+} from '@/common/constants/database.constants';
 
 // The Postgres error somewhere in the chain of causes (the query builder wraps the driver error).
 function findDatabaseError(error: unknown, code: string): DatabaseError | null {

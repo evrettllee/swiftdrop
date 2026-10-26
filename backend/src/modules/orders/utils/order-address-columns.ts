@@ -1,5 +1,5 @@
 import { alias } from 'drizzle-orm/pg-core';
-import { addresses } from '../../../database/schema';
+import { addresses } from '@/database/schema';
 import { ORDER_ADDRESS_ALIAS } from '../constants/orders.constants';
 
 // An order joins the addresses table twice, so the pickup and the delivery get their own aliases.

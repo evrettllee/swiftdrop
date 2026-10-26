@@ -9,10 +9,10 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { PAYMENT_STATUS, PAYMENT_STATUS_VALUES } from '../../common/enums/payment-status.enum';
-import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '../../common/constants/database.constants';
+import { PAYMENT_STATUS, PAYMENT_STATUS_VALUES } from '@/common/enums/payment-status.enum';
+import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '@/common/constants/database.constants';
 import { orders } from './orders';
-import { PAYMENT_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { PAYMENT_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const paymentStatusEnum = pgEnum('payment_status', PAYMENT_STATUS_VALUES);
 

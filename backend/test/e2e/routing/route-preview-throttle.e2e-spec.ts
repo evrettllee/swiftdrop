@@ -1,18 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { THROTTLE_ERROR_MESSAGE } from '../../../src/common/constants/http.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
+import { THROTTLE_ERROR_MESSAGE } from '@/common/constants/http.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import {
   ROUTE_PREVIEW_GUEST_THROTTLE_LIMIT,
   ROUTE_PREVIEW_ROUTES,
   ROUTING_THROTTLE_LIMIT,
-} from '../../../src/modules/routing/constants/routing.constants';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { CLIENT_IP_HEADER } from '../../support/constants';
-import { MINSK_DELIVERY, MINSK_PICKUP } from '../../support/fixtures';
-import { postApi } from '../../support/http';
-import { createRoutingMocks, createRoutingTestApp, resetRouting } from '../../support/routing';
+} from '@/modules/routing/constants/routing.constants';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { CLIENT_IP_HEADER } from '@test/support/constants';
+import { MINSK_DELIVERY, MINSK_PICKUP } from '@test/support/fixtures';
+import { postApi } from '@test/support/http';
+import { createRoutingMocks, createRoutingTestApp, resetRouting } from '@test/support/routing';
 
 const PREVIEW_PATH = `${ROUTE_PREVIEW_ROUTES.BASE}/${ROUTE_PREVIEW_ROUTES.PREVIEW}`;
 const VALID_POINTS = { pickup: MINSK_PICKUP, delivery: MINSK_DELIVERY };

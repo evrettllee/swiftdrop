@@ -1,9 +1,9 @@
 import type { Abstract, Type } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
-import { configureApp } from '../../src/app.setup';
-import { OsrmTripService } from '../../src/integrations/osrm/services/osrm-trip.service';
+import { AppModule } from '@/app.module';
+import { configureApp } from '@/app.setup';
+import { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
 import { TRUST_PROXY_SETTING } from './constants';
 
 // A token is a class, an abstract one is allowed, for example the payment gateway.

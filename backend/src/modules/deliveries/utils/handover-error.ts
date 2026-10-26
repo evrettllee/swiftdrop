@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import { DELIVERIES_ERROR_MESSAGES, HANDOVER_OUTCOME } from '../constants/deliveries.constants';
 import type { HandoverOutcome } from '../types/deliveries.types';
 

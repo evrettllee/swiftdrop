@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { geoPointSchema } from '../../../common/schemas/geo-point.schema';
-import { packageSpecSchema } from '../../../common/schemas/package-spec.schema';
-import { buildNameSchema, phoneSchema } from '../../../common/schemas/person-fields.schema';
-import { ADDRESS_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
+import { geoPointSchema } from '@/common/schemas/geo-point.schema';
+import { packageSpecSchema } from '@/common/schemas/package-spec.schema';
+import { buildNameSchema, phoneSchema } from '@/common/schemas/person-fields.schema';
+import { ADDRESS_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import {
   ORDERS_VALIDATION_MESSAGES,
   REQUIRED_TEXT_MIN_LENGTH,

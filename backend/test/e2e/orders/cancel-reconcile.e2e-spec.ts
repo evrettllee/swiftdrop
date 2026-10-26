@@ -1,19 +1,19 @@
 import { Logger, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
 import {
   CHECKOUT_SESSION_STATUS,
   PAYMENT_EVENT,
   SESSION_EXPIRE_RESULT,
-} from '../../../src/modules/payments/constants/payments.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '../../support/orders';
+} from '@/modules/payments/constants/payments.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { cancelOrder, type Cookies, placeOrders, readOrderStatus } from '@test/support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
@@ -22,8 +22,8 @@ import {
   readPaymentStatus,
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 const PAYMENT_REF = 'pi_test_reconciled';
 

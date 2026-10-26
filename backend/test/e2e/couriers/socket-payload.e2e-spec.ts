@@ -1,24 +1,24 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   COURIER_SOCKET_EVENTS,
   LOCATION_UPDATE_REJECTIONS,
   ORDER_JOIN_REJECTIONS,
   SOCKET_MAX_PAYLOAD_BYTES,
-} from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { OpenSockets, orderJoinRefusal, placeConfirmedOrder } from '../../support/chat';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/couriers/constants/couriers-socket.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets, orderJoinRefusal, placeConfirmedOrder } from '@test/support/chat';
+import { resetServiceArea } from '@test/support/pricing';
 import {
   emitWithAck,
   joinOrderRoom,
   listenTestApp,
   waitForDisconnect,
-} from '../../support/sockets';
-import { assignTrackedCourier, REPORTED_POINT } from '../../support/tracking';
+} from '@test/support/sockets';
+import { assignTrackedCourier, REPORTED_POINT } from '@test/support/tracking';
 
 // A body padded to the given size: the order id plus a field of filler.
 function paddedJoin(orderId: number, bytes: number): { orderId: number; pad: string } {

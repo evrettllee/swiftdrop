@@ -1,13 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import {
-  ROW_LOCK_NO_KEY_UPDATE,
-  SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { courierActiveOrder } from '../../../common/database/courier-active-order';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { courierProfiles, orders, vehicles } from '../../../database/schema';
+import { ROW_LOCK_NO_KEY_UPDATE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { courierActiveOrder } from '@/common/database/courier-active-order';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { courierProfiles, orders, vehicles } from '@/database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import { toCourierMe } from '../mappers/courier-profile.mapper';
 import type { CourierMe, CourierProfileRow, LockedProfile } from '../types/couriers.types';

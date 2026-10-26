@@ -1,7 +1,7 @@
-import { VEHICLE_LIMITS } from '../constants/vehicles.constants';
-import type { PackageSpec } from '../schemas/package-spec.schema';
-import { VEHICLE_TYPE_VALUES } from '../enums/vehicle-type.enum';
-import type { VehicleType } from '../enums/vehicle-type.enum';
+import { VEHICLE_LIMITS } from '@/common/constants/vehicles.constants';
+import type { PackageSpec } from '@/common/schemas/package-spec.schema';
+import { VEHICLE_TYPE_VALUES } from '@/common/enums/vehicle-type.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 
 export function canVehicleCarry(type: VehicleType, spec: PackageSpec): boolean {
   const limit = VEHICLE_LIMITS[type];

@@ -3,20 +3,20 @@ import { and, eq } from 'drizzle-orm';
 import {
   ORDERS_ONE_ACTIVE_PER_COURIER_INDEX,
   SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { withLockConflict } from '../../../common/database/lock-conflict';
+} from '@/common/constants/database.constants';
+import { withLockConflict } from '@/common/database/lock-conflict';
 import {
   type OrderTransaction,
   transitionOrderStatus,
-} from '../../../common/database/order-status-transition';
-import { getUniqueViolationConstraint } from '../../../common/database/pg-errors';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { orderOffers } from '../../../database/schema';
-import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+} from '@/common/database/order-status-transition';
+import { getUniqueViolationConstraint } from '@/common/database/pg-errors';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { orderOffers } from '@/database/schema';
+import { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import { ASSIGNMENT_ERROR_MESSAGES } from '../constants/assignment.constants';
 import { openOfferOf } from '../utils/open-offer';
 import { OfferNotifierService } from './offer-notifier.service';

@@ -1,5 +1,5 @@
-import type { VehicleLimit } from '../types/vehicle.types';
-import type { VehicleType } from '../enums/vehicle-type.enum';
+import type { VehicleLimit } from '@/common/types/vehicle.types';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 
 export const VEHICLE_LIMITS: Record<VehicleType, VehicleLimit> = {
   foot: { maxWeightKg: 3, maxSidesCm: [40, 30, 20], allowsFragile: true },

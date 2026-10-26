@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { COURIER_SOCKET_EVENTS } from '../../couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
+import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { OfferViewsService } from './offer-views.service';
 
 @Injectable()

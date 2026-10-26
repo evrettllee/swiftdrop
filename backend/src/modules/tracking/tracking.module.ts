@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { OsrmModule } from '../../integrations/osrm/osrm.module';
-import { CouriersModule } from '../couriers/couriers.module';
+import { OsrmModule } from '@/integrations/osrm/osrm.module';
+import { CouriersModule } from '@/modules/couriers/couriers.module';
 import { OrderEtaDataService } from './services/order-eta-data.service';
 import { OrderEtaStore } from './services/order-eta-store.service';
 import { OrderEtaService } from './services/order-eta.service';
