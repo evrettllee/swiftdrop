@@ -50,7 +50,7 @@ test('should count the unread messages of the sender and open the chat beside th
   );
   await expect(chat(page).getByText(CLIENT_MESSAGE.content)).toBeVisible();
   await expect(quickReplies(page)).toHaveText([...COURIER_CHAT_TEXTS.BEFORE_PICKUP_REPLIES]);
-  await expect.poll(() => stub.reads).toBeGreaterThan(0);
+  await expect.poll(() => stub.chat.reads.length).toBeGreaterThan(0);
   await expect(chatButton(page)).toHaveText(COURIER_CHAT_TEXTS.CHAT);
 
   await page.keyboard.press('Escape');

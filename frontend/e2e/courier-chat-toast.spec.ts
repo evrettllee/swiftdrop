@@ -72,7 +72,7 @@ test('should show no toast for an own message or while the chat is open', async 
   await chatButton(page).click();
   pushMessage(stub, 3);
 
-  await expect(page.getByText(`${NEW_TEXT} 3`)).toBeVisible();
+  await expect(page.getByRole('log').getByText(`${NEW_TEXT} 3`)).toBeVisible();
   await expect(toast(page)).toHaveCount(0);
 });
 
@@ -109,8 +109,12 @@ test('should lead from another page of the cabinet to the chat of the order', as
   await expect.poll(() => stub.socket.joins).toContain(CHAT_ORDER_ID);
 
   pushMessage(stub, 2);
-  await toast(page).getByRole('button', { name: 'Ответить' }).click();
+  await page
+    .getByRole('status')
+    .filter({ hasText: `${NEW_TEXT} 2` })
+    .getByRole('button', { name: 'Ответить' })
+    .click();
 
   await expect(page).toHaveURL(new RegExp(`${APP_ROUTES.COURIER_WORK}\\?chat=1$`));
-  await expect(page.getByText(`${NEW_TEXT} 2`)).toBeVisible();
+  await expect(page.getByRole('log').getByText(`${NEW_TEXT} 2`)).toBeVisible();
 });

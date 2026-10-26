@@ -1,7 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 import { ORDER_COURIER_TEXTS } from '../src/pages/order/config/tracking';
+import { CHAT_SENDER_ROLE } from '../src/shared/api/endpoints/chat';
 import { ORDER_CANCELLED_BY, ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { MAP_CLASS, MAP_TEXTS } from '../src/shared/ui/route-map/map';
+import { chatMessage, createChatBackend, stubChatBackend } from './support/chat-backend';
 import { LIVE_ORDER_ID, openLiveOrder, stubLiveOrder } from './support/live-order';
 import { COURIER_PHONE } from './support/order-details';
 import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
@@ -96,8 +98,13 @@ test('should call the courier and open the chat with the unread messages counted
 }) => {
   const order = await stubLiveOrder(page);
   order.status = ORDER_STATUS.COURIER_ASSIGNED;
-  await page.route(/\/api\/orders\/\d+\/messages(\?.*)?$/, (route) =>
-    route.fulfill({ json: { items: [], nextBeforeId: null, unreadCount: 2, canSend: true } }),
+  await stubChatBackend(
+    page,
+    LIVE_ORDER_ID,
+    createChatBackend(CHAT_SENDER_ROLE.CLIENT, [
+      chatMessage(1, CHAT_SENDER_ROLE.COURIER, 'Еду к вам'),
+      chatMessage(2, CHAT_SENDER_ROLE.COURIER, 'Буду через 7 минут'),
+    ]),
   );
   await openLiveOrder(page, order);
 

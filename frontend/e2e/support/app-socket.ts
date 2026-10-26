@@ -54,16 +54,29 @@ export async function stubAppSocket(
   { answerJoin = () => ({ ok: true }) }: AppSocketOptions = {},
 ): Promise<AppSocketStub> {
   let route: WebSocketRoute | null = null;
+  const waiting: string[] = [];
   const socket: AppSocketStub = {
     sent: [],
     joins: [],
     joinedAt: [],
-    push: (event, payload) => route?.send(`${EVENT_PREFIX}${JSON.stringify([event, payload])}`),
+    push: (event, payload) => {
+      const frame = `${EVENT_PREFIX}${JSON.stringify([event, payload])}`;
+
+      if (route === null) {
+        waiting.push(frame);
+      } else {
+        route.send(frame);
+      }
+    },
     drop: async () => route?.close(),
   };
 
   await page.routeWebSocket(`**${API_BASE_PATH}/socket.io/**`, (opened) => {
-    route = opened;
+    opened.onClose(() => {
+      if (route === opened) {
+        route = null;
+      }
+    });
     opened.send(ENGINE_OPEN);
     opened.onMessage((message) => {
       if (typeof message !== 'string') {
@@ -75,6 +88,8 @@ export async function stubAppSocket(
 
       if (message.startsWith(NAMESPACE_CONNECT_PREFIX)) {
         opened.send(NAMESPACE_CONNECTED);
+        route = opened;
+        waiting.splice(0).forEach((frame) => opened.send(frame));
       } else if (withAck?.event === SOCKET_EVENTS.ORDER_JOIN) {
         const { orderId } = withAck.payload as { orderId: number };
         socket.joins.push(orderId);
