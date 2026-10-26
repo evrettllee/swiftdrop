@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { formatOrderNumber } from '@/entities/order';
 import {
   Chat,
@@ -26,7 +27,7 @@ function toPerson(order: CourierOrder): ChatPerson {
   };
 }
 
-export function CourierChat({ chat, order, view }: CourierChatProps) {
+export const CourierChat = memo(function CourierChat({ chat, order, view }: CourierChatProps) {
   const person = toPerson(order);
   const { phone } = order.sender;
   const call =
@@ -69,4 +70,4 @@ export function CourierChat({ chat, order, view }: CourierChatProps) {
       {body}
     </ChatScreen>
   );
-}
+});

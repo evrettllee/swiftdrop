@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useMemo, useRef } from 'react';
 import { DESKTOP_MEDIA_QUERY } from '@/shared/config';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { useChatParam } from './useChatParam';
@@ -19,15 +19,18 @@ export function useOrderChatView(hasChat: boolean) {
     wasOpen.current = isOpen;
   }, [isOpen]);
 
-  return {
-    chatId,
-    chatButtonRef,
-    isDrawerOpen: isOpen && isDesktop,
-    isScreenOpen: isOpen && !isDesktop,
-    isOpen,
-    openChat,
-    closeChat,
-  };
+  return useMemo(
+    () => ({
+      chatId,
+      chatButtonRef,
+      isDrawerOpen: isOpen && isDesktop,
+      isScreenOpen: isOpen && !isDesktop,
+      isOpen,
+      openChat,
+      closeChat,
+    }),
+    [chatId, isOpen, isDesktop, openChat, closeChat],
+  );
 }
 
 export type OrderChatView = ReturnType<typeof useOrderChatView>;

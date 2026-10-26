@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { VEHICLE_TYPE_META } from '@/entities/courier';
 import {
   Chat,
@@ -33,7 +34,7 @@ function toPerson(courier: OrderChatProps['courier']): ChatPerson {
   };
 }
 
-export function OrderChat({ chat, courier, view }: OrderChatProps) {
+export const OrderChat = memo(function OrderChat({ chat, courier, view }: OrderChatProps) {
   const person = toPerson(courier);
   const label = ORDER_COURIER_TEXTS.chatWith(courier.name);
   const call =
@@ -62,4 +63,4 @@ export function OrderChat({ chat, courier, view }: OrderChatProps) {
       {body}
     </ChatScreen>
   );
-}
+});

@@ -5,13 +5,14 @@ import {
   WifiXIcon,
   XCircleIcon,
 } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import type { OrderDetails, OrderStatus } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { getStatusLine, STATUS_LINE_ICON, type StatusLineIcon } from '../lib/status-line';
 import { getStatusLineAnchorMs } from '../lib/status-line-anchor';
-import type { OrderTrackingState } from '../model/tracking-state';
+import type { OrderTracking } from '../model/order-tracking';
 import { useMinuteNow } from '../model/useMinuteNow';
+import { useTrackingState } from '../model/useOrderTracking';
 
 const ICONS: Record<StatusLineIcon, { icon: Icon; className: string }> = {
   [STATUS_LINE_ICON.CLOCK]: { icon: ClockIcon, className: 'text-warning' },
@@ -23,7 +24,7 @@ const ICONS: Record<StatusLineIcon, { icon: Icon; className: string }> = {
 type OrderStatusLineProps = {
   order: OrderDetails;
   paymentReturn: { isChecking: boolean; isFailed: boolean };
-  tracking: OrderTrackingState;
+  tracking: OrderTracking;
 };
 
 function useStatusAnnouncement(status: OrderStatus, title: string): string {
@@ -36,7 +37,12 @@ function useStatusAnnouncement(status: OrderStatus, title: string): string {
   return announced.text;
 }
 
-export function OrderStatusLine({ order, paymentReturn, tracking }: OrderStatusLineProps) {
+export const OrderStatusLine = memo(function OrderStatusLine({
+  order,
+  paymentReturn,
+  tracking: store,
+}: OrderStatusLineProps) {
+  const tracking = useTrackingState(store);
   const nowMs = useMinuteNow(getStatusLineAnchorMs({ order, tracking }));
   const line = getStatusLine({ order, payment: paymentReturn, tracking, nowMs });
   const look = line.icon === null ? null : ICONS[line.icon];
@@ -63,4 +69,4 @@ export function OrderStatusLine({ order, paymentReturn, tracking }: OrderStatusL
       </p>
     </section>
   );
-}
+});

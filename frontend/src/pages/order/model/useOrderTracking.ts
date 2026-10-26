@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useState, useSyncExternalStore } from 'react
 import type { OrderStatus } from '@/shared/api';
 import { onOrderEvent, SOCKET_EVENTS } from '@/shared/realtime';
 import { OrderTracking } from './order-tracking';
+import type { OrderTrackingState } from './tracking-state';
 
 // The events of the room of the order, while the page shows it. `onStatus` is called with every
 // order:status of the order, so the page loads what the event does not carry (the history, the
@@ -50,10 +51,12 @@ export function useOrderTracking(orderId: number, onStatus: (status: OrderStatus
     setEntry({ orderId, tracking });
   }
 
-  const state = useSyncExternalStore(tracking.subscribe, tracking.getState);
-
   useEffect(() => () => tracking.dispose(), [tracking]);
   useTrackingEvents(orderId, tracking, onStatus);
 
-  return { tracking, state };
+  return tracking;
+}
+
+export function useTrackingState(tracking: OrderTracking): OrderTrackingState {
+  return useSyncExternalStore(tracking.subscribe, tracking.getState);
 }

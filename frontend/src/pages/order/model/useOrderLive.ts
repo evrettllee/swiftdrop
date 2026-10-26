@@ -23,7 +23,7 @@ type OrderLiveSource = {
 export function useOrderLive(orderId: number, { order, refresh, refreshCourier }: OrderLiveSource) {
   const joins = useOrderRoom(isValidOrderId(orderId) ? orderId : null);
   const reloadAfterJoin = useEffectEvent(refresh);
-  const { tracking, state } = useOrderTracking(orderId, () => {
+  const tracking = useOrderTracking(orderId, () => {
     refresh();
     refreshCourier();
   });
@@ -43,7 +43,7 @@ export function useOrderLive(orderId: number, { order, refresh, refreshCourier }
     }
   }, [joins]);
 
-  return { tracking, trackingState: state, routeReloadToken: joins, chat };
+  return { tracking, routeReloadToken: joins, chat };
 }
 
 export type OrderLive = ReturnType<typeof useOrderLive>;

@@ -23,7 +23,12 @@ export const ChatBubble = memo(function ChatBubble({ message, isOwn }: ChatBubbl
     <div className={joinClassNames(BUBBLE_CLASS, isOwn ? OUTGOING_CLASS : INCOMING_CLASS)}>
       <span className="whitespace-pre-wrap">{message.content}</span>
       <span className="flex items-center justify-end gap-1 text-caption text-fg-secondary tabular-nums">
-        <time dateTime={message.sentAt.toISOString()}>{formatTime(message.sentAt)}</time>
+        <time
+          dateTime={message.sentAt.toISOString()}
+          className={isOwn ? 'text-fg dark:text-fg-secondary' : undefined}
+        >
+          {formatTime(message.sentAt)}
+        </time>
         {isOwn ? (
           <ReadIcon
             size={ICON_SIZE.SMALL}

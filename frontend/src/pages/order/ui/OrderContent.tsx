@@ -58,12 +58,13 @@ export function OrderContent({
       <OrderHeader order={order} />
       <div className={SIDE_COLUMN_LAYOUT_CLASS}>
         <div className={`contents lg:flex lg:flex-col lg:gap-8 ${MAIN_COLUMN_CLASS}`}>
-          <OrderStatusLine
+          <OrderStatusLine order={order} paymentReturn={paymentReturn} tracking={live.tracking} />
+          <OrderRoute
             order={order}
-            paymentReturn={paymentReturn}
-            tracking={live.trackingState}
+            tracking={live.tracking}
+            routeReloadToken={live.routeReloadToken}
+            vehicleType={courier?.vehicle?.type ?? null}
           />
-          <OrderRoute order={order} live={live} vehicleType={courier?.vehicle?.type ?? null} />
           {courier === null ? null : (
             <>
               <Divider />

@@ -9,18 +9,25 @@ import { getCourierMarkerLabel } from '../lib/courier-marker';
 import { withCourierLine } from '../lib/courier-line';
 import { getStatusLineAnchorMs } from '../lib/status-line-anchor';
 import { COURIER_ACTIVE_STATUSES, SEARCHING_STATUSES } from '../model/order-status-groups';
-import type { OrderLive } from '../model/useOrderLive';
+import type { OrderTracking } from '../model/order-tracking';
 import { useMinuteNow } from '../model/useMinuteNow';
+import { useTrackingState } from '../model/useOrderTracking';
 
 type OrderRouteMapProps = {
   order: OrderDetails;
-  live: OrderLive;
+  tracking: OrderTracking;
+  routeReloadToken: number;
   vehicleType: VehicleType | null;
 };
 
-export function OrderRouteMap({ order, live, vehicleType }: OrderRouteMapProps) {
+export function OrderRouteMap({
+  order,
+  tracking,
+  routeReloadToken,
+  vehicleType,
+}: OrderRouteMapProps) {
   const { orderId, status } = order;
-  const { tracking, trackingState } = live;
+  const trackingState = useTrackingState(tracking);
   const routeLines = useRouteLines(
     async (options) => {
       const route = await getClientOrderRoute(orderId, options);
@@ -29,7 +36,7 @@ export function OrderRouteMap({ order, live, vehicleType }: OrderRouteMapProps) 
       return route;
     },
     `${orderId}:${status}`,
-    { reloadToken: live.routeReloadToken },
+    { reloadToken: routeReloadToken },
   );
   const { courierLeg, courierPosition, isPositionStale } = trackingState;
   const route = useMemo(() => withCourierLine(routeLines, courierLeg), [routeLines, courierLeg]);

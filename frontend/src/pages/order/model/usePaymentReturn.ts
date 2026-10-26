@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { ORDER_STATUS, type OrderDetails, PAYMENT_STATUS } from '@/shared/api';
 import {
@@ -31,11 +31,10 @@ export function usePaymentReturn(order: OrderDetails | null, reload: () => void)
     return () => window.clearTimeout(timer);
   }, [isChecking, checks, reload]);
 
-  return {
-    isChecking,
-    // The client left the payment page, or the payment session expired.
-    isFailed:
-      isPending &&
-      (result === PAYMENT_RETURN.CANCELLED || order?.payment?.status === PAYMENT_STATUS.FAILED),
-  };
+  // The client left the payment page, or the payment session expired.
+  const isFailed =
+    isPending &&
+    (result === PAYMENT_RETURN.CANCELLED || order?.payment?.status === PAYMENT_STATUS.FAILED);
+
+  return useMemo(() => ({ isChecking, isFailed }), [isChecking, isFailed]);
 }
