@@ -12,11 +12,7 @@ import type { Database, Transaction } from '@/database/database.module';
 import { messages } from '@/database/schema';
 import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '../constants/chat.constants';
-import {
-  canSendInOrder,
-  sendRefusalMessage,
-  toChatMessage,
-} from '../mappers/chat-message.mapper';
+import { canSendInOrder, sendRefusalMessage, toChatMessage } from '../mappers/chat-message.mapper';
 import type { ChatMessage, MessageNewEvent, SentChatMessage } from '../types/chat.types';
 
 @Injectable()

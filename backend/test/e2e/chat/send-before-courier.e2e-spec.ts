@@ -41,20 +41,21 @@ describe('Sending a chat message before a courier (e2e)', () => {
     await app.close();
   });
 
-  it.each([
-    ORDER_STATUS.PENDING,
-    ORDER_STATUS.CONFIRMED,
-    ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT,
-  ])('should refuse with 409 saying the chat opens with a courier while %s', async (status) => {
-    await setOrderStatus(db, orderId, status);
+  it.each([ORDER_STATUS.PENDING, ORDER_STATUS.CONFIRMED, ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT])(
+    'should refuse with 409 saying the chat opens with a courier while %s',
+    async (status) => {
+      await setOrderStatus(db, orderId, status);
 
-    const response = await sendChatMessage(app, clientCookies, orderId).expect(HttpStatus.CONFLICT);
+      const response = await sendChatMessage(app, clientCookies, orderId).expect(
+        HttpStatus.CONFLICT,
+      );
 
-    expect(response.body.message).toBe(CHAT_ERROR_MESSAGES.CHAT_NOT_OPEN);
-    expect(await countOrderMessages(db, orderId)).toBe(0);
-    const history = await getChatHistory(app, clientCookies, orderId).expect(HttpStatus.OK);
-    expect((history.body as ChatHistory).canSend).toBe(false);
-  });
+      expect(response.body.message).toBe(CHAT_ERROR_MESSAGES.CHAT_NOT_OPEN);
+      expect(await countOrderMessages(db, orderId)).toBe(0);
+      const history = await getChatHistory(app, clientCookies, orderId).expect(HttpStatus.OK);
+      expect((history.body as ChatHistory).canSend).toBe(false);
+    },
+  );
 
   it.each([ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED])(
     'should refuse with 409 saying the chat is closed once the order is %s without a courier',
