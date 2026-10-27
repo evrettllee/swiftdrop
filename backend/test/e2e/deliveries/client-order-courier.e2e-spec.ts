@@ -7,8 +7,8 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { orders } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { CLIENT_ORDER_COURIER_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { createTestApp } from '@test/support/app';
@@ -120,10 +120,7 @@ describe('Order courier for the client (e2e)', () => {
   it('should tell the courier when the client cancels the assigned order', async () => {
     await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
     socket = await connectAppSocket(baseUrl, courierCookies);
-    const cancelled = waitForEvent<{ orderId: number }>(
-      socket,
-      COURIER_SOCKET_EVENTS.ORDER_CANCELLED,
-    );
+    const cancelled = waitForEvent<{ orderId: number }>(socket, SOCKET_EVENTS.ORDER_CANCELLED);
 
     await cancelOrder(app, clientCookies, orderId).expect(HttpStatus.OK);
 
@@ -132,7 +129,7 @@ describe('Order courier for the client (e2e)', () => {
 
   it('should cancel the order as usual when telling the courier fails', async () => {
     await assignOrder(db, orderId, courierId, ORDER_STATUS.COURIER_ASSIGNED);
-    const emit = jest.spyOn(app.get(CouriersGateway), 'emitToCourier').mockImplementation(() => {
+    const emit = jest.spyOn(app.get(RealtimeEventsService), 'toCourier').mockImplementation(() => {
       throw new Error('socket server is down');
     });
 

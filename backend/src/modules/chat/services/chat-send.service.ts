@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { withLockConflict } from '@/common/database/lock-conflict';
 import {
   orderParticipant,
@@ -6,22 +6,20 @@ import {
   participantActor,
 } from '@/common/database/order-participant';
 import type { RoleName } from '@/common/enums/role.enum';
-import { describeError } from '@/common/utils/describe-error';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
 import { messages } from '@/database/schema';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
-import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '../constants/chat.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
+import { CHAT_ERROR_MESSAGES } from '../constants/chat.constants';
 import { canSendInOrder, sendRefusalMessage, toChatMessage } from '../mappers/chat-message.mapper';
 import type { ChatMessage, MessageNewEvent, SentChatMessage } from '../types/chat.types';
 
 @Injectable()
 export class ChatSendService {
-  private readonly logger = new Logger(ChatSendService.name);
-
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
-    private readonly gateway: CouriersGateway,
+    private readonly events: RealtimeEventsService,
   ) {}
 
   // The message is saved while the order row is held, so it lands either before the order is
@@ -82,12 +80,6 @@ export class ChatSendService {
   private publish(orderId: number, message: ChatMessage): void {
     const event: MessageNewEvent = { orderId, message };
 
-    try {
-      this.gateway.emitToOrder(orderId, CHAT_SOCKET_EVENTS.MESSAGE_NEW, event);
-    } catch (error) {
-      this.logger.error(
-        `Message ${message.messageId} of order ${orderId} not sent to the room: ${describeError(error)}`,
-      );
-    }
+    this.events.toOrder(orderId, SOCKET_EVENTS.MESSAGE_NEW, event);
   }
 }

@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { DatabaseError } from 'pg';
 import { PG_LOCK_NOT_AVAILABLE_CODE } from '@/common/constants/database.constants';
 import type { Database } from '@/database/database.module';
-import { LOCATION_UPDATE_REJECTIONS } from '../constants/couriers-socket.constants';
+import { LOCATION_UPDATE_REJECTIONS } from '../constants/courier-location.constants';
 import { CourierLocationService } from './courier-location.service';
 
 const COURIER_ID = 7;

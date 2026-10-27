@@ -2,12 +2,12 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { LOCATION_UPDATE_REJECTIONS } from '@/modules/couriers/constants/courier-location.constants';
 import {
-  COURIER_SOCKET_EVENTS,
-  LOCATION_UPDATE_REJECTIONS,
   ORDER_JOIN_REJECTIONS,
   SOCKET_MAX_PAYLOAD_BYTES,
-} from '@/modules/couriers/constants/couriers-socket.constants';
+} from '@/modules/realtime/constants/realtime.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { OpenSockets, orderJoinRefusal, placeConfirmedOrder } from '@test/support/chat';
@@ -67,7 +67,7 @@ describe('Socket message size and shape (e2e)', () => {
     const socket = await sockets.connect(baseUrl, clientCookies);
     const closed = waitForDisconnect(socket);
 
-    socket.emit(COURIER_SOCKET_EVENTS.ORDER_JOIN, paddedJoin(orderId, SOCKET_MAX_PAYLOAD_BYTES));
+    socket.emit(SOCKET_EVENTS.ORDER_JOIN, paddedJoin(orderId, SOCKET_MAX_PAYLOAD_BYTES));
 
     await expect(closed).resolves.toEqual(expect.any(String));
     expect(socket.connected).toBe(false);
@@ -78,7 +78,7 @@ describe('Socket message size and shape (e2e)', () => {
     const socket = await sockets.connect(baseUrl, courier.cookies);
 
     await expect(
-      emitWithAck(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, { ...REPORTED_POINT, orderId }),
+      emitWithAck(socket, SOCKET_EVENTS.LOCATION_UPDATE, { ...REPORTED_POINT, orderId }),
     ).resolves.toEqual({ ok: false, reason: LOCATION_UPDATE_REJECTIONS.INVALID_LOCATION });
   });
 });

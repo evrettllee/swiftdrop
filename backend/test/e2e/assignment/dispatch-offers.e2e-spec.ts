@@ -10,7 +10,7 @@ import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import { OFFER_TTL_MS } from '@/modules/assignment/constants/assignment.constants';
 import { AssignmentRoundService } from '@/modules/assignment/services/assignment-round.service';
 import type { CourierOffer } from '@/modules/assignment/types/assignment.types';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import { addCourierOnShift, addCourierSession } from '@test/support/assignment';
 import { registerUser } from '@test/support/auth';
@@ -78,7 +78,7 @@ describe('Order dispatch offers (e2e)', () => {
 
   it('should offer the order to the courier nearby and send the offer to the socket', async () => {
     socket = await connectAppSocket(baseUrl, courierCookies);
-    const received = waitForEvent<CourierOffer>(socket, COURIER_SOCKET_EVENTS.OFFER_NEW);
+    const received = waitForEvent<CourierOffer>(socket, SOCKET_EVENTS.OFFER_NEW);
 
     await rounds.run();
 
@@ -111,7 +111,7 @@ describe('Order dispatch offers (e2e)', () => {
     await rounds.run();
     const [offer] = await readOffers();
     await setOrderStatus(db, orderId, ORDER_STATUS.CANCELLED);
-    const closed = waitForEvent<{ offerId: number }>(socket, COURIER_SOCKET_EVENTS.OFFER_CLOSED);
+    const closed = waitForEvent<{ offerId: number }>(socket, SOCKET_EVENTS.OFFER_CLOSED);
 
     await rounds.run();
 

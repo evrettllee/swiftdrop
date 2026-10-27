@@ -3,8 +3,8 @@ import {
   ORDER_JOIN_MAX_ATTEMPTS,
   ORDER_JOIN_REJECTIONS,
   ORDER_JOIN_WINDOW_MS,
-} from '../constants/couriers-socket.constants';
-import type { ClientSocketData } from '../types/couriers-socket.types';
+} from '../constants/realtime.constants';
+import type { ClientSocketData } from '../types/realtime.types';
 import { countJoinAttempt, rejectJoinAttempt } from './order-join';
 
 const NOW_MS = 10_000_000;

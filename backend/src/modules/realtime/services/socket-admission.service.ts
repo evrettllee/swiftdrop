@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Socket } from 'socket.io';
 import { ENV_KEYS } from '@/config/env.constants';
-import { SOCKET_ERRORS } from '@/modules/realtime/constants/realtime.constants';
-import { SocketAuthService } from '@/modules/realtime/services/socket-auth.service';
-import { SocketSessionTimersService } from '@/modules/realtime/services/socket-session-timers.service';
-import type { AppSocketData } from '../types/couriers-socket.types';
+import { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
+import { SOCKET_ERRORS } from '../constants/realtime.constants';
+import type { AppSocketData } from '../types/realtime.types';
 import { buildSocketData } from '../utils/socket-data';
-import { CourierProfilesService } from './courier-profiles.service';
+import { SocketAuthService } from './socket-auth.service';
+import { SocketSessionTimersService } from './socket-session-timers.service';
 
 // Who may open the app socket. The checks run in the handshake, so a refused client never gets a
 // connection at all.

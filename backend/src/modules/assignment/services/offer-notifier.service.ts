@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { OfferViewsService } from './offer-views.service';
 
 @Injectable()
 export class OfferNotifierService {
   constructor(
     private readonly views: OfferViewsService,
-    private readonly gateway: CouriersGateway,
+    private readonly events: RealtimeEventsService,
   ) {}
 
   // Sends a new offer to every open tab of its courier. A courier with no tab open sees it on
@@ -16,12 +16,12 @@ export class OfferNotifierService {
     const offer = await this.views.findById(offerId);
 
     if (offer) {
-      this.gateway.emitToCourier(courierProfileId, COURIER_SOCKET_EVENTS.OFFER_NEW, offer);
+      this.events.toCourier(courierProfileId, SOCKET_EVENTS.OFFER_NEW, offer);
     }
   }
 
   // Tells the courier to close the offer window.
   withdraw(offerId: number, courierProfileId: number): void {
-    this.gateway.emitToCourier(courierProfileId, COURIER_SOCKET_EVENTS.OFFER_CLOSED, { offerId });
+    this.events.toCourier(courierProfileId, SOCKET_EVENTS.OFFER_CLOSED, { offerId });
   }
 }

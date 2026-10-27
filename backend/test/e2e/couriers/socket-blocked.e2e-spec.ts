@@ -2,11 +2,9 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import {
-  LOCATION_UPDATE_REJECTIONS,
-  ORDER_JOIN_REJECTIONS,
-} from '@/modules/couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { LOCATION_UPDATE_REJECTIONS } from '@/modules/couriers/constants/courier-location.constants';
+import { ORDER_JOIN_REJECTIONS } from '@/modules/realtime/constants/realtime.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { SOCKET_ERRORS } from '@/modules/realtime/constants/realtime.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser, validRegistration } from '@test/support/auth';
@@ -118,7 +116,7 @@ describe('Blocked users on the app socket (e2e)', () => {
     const other = await sockets.connect(baseUrl, courier.cookies);
     const closed = tabs.map((tab) => waitForDisconnect(tab));
 
-    app.get(CouriersGateway).disconnectUser(clientUserId);
+    app.get(RealtimeEventsService).disconnectUser(clientUserId);
 
     await expect(Promise.all(closed)).resolves.toEqual([
       SERVER_DISCONNECT_REASON,

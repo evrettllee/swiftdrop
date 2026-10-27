@@ -8,7 +8,7 @@ import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import { COURIER_OFFERS_ROUTES } from '@/modules/assignment/constants/assignment.constants';
 import { OfferNotifierService } from '@/modules/assignment/services/offer-notifier.service';
 import type { CourierOffer } from '@/modules/assignment/types/assignment.types';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import {
   addCourierOnShift,
@@ -119,7 +119,7 @@ describe('Current courier offer (e2e)', () => {
   it('should send the offer to the courier socket when the offer is announced', async () => {
     socket = await connectAppSocket(baseUrl, courierCookies);
     const offerId = await insertOffer(db, orderId, courierId);
-    const received = waitForEvent<CourierOffer>(socket, COURIER_SOCKET_EVENTS.OFFER_NEW);
+    const received = waitForEvent<CourierOffer>(socket, SOCKET_EVENTS.OFFER_NEW);
 
     await app.get(OfferNotifierService).announce(offerId, courierId);
 

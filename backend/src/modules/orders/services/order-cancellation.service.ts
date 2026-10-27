@@ -15,9 +15,9 @@ import { describeError } from '@/common/utils/describe-error';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { orders } from '@/database/schema';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { PaymentCancellationService } from '@/modules/payments/services/payment-cancellation.service';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import {
   CANCELLABLE_STATUSES,
@@ -36,7 +36,7 @@ export class OrderCancellationService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly paymentCancellation: PaymentCancellationService,
-    private readonly couriersGateway: CouriersGateway,
+    private readonly events: RealtimeEventsService,
     private readonly orderTransactions: OrderTransactionsService,
   ) {}
 
@@ -99,9 +99,7 @@ export class OrderCancellationService {
         .limit(SINGLE_ROW_LIMIT);
 
       if (order?.courierId) {
-        this.couriersGateway.emitToCourier(order.courierId, COURIER_SOCKET_EVENTS.ORDER_CANCELLED, {
-          orderId,
-        });
+        this.events.toCourier(order.courierId, SOCKET_EVENTS.ORDER_CANCELLED, { orderId });
       }
     } catch (error) {
       this.logger.error(

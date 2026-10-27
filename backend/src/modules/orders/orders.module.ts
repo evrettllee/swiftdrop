@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { CouriersModule } from '@/modules/couriers/couriers.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
 import { PricingModule } from '@/modules/pricing/pricing.module';
+import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { OrderCancellationService } from './services/order-cancellation.service';
 import { OrderDetailsService } from './services/order-details.service';
 import { OrderPlacementService } from './services/order-placement.service';
@@ -12,7 +12,7 @@ import { UnpaidOrdersService } from './services/unpaid-orders.service';
 import { TrackingModule } from '@/modules/tracking/tracking.module';
 
 @Module({
-  imports: [PricingModule, PaymentsModule, CouriersModule, TrackingModule],
+  imports: [PricingModule, PaymentsModule, RealtimeModule, TrackingModule],
   controllers: [OrdersController],
   providers: [
     OrderPlacementService,

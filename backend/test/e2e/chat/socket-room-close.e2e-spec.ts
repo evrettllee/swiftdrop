@@ -4,11 +4,9 @@ import { Socket as ServerSocket } from 'socket.io';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import {
-  COURIER_SOCKET_EVENTS,
-  orderRoom,
-} from '@/modules/couriers/constants/couriers-socket.constants';
-import { OrderRoomsService } from '@/modules/couriers/services/order-rooms.service';
+import { orderRoom } from '@/modules/realtime/constants/realtime.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { OrderRoomsService } from '@/modules/realtime/services/order-rooms.service';
 import { SocketSessionTimersService } from '@/modules/realtime/services/socket-session-timers.service';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
@@ -55,7 +53,7 @@ describe('Joining an order room while the socket closes (e2e)', () => {
       db,
       (tx) => tx.execute(sql`lock table orders in access exclusive mode`),
       async () => {
-        socket.emit(COURIER_SOCKET_EVENTS.ORDER_JOIN, { orderId });
+        socket.emit(SOCKET_EVENTS.ORDER_JOIN, { orderId });
       },
       async () => {
         socket.close();

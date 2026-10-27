@@ -30,14 +30,6 @@ export const CHAT_NOT_OPEN_STATUSES = [
   ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT,
 ] as const;
 
-// Socket events of the order room.
-export const CHAT_SOCKET_EVENTS = {
-  // A new message of the order chat, sent after it is committed.
-  MESSAGE_NEW: 'message:new',
-  // One side read the messages to it up to an id; sent only when something was marked.
-  MESSAGE_READ: 'message:read',
-} as const;
-
 // Validation
 export const CHAT_VALIDATION_MESSAGES = {
   BEFORE_ID_INVALID: 'Некорректный номер сообщения',

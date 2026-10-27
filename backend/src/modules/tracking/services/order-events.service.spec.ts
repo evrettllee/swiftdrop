@@ -1,57 +1,59 @@
-import { Logger } from '@nestjs/common';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
-import type { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
-import { ORDER_ROOM_EVENTS } from '../constants/tracking.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import type { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { OrderEventsService } from './order-events.service';
 
 const ETA = new Date('2026-10-22T12:30:00Z');
 
 describe('OrderEventsService', () => {
-  const emitToOrder = jest.fn();
-  const service = new OrderEventsService({ emitToOrder } as unknown as CouriersGateway);
-  const logError = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+  const toOrder = jest.fn();
+  const toStaff = jest.fn();
+  const calls: string[] = [];
+  const service = new OrderEventsService({ toOrder, toStaff } as unknown as RealtimeEventsService);
 
   beforeEach(() => {
-    emitToOrder.mockReset();
-    logError.mockClear();
+    calls.length = 0;
+    toOrder.mockReset().mockImplementation((orderId: number) => calls.push(`order ${orderId}`));
+    toStaff.mockReset().mockImplementation(() => calls.push('staff'));
   });
 
-  afterAll(() => {
-    logError.mockRestore();
-  });
-
-  it('should send order:status with the time as ISO or null', () => {
+  it('should send order:status to the order room with the time as ISO or null', () => {
     service.publishStatusChanges([
       { orderId: 1, status: ORDER_STATUS.CONFIRMED, estimatedDeliveryAt: ETA },
       { orderId: 2, status: ORDER_STATUS.CANCELLED, estimatedDeliveryAt: null },
     ]);
 
-    expect(emitToOrder.mock.calls).toEqual([
+    expect(toOrder.mock.calls).toEqual([
       [
         1,
-        ORDER_ROOM_EVENTS.ORDER_STATUS,
+        SOCKET_EVENTS.ORDER_STATUS,
         { orderId: 1, status: ORDER_STATUS.CONFIRMED, estimatedDeliveryAt: ETA.toISOString() },
       ],
       [
         2,
-        ORDER_ROOM_EVENTS.ORDER_STATUS,
+        SOCKET_EVENTS.ORDER_STATUS,
         { orderId: 2, status: ORDER_STATUS.CANCELLED, estimatedDeliveryAt: null },
       ],
     ]);
   });
 
-  it('should log a failed send and go on with the next change', () => {
-    emitToOrder.mockImplementationOnce(() => {
-      throw new Error('socket server is down');
-    });
+  it('should send the same order:status to the staff after each order room', () => {
+    service.publishStatusChanges([
+      { orderId: 1, status: ORDER_STATUS.PICKED_UP, estimatedDeliveryAt: null },
+      { orderId: 3, status: ORDER_STATUS.IN_TRANSIT, estimatedDeliveryAt: ETA },
+    ]);
 
-    expect(() =>
-      service.publishStatusChanges([
-        { orderId: 1, status: ORDER_STATUS.PICKED_UP, estimatedDeliveryAt: null },
-        { orderId: 1, status: ORDER_STATUS.IN_TRANSIT, estimatedDeliveryAt: null },
-      ]),
-    ).not.toThrow();
-    expect(logError).toHaveBeenCalledTimes(1);
-    expect(emitToOrder).toHaveBeenCalledTimes(2);
+    expect(toStaff.mock.calls).toEqual([
+      [SOCKET_EVENTS.ORDER_STATUS, toOrder.mock.calls[0]?.[2]],
+      [SOCKET_EVENTS.ORDER_STATUS, toOrder.mock.calls[1]?.[2]],
+    ]);
+    expect(calls).toEqual(['order 1', 'staff', 'order 3', 'staff']);
+  });
+
+  it('should send nothing when no status changed', () => {
+    service.publishStatusChanges([]);
+
+    expect(toOrder).not.toHaveBeenCalled();
+    expect(toStaff).not.toHaveBeenCalled();
   });
 });

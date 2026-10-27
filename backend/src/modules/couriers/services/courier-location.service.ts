@@ -11,13 +11,13 @@ import { courierProfiles, orders, users } from '@/database/schema';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,
-} from '../constants/couriers-socket.constants';
+} from '../constants/courier-location.constants';
 import { locationUpdateBodySchema } from '../dto/location-update.dto';
 import type {
-  CourierSocketData,
+  CourierLocationSession,
   LocationUpdateRejection,
   LocationUpdateResult,
-} from '../types/couriers-socket.types';
+} from '../types/courier-location.types';
 import { rejectLocationUpdate } from '../utils/location-update';
 
 // A stored position: the time of the database and the order the courier carries, if any.
@@ -36,7 +36,7 @@ export class CourierLocationService {
 
   // A position sent on the socket of a courier: checked, then saved when the checks pass. The
   // socket check is only a cheap filter; the limit per courier is kept by the query itself.
-  async update(data: CourierSocketData, body: unknown): Promise<LocationUpdateResult> {
+  async update(data: CourierLocationSession, body: unknown): Promise<LocationUpdateResult> {
     const nowMs = Date.now();
     const rejection = rejectLocationUpdate(data, nowMs);
     const point = locationUpdateBodySchema.safeParse(body);

@@ -9,10 +9,8 @@ import {
 } from '@/modules/deliveries/constants/deliveries.constants';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
-import {
-  ETA_SHUTDOWN_WAIT_MS,
-  ORDER_ROOM_EVENTS,
-} from '@/modules/tracking/constants/tracking.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { ETA_SHUTDOWN_WAIT_MS } from '@/modules/tracking/constants/tracking.constants';
 import { OrderEtaStore } from '@/modules/tracking/services/order-eta-store.service';
 import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
 import type { OrderEtaEvent } from '@/modules/tracking/types/tracking.types';
@@ -52,7 +50,7 @@ describe('Arrival estimate and the route of the client (e2e)', () => {
 
   // The courier reports a position and the client gets the first estimate of it.
   async function firstEstimate(): Promise<OrderEtaEvent> {
-    const received = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const received = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
     await sendLocation(await sockets.connect(baseUrl, courier.cookies));
 
     return received;
@@ -83,7 +81,7 @@ describe('Arrival estimate and the route of the client (e2e)', () => {
 
   it('should estimate at once with the line to the recipient after the pickup', async () => {
     await firstEstimate();
-    const afterPickup = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const afterPickup = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
     const path = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.PICKUP.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
 
     await postApi(app, path).set(COOKIE_HEADER, courier.cookies).expect(HttpStatus.OK);
@@ -114,7 +112,7 @@ describe('Arrival estimate and the route of the client (e2e)', () => {
 
   it('should give no arrival at the pickup point in the route after the pickup', async () => {
     await firstEstimate();
-    const afterPickup = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const afterPickup = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
     const path = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.PICKUP.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
     await postApi(app, path).set(COOKIE_HEADER, courier.cookies).expect(HttpStatus.OK);
     await afterPickup;
@@ -141,7 +139,7 @@ describe('Arrival estimate and the route of the client (e2e)', () => {
   it('should answer without the line after a restart and estimate in the background', async () => {
     await firstEstimate();
     app.get(OrderEtaStore).clear();
-    const estimate = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const estimate = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
 
     const response = await getOrderRoute();
 

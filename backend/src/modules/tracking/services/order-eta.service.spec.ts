@@ -1,9 +1,10 @@
 import { Logger } from '@nestjs/common';
 import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 import type { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
-import type { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import type { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import type { CourierLocationEventsService } from '@/modules/couriers/services/courier-location-events.service';
-import { ETA_RECALC_INTERVAL_MS, ORDER_ROOM_EVENTS } from '../constants/tracking.constants';
+import { ETA_RECALC_INTERVAL_MS } from '../constants/tracking.constants';
 import type { EtaSource } from '../types/tracking.types';
 import type { OrderEtaDataService } from './order-eta-data.service';
 import { OrderEtaStore } from './order-eta-store.service';
@@ -30,7 +31,7 @@ function source(overrides: Partial<EtaSource> = {}): EtaSource {
 describe('OrderEtaService', () => {
   const data = { load: jest.fn(), save: jest.fn() };
   const trips = { isAvailable: jest.fn(), getTrip: jest.fn() };
-  const gateway = { emitToOrder: jest.fn() };
+  const gateway = { toOrder: jest.fn() };
   let store: OrderEtaStore;
   let service: OrderEtaService;
   let nowMs: number;
@@ -58,7 +59,7 @@ describe('OrderEtaService', () => {
       store,
       data as unknown as OrderEtaDataService,
       trips as unknown as OsrmTripService,
-      gateway as unknown as CouriersGateway,
+      gateway as unknown as RealtimeEventsService,
       { subscribe: jest.fn() } as unknown as CourierLocationEventsService,
     );
   });
@@ -66,7 +67,7 @@ describe('OrderEtaService', () => {
   it('should send the estimate and keep the line of the courier', async () => {
     await service.refresh(ORDER_ID, false);
 
-    expect(gateway.emitToOrder).toHaveBeenCalledWith(ORDER_ID, ORDER_ROOM_EVENTS.ORDER_ETA, {
+    expect(gateway.toOrder).toHaveBeenCalledWith(ORDER_ID, SOCKET_EVENTS.ORDER_ETA, {
       orderId: ORDER_ID,
       estimatedDeliveryAt: new Date(START_MS + 600_000 + 120_000).toISOString(),
       courierLeg: { geometry: 'leg', toPoint: 'dropoff' },
@@ -126,7 +127,7 @@ describe('OrderEtaService', () => {
     finishTrip(TRIP);
     await shutdown;
     await service.refresh(ORDER_ID + 1, true);
-    expect(gateway.emitToOrder).toHaveBeenCalledTimes(1);
+    expect(gateway.toOrder).toHaveBeenCalledTimes(1);
     expect(trips.getTrip).toHaveBeenCalledTimes(1);
   });
 
@@ -140,7 +141,7 @@ describe('OrderEtaService', () => {
     await service.refresh(ORDER_ID, true);
 
     expect(trips.getTrip).not.toHaveBeenCalled();
-    expect(gateway.emitToOrder).not.toHaveBeenCalled();
+    expect(gateway.toOrder).not.toHaveBeenCalled();
   });
 
   it('should not read the order while the breaker is open', async () => {
@@ -176,7 +177,7 @@ describe('OrderEtaService', () => {
     await service.refresh(ORDER_ID, true);
 
     expect(data.save).toHaveBeenCalledWith(ORDER_ID, ORDER_STATUS.IN_TRANSIT, expect.any(Date));
-    expect(gateway.emitToOrder).not.toHaveBeenCalled();
+    expect(gateway.toOrder).not.toHaveBeenCalled();
     expect(store.get(ORDER_ID)?.courierLeg).toBeNull();
   });
 });

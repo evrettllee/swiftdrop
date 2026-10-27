@@ -5,7 +5,8 @@ import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '@/modules/chat/constants/chat.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { CHAT_ERROR_MESSAGES } from '@/modules/chat/constants/chat.constants';
 import type {
   ChatHistory,
   MessageNewEvent,
@@ -99,7 +100,7 @@ describe('Sending a chat message (e2e)', () => {
       [client, courier, outsider].map((socket) => joinOrderRoom(socket, { orderId })),
     );
     const received = [client, courier, outsider].map((socket) =>
-      collectEvents<MessageNewEvent>(socket, CHAT_SOCKET_EVENTS.MESSAGE_NEW),
+      collectEvents<MessageNewEvent>(socket, SOCKET_EVENTS.MESSAGE_NEW),
     );
 
     const response = await sendChatMessage(app, clientCookies, orderId).expect(HttpStatus.CREATED);

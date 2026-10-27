@@ -1,6 +1,6 @@
 import { ROLE, type RoleName } from '@/common/enums/role.enum';
-import type { SocketSession } from '@/modules/realtime/types/realtime.types';
-import { buildSocketData } from './socket-data';
+import type { SocketSession } from '../types/realtime.types';
+import { buildSocketData, isStaffSocket } from './socket-data';
 
 const USER_ID = 7;
 const COURIER_PROFILE_ID = 42;
@@ -55,13 +55,35 @@ describe('buildSocketData', () => {
     expect(findCourierProfileId).not.toHaveBeenCalled();
   });
 
-  it.each([ROLE.MANAGER, ROLE.ADMIN])(
-    'should refuse the socket when a %s connects',
-    async (role) => {
-      const data = await buildSocketData(session(role), findCourierProfileId);
+  it.each([ROLE.MANAGER, ROLE.ADMIN])('should admit a %s as staff', async (role) => {
+    const data = await buildSocketData(session(role), findCourierProfileId);
 
-      expect(data).toBeNull();
-      expect(findCourierProfileId).not.toHaveBeenCalled();
-    },
-  );
+    expect(data).toEqual({
+      role,
+      userId: USER_ID,
+      sessionExpiresAtMs: EXPIRES_AT_MS,
+      orderJoinAttemptsMs: [],
+    });
+    expect(data && isStaffSocket(data)).toBe(true);
+    expect(findCourierProfileId).not.toHaveBeenCalled();
+  });
+
+  it('should refuse the socket when the role is unknown', async () => {
+    const data = await buildSocketData(session('guest' as RoleName), findCourierProfileId);
+
+    expect(data).toBeNull();
+  });
+});
+
+describe('isStaffSocket', () => {
+  it.each([
+    [ROLE.CLIENT, false],
+    [ROLE.COURIER, false],
+    [ROLE.MANAGER, true],
+    [ROLE.ADMIN, true],
+  ])('should tell whether a %s socket is staff: %s', async (role, isStaff) => {
+    const data = await buildSocketData(session(role), () => Promise.resolve(COURIER_PROFILE_ID));
+
+    expect(data && isStaffSocket(data)).toBe(isStaff);
+  });
 });

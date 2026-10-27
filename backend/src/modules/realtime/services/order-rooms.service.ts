@@ -10,15 +10,17 @@ import {
   ORDER_ROOMS_MAX_PER_SOCKET,
   orderRoom,
   PARTICIPANT_ACCESS,
-} from '../constants/couriers-socket.constants';
-import { orderRoomBodySchema } from '../dto/order-room.dto';
+} from '../constants/realtime.constants';
+import { orderRoomBodySchema } from '../dto/room.dto';
 import type {
   AppSocketData,
   OrderJoinAck,
   ParticipantAccess,
-} from '../types/couriers-socket.types';
+  ParticipantSocketData,
+} from '../types/realtime.types';
 import { countJoinAttempt, rejectJoinAttempt } from '../utils/order-join';
 import { closeAfterAnswer } from '../utils/socket-close';
+import { isStaffSocket } from '../utils/socket-data';
 
 const JOINED: OrderJoinAck = { ok: true };
 const TOO_MANY_ROOMS: OrderJoinAck = { ok: false, reason: ORDER_JOIN_REJECTIONS.TOO_MANY_ROOMS };
@@ -57,6 +59,8 @@ export class OrderRoomsService {
       ack = JOINED;
     } else if (isRoomLimitReached(socket)) {
       ack = TOO_MANY_ROOMS;
+    } else if (isStaffSocket(data)) {
+      ack = NOT_FOUND;
     } else {
       ack = await this.enterIfParticipant(socket, data, parsed.data.orderId);
     }
@@ -75,7 +79,10 @@ export class OrderRoomsService {
 
   // The same check as the chat: a foreign order and a missing one look and take the same. The
   // account may have been blocked after the socket opened, so the same query reads that too.
-  async participantAccess(data: AppSocketData, orderId: number): Promise<ParticipantAccess> {
+  async participantAccess(
+    data: ParticipantSocketData,
+    orderId: number,
+  ): Promise<ParticipantAccess> {
     const { participant, actorBlocked } = await orderAccess(this.db, orderId, {
       role: data.role,
       userId: data.userId,
@@ -96,7 +103,7 @@ export class OrderRoomsService {
   // answer of a foreign order, then the socket is closed.
   private async enterIfParticipant(
     socket: Socket,
-    data: AppSocketData,
+    data: ParticipantSocketData,
     orderId: number,
   ): Promise<OrderJoinAck> {
     let ack = JOINED;

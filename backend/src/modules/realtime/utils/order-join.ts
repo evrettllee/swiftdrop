@@ -2,8 +2,8 @@ import {
   ORDER_JOIN_MAX_ATTEMPTS,
   ORDER_JOIN_REJECTIONS,
   ORDER_JOIN_WINDOW_MS,
-} from '../constants/couriers-socket.constants';
-import type { AppSocketData, OrderJoinRejection } from '../types/couriers-socket.types';
+} from '../constants/realtime.constants';
+import type { AppSocketData, OrderJoinRejection } from '../types/realtime.types';
 
 // The join attempts of the last window with this one added. Only one more than the limit is kept,
 // so a flood of joins cannot grow the list.

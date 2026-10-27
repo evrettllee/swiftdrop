@@ -2,7 +2,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { assignCourier, OpenSockets, placeConfirmedOrder } from '@test/support/chat';
@@ -49,7 +49,7 @@ describe('Order room events (e2e)', () => {
     await app.close();
   });
 
-  it('should deliver an emitToOrder event to the client and courier but not to an outsider', async () => {
+  it('should deliver an order event to the client and courier but not to an outsider', async () => {
     const courier = await assignCourier(app, db, orderId);
     const outsiderCookies = (await registerUser(app, SECOND_CLIENT)).cookies;
     const outsiderOrderId = await placeConfirmedOrder(app, db, outsiderCookies);
@@ -63,7 +63,7 @@ describe('Order room events (e2e)', () => {
     const clientEvent = waitForEvent(client, TEST_EVENT);
     const courierEvent = waitForEvent(courierSocket, TEST_EVENT);
 
-    app.get(CouriersGateway).emitToOrder(orderId, TEST_EVENT, TEST_PAYLOAD);
+    app.get(RealtimeEventsService).toOrder(orderId, TEST_EVENT, TEST_PAYLOAD);
 
     await expect(clientEvent).resolves.toEqual(TEST_PAYLOAD);
     await expect(courierEvent).resolves.toEqual(TEST_PAYLOAD);
@@ -80,7 +80,7 @@ describe('Order room events (e2e)', () => {
     const courierEvents = collectEvents(courierSocket, TEST_EVENT);
     const clientEvent = waitForEvent(client, TEST_EVENT);
 
-    app.get(CouriersGateway).emitToOrder(orderId, TEST_EVENT, TEST_PAYLOAD, {
+    app.get(RealtimeEventsService).toOrder(orderId, TEST_EVENT, TEST_PAYLOAD, {
       exceptCourierProfileId: courier.courierProfileId,
     });
 

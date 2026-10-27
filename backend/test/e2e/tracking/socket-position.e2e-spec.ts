@@ -3,8 +3,8 @@ import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
-import type { CourierLocationEvent } from '@/modules/couriers/types/couriers-socket.types';
+import type { CourierLocationEvent } from '@/modules/couriers/types/courier-location.types';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
@@ -24,7 +24,7 @@ import {
   sendLocation,
 } from '@test/support/tracking';
 
-const LOCATION_EVENT = COURIER_SOCKET_EVENTS.COURIER_LOCATION;
+const LOCATION_EVENT = SOCKET_EVENTS.COURIER_LOCATION;
 
 // Negative checks wait for a round trip of the socket that must stay silent: the room gets the
 // position right after the acknowledgement of the courier, before the server reads the next packet.

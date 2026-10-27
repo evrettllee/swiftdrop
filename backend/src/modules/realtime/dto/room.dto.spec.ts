@@ -1,5 +1,5 @@
 import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
-import { orderRoomBodySchema } from './order-room.dto';
+import { orderRoomBodySchema } from './room.dto';
 
 describe('orderRoomBodySchema', () => {
   it('should accept a positive integer order id', () => {

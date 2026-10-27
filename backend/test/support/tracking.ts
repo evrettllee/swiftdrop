@@ -5,9 +5,8 @@ import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import type { Database } from '@/database/database.module';
 import { courierProfiles } from '@/database/schema';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
-import type { LocationAck } from '@/modules/couriers/types/couriers-socket.types';
-import { ORDER_ROOM_EVENTS } from '@/modules/tracking/constants/tracking.constants';
+import type { LocationAck } from '@/modules/couriers/types/courier-location.types';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { OrderEtaDataService } from '@/modules/tracking/services/order-eta-data.service';
 import type { OrderStatusEvent } from '@/modules/tracking/types/tracking.types';
 import { assignCourier, type OpenSockets } from './chat';
@@ -22,7 +21,7 @@ export function sendLocation(
   socket: Socket,
   point: GeoPoint = REPORTED_POINT,
 ): Promise<LocationAck> {
-  return emitWithAck<LocationAck>(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, point);
+  return emitWithAck<LocationAck>(socket, SOCKET_EVENTS.LOCATION_UPDATE, point);
 }
 
 // The courier of the order, whose last position is old enough for the next one to be taken.
@@ -54,7 +53,7 @@ export async function watchOrderStatus(
 
   return {
     socket,
-    events: collectEvents<OrderStatusEvent>(socket, ORDER_ROOM_EVENTS.ORDER_STATUS),
+    events: collectEvents<OrderStatusEvent>(socket, SOCKET_EVENTS.ORDER_STATUS),
   };
 }
 

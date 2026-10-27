@@ -5,11 +5,9 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { courierProfiles } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import {
-  COURIER_SOCKET_EVENTS,
-  LOCATION_UPDATE_REJECTIONS,
-} from '@/modules/couriers/constants/couriers-socket.constants';
-import type { LocationAck } from '@/modules/couriers/types/couriers-socket.types';
+import { LOCATION_UPDATE_REJECTIONS } from '@/modules/couriers/constants/courier-location.constants';
+import type { LocationAck } from '@/modules/couriers/types/courier-location.types';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { CAR, createCourier, putAvailability, putVehicle } from '@test/support/couriers';
@@ -28,7 +26,7 @@ describe('Courier socket location (e2e)', () => {
   const getRoute = jest.fn();
 
   function sendLocation(body: unknown): Promise<LocationAck> {
-    return emitWithAck<LocationAck>(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, body);
+    return emitWithAck<LocationAck>(socket, SOCKET_EVENTS.LOCATION_UPDATE, body);
   }
 
   beforeAll(async () => {

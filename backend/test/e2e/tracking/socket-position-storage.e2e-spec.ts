@@ -5,10 +5,8 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { courierProfiles } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import {
-  COURIER_SOCKET_EVENTS,
-  LOCATION_UPDATE_REJECTIONS,
-} from '@/modules/couriers/constants/couriers-socket.constants';
+import { LOCATION_UPDATE_REJECTIONS } from '@/modules/couriers/constants/courier-location.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
@@ -66,7 +64,7 @@ describe('Courier position storage (e2e)', () => {
     const client = await sockets.connect(baseUrl, clientCookies);
     const courierSocket = await sockets.connect(baseUrl, courier.cookies);
     await joinOrderRoom(client, { orderId });
-    const received = waitForEvent(client, COURIER_SOCKET_EVENTS.COURIER_LOCATION);
+    const received = waitForEvent(client, SOCKET_EVENTS.COURIER_LOCATION);
 
     await expect(sendLocation(courierSocket)).resolves.toEqual({ ok: true });
 

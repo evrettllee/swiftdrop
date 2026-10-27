@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
+import { ROLE_NAMES } from '@/common/enums/role.enum';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { AuthCookiesService } from '../services/auth-cookies.service';
 import { AUTH_THROTTLE } from '../constants/access.constants';
@@ -21,6 +22,7 @@ import { AuthService } from '../services/auth.service';
 import type { AuthResponse, AuthResult, AuthUser, OAuthRequest } from '../types/auth.types';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { Public } from '../decorators/public.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { loginSchema, type LoginDto } from '../dto/login.dto';
 import { registerSchema, type RegisterDto } from '../dto/register.dto';
 import { OAuthFailureFilter } from '../filters/oauth-failure.filter';
@@ -87,6 +89,7 @@ export class AuthController {
   }
 
   @Get(AUTH_ROUTES.ME)
+  @Roles(...ROLE_NAMES)
   me(@CurrentUser() user: AuthUser): AuthUser {
     return user;
   }

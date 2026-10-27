@@ -6,7 +6,7 @@ import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import { CHAT_SOCKET_EVENTS } from '@/modules/chat/constants/chat.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import type {
   ChatHistory,
   ChatReadResult,
@@ -76,7 +76,7 @@ describe('Marking chat messages read (e2e)', () => {
     ]);
     client = await sockets.connect(baseUrl, clientCookies);
     await joinOrderRoom(client, { orderId });
-    reads = collectEvents<MessageReadEvent>(client, CHAT_SOCKET_EVENTS.MESSAGE_READ);
+    reads = collectEvents<MessageReadEvent>(client, SOCKET_EVENTS.MESSAGE_READ);
   });
 
   afterEach(() => {
