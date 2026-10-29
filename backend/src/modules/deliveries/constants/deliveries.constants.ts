@@ -1,6 +1,7 @@
 import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
 import {
   COURIER_ACTIVE_ORDER_STATUSES,
+  COURIER_HISTORY_STATUSES,
   ORDER_BUSY_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
 } from '@/common/constants/orders.constants';
@@ -83,10 +84,7 @@ export const LAST_NAME_INITIAL_MARK = '.';
 
 // History
 // Orders that ended while they were with the courier.
-export const HISTORY_STATUSES: readonly OrderStatus[] = [
-  ORDER_STATUS.DELIVERED,
-  ORDER_STATUS.CANCELLED,
-];
+export const HISTORY_STATUSES: readonly OrderStatus[] = COURIER_HISTORY_STATUSES;
 // The stages of an order the courier took part in: a finished order shows only these.
 export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.COURIER_ASSIGNED,
@@ -99,6 +97,7 @@ export const HISTORY_PAGE_SIZE_DEFAULT = 10;
 
 export const HISTORY_SORT_KEY = {
   ID: 'id',
+  FINISHED_AT: 'finishedAt',
 } as const;
 
 // Validation

@@ -3,6 +3,7 @@ import {
   PERSON_FIELD_LENGTH,
 } from '@/common/constants/field-lengths.constants';
 import {
+  ORDER_FINISHED_STATUSES,
   ORDER_ID_INVALID_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
 } from '@/common/constants/orders.constants';
@@ -46,11 +47,7 @@ export const ACTIVE_STATUSES: readonly OrderStatus[] = [
 ];
 
 // Finished orders: the "Finished" tab of the list; only these can be repeated.
-export const FINISHED_STATUSES: readonly OrderStatus[] = [
-  ORDER_STATUS.DELIVERED,
-  ORDER_STATUS.CANCELLED,
-  ORDER_STATUS.REJECTED,
-];
+export const FINISHED_STATUSES: readonly OrderStatus[] = ORDER_FINISHED_STATUSES;
 
 export const ORDER_CANCELLED_BY = {
   CLIENT: 'client',

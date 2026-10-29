@@ -16,6 +16,7 @@ import { readOrderStatus } from '@test/support/orders';
 import { createRoutingMocks, createRoutingTestApp, resetRouting } from '@test/support/routing';
 import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '@test/support/sockets';
 import { assignTrackedCourier, sendLocation } from '@test/support/tracking';
+import { statusChange } from '@test/support/order-status';
 
 // Older than the limit of positions per courier, so the next one is stored.
 const PAST_POSITION_MS = 10_000;
@@ -34,7 +35,7 @@ describe('Positions and estimates at the end of an order (e2e)', () => {
   function deliverUncommitted(tx: Transaction) {
     return tx
       .update(orders)
-      .set({ status: ORDER_STATUS.DELIVERED })
+      .set(statusChange(ORDER_STATUS.DELIVERED))
       .where(eq(orders.orderId, orderId));
   }
 

@@ -22,6 +22,7 @@ import { postApi } from '@test/support/http';
 import { commitOnceBlocked, holdOrder, whileRowsAreHeld } from '@test/support/locks';
 import { readOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
+import { statusChange } from '@test/support/order-status';
 
 const RIGHT_CODE = '4821';
 
@@ -67,7 +68,7 @@ describe('Chat messages and the order row lock (e2e)', () => {
       (tx) =>
         tx
           .update(orders)
-          .set({ status: ORDER_STATUS.DELIVERED })
+          .set(statusChange(ORDER_STATUS.DELIVERED))
           .where(eq(orders.orderId, orderId)),
       () => sendChatMessage(app, courierCookies, orderId),
     );

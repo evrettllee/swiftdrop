@@ -8,6 +8,7 @@ export type HistorySortKey = (typeof HISTORY_SORT_KEY)[keyof typeof HISTORY_SORT
 export const HISTORY_SORT: SortSpec<HistorySortKey> = {
   whitelist: {
     id: { column: orders.orderId, kind: SORT_VALUE_KIND.INTEGER },
+    finishedAt: { column: orders.finishedAt, kind: SORT_VALUE_KIND.TIMESTAMP },
   },
   idColumn: orders.orderId,
   defaultSort: { key: HISTORY_SORT_KEY.ID, direction: SORT_DIRECTION.DESC },

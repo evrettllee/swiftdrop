@@ -1,7 +1,10 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { Database, Transaction } from '@/database/database.module';
 import { orders, orderStatusHistory } from '@/database/schema';
+import { ORDER_FINISHED_STATUSES } from '@/common/constants/orders.constants';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
+
+const finishedStatuses = new Set<OrderStatus>(ORDER_FINISHED_STATUSES);
 
 // Columns that change together with the status, for example the courier who took the order.
 export type OrderTransitionChanges = Partial<
@@ -61,9 +64,10 @@ export async function transitionOrderStatus(
   transition: OrderStatusTransition,
 ): Promise<{ orderId: number } | undefined> {
   const { orderId, from, to, changedBy, clientId, courierId, changes } = transition;
+  const finishedAt = finishedStatuses.has(to) ? sql`now()` : undefined;
   const [updated] = await orderTx.tx
     .update(orders)
-    .set({ ...changes, status: to })
+    .set({ ...changes, status: to, ...(finishedAt && { finishedAt }) })
     .where(
       and(
         eq(orders.orderId, orderId),

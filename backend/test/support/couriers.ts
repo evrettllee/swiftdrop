@@ -9,6 +9,7 @@ import { COURIERS_ROUTES } from '@/modules/couriers/constants/couriers.constants
 import { COOKIE_HEADER, validRegistration } from './auth';
 import { getApi, putApi } from './http';
 import { createUserWithRole } from './users';
+import { statusChange } from './order-status';
 
 export const COURIER_ACCOUNT = {
   firstName: 'Дмитрий',
@@ -63,7 +64,7 @@ export async function assignOrder(
 ): Promise<void> {
   await db
     .update(orders)
-    .set({ courierId: courierProfileId, status })
+    .set({ courierId: courierProfileId, ...statusChange(status) })
     .where(eq(orders.orderId, orderId));
 }
 

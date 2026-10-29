@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  listPeriodShape,
   listSortParamSchema,
   resolveListQuery,
   unknownParameterError,
@@ -12,6 +13,7 @@ export const courierHistorySchema = z
   .strictObject(
     {
       ...listPaginationShape(HISTORY_PAGE_SIZE_DEFAULT),
+      ...listPeriodShape,
       sort: listSortParamSchema,
     },
     { error: unknownParameterError },

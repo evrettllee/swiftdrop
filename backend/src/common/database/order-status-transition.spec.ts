@@ -111,3 +111,58 @@ describe('runOrderTransaction', () => {
     expect(publish).toHaveBeenCalledWith([]);
   });
 });
+
+describe('transitionOrderStatus finish time', () => {
+  function recordingTransaction(sets: Record<string, unknown>[]) {
+    const tx = {
+      update: () => ({
+        set: (values: Record<string, unknown>) => {
+          sets.push(values);
+
+          return {
+            where: () => ({
+              returning: () =>
+                Promise.resolve([{ orderId: 1, status: values.status, estimatedDeliveryAt: null }]),
+            }),
+          };
+        },
+      }),
+      insert: () => ({ values: () => Promise.resolve() }),
+    } as unknown as Transaction;
+
+    return { tx, statusChanges: [] };
+  }
+
+  it.each([ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED])(
+    'should stamp the finish time when the order becomes %s',
+    async (to) => {
+      const sets: Record<string, unknown>[] = [];
+
+      await transitionOrderStatus(recordingTransaction(sets), {
+        orderId: 1,
+        from: [],
+        to,
+        changedBy: null,
+      });
+
+      expect(sets[0]).toHaveProperty('finishedAt');
+      expect(sets[0].status).toBe(to);
+    },
+  );
+
+  it.each([ORDER_STATUS.CONFIRMED, ORDER_STATUS.COURIER_ASSIGNED, ORDER_STATUS.IN_TRANSIT])(
+    'should leave the finish time alone when the order becomes %s',
+    async (to) => {
+      const sets: Record<string, unknown>[] = [];
+
+      await transitionOrderStatus(recordingTransaction(sets), {
+        orderId: 1,
+        from: [],
+        to,
+        changedBy: null,
+      });
+
+      expect(sets[0]).not.toHaveProperty('finishedAt');
+    },
+  );
+});

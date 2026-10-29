@@ -13,6 +13,14 @@ export const COURIER_ACTIVE_ORDER_STATUSES = [
   ORDER_STATUS.IN_TRANSIT,
 ] as const;
 
+export const ORDER_FINISHED_STATUSES = [
+  ORDER_STATUS.DELIVERED,
+  ORDER_STATUS.CANCELLED,
+  ORDER_STATUS.REJECTED,
+] as const;
+
+export const COURIER_HISTORY_STATUSES = [ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED] as const;
+
 // The chat of an order takes new messages only while the order is with its courier; before and
 // after that its history is still readable.
 export const CHAT_WRITABLE_STATUSES = COURIER_ACTIVE_ORDER_STATUSES;

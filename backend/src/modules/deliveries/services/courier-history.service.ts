@@ -1,14 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, count, eq, inArray, max, type SQL } from 'drizzle-orm';
+import { and, count, eq, gte, inArray, lt, max, type SQL } from 'drizzle-orm';
 import { type ListFetch, mapPageItems, paginate } from '@/common/database/paginate';
+import type { DateRange } from '@/common/utils/date-range';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
-import { orders, orderStatusHistory, packages } from '@/database/schema';
+import { orders, packages } from '@/database/schema';
 import { aliasOrderAddresses } from '@/modules/orders/utils/order-address-columns';
 import { HISTORY_STATUSES } from '../constants/deliveries.constants';
 import type { CourierHistoryDto } from '../dto/courier-history.dto';
 import type { CourierHistoryPage } from '../types/deliveries.types';
 import { HISTORY_SORT } from '../utils/history-sort';
+
+function periodCondition({ start, end }: DateRange): SQL | undefined {
+  return and(
+    start === null ? undefined : gte(orders.finishedAt, start),
+    end === null ? undefined : lt(orders.finishedAt, end),
+  );
+}
 
 @Injectable()
 export class CourierHistoryService {
@@ -22,6 +30,7 @@ export class CourierHistoryService {
       where: and(
         eq(orders.courierId, courierProfileId),
         inArray(orders.status, [...HISTORY_STATUSES]),
+        periodCondition(query.period),
       ),
       fetch: (options) => this.fetch(options),
       count: (where) => this.count(where),
@@ -43,7 +52,7 @@ export class CourierHistoryService {
         .select({
           orderId: orders.orderId,
           status: orders.status,
-          finishedAt: orderStatusHistory.changedAt,
+          finishedAt: orders.finishedAt,
           pickup: { street: pickup.street, house: pickup.house },
           delivery: { street: delivery.street, house: delivery.house },
           distanceKm: orders.distanceKm,
@@ -55,14 +64,6 @@ export class CourierHistoryService {
         .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
         // Every order has exactly one package (packages.order_id is unique).
         .innerJoin(packages, eq(packages.orderId, orders.orderId))
-        // The final status is written to the history once, so this row is the moment it ended.
-        .leftJoin(
-          orderStatusHistory,
-          and(
-            eq(orderStatusHistory.orderId, orders.orderId),
-            eq(orderStatusHistory.status, orders.status),
-          ),
-        )
         .where(where)
         .orderBy(...orderBy)
         .limit(limit)

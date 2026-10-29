@@ -34,11 +34,32 @@ describe('courierHistorySchema', () => {
     expect(messagesOf({ sort: 'createdAt:desc' })).toEqual([LIST_VALIDATION_MESSAGES.SORT_INVALID]);
   });
 
-  it.each([
-    ['a period', { from: '2026-10-01' }],
-    ['a filter', { status: 'finished' }],
-  ])('should refuse %s it does not support', (_, query) => {
-    expect(messagesOf(query)).toHaveLength(1);
+  it('should sort by the moment the order finished', () => {
+    const result = courierHistorySchema.safeParse({ sort: 'finishedAt:desc' });
+
+    expect(result.success && result.data.sort).toEqual({ key: 'finishedAt', direction: 'desc' });
+  });
+
+  it('should take the cursor of the finish time sort', () => {
+    const cursor = encodeListCursor({ k: 'finishedAt', d: 'desc', v: '1792261697859619', id: 241 });
+    const result = courierHistorySchema.safeParse({ cursor, sort: 'finishedAt:desc' });
+
+    expect(result.success && result.data.pagination).toMatchObject({
+      position: { value: '1792261697859619', id: 241 },
+    });
+  });
+
+  it('should take a period of whole days in Minsk', () => {
+    const result = courierHistorySchema.safeParse({ from: '2026-10-29', to: '2026-10-29' });
+
+    expect(result.success && result.data.period).toEqual({
+      start: new Date('2026-10-28T21:00:00.000Z'),
+      end: new Date('2026-10-29T21:00:00.000Z'),
+    });
+  });
+
+  it('should refuse a filter it does not support', () => {
+    expect(messagesOf({ status: 'finished' })).toHaveLength(1);
   });
 
   it('should refuse a limit above 100', () => {
