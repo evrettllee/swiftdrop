@@ -62,9 +62,9 @@ export const orders = pgTable(
     otpLockedUntil: timestamp({ withTimezone: true }),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     finishedAt: timestamp({ withTimezone: true }),
+    statusChangedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    index('orders_client_id_idx').on(table.clientId),
     index('orders_courier_id_idx').on(table.courierId),
     index('orders_client_created_at_idx').on(
       table.clientId,
@@ -83,6 +83,9 @@ export const orders = pgTable(
       table.createdAt.desc().nullsFirst(),
       table.orderId.desc().nullsFirst(),
     ),
+    index('orders_recipient_name_trgm_idx').using('gin', table.recipientName.op('gin_trgm_ops')),
+    index('orders_recipient_phone_idx').on(table.recipientPhone),
+    index('orders_status_changed_at_idx').on(table.status, table.statusChangedAt, table.orderId),
     // A courier carries at most one order at a time, even when two offers are accepted at once.
     uniqueIndex('orders_one_active_per_courier_uidx')
       .on(table.courierId)

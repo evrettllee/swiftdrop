@@ -67,7 +67,7 @@ export async function transitionOrderStatus(
   const finishedAt = finishedStatuses.has(to) ? sql`now()` : undefined;
   const [updated] = await orderTx.tx
     .update(orders)
-    .set({ ...changes, status: to, ...(finishedAt && { finishedAt }) })
+    .set({ ...changes, status: to, statusChangedAt: sql`now()`, ...(finishedAt && { finishedAt }) })
     .where(
       and(
         eq(orders.orderId, orderId),

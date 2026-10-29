@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { boolean, integer, pgTable, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  integer,
+  pgTable,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/pg-core';
+import { fullNameSql } from '../sql-expressions';
 import { roles } from './roles';
 import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
@@ -24,5 +33,10 @@ export const users = pgTable(
     uniqueIndex('users_email_active_uidx')
       .on(table.email)
       .where(sql`${table.deletedAt} IS NULL`),
+    index('users_full_name_trgm_idx').using(
+      'gin',
+      sql`${fullNameSql(table.firstName, table.lastName)} gin_trgm_ops`,
+    ),
+    index('users_email_trgm_idx').using('gin', table.email.op('gin_trgm_ops')),
   ],
 );
