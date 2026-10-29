@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  check,
   index,
   integer,
   numeric,
@@ -11,6 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { PAYMENT_STATUS, PAYMENT_STATUS_VALUES } from '@/common/enums/payment-status.enum';
 import { PAYMENTS_ONE_PENDING_PER_ORDER_INDEX } from '@/common/constants/database.constants';
+import { sqlLiteral } from '../sql-literal';
 import { orders } from './orders';
 import { PAYMENT_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
@@ -36,6 +38,8 @@ export const payments = pgTable(
     // The reference of the payment in Stripe, it is known after the payment and used for a refund.
     stripePaymentId: varchar({ length: PAYMENT_FIELD_LENGTH.STRIPE_PAYMENT_ID }).unique(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    paidAt: timestamp({ withTimezone: true }),
+    refundedAt: timestamp({ withTimezone: true }),
   },
   (table) => [
     index('payments_order_id_idx').on(table.orderId),
@@ -43,5 +47,13 @@ export const payments = pgTable(
     uniqueIndex(PAYMENTS_ONE_PENDING_PER_ORDER_INDEX)
       .on(table.orderId)
       .where(sql`${table.status} = ${sql.raw(`'${PAYMENT_STATUS.PENDING}'`)}`),
+    check(
+      'payments_paid_at_check',
+      sql`${table.status} <> ${sqlLiteral(PAYMENT_STATUS.PAID)} OR ${table.paidAt} IS NOT NULL`,
+    ),
+    check(
+      'payments_refunded_at_check',
+      sql`${table.status} <> ${sqlLiteral(PAYMENT_STATUS.REFUNDED)} OR ${table.refundedAt} IS NOT NULL`,
+    ),
   ],
 );

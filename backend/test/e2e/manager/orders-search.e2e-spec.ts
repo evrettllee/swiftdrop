@@ -83,9 +83,21 @@ describe('Manager orders search and filters (e2e)', () => {
     expect(idsOf(await list({ q: 'козлова' }))).toEqual([...firstIds, ...secondIds].reverse());
   });
 
+  it('should find the orders of a client by a local Belarusian number', async () => {
+    expect(idsOf(await list({ q: '8 029 765-43-21' }))).toEqual([...secondIds].reverse());
+  });
+
   it('should take % and _ of the search as plain characters', async () => {
-    expect(idsOf(await list({ q: '%' }))).toEqual([]);
-    expect(idsOf(await list({ q: '_' }))).toEqual([]);
+    expect(idsOf(await list({ q: '%%%' }))).toEqual([]);
+    expect(idsOf(await list({ q: '___' }))).toEqual([]);
+  });
+
+  it('should refuse a text search shorter than three characters', async () => {
+    const response = await getManagerOrders(app, manager, { q: 'Ив' }).expect(
+      HttpStatus.BAD_REQUEST,
+    );
+
+    expect(JSON.stringify(response.body)).toContain('Введите не меньше 3 символов');
   });
 
   it('should filter by the courier, the payment and fragile parcels', async () => {

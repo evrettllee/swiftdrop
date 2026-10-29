@@ -18,10 +18,26 @@ import {
   MANAGER_ORDERS_VALIDATION_MESSAGES,
   MANAGER_STATUS_GROUP_VALUES,
   PAYMENT_STATE_VALUES,
+  TEXT_SEARCH_MIN_LENGTH,
 } from '../constants/manager-orders.constants';
-import type { ManagerOrderFilters } from '../types/manager-orders.types';
+import type { ManagerOrderFilters, OrderSearch } from '../types/manager-orders.types';
 import { MANAGER_ORDERS_SORT } from '../utils/manager-orders-sort';
 import { parseOrderSearch } from '../utils/order-search';
+
+function toSearch(query: string, ctx: z.RefinementCtx): OrderSearch {
+  const search = parseOrderSearch(query);
+
+  if (search.kind === 'text' && query.length < TEXT_SEARCH_MIN_LENGTH) {
+    ctx.addIssue({
+      code: 'custom',
+      message: MANAGER_ORDERS_VALIDATION_MESSAGES.TEXT_SEARCH_TOO_SHORT,
+    });
+
+    return z.NEVER;
+  }
+
+  return search;
+}
 
 const filterShape = {
   ...listPeriodShape,
@@ -35,7 +51,7 @@ const filterShape = {
   fragile: z
     .literal(FRAGILE_ONLY, { error: MANAGER_ORDERS_VALIDATION_MESSAGES.FRAGILE_INVALID })
     .optional(),
-  q: listSearchSchema.optional(),
+  q: listSearchSchema.transform(toSearch).optional(),
 };
 
 type RawFilters = z.infer<z.ZodObject<typeof filterShape>>;
@@ -46,7 +62,7 @@ function toFilters(raw: RawFilters): ManagerOrderFilters {
     courierId: raw.courierId ?? null,
     payment: raw.payment ?? null,
     fragile: raw.fragile === FRAGILE_ONLY,
-    search: raw.q === undefined ? null : parseOrderSearch(raw.q),
+    search: raw.q ?? null,
   };
 }
 

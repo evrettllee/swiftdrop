@@ -13,6 +13,30 @@ describe('parseOrderSearch', () => {
     expect(parseOrderSearch(query)).toEqual({ kind: 'number', orderId: null, phone });
   });
 
+  it.each([
+    ['80291234567', '+375291234567'],
+    ['8 (029) 123-45-67', '+375291234567'],
+    ['8 029 123 45 67', '+375291234567'],
+  ])('should read the local Belarusian number %j as %s', (query, phone) => {
+    expect(parseOrderSearch(query)).toEqual({ kind: 'number', orderId: null, phone });
+  });
+
+  it('should read nine digits as a Belarusian number and as an order id', () => {
+    expect(parseOrderSearch('29 123 45 67')).toEqual({
+      kind: 'number',
+      orderId: 291_234_567,
+      phone: '+375291234567',
+    });
+  });
+
+  it.each([
+    ['81291234567', '+81291234567'],
+    ['8029123456', '+8029123456'],
+    ['375291234567', '+375291234567'],
+  ])('should keep %j that is no local Belarusian number as %s', (query, phone) => {
+    expect(parseOrderSearch(query)).toMatchObject({ kind: 'number', phone });
+  });
+
   it('should try both an order id and a phone for ten digits that fit the id column', () => {
     expect(parseOrderSearch('2012345678')).toEqual({
       kind: 'number',

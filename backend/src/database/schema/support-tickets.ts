@@ -54,6 +54,7 @@ export const supportTickets = pgTable(
       table.userId,
       table.ticketId.desc().nullsFirst(),
     ),
+    index('support_tickets_order_id_idx').on(table.orderId),
     index('support_tickets_queue_idx')
       .on(table.awaitingStaff, table.lastMessageAt)
       .where(sql`${table.status} <> ${sqlLiteral(SUPPORT_TICKET_STATUS.CLOSED)}`),

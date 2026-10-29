@@ -1,5 +1,6 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
 import { payments } from '@/database/schema';
 import type { Database } from '@/database/database.module';
 import {
@@ -88,6 +89,8 @@ export async function insertPayment(
   overrides: Partial<typeof payments.$inferInsert> = {},
 ): Promise<number> {
   sessionCounter += 1;
+  const status = overrides.status ?? PAYMENT_STATUS.PENDING;
+  const isSettled = status === PAYMENT_STATUS.PAID || status === PAYMENT_STATUS.REFUNDED;
 
   const [payment] = await db
     .insert(payments)
@@ -97,6 +100,8 @@ export async function insertPayment(
       amountUsd: VALID_ORDER_AMOUNT_USD_TEXT,
       exchangeRate: USD_RATE,
       checkoutSessionId: `cs_test_inserted_${sessionCounter}`,
+      paidAt: isSettled ? new Date() : null,
+      refundedAt: status === PAYMENT_STATUS.REFUNDED ? new Date() : null,
       ...overrides,
     })
     .returning({ paymentId: payments.paymentId });

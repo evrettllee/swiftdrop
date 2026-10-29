@@ -3,7 +3,29 @@ import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum
 export const MANAGER_ORDERS_ROUTES = {
   BASE: 'manager/orders',
   COUNTS: 'counts',
+  DETAILS: ':orderId',
+  ROUTE: ':orderId/route',
 } as const;
+
+export const ORDER_ACTOR = {
+  CLIENT: 'client',
+  COURIER: 'courier',
+  STAFF: 'staff',
+  SYSTEM: 'system',
+} as const;
+
+export const ORDER_ACTOR_VALUES = [
+  ORDER_ACTOR.CLIENT,
+  ORDER_ACTOR.COURIER,
+  ORDER_ACTOR.STAFF,
+  ORDER_ACTOR.SYSTEM,
+] as const;
+
+export type OrderActor = (typeof ORDER_ACTOR_VALUES)[number];
+
+export const TICKET_AUTHOR_VALUES = [ORDER_ACTOR.CLIENT, ORDER_ACTOR.COURIER] as const;
+
+export type TicketAuthor = (typeof TICKET_AUTHOR_VALUES)[number];
 
 export const MANAGER_ORDERS_PAGE_SIZE_DEFAULT = 20;
 
@@ -64,8 +86,13 @@ export const NUMERIC_SEARCH = /^[\d\s+\-()]+$/;
 export const NON_DIGITS = /\D/g;
 export const ORDER_ID_MAX_DIGITS = 10;
 export const PHONE_PREFIX = '+';
+export const BELARUS_COUNTRY_CODE = '375';
+export const BELARUS_TRUNK_PREFIX = '80';
+export const BELARUS_NATIONAL_DIGITS = 9;
+export const TEXT_SEARCH_MIN_LENGTH = 3;
 
 export const MANAGER_ORDERS_VALIDATION_MESSAGES = {
+  TEXT_SEARCH_TOO_SHORT: `Введите не меньше ${TEXT_SEARCH_MIN_LENGTH} символов`,
   COURIER_ID_INVALID: 'Некорректный номер курьера',
   FRAGILE_INVALID: 'Фильтр хрупких посылок принимает только true',
 } as const;

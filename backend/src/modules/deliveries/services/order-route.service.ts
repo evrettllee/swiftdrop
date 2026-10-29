@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, type SQL } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { positionAgeMsSql } from '@/common/database/position-age';
 import { DRIZZLE } from '@/database/database.constants';
@@ -28,16 +28,25 @@ const SEGMENT_OF_LEG: Record<CourierLegTarget, RouteSegmentKind> = {
 };
 
 @Injectable()
-export class ClientOrderRouteService {
+export class OrderRouteService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly routes: RouteLinesService,
     private readonly eta: OrderEtaService,
   ) {}
 
-  // The route of an order of the client and where its courier is, in one query with the vehicle of
-  // the courier for the profile of the parcel line; a foreign order looks the same as a missing one. The age of the position is counted by the clock of the database that stored it.
-  async find(clientId: number, orderId: number): Promise<ClientOrderRoute> {
+  findForClient(clientId: number, orderId: number): Promise<ClientOrderRoute> {
+    return this.find(orderId, eq(orders.clientId, clientId));
+  }
+
+  findForStaff(orderId: number): Promise<ClientOrderRoute> {
+    return this.find(orderId, undefined);
+  }
+
+  // The route of an order and where its courier is, in one query with the vehicle of the courier for
+  // the profile of the parcel line; for a client, a foreign order looks the same as a missing one. The
+  // age of the position is counted by the clock of the database that stored it.
+  private async find(orderId: number, owner: SQL | undefined): Promise<ClientOrderRoute> {
     const { pickup, delivery } = aliasOrderAddresses();
     const [order] = await this.db
       .select({
@@ -56,7 +65,7 @@ export class ClientOrderRouteService {
       .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
       .leftJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
       .leftJoin(vehicles, eq(vehicles.courierProfileId, courierProfiles.courierProfileId))
-      .where(and(eq(orders.orderId, orderId), eq(orders.clientId, clientId)))
+      .where(and(eq(orders.orderId, orderId), owner))
       .limit(SINGLE_ROW_LIMIT);
 
     if (!order) {

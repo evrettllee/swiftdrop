@@ -9,7 +9,7 @@ import { type OrderIdParamDto, orderIdParamSchema } from '@/modules/orders/dto/o
 import { ROUTING_THROTTLE } from '@/modules/routing/constants/routing.constants';
 import { CLIENT_ORDER_COURIER_ROUTES } from '../constants/deliveries.constants';
 import { ClientOrderCourierService } from '../services/client-order-courier.service';
-import { ClientOrderRouteService } from '../services/client-order-route.service';
+import { OrderRouteService } from '../services/order-route.service';
 import type { ClientOrderCourier, ClientOrderRoute } from '../types/deliveries.types';
 
 @Controller(CLIENT_ORDER_COURIER_ROUTES.BASE)
@@ -17,7 +17,7 @@ import type { ClientOrderCourier, ClientOrderRoute } from '../types/deliveries.t
 export class ClientOrderCourierController {
   constructor(
     private readonly orderCourier: ClientOrderCourierService,
-    private readonly orderRoute: ClientOrderRouteService,
+    private readonly orderRoute: OrderRouteService,
   ) {}
 
   @Get(CLIENT_ORDER_COURIER_ROUTES.COURIER)
@@ -36,6 +36,6 @@ export class ClientOrderCourierController {
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
   ): Promise<ClientOrderRoute> {
-    return this.orderRoute.find(user.userId, params.orderId);
+    return this.orderRoute.findForClient(user.userId, params.orderId);
   }
 }
