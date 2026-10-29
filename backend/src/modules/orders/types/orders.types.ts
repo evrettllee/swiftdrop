@@ -1,3 +1,4 @@
+import type { ListPage } from '@/common/types/page.types';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { PaymentStatus } from '@/common/enums/payment-status.enum';
 import type { ORDER_CANCELLED_BY } from '../constants/orders.constants';
@@ -28,12 +29,7 @@ export type OrderListItem = {
   delivery: OrderAddressView;
 };
 
-export type OrdersPage = {
-  items: OrderListItem[];
-  total: number;
-  page: number;
-  limit: number;
-};
+export type OrdersPage = ListPage<OrderListItem>;
 
 export type OrderPointView = OrderAddressView & {
   latitude: number;

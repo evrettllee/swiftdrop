@@ -1,28 +1,21 @@
 import { z } from 'zod';
 import {
-  DELIVERIES_VALIDATION_MESSAGES,
-  HISTORY_FIRST_PAGE,
-  HISTORY_PAGE_SIZE_DEFAULT,
-  HISTORY_PAGE_SIZE_MAX,
-  HISTORY_PAGE_SIZE_MIN,
-} from '../constants/deliveries.constants';
+  listSortParamSchema,
+  resolveListQuery,
+  unknownParameterError,
+} from '@/common/schemas/list-query.schema';
+import { listPaginationShape } from '@/common/schemas/pagination.schema';
+import { HISTORY_PAGE_SIZE_DEFAULT } from '../constants/deliveries.constants';
+import { HISTORY_SORT } from '../utils/history-sort';
 
-const pageError = DELIVERIES_VALIDATION_MESSAGES.PAGE_INVALID;
-const limitError = DELIVERIES_VALIDATION_MESSAGES.LIMIT_INVALID;
-
-// Query values arrive as strings, so numbers are coerced.
-export const courierHistorySchema = z.object({
-  page: z.coerce
-    .number({ error: pageError })
-    .int({ error: pageError })
-    .min(HISTORY_FIRST_PAGE, { error: pageError })
-    .default(HISTORY_FIRST_PAGE),
-  limit: z.coerce
-    .number({ error: limitError })
-    .int({ error: limitError })
-    .min(HISTORY_PAGE_SIZE_MIN, { error: limitError })
-    .max(HISTORY_PAGE_SIZE_MAX, { error: limitError })
-    .default(HISTORY_PAGE_SIZE_DEFAULT),
-});
+export const courierHistorySchema = z
+  .strictObject(
+    {
+      ...listPaginationShape(HISTORY_PAGE_SIZE_DEFAULT),
+      sort: listSortParamSchema,
+    },
+    { error: unknownParameterError },
+  )
+  .transform((query, ctx) => resolveListQuery(query, HISTORY_SORT, ctx) ?? z.NEVER);
 
 export type CourierHistoryDto = z.infer<typeof courierHistorySchema>;

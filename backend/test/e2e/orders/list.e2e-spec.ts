@@ -51,6 +51,7 @@ describe('Orders list (e2e)', () => {
       total: 0,
       page: ORDERS_FIRST_PAGE,
       limit: ORDERS_PAGE_SIZE_DEFAULT,
+      until: null,
     });
   });
 

@@ -1,3 +1,4 @@
+import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
 import {
   COURIER_ACTIVE_ORDER_STATUSES,
   ORDER_BUSY_MESSAGE,
@@ -94,16 +95,17 @@ export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,
   ORDER_STATUS.CANCELLED,
 ];
-export const HISTORY_FIRST_PAGE = 1;
-export const HISTORY_PAGE_SIZE_MIN = 1;
 export const HISTORY_PAGE_SIZE_DEFAULT = 10;
-export const HISTORY_PAGE_SIZE_MAX = 50;
+
+export const HISTORY_SORT_KEY = {
+  ID: 'id',
+} as const;
 
 // Validation
 export const DELIVERIES_VALIDATION_MESSAGES = {
   CODE_INVALID: `Введите ${DELIVERY_CODE_LENGTH} цифры кода`,
-  PAGE_INVALID: 'Некорректный номер страницы',
-  LIMIT_INVALID: `Размер страницы: от ${HISTORY_PAGE_SIZE_MIN} до ${HISTORY_PAGE_SIZE_MAX}`,
+  PAGE_INVALID: LIST_VALIDATION_MESSAGES.PAGE_INVALID,
+  LIMIT_INVALID: LIST_VALIDATION_MESSAGES.LIMIT_INVALID,
 } as const;
 
 // Errors
