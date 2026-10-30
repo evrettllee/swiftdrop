@@ -10,6 +10,7 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { SUPPORT_TICKETS_ONE_OPEN_PER_ORDER_INDEX } from '@/common/constants/database.constants';
 import { SUPPORT_TICKET_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import {
   SUPPORT_TICKET_STATUS,
@@ -58,7 +59,7 @@ export const supportTickets = pgTable(
     index('support_tickets_queue_idx')
       .on(table.awaitingStaff, table.lastMessageAt)
       .where(sql`${table.status} <> ${sqlLiteral(SUPPORT_TICKET_STATUS.CLOSED)}`),
-    uniqueIndex('support_tickets_one_open_per_order_uidx')
+    uniqueIndex(SUPPORT_TICKETS_ONE_OPEN_PER_ORDER_INDEX)
       .on(table.orderId, table.userId)
       .where(
         sql`${table.status} <> ${sqlLiteral(SUPPORT_TICKET_STATUS.CLOSED)} AND ${table.orderId} IS NOT NULL`,

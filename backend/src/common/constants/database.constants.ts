@@ -14,3 +14,4 @@ export const PAYMENTS_ONE_PENDING_PER_ORDER_INDEX = 'payments_one_pending_per_or
 // The partial unique index that keeps one active order per courier.
 export const ORDERS_ONE_ACTIVE_PER_COURIER_INDEX = 'orders_one_active_per_courier_uidx';
 export const SERVICE_ZONES_NAME_INDEX = 'service_zones_name_lower_uidx';
+export const SUPPORT_TICKETS_ONE_OPEN_PER_ORDER_INDEX = 'support_tickets_one_open_per_order_uidx';
