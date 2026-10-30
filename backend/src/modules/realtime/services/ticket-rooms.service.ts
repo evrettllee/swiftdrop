@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Socket } from 'socket.io';
-import { findAccessibleTicket } from '@/common/database/ticket-access';
+import { ticketRoomAccess } from '@/common/database/ticket-access';
 import { describeError } from '@/common/utils/describe-error';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
@@ -13,6 +13,7 @@ import {
 import { ticketRoomBodySchema } from '../dto/room.dto';
 import type { AppSocketData, OrderJoinAck } from '../types/realtime.types';
 import { countJoinAttempt, rejectJoinAttempt } from '../utils/order-join';
+import { closeAfterAnswer } from '../utils/socket-close';
 
 const JOINED: OrderJoinAck = { ok: true };
 const NOT_FOUND: OrderJoinAck = { ok: false, reason: ORDER_JOIN_REJECTIONS.NOT_FOUND };
@@ -68,10 +69,16 @@ export class TicketRoomsService {
     ticketId: number,
   ): Promise<OrderJoinAck> {
     try {
-      const ticket = await findAccessibleTicket(this.db, ticketId, {
+      const { ticket, actorBlocked } = await ticketRoomAccess(this.db, ticketId, {
         userId: data.userId,
         role: data.role,
       });
+
+      if (actorBlocked) {
+        closeAfterAnswer(socket);
+
+        return NOT_FOUND;
+      }
 
       if (!ticket) {
         return NOT_FOUND;

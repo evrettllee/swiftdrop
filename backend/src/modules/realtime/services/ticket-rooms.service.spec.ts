@@ -6,6 +6,7 @@ import { TicketRoomsService } from './ticket-rooms.service';
 
 function socketOf(role: AppSocketData['role'], rooms: string[] = []) {
   const joined = new Set(rooms);
+  const disconnect = jest.fn();
   const data = {
     userId: 7,
     role,
@@ -16,6 +17,7 @@ function socketOf(role: AppSocketData['role'], rooms: string[] = []) {
     data,
     rooms: joined,
     connected: true,
+    disconnect,
     join: jest.fn(async (room: string) => {
       joined.add(room);
     }),
@@ -24,8 +26,10 @@ function socketOf(role: AppSocketData['role'], rooms: string[] = []) {
     }),
   } as unknown as Socket;
 
-  return { socket, joined };
+  return { socket, joined, disconnect };
 }
+
+const STRANGER_ROW = { actorBlocked: false, ticketId: null, userId: null, status: null };
 
 function serviceWith(results: unknown[][]) {
   const fake = queueDatabase(results);
@@ -35,7 +39,9 @@ function serviceWith(results: unknown[][]) {
 
 describe('TicketRoomsService', () => {
   it('should let the author into the room of their ticket', async () => {
-    const { service, fake } = serviceWith([[{ ticketId: 3, userId: 7, status: 'open' }]]);
+    const { service, fake } = serviceWith([
+      [{ actorBlocked: false, ticketId: 3, userId: 7, status: 'open' }],
+    ]);
     const { socket, joined } = socketOf('client');
 
     expect(await service.join(socket, { ticketId: 3 })).toEqual({ ok: true });
@@ -44,15 +50,32 @@ describe('TicketRoomsService', () => {
   });
 
   it('should keep a stranger out as not found', async () => {
-    const { service } = serviceWith([[]]);
+    const { service } = serviceWith([[STRANGER_ROW]]);
     const { socket, joined } = socketOf('courier');
 
     expect(await service.join(socket, { ticketId: 3 })).toEqual({ ok: false, reason: 'not_found' });
     expect(joined.has('ticket:3')).toBe(false);
   });
 
+  it.each([
+    ['blocked since the socket opened', [{ ...STRANGER_ROW, actorBlocked: true, ticketId: 3 }]],
+    ['gone', []],
+  ])('should keep a user who is %s out and close the socket', async (_case, rows) => {
+    jest.useFakeTimers();
+    const { service } = serviceWith([rows]);
+    const { socket, joined, disconnect } = socketOf('client');
+
+    expect(await service.join(socket, { ticketId: 3 })).toEqual({ ok: false, reason: 'not_found' });
+    jest.runAllTimers();
+    expect(joined.has('ticket:3')).toBe(false);
+    expect(disconnect).toHaveBeenCalledWith(true);
+    jest.useRealTimers();
+  });
+
   it('should let the staff into any ticket that exists', async () => {
-    const { service } = serviceWith([[{ ticketId: 3, userId: 9, status: 'closed' }]]);
+    const { service } = serviceWith([
+      [{ actorBlocked: false, ticketId: 3, userId: 9, status: 'closed' }],
+    ]);
     const { socket, joined } = socketOf('manager');
 
     expect(await service.join(socket, { ticketId: 3 })).toEqual({ ok: true });

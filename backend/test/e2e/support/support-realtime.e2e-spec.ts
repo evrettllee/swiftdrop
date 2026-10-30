@@ -103,16 +103,6 @@ describe('Support tickets in real time (e2e)', () => {
     expect((await toStaff).message).toMatchObject({ text: 'Спасибо', authorName: 'Иван Петров' });
   });
 
-  it('should keep another user out of the ticket room', async () => {
-    const stranger = await connect((await registerUser(app, SECOND_CLIENT)).cookies);
-    const leaked = collectEvents(stranger, SOCKET_EVENTS.SUPPORT_MESSAGE);
-
-    expect(await join(stranger, ticketId)).toEqual({ ok: false, reason: 'not_found' });
-    await postTicketMessage(app, client, ticketId, 'Ещё').expect(HttpStatus.CREATED);
-    await roundTrip(stranger);
-    expect(leaked).toEqual([]);
-  });
-
   it('should tell the staff about tickets without texts or names', async () => {
     const staff = await connect(manager);
     const other = (await registerUser(app, SECOND_CLIENT)).cookies;

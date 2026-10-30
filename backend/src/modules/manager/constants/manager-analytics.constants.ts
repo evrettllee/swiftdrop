@@ -1,4 +1,5 @@
 import { SORT_DIRECTION } from '@/common/constants/list.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 
 export const MANAGER_ANALYTICS_ROUTES = {
   BASE: 'manager/analytics',
@@ -40,4 +41,11 @@ export const ANALYTICS_COURIER_DEFAULT_SORT = {
 
 export const ANALYTICS_VALIDATION_MESSAGES = {
   PERIOD_TOO_LONG: `Период аналитики: не больше ${ANALYTICS_PERIOD.MAX_DAYS} дней`,
+} as const;
+
+export const MANAGER_ANALYTICS_THROTTLE = {
+  KEY: 'manager-analytics',
+  LIMIT: 30,
+  TTL_MS: MS_PER_MINUTE,
+  MESSAGE: 'Слишком много запросов аналитики. Подождите минуту',
 } as const;

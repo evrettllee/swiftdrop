@@ -11,6 +11,10 @@ import { ManagerCouriersController } from './controllers/manager-couriers.contro
 import { ManagerOrderCancellationController } from './controllers/manager-order-cancellation.controller';
 import { ManagerOrdersController } from './controllers/manager-orders.controller';
 import { ManagerZonesController } from './controllers/manager-zones.controller';
+import {
+  ManagerAnalyticsThrottleGuard,
+  ManagerExportThrottleGuard,
+} from './guards/manager-throttle.guards';
 import { ManagerAnalyticsService } from './services/manager-analytics.service';
 import { ManagerOrderCountsService } from './services/manager-order-counts.service';
 import { ManagerOrderDetailsService } from './services/manager-order-details.service';
@@ -60,6 +64,8 @@ import { ManagerZonesService } from './services/manager-zones.service';
     ManagerZonesService,
     ManagerZoneWritesService,
     ManagerAnalyticsService,
+    ManagerExportThrottleGuard,
+    ManagerAnalyticsThrottleGuard,
   ],
 })
 export class ManagerModule {}

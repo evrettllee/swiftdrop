@@ -104,7 +104,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     return this.orderRooms.leave(socket, body);
   }
 
-  // Only a courier sends positions: any other socket is refused without looking at the body.
   @SubscribeMessage(SOCKET_EVENTS.TICKET_JOIN)
   joinTicket(
     @ConnectedSocket() socket: Socket,
@@ -118,6 +117,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     return this.ticketRooms.leave(socket, body);
   }
 
+  // Only a courier sends positions: any other socket is refused without looking at the body.
   @SubscribeMessage(SOCKET_EVENTS.LOCATION_UPDATE)
   updateLocation(
     @ConnectedSocket() socket: Socket,

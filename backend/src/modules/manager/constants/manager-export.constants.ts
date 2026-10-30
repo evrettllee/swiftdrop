@@ -1,5 +1,4 @@
 import { MS_PER_MINUTE } from '@/common/constants/time.constants';
-import { buildThrottleOverride } from '@/common/utils/throttle';
 
 export const MANAGER_EXPORT_ROUTE = 'export';
 
@@ -17,12 +16,11 @@ export const EXPORT_FLAG_TRUE = 'true';
 
 export const MANAGER_EXPORT_ROW_LIMIT = 5000;
 
-const MANAGER_EXPORT_THROTTLE_LIMIT = 10;
-
-export const MANAGER_EXPORT_THROTTLE = buildThrottleOverride(
-  MANAGER_EXPORT_THROTTLE_LIMIT,
-  MS_PER_MINUTE,
-);
+export const MANAGER_EXPORT_THROTTLE = {
+  KEY: 'manager-export',
+  LIMIT: 10,
+  TTL_MS: MS_PER_MINUTE,
+} as const;
 
 export const EXPORT_TOO_LARGE_CODE = 'EXPORT_TOO_LARGE';
 
@@ -30,6 +28,7 @@ export const MANAGER_EXPORT_MESSAGES = {
   FORMAT_INVALID: 'Укажите формат выгрузки: csv или xlsx',
   WITH_PHONES_INVALID: 'Параметр withPhones принимает только true или false',
   TOO_LARGE: `Выгрузка ограничена ${MANAGER_EXPORT_ROW_LIMIT} строками, сузьте фильтр`,
+  TOO_MANY: 'Слишком много выгрузок. Подождите минуту',
 } as const;
 
 export const EXPORT_CONTENT_TYPE: Record<ExportFormat, string> = {
