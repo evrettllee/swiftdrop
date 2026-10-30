@@ -97,3 +97,7 @@ export type StaffCourierEvent = {
   courierId: number;
   kind: StaffCourierEventKind;
 };
+
+export type StaffZoneEvent = {
+  zoneId: number;
+};

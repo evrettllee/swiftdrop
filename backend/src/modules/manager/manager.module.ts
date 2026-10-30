@@ -3,11 +3,13 @@ import { AssignmentModule } from '@/modules/assignment/assignment.module';
 import { CouriersModule } from '@/modules/couriers/couriers.module';
 import { DeliveriesModule } from '@/modules/deliveries/deliveries.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
+import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { TrackingModule } from '@/modules/tracking/tracking.module';
 import { ManagerOrderAssignmentController } from './controllers/manager-order-assignment.controller';
 import { ManagerCouriersController } from './controllers/manager-couriers.controller';
 import { ManagerOrderCancellationController } from './controllers/manager-order-cancellation.controller';
 import { ManagerOrdersController } from './controllers/manager-orders.controller';
+import { ManagerZonesController } from './controllers/manager-zones.controller';
 import { ManagerOrderCountsService } from './services/manager-order-counts.service';
 import { ManagerOrderDetailsService } from './services/manager-order-details.service';
 import { ManagerCourierCandidatesService } from './services/manager-courier-candidates.service';
@@ -20,14 +22,24 @@ import { ManagerOrderCancellationService } from './services/manager-order-cancel
 import { ManagerOrderReassignmentService } from './services/manager-order-reassignment.service';
 import { ManagerOrdersExportService } from './services/manager-orders-export.service';
 import { ManagerOrdersService } from './services/manager-orders.service';
+import { ManagerZoneWritesService } from './services/manager-zone-writes.service';
+import { ManagerZonesService } from './services/manager-zones.service';
 
 @Module({
-  imports: [DeliveriesModule, AssignmentModule, CouriersModule, TrackingModule, OrdersModule],
+  imports: [
+    DeliveriesModule,
+    AssignmentModule,
+    CouriersModule,
+    TrackingModule,
+    OrdersModule,
+    RealtimeModule,
+  ],
   controllers: [
     ManagerOrdersController,
     ManagerOrderAssignmentController,
     ManagerOrderCancellationController,
     ManagerCouriersController,
+    ManagerZonesController,
   ],
   providers: [
     ManagerOrdersService,
@@ -42,6 +54,8 @@ import { ManagerOrdersService } from './services/manager-orders.service';
     ManagerAssignmentRestartService,
     ManagerOrderCancellationService,
     ManagerCouriersMapService,
+    ManagerZonesService,
+    ManagerZoneWritesService,
   ],
 })
 export class ManagerModule {}

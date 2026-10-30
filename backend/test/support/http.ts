@@ -34,6 +34,13 @@ export function putApi(app: NestExpressApplication, path: string) {
     .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
 
+export function patchApi(app: NestExpressApplication, path: string) {
+  return request(app.getHttpServer())
+    .patch(`/${GLOBAL_PREFIX}/${path}`)
+    .set(CLIENT_IP_HEADER, nextClientIp())
+    .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
+}
+
 // A GET under the API prefix with its own address, the CSRF header is not needed for reads.
 export function getApi(app: NestExpressApplication, path: string) {
   return request(app.getHttpServer())

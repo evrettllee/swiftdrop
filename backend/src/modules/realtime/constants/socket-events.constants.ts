@@ -24,6 +24,7 @@ export const SOCKET_EVENTS = {
   ORDER_COURIER: 'order:courier',
   STAFF_COURIER_LOCATION: 'staff:courier-location',
   STAFF_COURIER: 'staff:courier',
+  STAFF_ZONE: 'staff:zone',
 } as const;
 
 export const STAFF_COURIER_EVENT_KIND = {

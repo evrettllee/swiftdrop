@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { boolean, check, integer, jsonb, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  check,
+  integer,
+  jsonb,
+  pgTable,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { SERVICE_ZONE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { sqlIntegerLiteral } from '../sql-literal';
 import { tariffs } from './tariffs';
@@ -22,6 +31,7 @@ export const serviceZones = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
+    uniqueIndex('service_zones_name_lower_uidx').on(sql`lower(${table.name})`),
     check(
       'service_zones_name_length_check',
       sql`char_length(${table.name}) BETWEEN ${sqlIntegerLiteral(SERVICE_ZONE_FIELD_LENGTH.NAME_MIN)} AND ${sqlIntegerLiteral(SERVICE_ZONE_FIELD_LENGTH.NAME)}`,
