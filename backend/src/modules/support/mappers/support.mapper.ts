@@ -5,6 +5,7 @@ import {
   TICKET_TOPIC_LABELS,
 } from '../constants/support.constants';
 import type {
+  MessageViewer,
   TicketDeliveryAddress,
   TicketDetails,
   TicketDetailsRow,
@@ -67,7 +68,17 @@ export function toTicketDetails(row: TicketDetailsRow): TicketDetails {
   };
 }
 
-export function toTicketMessage(row: TicketMessageRow, authorId: number): TicketMessage {
+export function staffName(firstName: string, lastName: string, viewer: MessageViewer): string {
+  return viewer === 'staff'
+    ? `${firstName} ${[...lastName].slice(0, 1).join('')}.`
+    : `${firstName}, ${STAFF_AUTHOR_SUFFIX}`;
+}
+
+export function toTicketMessage(
+  row: TicketMessageRow,
+  authorId: number,
+  viewer: MessageViewer = 'author',
+): TicketMessage {
   const fromStaff = row.senderId !== authorId;
 
   return {
@@ -76,7 +87,7 @@ export function toTicketMessage(row: TicketMessageRow, authorId: number): Ticket
     createdAt: row.sentAt.toISOString(),
     fromStaff,
     authorName: fromStaff
-      ? `${row.senderFirstName}, ${STAFF_AUTHOR_SUFFIX}`
+      ? staffName(row.senderFirstName, row.senderLastName, viewer)
       : `${row.senderFirstName} ${row.senderLastName}`,
     isRead: row.isRead,
   };

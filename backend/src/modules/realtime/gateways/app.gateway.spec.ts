@@ -8,6 +8,7 @@ import type { OrderRoomsService } from '../services/order-rooms.service';
 import type { RealtimeEventsService } from '../services/realtime-events.service';
 import type { SocketAdmissionService } from '../services/socket-admission.service';
 import type { SocketSessionTimersService } from '../services/socket-session-timers.service';
+import type { TicketRoomsService } from '../services/ticket-rooms.service';
 import type { AppSocketData } from '../types/realtime.types';
 import { AppGateway } from './app.gateway';
 
@@ -35,6 +36,7 @@ describe('AppGateway', () => {
     { schedule: jest.fn(), clear: jest.fn() } as unknown as SocketSessionTimersService,
     {} as CourierLocationEventsService,
     {} as RealtimeEventsService,
+    {} as TicketRoomsService,
   );
 
   async function roomsJoinedBy(role: AppSocketData['role']): Promise<unknown> {

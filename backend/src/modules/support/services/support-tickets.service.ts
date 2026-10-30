@@ -1,8 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq, max, type SQL, sql } from 'drizzle-orm';
+import { and, eq, max, type SQL } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { mapPageItems, paginate, type ListFetch } from '@/common/database/paginate';
-import { SUPPORT_TICKET_STATUS } from '@/common/enums/support-ticket.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { supportTickets } from '@/database/schema';
@@ -11,11 +10,15 @@ import type { ListTicketsDto } from '../dto/support.dto';
 import { toTicketDetails, toTicketListItem } from '../mappers/support.mapper';
 import type { SupportAuthor, TicketDetails, TicketsPage } from '../types/support.types';
 import { TICKETS_SORT } from '../utils/support-sort';
+import { SupportTicketClosingService } from './support-ticket-closing.service';
 import { ownTicket, ticketDetailsRows, ticketListRows } from '../utils/support-ticket-query';
 
 @Injectable()
 export class SupportTicketsService {
-  constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: Database,
+    private readonly closing: SupportTicketClosingService,
+  ) {}
 
   async list(author: SupportAuthor, query: ListTicketsDto): Promise<TicketsPage> {
     const where = and(
@@ -48,20 +51,7 @@ export class SupportTicketsService {
   }
 
   async close(author: SupportAuthor, ticketId: number): Promise<TicketDetails> {
-    await this.db
-      .update(supportTickets)
-      .set({
-        status: SUPPORT_TICKET_STATUS.CLOSED,
-        closedAt: sql`now()`,
-        closedBy: author.userId,
-        awaitingStaff: false,
-      })
-      .where(
-        and(
-          ownTicket(author.userId, ticketId),
-          eq(supportTickets.status, SUPPORT_TICKET_STATUS.OPEN),
-        ),
-      );
+    await this.closing.close(author, ticketId);
 
     return this.get(author, ticketId);
   }

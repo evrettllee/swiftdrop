@@ -30,6 +30,7 @@ import { OrderRoomsService } from '../services/order-rooms.service';
 import { RealtimeEventsService } from '../services/realtime-events.service';
 import { SocketAdmissionService } from '../services/socket-admission.service';
 import { SocketSessionTimersService } from '../services/socket-session-timers.service';
+import { TicketRoomsService } from '../services/ticket-rooms.service';
 import type { AppSocketData, CourierSocketData, OrderJoinAck } from '../types/realtime.types';
 import { closeAfterAnswer } from '../utils/socket-close';
 import { isStaffSocket } from '../utils/socket-data';
@@ -69,6 +70,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     private readonly sessionTimers: SocketSessionTimersService,
     private readonly locationEvents: CourierLocationEventsService,
     private readonly events: RealtimeEventsService,
+    private readonly ticketRooms: TicketRoomsService,
   ) {}
 
   afterInit(namespace: Namespace): void {
@@ -103,6 +105,19 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   // Only a courier sends positions: any other socket is refused without looking at the body.
+  @SubscribeMessage(SOCKET_EVENTS.TICKET_JOIN)
+  joinTicket(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() body: unknown,
+  ): Promise<OrderJoinAck> {
+    return this.ticketRooms.join(socket, body);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.TICKET_LEAVE)
+  leaveTicket(@ConnectedSocket() socket: Socket, @MessageBody() body: unknown): Promise<void> {
+    return this.ticketRooms.leave(socket, body);
+  }
+
   @SubscribeMessage(SOCKET_EVENTS.LOCATION_UPDATE)
   updateLocation(
     @ConnectedSocket() socket: Socket,

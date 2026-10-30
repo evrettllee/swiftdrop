@@ -24,7 +24,8 @@ import {
   TICKET_TOPICS_BY_ROLE,
 } from '../constants/support.constants';
 import type { CreateTicketDto } from '../dto/support.dto';
-import type { SupportAuthor, TicketDetails } from '../types/support.types';
+import type { SupportAuthor, SupportTransaction, TicketDetails } from '../types/support.types';
+import { TICKET_STATE_COLUMNS } from '../utils/support-ticket-query';
 import { SupportMessageWriterService } from './support-message-writer.service';
 import { SupportTicketsService } from './support-tickets.service';
 
@@ -48,14 +49,16 @@ export class SupportTicketCreationService {
       });
     }
 
-    const ticketId = await this.db
-      .transaction((tx) => this.insert(tx, author, dto))
+    const ticketId = await this.writer
+      .run((supportTx) => this.insert(supportTx, author, dto))
       .catch((error: unknown) => this.refuseDuplicate(error, author, dto.orderId));
 
     return this.tickets.get(author, ticketId);
   }
 
-  private async insert(tx: Transaction, author: SupportAuthor, dto: CreateTicketDto) {
+  private async insert(supportTx: SupportTransaction, author: SupportAuthor, dto: CreateTicketDto) {
+    const { tx } = supportTx;
+
     if (dto.orderId !== null && !(await this.canUseOrder(tx, author, dto.orderId))) {
       throw new NotFoundException(SUPPORT_MESSAGES.ORDER_NOT_FOUND);
     }
@@ -68,14 +71,15 @@ export class SupportTicketCreationService {
         topic: dto.topic,
         subject: dto.subject,
       })
-      .returning({ ticketId: supportTickets.ticketId });
+      .returning(TICKET_STATE_COLUMNS);
 
-    await this.writer.write(tx, {
+    await this.writer.write(supportTx, {
       ticketId: ticket.ticketId,
       senderId: author.userId,
       text: dto.message,
       fromStaff: false,
     });
+    this.writer.created(supportTx, ticket);
 
     return ticket.ticketId;
   }

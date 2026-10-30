@@ -46,6 +46,18 @@ export function isOrderRoom(room: string): boolean {
   return room.startsWith(ORDER_ROOM_PREFIX);
 }
 
+const TICKET_ROOM_PREFIX = 'ticket:';
+
+export function ticketRoom(ticketId: number): string {
+  return `${TICKET_ROOM_PREFIX}${ticketId}`;
+}
+
+export function isTicketRoom(room: string): boolean {
+  return room.startsWith(TICKET_ROOM_PREFIX);
+}
+
+export const TICKET_ROOMS_MAX_PER_SOCKET = 5;
+
 export const STAFF_ROOM = 'staff';
 
 // Heartbeat

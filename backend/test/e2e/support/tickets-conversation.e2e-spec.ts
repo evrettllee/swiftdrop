@@ -45,8 +45,8 @@ describe('Support ticket list and conversation (e2e)', () => {
     };
     const [staff] = await db.select().from(users).where(eq(users.email, MANAGER_ACCOUNT.email));
     const writer = app.get(SupportMessageWriterService);
-    await db.transaction((tx) =>
-      writer.write(tx, {
+    await writer.run((supportTx) =>
+      writer.write(supportTx, {
         ticketId: ids.old,
         senderId: staff.userId,
         text: STAFF_REPLY,

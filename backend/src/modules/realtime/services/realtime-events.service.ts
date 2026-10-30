@@ -1,8 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { Namespace } from 'socket.io';
 import { describeError } from '@/common/utils/describe-error';
-import { courierRoom, orderRoom, STAFF_ROOM, userRoom } from '../constants/realtime.constants';
-import type { EmitToOrderOptions } from '../types/realtime.types';
+import {
+  courierRoom,
+  orderRoom,
+  STAFF_ROOM,
+  ticketRoom,
+  userRoom,
+} from '../constants/realtime.constants';
+import type { EmitToOrderOptions, EmitToTicketOptions } from '../types/realtime.types';
 
 @Injectable()
 export class RealtimeEventsService {
@@ -46,6 +52,22 @@ export class RealtimeEventsService {
 
   toStaff(event: string, payload: unknown): void {
     this.run(`${event} to staff`, (namespace) => namespace.to(STAFF_ROOM).emit(event, payload));
+  }
+
+  toTicket(
+    ticketId: number,
+    event: string,
+    payload: unknown,
+    options: EmitToTicketOptions = {},
+  ): void {
+    const excluded = [
+      ...(options.exceptStaff ? [STAFF_ROOM] : []),
+      ...(options.exceptUserId === undefined ? [] : [userRoom(options.exceptUserId)]),
+    ];
+
+    this.run(`${event} to ticket ${ticketId}`, (namespace) =>
+      namespace.to(ticketRoom(ticketId)).except(excluded).emit(event, payload),
+    );
   }
 
   removeCourierFromOrder(orderId: number, courierProfileId: number): void {

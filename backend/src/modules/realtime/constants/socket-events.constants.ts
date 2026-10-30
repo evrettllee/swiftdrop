@@ -25,6 +25,11 @@ export const SOCKET_EVENTS = {
   STAFF_COURIER_LOCATION: 'staff:courier-location',
   STAFF_COURIER: 'staff:courier',
   STAFF_ZONE: 'staff:zone',
+  TICKET_JOIN: 'ticket:join',
+  TICKET_LEAVE: 'ticket:leave',
+  SUPPORT_MESSAGE: 'support:message',
+  SUPPORT_READ: 'support:read',
+  SUPPORT_TICKET: 'support:ticket',
 } as const;
 
 export const STAFF_COURIER_EVENT_KIND = {
@@ -47,4 +52,23 @@ export const STAFF_ORDER_EVENT_KIND_VALUES = [
   STAFF_ORDER_EVENT_KIND.CREATED,
   STAFF_ORDER_EVENT_KIND.STATUS,
   STAFF_ORDER_EVENT_KIND.COURIER,
+] as const;
+
+export const SUPPORT_READ_BY = {
+  AUTHOR: 'author',
+  STAFF: 'staff',
+} as const;
+
+export const SUPPORT_READ_BY_VALUES = [SUPPORT_READ_BY.AUTHOR, SUPPORT_READ_BY.STAFF] as const;
+
+export const SUPPORT_TICKET_EVENT_KIND = {
+  CREATED: 'created',
+  MESSAGE: 'message',
+  CLOSED: 'closed',
+} as const;
+
+export const SUPPORT_TICKET_EVENT_KIND_VALUES = [
+  SUPPORT_TICKET_EVENT_KIND.CREATED,
+  SUPPORT_TICKET_EVENT_KIND.MESSAGE,
+  SUPPORT_TICKET_EVENT_KIND.CLOSED,
 ] as const;

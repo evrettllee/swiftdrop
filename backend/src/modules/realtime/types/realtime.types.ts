@@ -1,4 +1,5 @@
 import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { SupportTicketStatus } from '@/common/enums/support-ticket.enum';
 import type { ROLE } from '@/common/enums/role.enum';
 import type { AuthUser } from '@/modules/auth/types/auth.types';
 import type { CourierLocationSession } from '@/modules/couriers/types/courier-location.types';
@@ -11,6 +12,8 @@ import type {
 import type {
   STAFF_COURIER_EVENT_KIND_VALUES,
   STAFF_ORDER_EVENT_KIND_VALUES,
+  SUPPORT_READ_BY_VALUES,
+  SUPPORT_TICKET_EVENT_KIND_VALUES,
 } from '../constants/socket-events.constants';
 
 // Who opened a socket and until when their access token was valid at that moment.
@@ -100,4 +103,39 @@ export type StaffCourierEvent = {
 
 export type StaffZoneEvent = {
   zoneId: number;
+};
+
+export type EmitToTicketOptions = {
+  exceptStaff?: boolean;
+  exceptUserId?: number;
+};
+
+export type SupportMessagePayload = {
+  id: number;
+  text: string;
+  createdAt: string;
+  fromStaff: boolean;
+  authorName: string;
+  isRead: boolean;
+};
+
+export type SupportMessageEvent = {
+  ticketId: number;
+  message: SupportMessagePayload;
+};
+
+export type SupportReadBy = (typeof SUPPORT_READ_BY_VALUES)[number];
+
+export type SupportReadEvent = {
+  ticketId: number;
+  by: SupportReadBy;
+};
+
+export type SupportTicketEventKind = (typeof SUPPORT_TICKET_EVENT_KIND_VALUES)[number];
+
+export type SupportTicketEvent = {
+  ticketId: number;
+  kind: SupportTicketEventKind;
+  awaitingStaff: boolean;
+  status: SupportTicketStatus;
 };

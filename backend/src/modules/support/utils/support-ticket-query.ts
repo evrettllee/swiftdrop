@@ -3,11 +3,18 @@ import { alias } from 'drizzle-orm/pg-core';
 import type { Database, Transaction } from '@/database/database.module';
 import { addresses, messages, orders, supportTickets } from '@/database/schema';
 
+export const TICKET_STATE_COLUMNS = {
+  ticketId: supportTickets.ticketId,
+  userId: supportTickets.userId,
+  status: supportTickets.status,
+  awaitingStaff: supportTickets.awaitingStaff,
+};
+
 export function staffMessageCondition(): SQL {
   return sql`${messages.senderId} <> ${supportTickets.userId}`;
 }
 
-function lastMessageOf(executor: Database | Transaction) {
+export function lastMessageOf(executor: Database | Transaction) {
   return executor
     .select({ text: messages.content, senderId: messages.senderId, sentAt: messages.sentAt })
     .from(messages)
@@ -24,7 +31,7 @@ const unreadCount = sql<number>`(
     and ${messages.isRead} = false
 )`;
 
-function ticketFields(last: ReturnType<typeof lastMessageOf>) {
+export function ticketFields(last: ReturnType<typeof lastMessageOf>) {
   return {
     ticketId: supportTickets.ticketId,
     userId: supportTickets.userId,

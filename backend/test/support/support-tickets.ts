@@ -3,6 +3,7 @@ import {
   SUPPORT_ROUTES,
   TICKET_ID_ROUTE_PARAM,
 } from '@/modules/support/constants/support.constants';
+import { SUPPORT_STAFF_ROUTES } from '@/modules/support/constants/support-staff.constants';
 import { COOKIE_HEADER } from './auth';
 import { getApi, postApi } from './http';
 
@@ -63,4 +64,60 @@ export function postTicketAction(
   ticketId: number,
 ) {
   return withCookies(postApi(app, ticketPath(route, ticketId)), cookies);
+}
+
+function staffPath(route: string, ticketId?: number): string {
+  const path =
+    ticketId === undefined ? route : route.replace(TICKET_ID_ROUTE_PARAM, String(ticketId));
+
+  return `${SUPPORT_STAFF_ROUTES.BASE}/${path}`;
+}
+
+export function getStaffTickets(
+  app: NestExpressApplication,
+  cookies: string | null,
+  query: Record<string, string | number> = {},
+) {
+  return withCookies(getApi(app, staffPath(SUPPORT_STAFF_ROUTES.TICKETS)).query(query), cookies);
+}
+
+export function getStaffCounts(app: NestExpressApplication, cookies: string | null) {
+  return withCookies(getApi(app, staffPath(SUPPORT_STAFF_ROUTES.COUNTS)), cookies);
+}
+
+export function getStaffTicket(
+  app: NestExpressApplication,
+  cookies: string | null,
+  ticketId: number,
+) {
+  return withCookies(getApi(app, staffPath(SUPPORT_STAFF_ROUTES.TICKET, ticketId)), cookies);
+}
+
+export function getStaffMessages(
+  app: NestExpressApplication,
+  cookies: string | null,
+  ticketId: number,
+) {
+  return withCookies(getApi(app, staffPath(SUPPORT_STAFF_ROUTES.MESSAGES, ticketId)), cookies);
+}
+
+export function postStaffMessage(
+  app: NestExpressApplication,
+  cookies: string | null,
+  ticketId: number,
+  text: string,
+) {
+  return withCookies(
+    postApi(app, staffPath(SUPPORT_STAFF_ROUTES.MESSAGES, ticketId)),
+    cookies,
+  ).send({ text });
+}
+
+export function postStaffAction(
+  app: NestExpressApplication,
+  cookies: string | null,
+  route: typeof SUPPORT_STAFF_ROUTES.READ | typeof SUPPORT_STAFF_ROUTES.CLOSE,
+  ticketId: number,
+) {
+  return withCookies(postApi(app, staffPath(route, ticketId)), cookies);
 }

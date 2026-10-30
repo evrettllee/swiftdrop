@@ -1,46 +1,40 @@
-import {
-  ConflictException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, eq, max, type SQL, sql } from 'drizzle-orm';
-import { ROW_LOCK_NO_KEY_UPDATE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { withLockConflict } from '@/common/database/lock-conflict';
 import { mapPageItems, paginate, type ListFetch } from '@/common/database/paginate';
+import {
+  type AccessibleTicket,
+  findAccessibleTicket,
+  isTicketStaff,
+  type TicketActor,
+} from '@/common/database/ticket-access';
 import { SUPPORT_TICKET_STATUS } from '@/common/enums/support-ticket.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
-import { messages, supportTickets, users } from '@/database/schema';
-import { SUPPORT_ERROR_CODE, SUPPORT_MESSAGES } from '../constants/support.constants';
+import { messages, users } from '@/database/schema';
+import { SUPPORT_MESSAGES } from '../constants/support.constants';
 import type { TicketMessagesDto } from '../dto/support.dto';
 import { toTicketMessage } from '../mappers/support.mapper';
-import type {
-  SupportAuthor,
-  TicketMessage,
-  TicketMessagesPage,
-  TicketReadResult,
-} from '../types/support.types';
+import type { TicketMessage, TicketMessagesPage, TicketReadResult } from '../types/support.types';
+import { readerOf, ticketClosedError, unreadFor, viewerOf } from '../utils/support-message-rules';
 import { TICKET_MESSAGES_SORT } from '../utils/support-sort';
-import { ownTicket, staffMessageCondition } from '../utils/support-ticket-query';
+import { SupportEventsService } from './support-events.service';
 import { SupportMessageWriterService } from './support-message-writer.service';
-
-const UNREAD_FROM_STAFF = and(staffMessageCondition(), eq(messages.isRead, false));
 
 @Injectable()
 export class SupportTicketMessagesService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly writer: SupportMessageWriterService,
+    private readonly events: SupportEventsService,
   ) {}
 
   async list(
-    author: SupportAuthor,
+    actor: TicketActor,
     ticketId: number,
     query: TicketMessagesDto,
   ): Promise<TicketMessagesPage> {
-    await this.findOwn(this.db, author, ticketId);
+    const ticket = await this.findOrFail(this.db, actor, ticketId);
     const page = await paginate(query, {
       whitelist: TICKET_MESSAGES_SORT.whitelist,
       idColumn: messages.messageId,
@@ -51,67 +45,57 @@ export class SupportTicketMessagesService {
       idOf: (row) => row.messageId,
     });
 
-    return mapPageItems(page, (row) => toTicketMessage(row, author.userId));
+    return mapPageItems(page, (row) => toTicketMessage(row, ticket.userId, viewerOf(actor)));
   }
 
-  async send(author: SupportAuthor, ticketId: number, text: string): Promise<TicketMessage> {
-    const written = await withLockConflict(
+  async send(actor: TicketActor, ticketId: number, text: string): Promise<TicketMessage> {
+    const { row, authorId } = await withLockConflict(
       () =>
-        this.db.transaction(async (tx) => {
-          const ticket = await this.findOwn(tx, author, ticketId, true);
+        this.writer.run(async (supportTx) => {
+          const ticket = await this.findOrFail(supportTx.tx, actor, ticketId, true);
 
           if (ticket.status === SUPPORT_TICKET_STATUS.CLOSED) {
-            throw new ConflictException({
-              statusCode: HttpStatus.CONFLICT,
-              code: SUPPORT_ERROR_CODE.TICKET_CLOSED,
-              message: SUPPORT_MESSAGES.TICKET_CLOSED,
-            });
+            throw ticketClosedError();
           }
 
-          return this.writer.write(tx, {
+          const written = await this.writer.write(supportTx, {
             ticketId,
-            senderId: author.userId,
+            senderId: actor.userId,
             text,
-            fromStaff: false,
+            fromStaff: isTicketStaff(actor.role),
           });
+
+          return { row: written, authorId: ticket.userId };
         }),
       SUPPORT_MESSAGES.BUSY,
     );
-    const [row] = await this.rows().where(eq(messages.messageId, written.messageId));
 
-    return toTicketMessage(row, author.userId);
+    return toTicketMessage(row, authorId, viewerOf(actor));
   }
 
-  async markRead(author: SupportAuthor, ticketId: number): Promise<TicketReadResult> {
-    await this.findOwn(this.db, author, ticketId);
-    const inTicket = sql`${messages.ticketId} = ${ticketId} and ${supportTickets.ticketId} = ${ticketId}`;
+  async markRead(actor: TicketActor, ticketId: number): Promise<TicketReadResult> {
+    const ticket = await this.findOrFail(this.db, actor, ticketId);
     const marked = await this.db
       .update(messages)
       .set({ isRead: true })
-      .from(supportTickets)
-      .where(and(inTicket, UNREAD_FROM_STAFF, sql`${messages.sentAt} <= now()`))
+      .where(and(unreadFor(actor, ticket), sql`${messages.sentAt} <= now()`))
       .returning({ messageId: messages.messageId });
-    const [unread] = await this.db
-      .select({ total: sql<number>`count(*)::int` })
-      .from(messages)
-      .innerJoin(supportTickets, eq(supportTickets.ticketId, messages.ticketId))
-      .where(and(eq(messages.ticketId, ticketId), UNREAD_FROM_STAFF));
+    const unreadCount = await this.db.$count(messages, unreadFor(actor, ticket));
 
-    return { readCount: marked.length, unreadCount: unread?.total ?? 0 };
+    if (marked.length > 0) {
+      this.events.read(ticketId, readerOf(actor));
+    }
+
+    return { readCount: marked.length, unreadCount };
   }
 
-  private async findOwn(
+  private async findOrFail(
     executor: Database | Transaction,
-    author: SupportAuthor,
+    actor: TicketActor,
     ticketId: number,
     lock = false,
-  ) {
-    const query = executor
-      .select({ status: supportTickets.status })
-      .from(supportTickets)
-      .where(ownTicket(author.userId, ticketId))
-      .limit(SINGLE_ROW_LIMIT);
-    const [ticket] = await (lock ? query.for(ROW_LOCK_NO_KEY_UPDATE) : query);
+  ): Promise<AccessibleTicket> {
+    const ticket = await findAccessibleTicket(executor, ticketId, actor, { lock });
 
     if (!ticket) {
       throw new NotFoundException(SUPPORT_MESSAGES.TICKET_NOT_FOUND);
@@ -120,7 +104,7 @@ export class SupportTicketMessagesService {
     return ticket;
   }
 
-  private rows(sortValue: SQL<string> = sql<string>`''`) {
+  private fetch({ where, orderBy, limit, offset, sortValue }: ListFetch) {
     return this.db
       .select({
         messageId: messages.messageId,
@@ -133,11 +117,7 @@ export class SupportTicketMessagesService {
         sortValue,
       })
       .from(messages)
-      .innerJoin(users, eq(users.userId, messages.senderId));
-  }
-
-  private fetch({ where, orderBy, limit, offset, sortValue }: ListFetch) {
-    return this.rows(sortValue)
+      .innerJoin(users, eq(users.userId, messages.senderId))
       .where(where)
       .orderBy(...orderBy)
       .limit(limit)

@@ -9,6 +9,7 @@ import { SocketAdmissionService } from './services/socket-admission.service';
 import { SocketAuthService } from './services/socket-auth.service';
 import { SocketSessionTimersService } from './services/socket-session-timers.service';
 import { StaffCourierEventsService } from './services/staff-courier-events.service';
+import { TicketRoomsService } from './services/ticket-rooms.service';
 
 // The secret is passed on every check, so the JWT module needs no options of its own here.
 @Module({
@@ -18,6 +19,7 @@ import { StaffCourierEventsService } from './services/staff-courier-events.servi
     SocketSessionTimersService,
     SocketAdmissionService,
     OrderRoomsService,
+    TicketRoomsService,
     RealtimeEventsService,
     StaffCourierEventsService,
     AppGateway,

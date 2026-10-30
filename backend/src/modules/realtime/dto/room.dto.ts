@@ -8,3 +8,7 @@ export const orderRoomBodySchema = z.strictObject({
 });
 
 export type OrderRoomBody = z.infer<typeof orderRoomBodySchema>;
+
+export const ticketRoomBodySchema = z.strictObject({
+  ticketId: z.number().int().positive().max(DB_INTEGER_MAX),
+});

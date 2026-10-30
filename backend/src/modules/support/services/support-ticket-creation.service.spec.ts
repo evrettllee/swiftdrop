@@ -4,7 +4,7 @@ import { TICKET_TOPIC_VALUES } from '@/common/enums/support-ticket.enum';
 import type { Database, Transaction } from '@/database/database.module';
 import { queueDatabase } from '@test/support/queue-database';
 import type { CreateTicketDto } from '../dto/support.dto';
-import type { SupportAuthor } from '../types/support.types';
+import type { SupportAuthor, SupportTransaction } from '../types/support.types';
 import type { SupportMessageWriterService } from './support-message-writer.service';
 import { isTopicAllowed, SupportTicketCreationService } from './support-ticket-creation.service';
 import type { SupportTicketsService } from './support-tickets.service';
@@ -34,14 +34,17 @@ function setUp(results: unknown[][], failure?: Error, after: unknown[][] = []) {
     select: (...args: unknown[]) => (outside.db.select as (...a: unknown[]) => unknown)(...args),
   } as unknown as Database;
   const write = jest.fn().mockResolvedValue({ messageId: 1, sentAt: new Date() });
+  const created = jest.fn();
+  const run = <T>(work: (supportTx: SupportTransaction) => Promise<T>) =>
+    db.transaction((tx) => work({ tx, pending: [] }));
   const get = jest.fn().mockResolvedValue({ id: 3 });
   const service = new SupportTicketCreationService(
     db,
-    { write } as unknown as SupportMessageWriterService,
+    { write, created, run } as unknown as SupportMessageWriterService,
     { get } as unknown as SupportTicketsService,
   );
 
-  return { service, fake, write, get };
+  return { service, fake, write, get, created };
 }
 
 const failureOf = async (promise: Promise<unknown>) =>
@@ -59,11 +62,12 @@ describe('isTopicAllowed', () => {
 
 describe('SupportTicketCreationService', () => {
   it('should save the ticket and its first message from the author in one transaction', async () => {
-    const { service, write, get, fake } = setUp([[{ orderId: 12 }], [{ ticketId: 3 }]]);
+    const { service, write, get, fake, created } = setUp([[{ orderId: 12 }], [{ ticketId: 3 }]]);
 
     await service.create(CLIENT, DTO);
 
-    expect(write.mock.calls[0][0]).toBe(fake.tx);
+    expect(write.mock.calls[0][0].tx).toBe(fake.tx);
+    expect(created).toHaveBeenCalledWith(write.mock.calls[0][0], { ticketId: 3 });
     expect(write.mock.calls[0][1]).toEqual({
       ticketId: 3,
       senderId: 7,
