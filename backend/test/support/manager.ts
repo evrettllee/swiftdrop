@@ -10,13 +10,12 @@ import {
   CSV_SEPARATOR,
   MANAGER_EXPORT_ROUTE,
 } from '@/modules/manager/constants/manager-export.constants';
-import { MANAGER_ASSIGNMENT_ROUTES } from '@/modules/manager/constants/manager-assignment.constants';
 import { MANAGER_ORDERS_ROUTES } from '@/modules/manager/constants/manager-orders.constants';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import type { StaffOrderEvent, StaffOrderEventKind } from '@/modules/realtime/types/realtime.types';
 import { COOKIE_HEADER } from './auth';
-import { getApi, postApi } from './http';
+import { getApi } from './http';
 import { createUserWithRole, MANAGER_ACCOUNT } from './users';
 
 export type ManagerListBody = {
@@ -52,7 +51,7 @@ export function idsOf(body: ManagerListBody): number[] {
   return body.items.map((item) => item.id);
 }
 
-function managerOrderPath(route: string, orderId: number): string {
+export function managerOrderPath(route: string, orderId: number): string {
   return `${MANAGER_ORDERS_ROUTES.BASE}/${route.replace(ORDER_ID_ROUTE_PARAM, String(orderId))}`;
 }
 
@@ -131,34 +130,4 @@ export function csvLines(body: Buffer): string[][] {
     .split(CSV_LINE_END)
     .filter((line) => line.length > 0)
     .map((line) => line.split(CSV_SEPARATOR));
-}
-
-export function getCandidates(
-  app: NestExpressApplication,
-  cookies: string | null,
-  orderId: number,
-  query: Record<string, string> = {},
-) {
-  const candidatesRequest = getApi(
-    app,
-    managerOrderPath(MANAGER_ASSIGNMENT_ROUTES.CANDIDATES, orderId),
-  ).query(query);
-
-  return cookies === null ? candidatesRequest : candidatesRequest.set(COOKIE_HEADER, cookies);
-}
-
-export function postAssign(
-  app: NestExpressApplication,
-  cookies: string | null,
-  orderId: number,
-  courierId: number,
-) {
-  const assignRequest = postApi(
-    app,
-    managerOrderPath(MANAGER_ASSIGNMENT_ROUTES.ASSIGN, orderId),
-  ).send({
-    courierId,
-  });
-
-  return cookies === null ? assignRequest : assignRequest.set(COOKIE_HEADER, cookies);
 }

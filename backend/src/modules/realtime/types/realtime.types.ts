@@ -71,3 +71,12 @@ export type StaffOrderEvent = {
 export type OrderAssignedEvent = {
   orderId: number;
 };
+
+export type OrderUnassignedEvent = {
+  orderId: number;
+};
+
+export type OrderCourierEvent = {
+  orderId: number;
+  courierId: number | null;
+};

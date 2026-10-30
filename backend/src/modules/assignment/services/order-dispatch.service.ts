@@ -39,7 +39,7 @@ export class OrderDispatchService {
 
     if (!order) {
       this.logger.warn(`Order ${orderId} to dispatch is missing`);
-    } else if ((await this.countOffers(orderId)) >= MAX_OFFERS_PER_ORDER) {
+    } else if ((await this.countOffers(order)) >= MAX_OFFERS_PER_ORDER) {
       await this.moveToManual(orderId, `${MAX_OFFERS_PER_ORDER} offers were not accepted`);
     } else {
       await this.offerOrWait(order, now);
@@ -71,12 +71,16 @@ export class OrderDispatchService {
     }
   }
 
-  private async countOffers(orderId: number): Promise<number> {
+  private async countOffers({ orderId, round }: DispatchOrder): Promise<number> {
     const [row] = await this.db
       .select({ total: count() })
       .from(orderOffers)
       .where(
-        and(eq(orderOffers.orderId, orderId), ne(orderOffers.status, ORDER_OFFER_STATUS.REVOKED)),
+        and(
+          eq(orderOffers.orderId, orderId),
+          eq(orderOffers.round, round),
+          ne(orderOffers.status, ORDER_OFFER_STATUS.REVOKED),
+        ),
       );
 
     return row?.total ?? 0;

@@ -20,6 +20,8 @@ export const SOCKET_EVENTS = {
   MESSAGE_READ: 'message:read',
   STAFF_ORDER: 'staff:order',
   ORDER_ASSIGNED: 'order:assigned',
+  ORDER_UNASSIGNED: 'order:unassigned',
+  ORDER_COURIER: 'order:courier',
 } as const;
 
 export const STAFF_ORDER_EVENT_KIND = {

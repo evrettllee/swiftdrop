@@ -8,6 +8,7 @@ export type DispatchOrder = {
   pickup: GeoPoint;
   delivery: GeoPoint;
   parcel: PackageSpec;
+  round: number;
 };
 
 // A courier who may get the order, with the straight-line distance to the pickup point.

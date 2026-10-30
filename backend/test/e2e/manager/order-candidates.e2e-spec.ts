@@ -16,7 +16,8 @@ import {
   SECOND_COURIER_ACCOUNT,
 } from '@test/support/couriers';
 import { MINSK_PICKUP } from '@test/support/fixtures';
-import { createManager, getCandidates, postAssign } from '@test/support/manager';
+import { createManager } from '@test/support/manager';
+import { getCandidates, postAssign } from '@test/support/manager-assignment';
 import { type Cookies, placeOrders, setOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
 import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';

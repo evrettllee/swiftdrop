@@ -15,6 +15,7 @@ const ORDER = {
   pickup: { latitude: 53.9, longitude: 27.55 },
   delivery: { latitude: 53.91, longitude: 27.6 },
   parcel: { weightKg: 2.5, lengthCm: 30, widthCm: 20, heightCm: 10, isFragile: false },
+  round: 3,
 };
 
 function setUp(offersCounted: number) {
@@ -35,7 +36,7 @@ function setUp(offersCounted: number) {
 }
 
 describe('OrderDispatchService', () => {
-  it('should not count offers revoked by a manager as attempts of the order', async () => {
+  it('should count only the offers of the current round that were not revoked', async () => {
     const { service, fake } = setUp(0);
 
     await service.dispatch(42, new Date());
@@ -43,8 +44,10 @@ describe('OrderDispatchService', () => {
     const countWhere = fake.calls.find((call) => call.method === 'where')?.args[0] as SQL;
     const { sql, params } = dialect.sqlToQuery(countWhere);
 
-    expect(sql).toBe('("order_offers"."order_id" = $1 and "order_offers"."status" <> $2)');
-    expect(params).toEqual([42, 'revoked']);
+    expect(sql).toBe(
+      '("order_offers"."order_id" = $1 and "order_offers"."round" = $2 and "order_offers"."status" <> $3)',
+    );
+    expect(params).toEqual([42, 3, 'revoked']);
   });
 
   it('should keep searching while fewer than five offers count', async () => {

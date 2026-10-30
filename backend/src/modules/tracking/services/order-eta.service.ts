@@ -53,6 +53,13 @@ export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
     }
   }
 
+  onCourierChanges(changes: readonly OrderStatusChange[]): void {
+    for (const { orderId } of changes) {
+      this.store.delete(orderId);
+      void this.refresh(orderId, true);
+    }
+  }
+
   // The stored line of the courier for the map, or null. An order not estimated yet (a restarted
   // server) gets an estimate in the background; its line comes with order:eta.
   courierLeg(orderId: number): CourierLeg | null {

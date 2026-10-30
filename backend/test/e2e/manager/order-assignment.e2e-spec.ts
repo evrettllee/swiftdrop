@@ -14,12 +14,8 @@ import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '@test/support/couriers';
 import { MINSK_PICKUP } from '@test/support/fixtures';
-import {
-  createManager,
-  getManagerOrder,
-  postAssign,
-  waitForStaffOrder,
-} from '@test/support/manager';
+import { createManager, getManagerOrder, waitForStaffOrder } from '@test/support/manager';
+import { postAssign } from '@test/support/manager-assignment';
 import { placeOrders, setOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
 import { connectAppSocket, listenTestApp, waitForEvent } from '@test/support/sockets';

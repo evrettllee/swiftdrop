@@ -131,7 +131,7 @@ describe('Manager order details (e2e)', () => {
       actions: {
         canAssign: false,
         canReassign: true,
-        canRestartAutoAssign: false,
+        canRestartAutoAssign: true,
         canCancel: true,
       },
     });

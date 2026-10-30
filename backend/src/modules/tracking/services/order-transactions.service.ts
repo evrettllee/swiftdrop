@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  type OrderCourierChanged,
   type OrderStatusChange,
   type OrderTransaction,
   runOrderTransaction,
@@ -20,12 +21,19 @@ export class OrderTransactionsService {
   ) {}
 
   run<T>(work: (orderTx: OrderTransaction) => Promise<T>): Promise<T> {
-    return runOrderTransaction(this.db, work, (changes) => this.publish(changes));
+    return runOrderTransaction(this.db, work, (changes, courierChanges) =>
+      this.publish(changes, courierChanges),
+    );
   }
 
   // The status first: the client sees the new stage before its estimate.
-  private publish(changes: readonly OrderStatusChange[]): void {
+  private publish(
+    changes: readonly OrderStatusChange[],
+    courierChanges: readonly OrderCourierChanged[],
+  ): void {
     this.events.publishStatusChanges(changes);
+    this.events.publishCourierChanges(courierChanges);
     this.eta.onStatusChanges(changes);
+    this.eta.onCourierChanges(courierChanges);
   }
 }

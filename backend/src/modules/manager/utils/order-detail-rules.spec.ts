@@ -52,7 +52,7 @@ describe('toActions', () => {
     pending: [false, false, false, true],
     confirmed: [true, false, false, true],
     awaiting_manual_assignment: [true, false, true, true],
-    courier_assigned: [false, true, false, true],
+    courier_assigned: [false, true, true, true],
     picked_up: [false, false, false, false],
     in_transit: [false, false, false, false],
     delivered: [false, false, false, false],

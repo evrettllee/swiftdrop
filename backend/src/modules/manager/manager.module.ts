@@ -9,7 +9,10 @@ import { ManagerOrderCountsService } from './services/manager-order-counts.servi
 import { ManagerOrderDetailsService } from './services/manager-order-details.service';
 import { ManagerCourierCandidatesService } from './services/manager-courier-candidates.service';
 import { ManagerExportLimits } from './services/manager-export-limits';
+import { ManagerAssignmentRestartService } from './services/manager-assignment-restart.service';
+import { ManagerCourierLockService } from './services/manager-courier-lock.service';
 import { ManagerOrderAssignmentService } from './services/manager-order-assignment.service';
+import { ManagerOrderReassignmentService } from './services/manager-order-reassignment.service';
 import { ManagerOrdersExportService } from './services/manager-orders-export.service';
 import { ManagerOrdersService } from './services/manager-orders.service';
 
@@ -23,7 +26,10 @@ import { ManagerOrdersService } from './services/manager-orders.service';
     ManagerOrdersExportService,
     ManagerExportLimits,
     ManagerCourierCandidatesService,
+    ManagerCourierLockService,
     ManagerOrderAssignmentService,
+    ManagerOrderReassignmentService,
+    ManagerAssignmentRestartService,
   ],
 })
 export class ManagerModule {}

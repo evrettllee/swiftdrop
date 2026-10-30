@@ -3,6 +3,8 @@ import { eq } from 'drizzle-orm';
 import {
   ORDER_NOT_FOUND_MESSAGE,
   STAFF_ASSIGNABLE_STATUSES,
+  STAFF_AUTO_ASSIGN_RESTARTABLE_STATUSES,
+  STAFF_REASSIGNABLE_STATUSES,
 } from '@/common/constants/orders.constants';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { parcelColumns } from '@/common/database/parcel-columns';
@@ -12,13 +14,40 @@ import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import type { Database, Transaction } from '@/database/database.module';
 import { addresses, orders, packages } from '@/database/schema';
 import {
+  COURIER_CHANGED_CODE,
   COURIER_NOT_AVAILABLE_CODE,
   MANAGER_ASSIGNMENT_MESSAGES,
   ORDER_NOT_ASSIGNABLE_CODE,
+  ORDER_NOT_REASSIGNABLE_CODE,
+  ORDER_NOT_RESTARTABLE_CODE,
   type UnsuitableReason,
 } from '../constants/manager-assignment.constants';
 
 const ROW_LOCK_UPDATE = 'update';
+
+export type StaffOrderRule = {
+  statuses: readonly OrderStatus[];
+  code: string;
+  message: string;
+};
+
+export const ASSIGN_RULE: StaffOrderRule = {
+  statuses: STAFF_ASSIGNABLE_STATUSES,
+  code: ORDER_NOT_ASSIGNABLE_CODE,
+  message: MANAGER_ASSIGNMENT_MESSAGES.ORDER_NOT_ASSIGNABLE,
+};
+
+export const REASSIGN_RULE: StaffOrderRule = {
+  statuses: STAFF_REASSIGNABLE_STATUSES,
+  code: ORDER_NOT_REASSIGNABLE_CODE,
+  message: MANAGER_ASSIGNMENT_MESSAGES.ORDER_NOT_REASSIGNABLE,
+};
+
+export const RESTART_RULE: StaffOrderRule = {
+  statuses: STAFF_AUTO_ASSIGN_RESTARTABLE_STATUSES,
+  code: ORDER_NOT_RESTARTABLE_CODE,
+  message: MANAGER_ASSIGNMENT_MESSAGES.ORDER_NOT_RESTARTABLE,
+};
 
 export type AssignableOrder = {
   orderId: number;
@@ -26,21 +55,28 @@ export type AssignableOrder = {
   parcel: PackageSpec;
 };
 
-const assignableStatuses = new Set<OrderStatus>(STAFF_ASSIGNABLE_STATUSES);
+export type StaffOrder = AssignableOrder & {
+  status: OrderStatus;
+  courierId: number | null;
+  round: number;
+};
 
-export function isAssignable(status: OrderStatus): boolean {
-  return assignableStatuses.has(status);
+export function conflict(code: string, message: string, extra: object = {}): ConflictException {
+  return new ConflictException({ statusCode: HttpStatus.CONFLICT, code, message, ...extra });
 }
 
-export async function loadAssignableOrder(
+export async function loadStaffOrder(
   executor: Database | Transaction,
   orderId: number,
+  rule: StaffOrderRule,
   lock: boolean,
-): Promise<AssignableOrder> {
+): Promise<StaffOrder> {
   const query = executor
     .select({
       orderId: orders.orderId,
       status: orders.status,
+      courierId: orders.courierId,
+      round: orders.assignmentRound,
       pickup: { latitude: addresses.latitude, longitude: addresses.longitude },
       parcel: parcelColumns(),
     })
@@ -55,22 +91,33 @@ export async function loadAssignableOrder(
     throw new NotFoundException(ORDER_NOT_FOUND_MESSAGE);
   }
 
-  if (!isAssignable(order.status)) {
-    throw new ConflictException({
-      statusCode: HttpStatus.CONFLICT,
-      code: ORDER_NOT_ASSIGNABLE_CODE,
-      message: MANAGER_ASSIGNMENT_MESSAGES.ORDER_NOT_ASSIGNABLE,
-    });
+  if (!rule.statuses.includes(order.status)) {
+    throw conflict(rule.code, rule.message);
   }
 
-  return { orderId: order.orderId, pickup: order.pickup, parcel: order.parcel };
+  return order;
+}
+
+export async function loadAssignableOrder(
+  executor: Database | Transaction,
+  orderId: number,
+  lock: boolean,
+): Promise<AssignableOrder> {
+  const { pickup, parcel } = await loadStaffOrder(executor, orderId, ASSIGN_RULE, lock);
+
+  return { orderId, pickup, parcel };
+}
+
+export function ensureExpectedCourier(order: StaffOrder, expectedCourierId: number | null): void {
+  if (order.courierId !== expectedCourierId) {
+    throw conflict(COURIER_CHANGED_CODE, MANAGER_ASSIGNMENT_MESSAGES.COURIER_CHANGED, {
+      currentCourierId: order.courierId,
+    });
+  }
 }
 
 export function courierNotAvailable(reason: UnsuitableReason): ConflictException {
-  return new ConflictException({
-    statusCode: HttpStatus.CONFLICT,
-    code: COURIER_NOT_AVAILABLE_CODE,
-    message: MANAGER_ASSIGNMENT_MESSAGES.COURIER_NOT_AVAILABLE,
+  return conflict(COURIER_NOT_AVAILABLE_CODE, MANAGER_ASSIGNMENT_MESSAGES.COURIER_NOT_AVAILABLE, {
     reason,
   });
 }

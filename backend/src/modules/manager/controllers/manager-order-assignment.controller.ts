@@ -12,10 +12,20 @@ import {
   assignCourierSchema,
   type CourierCandidatesDto,
   courierCandidatesSchema,
+  type ReassignCourierDto,
+  reassignCourierSchema,
+  type RestartAssignmentDto,
+  restartAssignmentSchema,
 } from '../dto/manager-assignment.dto';
+import { ManagerAssignmentRestartService } from '../services/manager-assignment-restart.service';
 import { ManagerCourierCandidatesService } from '../services/manager-courier-candidates.service';
 import { ManagerOrderAssignmentService } from '../services/manager-order-assignment.service';
-import type { AssignedOrder, CourierCandidates } from '../types/manager-assignment.types';
+import { ManagerOrderReassignmentService } from '../services/manager-order-reassignment.service';
+import type {
+  AssignedOrder,
+  CourierCandidates,
+  RestartedOrder,
+} from '../types/manager-assignment.types';
 
 @Controller(MANAGER_ORDERS_ROUTES.BASE)
 @Roles(ROLE.MANAGER, ROLE.ADMIN)
@@ -23,6 +33,8 @@ export class ManagerOrderAssignmentController {
   constructor(
     private readonly candidates: ManagerCourierCandidatesService,
     private readonly assignment: ManagerOrderAssignmentService,
+    private readonly reassignment: ManagerOrderReassignmentService,
+    private readonly restart: ManagerAssignmentRestartService,
   ) {}
 
   @Get(MANAGER_ASSIGNMENT_ROUTES.CANDIDATES)
@@ -41,5 +53,37 @@ export class ManagerOrderAssignmentController {
     @Body(new ZodValidationPipe(assignCourierSchema)) body: AssignCourierDto,
   ): Promise<AssignedOrder> {
     return this.assignment.assign(user.userId, params.orderId, body.courierId);
+  }
+
+  @Post(MANAGER_ASSIGNMENT_ROUTES.REASSIGN)
+  @HttpCode(HttpStatus.OK)
+  reassign(
+    @CurrentUser() user: AuthUser,
+    @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
+    @Body(new ZodValidationPipe(reassignCourierSchema)) body: ReassignCourierDto,
+  ): Promise<AssignedOrder> {
+    return this.reassignment.reassign({
+      managerUserId: user.userId,
+      orderId: params.orderId,
+      courierId: body.courierId,
+      expectedCourierId: body.expectedCourierId,
+      reason: body.reason,
+      now: new Date(),
+    });
+  }
+
+  @Post(MANAGER_ASSIGNMENT_ROUTES.RESTART_ASSIGNMENT)
+  @HttpCode(HttpStatus.OK)
+  restartAssignment(
+    @CurrentUser() user: AuthUser,
+    @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
+    @Body(new ZodValidationPipe(restartAssignmentSchema)) body: RestartAssignmentDto,
+  ): Promise<RestartedOrder> {
+    return this.restart.restart({
+      managerUserId: user.userId,
+      orderId: params.orderId,
+      expectedCourierId: body.expectedCourierId,
+      reason: body.reason,
+    });
   }
 }

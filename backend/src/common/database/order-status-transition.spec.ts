@@ -54,9 +54,10 @@ describe('runOrderTransaction', () => {
     );
 
     expect(calls).toEqual(['update confirmed', 'commit', 'publish 1']);
-    expect(publish).toHaveBeenCalledWith([
-      { orderId: 1, status: ORDER_STATUS.CONFIRMED, estimatedDeliveryAt: ETA },
-    ]);
+    expect(publish).toHaveBeenCalledWith(
+      [{ orderId: 1, status: ORDER_STATUS.CONFIRMED, estimatedDeliveryAt: ETA }],
+      [],
+    );
   });
 
   it('should publish nothing when the transaction rolls back', async () => {
@@ -108,7 +109,7 @@ describe('runOrderTransaction', () => {
 
     await runOrderTransaction(fakeDatabase([]), () => Promise.resolve(), publish);
 
-    expect(publish).toHaveBeenCalledWith([]);
+    expect(publish).toHaveBeenCalledWith([], []);
   });
 });
 
@@ -130,7 +131,7 @@ describe('transitionOrderStatus finish time', () => {
       insert: () => ({ values: () => Promise.resolve() }),
     } as unknown as Transaction;
 
-    return { tx, statusChanges: [] };
+    return { tx, statusChanges: [], courierChanges: [] };
   }
 
   it.each([ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED])(

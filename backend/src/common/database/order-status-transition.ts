@@ -6,9 +6,24 @@ import type { OrderStatus } from '@/common/enums/order-status.enum';
 
 const finishedStatuses = new Set<OrderStatus>(ORDER_FINISHED_STATUSES);
 
+const changeColumns = {
+  orderId: orders.orderId,
+  status: orders.status,
+  estimatedDeliveryAt: orders.estimatedDeliveryAt,
+  statusChangedAt: orders.statusChangedAt,
+  courierId: orders.courierId,
+};
+
+function statusIn(from: OrderStatus | readonly OrderStatus[]) {
+  return typeof from === 'string' ? eq(orders.status, from) : inArray(orders.status, [...from]);
+}
+
 // Columns that change together with the status, for example the courier who took the order.
 export type OrderTransitionChanges = Partial<
-  Pick<typeof orders.$inferInsert, 'courierId' | 'otpCode' | 'otpFailedAttempts' | 'otpLockedUntil'>
+  Pick<
+    typeof orders.$inferInsert,
+    'courierId' | 'otpCode' | 'otpFailedAttempts' | 'otpLockedUntil' | 'assignmentRound'
+  >
 >;
 
 export type OrderStatusTransition = {
@@ -23,6 +38,7 @@ export type OrderStatusTransition = {
   // Limits the change to an order of this courier.
   courierId?: number;
   changes?: OrderTransitionChanges;
+  comment?: string | null;
 };
 
 // A status an order got, as it is right after the change.
@@ -39,6 +55,7 @@ export type OrderStatusChange = {
 export type OrderTransaction = {
   readonly tx: Transaction;
   readonly statusChanges: OrderStatusChange[];
+  readonly courierChanges: OrderCourierChanged[];
 };
 
 // Runs the work in a transaction and hands its status changes, in the order they were made, to
@@ -47,12 +64,16 @@ export type OrderTransaction = {
 export async function runOrderTransaction<T>(
   db: Database,
   work: (orderTx: OrderTransaction) => Promise<T>,
-  publish: (changes: readonly OrderStatusChange[]) => void,
+  publish: (
+    changes: readonly OrderStatusChange[],
+    courierChanges: readonly OrderCourierChanged[],
+  ) => void,
 ): Promise<T> {
   const statusChanges: OrderStatusChange[] = [];
-  const result = await db.transaction((tx) => work({ tx, statusChanges }));
+  const courierChanges: OrderCourierChanged[] = [];
+  const result = await db.transaction((tx) => work({ tx, statusChanges, courierChanges }));
 
-  publish(statusChanges);
+  publish(statusChanges, courierChanges);
 
   return result;
 }
@@ -65,7 +86,7 @@ export async function transitionOrderStatus(
   orderTx: OrderTransaction,
   transition: OrderStatusTransition,
 ): Promise<{ orderId: number } | undefined> {
-  const { orderId, from, to, changedBy, clientId, courierId, changes } = transition;
+  const { orderId, from, to, changedBy, clientId, courierId, changes, comment } = transition;
   const finishedAt = finishedStatuses.has(to) ? sql`now()` : undefined;
   const [updated] = await orderTx.tx
     .update(orders)
@@ -75,20 +96,46 @@ export async function transitionOrderStatus(
         eq(orders.orderId, orderId),
         clientId === undefined ? undefined : eq(orders.clientId, clientId),
         courierId === undefined ? undefined : eq(orders.courierId, courierId),
-        typeof from === 'string' ? eq(orders.status, from) : inArray(orders.status, [...from]),
+        statusIn(from),
       ),
     )
-    .returning({
-      orderId: orders.orderId,
-      status: orders.status,
-      estimatedDeliveryAt: orders.estimatedDeliveryAt,
-      statusChangedAt: orders.statusChangedAt,
-      courierId: orders.courierId,
-    });
+    .returning(changeColumns);
 
   if (updated) {
-    await orderTx.tx.insert(orderStatusHistory).values({ orderId, status: to, changedBy });
+    await orderTx.tx.insert(orderStatusHistory).values({ orderId, status: to, changedBy, comment });
     orderTx.statusChanges.push(updated);
+  }
+
+  return updated ? { orderId: updated.orderId } : undefined;
+}
+
+export type OrderCourierChanged = OrderStatusChange & { previousCourierId: number | null };
+
+export type OrderCourierChange = {
+  orderId: number;
+  from: readonly OrderStatus[];
+  courierId: number;
+  previousCourierId: number | null;
+  changedBy: number;
+  comment: string | null;
+};
+
+export async function changeOrderCourier(
+  orderTx: OrderTransaction,
+  change: OrderCourierChange,
+): Promise<{ orderId: number } | undefined> {
+  const { orderId, from, courierId, previousCourierId, changedBy, comment } = change;
+  const [updated] = await orderTx.tx
+    .update(orders)
+    .set({ courierId })
+    .where(and(eq(orders.orderId, orderId), statusIn(from)))
+    .returning(changeColumns);
+
+  if (updated) {
+    await orderTx.tx
+      .insert(orderStatusHistory)
+      .values({ orderId, status: updated.status, changedBy, comment });
+    orderTx.courierChanges.push({ ...updated, previousCourierId });
   }
 
   return updated ? { orderId: updated.orderId } : undefined;

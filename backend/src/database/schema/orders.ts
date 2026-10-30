@@ -63,6 +63,7 @@ export const orders = pgTable(
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     finishedAt: timestamp({ withTimezone: true }),
     statusChangedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    assignmentRound: smallint().notNull().default(1),
   },
   (table) => [
     index('orders_courier_id_idx').on(table.courierId),
@@ -93,6 +94,7 @@ export const orders = pgTable(
     check('orders_otp_code_check', sql`${table.otpCode} ~ '^[0-9]{4}$'`),
     check('orders_otp_failed_attempts_check', sql`${table.otpFailedAttempts} >= 0`),
     check('orders_estimated_minutes_check', sql`${table.estimatedMinutes} >= 0`),
+    check('orders_assignment_round_check', sql`${table.assignmentRound} >= 1`),
     check(
       'orders_finished_at_check',
       sql`${table.status} NOT IN (${sqlLiteralList(ORDER_FINISHED_STATUSES)}) OR ${table.finishedAt} IS NOT NULL`,

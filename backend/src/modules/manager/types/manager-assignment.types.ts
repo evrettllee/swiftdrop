@@ -1,3 +1,4 @@
+import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 import type { UnsuitableReason } from '../constants/manager-assignment.constants';
 
@@ -41,3 +42,10 @@ export type AssignedOrder = {
   orderId: number;
   courierId: number;
 };
+
+export type RestartedOrder = {
+  orderId: number;
+  status: OrderStatus;
+};
+
+export type RevokedOffer = { offerId: number; courierId: number };

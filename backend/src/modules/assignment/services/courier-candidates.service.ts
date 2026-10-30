@@ -46,7 +46,7 @@ export class CourierCandidatesService {
           courierAccountActive,
           lte(distanceKm, ASSIGNMENT_RADIUS_KM),
           notExists(this.pendingOffers()),
-          notExists(this.offersOfOrder(order.orderId)),
+          notExists(this.offersOfOrder(order)),
         ),
       )
       .orderBy(distanceKm)
@@ -67,8 +67,9 @@ export class CourierCandidatesService {
       );
   }
 
-  // An order is offered to a courier once: a decline or a missed offer is final for that order.
-  private offersOfOrder(orderId: number) {
+  // An order is offered to a courier once a round: a decline or a missed offer is final until a
+  // manager restarts the search.
+  private offersOfOrder({ orderId, round }: DispatchOrder) {
     return this.db
       .select({ offerId: orderOffers.offerId })
       .from(orderOffers)
@@ -76,6 +77,7 @@ export class CourierCandidatesService {
         and(
           eq(orderOffers.courierId, courierProfiles.courierProfileId),
           eq(orderOffers.orderId, orderId),
+          eq(orderOffers.round, round),
         ),
       );
   }

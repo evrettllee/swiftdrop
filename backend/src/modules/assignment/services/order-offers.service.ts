@@ -49,7 +49,7 @@ export class OrderOffersService {
     now: Date,
   ): Promise<number | null> {
     const [order] = await tx
-      .select({ status: orders.status })
+      .select({ status: orders.status, round: orders.assignmentRound })
       .from(orders)
       .where(eq(orders.orderId, orderId))
       .limit(SINGLE_ROW_LIMIT)
@@ -70,6 +70,7 @@ export class OrderOffersService {
         expiresAt: new Date(now.getTime() + OFFER_TTL_MS),
         pickupEtaSec: plan.pickupEtaSec,
         totalEtaSec: plan.totalEtaSec,
+        round: order.round,
       })
       .onConflictDoNothing()
       .returning({ offerId: orderOffers.offerId });

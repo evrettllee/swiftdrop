@@ -33,6 +33,6 @@ import { TrackingModule } from '@/modules/tracking/tracking.module';
     AssignmentRoundService,
     AssignmentJob,
   ],
-  exports: [DispatchOrdersService, OfferNotifierService],
+  exports: [DispatchOrdersService, OfferNotifierService, OrderDispatchService],
 })
 export class AssignmentModule {}

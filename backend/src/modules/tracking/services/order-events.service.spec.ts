@@ -114,6 +114,44 @@ describe('OrderEventsService', () => {
     }
   });
 
+  it('should send order:courier to the order room and staff:order of kind courier', () => {
+    service.publishCourierChanges([
+      {
+        ...change({ orderId: 4, status: ORDER_STATUS.COURIER_ASSIGNED, courierId: 9 }),
+        previousCourierId: 5,
+      },
+    ]);
+
+    expect(toOrder.mock.calls).toEqual([
+      [4, SOCKET_EVENTS.ORDER_COURIER, { orderId: 4, courierId: 9 }, { exceptCourierProfileId: 5 }],
+    ]);
+    expect(toStaff.mock.calls).toEqual([
+      [
+        SOCKET_EVENTS.STAFF_ORDER,
+        {
+          orderId: 4,
+          kind: 'courier',
+          status: ORDER_STATUS.COURIER_ASSIGNED,
+          statusChangedAt: CHANGED_AT.toISOString(),
+          courierId: 9,
+        },
+      ],
+    ]);
+    expect(calls).toEqual(['order 4', 'staff']);
+  });
+
+  it('should send order:courier with no courier when the courier is taken off', () => {
+    service.publishOrderCourier(4, null);
+
+    expect(toOrder).toHaveBeenCalledWith(
+      4,
+      SOCKET_EVENTS.ORDER_COURIER,
+      { orderId: 4, courierId: null },
+      { exceptCourierProfileId: undefined },
+    );
+    expect(toStaff).not.toHaveBeenCalled();
+  });
+
   it('should send nothing when no status changed', () => {
     service.publishStatusChanges([]);
 

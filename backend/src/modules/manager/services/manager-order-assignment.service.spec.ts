@@ -1,36 +1,16 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { DatabaseError } from 'pg';
-import type { OrderTransaction } from '@/common/database/order-status-transition';
-import type { Database } from '@/database/database.module';
-import type { OfferNotifierService } from '@/modules/assignment/services/offer-notifier.service';
-import type { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
-import type { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
-import { queueDatabase } from '@test/support/queue-database';
+import {
+  FAKE_CHECKS,
+  FAKE_COURIER_ROW,
+  fakeAssignment,
+  fakeOrderRow,
+} from '@test/support/manager-assignment-fakes';
 import { ManagerOrderAssignmentService } from './manager-order-assignment.service';
 
-const PARCEL = { weightKg: 2.5, lengthCm: 30, widthCm: 20, heightCm: 10, isFragile: false };
-const ORDER = {
-  orderId: 42,
-  status: 'confirmed',
-  pickup: { latitude: 53.9, longitude: 27.55 },
-  parcel: PARCEL,
-};
-const CHECKS = {
-  onShift: true,
-  freshLocation: true,
-  free: true,
-  hasVehicle: true,
-  vehicleFits: true,
-};
-const COURIER = {
-  courierId: 3,
-  firstName: 'Дмитрий',
-  lastName: 'Соколов',
-  vehicleType: 'car',
-  pickupDistanceM: 900,
-  positionAgeMs: 1000,
-  hasOpenOffer: true,
-};
+const ORDER = fakeOrderRow('confirmed');
+const COURIER = FAKE_COURIER_ROW;
+const CHECKS = FAKE_CHECKS;
 const CHANGED = {
   orderId: 42,
   status: 'courier_assigned',
@@ -40,36 +20,10 @@ const CHANGED = {
 };
 
 function setUp(results: unknown[][], failure?: Error) {
-  const fake = queueDatabase(results);
-  const log: string[] = [];
-  const run = jest.fn(async (work: (orderTx: OrderTransaction) => Promise<unknown>) => {
-    const result = await work({ tx: fake.tx, statusChanges: [] });
+  const fakes = fakeAssignment(results, failure);
+  const service = new ManagerOrderAssignmentService(fakes.locks, fakes.notifierService);
 
-    if (failure) {
-      throw failure;
-    }
-
-    log.push('commit');
-
-    return result;
-  });
-  const notifier = {
-    withdraw: jest.fn((offerId: number) => log.push(`offer:closed ${offerId}`)),
-    assigned: jest.fn((orderId: number) => log.push(`order:assigned ${orderId}`)),
-  };
-  const lockIsAvailable = jest.fn(() => {
-    log.push('lock courier');
-
-    return Promise.resolve(true);
-  });
-  const service = new ManagerOrderAssignmentService(
-    fake.db as Database,
-    { run } as unknown as OrderTransactionsService,
-    { lockIsAvailable } as unknown as CourierProfilesService,
-    notifier as unknown as OfferNotifierService,
-  );
-
-  return { service, notifier, log, fake };
+  return { ...fakes, service };
 }
 
 const rejection = async (promise: Promise<unknown>) =>
@@ -93,7 +47,7 @@ describe('ManagerOrderAssignmentService', () => {
       'commit',
       'offer:closed 5',
       'offer:closed 6',
-      'order:assigned 42',
+      'order:assigned 42 to 3',
     ]);
     expect(fake.calls.find((call) => call.method === 'for')?.args[0]).toBe('update');
     expect(fake.calls.filter((call) => call.method === 'set').map((call) => call.args[0])).toEqual([
