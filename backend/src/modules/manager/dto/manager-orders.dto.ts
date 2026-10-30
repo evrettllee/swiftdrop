@@ -39,6 +39,8 @@ function toSearch(query: string, ctx: z.RefinementCtx): OrderSearch {
   return search;
 }
 
+export const managerSearchSchema = listSearchSchema.transform(toSearch);
+
 export const managerOrderFilterShape = {
   ...listPeriodShape,
   courierId: z.coerce
@@ -51,7 +53,7 @@ export const managerOrderFilterShape = {
   fragile: z
     .literal(FRAGILE_ONLY, { error: MANAGER_ORDERS_VALIDATION_MESSAGES.FRAGILE_INVALID })
     .optional(),
-  q: listSearchSchema.transform(toSearch).optional(),
+  q: managerSearchSchema.optional(),
 };
 
 type RawFilters = z.infer<z.ZodObject<typeof managerOrderFilterShape>>;

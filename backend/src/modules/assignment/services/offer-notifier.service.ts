@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
+import type { OrderAssignedEvent } from '@/modules/realtime/types/realtime.types';
 import { OfferViewsService } from './offer-views.service';
 
 @Injectable()
@@ -18,6 +19,12 @@ export class OfferNotifierService {
     if (offer) {
       this.events.toCourier(courierProfileId, SOCKET_EVENTS.OFFER_NEW, offer);
     }
+  }
+
+  assigned(orderId: number, courierProfileId: number): void {
+    const event: OrderAssignedEvent = { orderId };
+
+    this.events.toCourier(courierProfileId, SOCKET_EVENTS.ORDER_ASSIGNED, event);
   }
 
   // Tells the courier to close the offer window.

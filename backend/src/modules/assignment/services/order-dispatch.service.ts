@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, count, eq, max } from 'drizzle-orm';
+import { and, count, eq, max, ne } from 'drizzle-orm';
 import { transitionOrderStatus } from '@/common/database/order-status-transition';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
@@ -74,7 +75,9 @@ export class OrderDispatchService {
     const [row] = await this.db
       .select({ total: count() })
       .from(orderOffers)
-      .where(eq(orderOffers.orderId, orderId));
+      .where(
+        and(eq(orderOffers.orderId, orderId), ne(orderOffers.status, ORDER_OFFER_STATUS.REVOKED)),
+      );
 
     return row?.total ?? 0;
   }

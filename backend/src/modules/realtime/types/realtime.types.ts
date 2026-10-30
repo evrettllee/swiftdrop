@@ -67,3 +67,7 @@ export type StaffOrderEvent = {
   statusChangedAt: string;
   courierId: number | null;
 };
+
+export type OrderAssignedEvent = {
+  orderId: number;
+};

@@ -50,7 +50,7 @@ describe('toPayment', () => {
 describe('toActions', () => {
   const EXPECTED: Record<OrderStatus, [boolean, boolean, boolean, boolean]> = {
     pending: [false, false, false, true],
-    confirmed: [false, false, false, true],
+    confirmed: [true, false, false, true],
     awaiting_manual_assignment: [true, false, true, true],
     courier_assigned: [false, true, false, true],
     picked_up: [false, false, false, false],
