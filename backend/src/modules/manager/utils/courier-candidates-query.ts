@@ -50,7 +50,7 @@ function openOfferExists(db: Database): SQL {
   );
 }
 
-function searchCondition(search: OrderSearch | null): SQL | undefined {
+export function courierSearchCondition(search: OrderSearch | null): SQL | undefined {
   if (search === null) {
     return undefined;
   }
@@ -111,7 +111,7 @@ export function courierCandidatesQuery(
       and(
         courierAccountActive,
         options.suitable ? eligible : ineligible,
-        searchCondition(search),
+        courierSearchCondition(search),
         vehicleTypes === null ? undefined : inArray(vehicles.type, vehicleTypes),
       ),
     )

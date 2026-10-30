@@ -22,7 +22,19 @@ export const SOCKET_EVENTS = {
   ORDER_ASSIGNED: 'order:assigned',
   ORDER_UNASSIGNED: 'order:unassigned',
   ORDER_COURIER: 'order:courier',
+  STAFF_COURIER_LOCATION: 'staff:courier-location',
+  STAFF_COURIER: 'staff:courier',
 } as const;
+
+export const STAFF_COURIER_EVENT_KIND = {
+  ONLINE: 'online',
+  OFFLINE: 'offline',
+} as const;
+
+export const STAFF_COURIER_EVENT_KIND_VALUES = [
+  STAFF_COURIER_EVENT_KIND.ONLINE,
+  STAFF_COURIER_EVENT_KIND.OFFLINE,
+] as const;
 
 export const STAFF_ORDER_EVENT_KIND = {
   CREATED: 'created',

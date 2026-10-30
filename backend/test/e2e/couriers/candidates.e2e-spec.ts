@@ -79,6 +79,7 @@ describe('Courier candidates (e2e)', () => {
       pickup: MINSK_PICKUP,
       delivery: MINSK_DELIVERY,
       parcel: SMALL_PACKAGE,
+      round: 1,
     });
   });
 

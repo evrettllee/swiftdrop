@@ -8,7 +8,10 @@ import type {
   SOCKET_ROLES,
   STAFF_ROLES,
 } from '../constants/realtime.constants';
-import type { STAFF_ORDER_EVENT_KIND_VALUES } from '../constants/socket-events.constants';
+import type {
+  STAFF_COURIER_EVENT_KIND_VALUES,
+  STAFF_ORDER_EVENT_KIND_VALUES,
+} from '../constants/socket-events.constants';
 
 // Who opened a socket and until when their access token was valid at that moment.
 export type SocketSession = {
@@ -79,4 +82,18 @@ export type OrderUnassignedEvent = {
 export type OrderCourierEvent = {
   orderId: number;
   courierId: number | null;
+};
+
+export type StaffCourierLocationEvent = {
+  courierId: number;
+  lat: number;
+  lng: number;
+  at: string;
+};
+
+export type StaffCourierEventKind = (typeof STAFF_COURIER_EVENT_KIND_VALUES)[number];
+
+export type StaffCourierEvent = {
+  courierId: number;
+  kind: StaffCourierEventKind;
 };

@@ -34,6 +34,7 @@ import type { AppSocketData, CourierSocketData, OrderJoinAck } from '../types/re
 import { closeAfterAnswer } from '../utils/socket-close';
 import { isStaffSocket } from '../utils/socket-data';
 import { admitInHandshake } from '../utils/socket-handshake';
+import { toStaffCourierLocation } from '../utils/staff-courier-event';
 
 function roomsOnConnect(data: AppSocketData): string[] {
   const rooms = [userRoom(data.userId)];
@@ -122,7 +123,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     data: CourierSocketData,
     body: unknown,
   ): Promise<LocationAck> {
-    const { ack, event } = await this.locations.update(data, body);
+    const { ack, event, saved } = await this.locations.update(data, body);
 
     if (!ack.ok && ack.reason === LOCATION_UPDATE_REJECTIONS.UNAUTHORIZED) {
       closeAfterAnswer(socket);
@@ -135,6 +136,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
         });
         this.locationEvents.publish(event);
       });
+    }
+
+    if (saved) {
+      setImmediate(() =>
+        this.events.toStaff(SOCKET_EVENTS.STAFF_COURIER_LOCATION, toStaffCourierLocation(saved)),
+      );
     }
 
     return ack;

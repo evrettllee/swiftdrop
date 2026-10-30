@@ -26,6 +26,7 @@ export type SavedLocation = { locationUpdatedAt: Date; activeOrderId: number | n
 const REFUSED = (reason: LocationUpdateRejection): LocationUpdateResult => ({
   ack: { ok: false, reason },
   event: null,
+  saved: null,
 });
 
 @Injectable()
@@ -57,20 +58,22 @@ export class CourierLocationService {
   // Saves the position and answers the socket: a failure is a refusal in the acknowledgement,
   // never an error the client does not wait for.
   async record(courierProfileId: number, point: GeoPoint): Promise<LocationUpdateResult> {
-    let result: LocationUpdateResult = { ack: { ok: true }, event: null };
+    let result: LocationUpdateResult = { ack: { ok: true }, event: null, saved: null };
 
     try {
       const saved = await this.save(courierProfileId, point);
 
       if (!saved) {
         result = REFUSED(await this.refusalReason(courierProfileId));
-      } else if (saved.activeOrderId !== null) {
-        result.event = {
-          orderId: saved.activeOrderId,
-          latitude: point.latitude,
-          longitude: point.longitude,
-          updatedAt: saved.locationUpdatedAt.toISOString(),
-        };
+      } else {
+        const { latitude, longitude } = point;
+        const updatedAt = saved.locationUpdatedAt.toISOString();
+
+        result.saved = { courierProfileId, latitude, longitude, updatedAt };
+        result.event =
+          saved.activeOrderId === null
+            ? null
+            : { orderId: saved.activeOrderId, latitude, longitude, updatedAt };
       }
     } catch (error) {
       // Going on or off shift holds the profile row: the next position comes in a few seconds.

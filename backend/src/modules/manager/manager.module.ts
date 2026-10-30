@@ -5,6 +5,7 @@ import { DeliveriesModule } from '@/modules/deliveries/deliveries.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { TrackingModule } from '@/modules/tracking/tracking.module';
 import { ManagerOrderAssignmentController } from './controllers/manager-order-assignment.controller';
+import { ManagerCouriersController } from './controllers/manager-couriers.controller';
 import { ManagerOrderCancellationController } from './controllers/manager-order-cancellation.controller';
 import { ManagerOrdersController } from './controllers/manager-orders.controller';
 import { ManagerOrderCountsService } from './services/manager-order-counts.service';
@@ -12,6 +13,7 @@ import { ManagerOrderDetailsService } from './services/manager-order-details.ser
 import { ManagerCourierCandidatesService } from './services/manager-courier-candidates.service';
 import { ManagerExportLimits } from './services/manager-export-limits';
 import { ManagerAssignmentRestartService } from './services/manager-assignment-restart.service';
+import { ManagerCouriersMapService } from './services/manager-couriers-map.service';
 import { ManagerCourierLockService } from './services/manager-courier-lock.service';
 import { ManagerOrderAssignmentService } from './services/manager-order-assignment.service';
 import { ManagerOrderCancellationService } from './services/manager-order-cancellation.service';
@@ -25,6 +27,7 @@ import { ManagerOrdersService } from './services/manager-orders.service';
     ManagerOrdersController,
     ManagerOrderAssignmentController,
     ManagerOrderCancellationController,
+    ManagerCouriersController,
   ],
   providers: [
     ManagerOrdersService,
@@ -38,6 +41,7 @@ import { ManagerOrdersService } from './services/manager-orders.service';
     ManagerOrderReassignmentService,
     ManagerAssignmentRestartService,
     ManagerOrderCancellationService,
+    ManagerCouriersMapService,
   ],
 })
 export class ManagerModule {}

@@ -4,6 +4,7 @@ import { CourierAvailabilityService } from './services/courier-availability.serv
 import { CourierLocationEventsService } from './services/courier-location-events.service';
 import { CourierLocationService } from './services/courier-location.service';
 import { CourierProfilesService } from './services/courier-profiles.service';
+import { CourierShiftEventsService } from './services/courier-shift-events.service';
 import { CourierVehiclesService } from './services/courier-vehicles.service';
 
 @Module({
@@ -14,7 +15,13 @@ import { CourierVehiclesService } from './services/courier-vehicles.service';
     CourierAvailabilityService,
     CourierLocationService,
     CourierLocationEventsService,
+    CourierShiftEventsService,
   ],
-  exports: [CourierProfilesService, CourierLocationService, CourierLocationEventsService],
+  exports: [
+    CourierProfilesService,
+    CourierLocationService,
+    CourierLocationEventsService,
+    CourierShiftEventsService,
+  ],
 })
 export class CouriersModule {}

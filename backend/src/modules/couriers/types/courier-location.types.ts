@@ -23,7 +23,15 @@ export type CourierLocationEvent = {
 
 // What a position sent on the socket ended with: the answer to the courier and, when it was
 // stored during an active order, the event for the room of that order.
+export type SavedCourierPosition = {
+  courierProfileId: number;
+  latitude: number;
+  longitude: number;
+  updatedAt: string;
+};
+
 export type LocationUpdateResult = {
   ack: LocationAck;
   event: CourierLocationEvent | null;
+  saved: SavedCourierPosition | null;
 };
