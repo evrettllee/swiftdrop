@@ -172,3 +172,21 @@ export function resolveListQuery<K extends string>(
     return null;
   }
 }
+
+export function resolveListSort<K extends string>(
+  raw: string | undefined,
+  spec: SortSpec<K>,
+  ctx: z.RefinementCtx,
+): ListSort<K> | null {
+  try {
+    return parseSort(raw, spec);
+  } catch (error) {
+    if (!(error instanceof ListQueryError)) {
+      throw error;
+    }
+
+    ctx.addIssue({ code: 'custom', path: [error.problem.path], message: error.problem.message });
+
+    return null;
+  }
+}

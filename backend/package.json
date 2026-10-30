@@ -43,6 +43,7 @@
     "@turf/boolean-point-in-polygon": "^7.4.0",
     "cookie-parser": "^1.4.7",
     "drizzle-orm": "0.45.3",
+    "exceljs": "4.4.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",

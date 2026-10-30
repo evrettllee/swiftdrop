@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, count, eq, max, type SQL } from 'drizzle-orm';
+import { and, eq, max, type SQL } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { type ListFetch, mapPageItems, paginate } from '@/common/database/paginate';
 import { DRIZZLE } from '@/database/database.constants';
@@ -14,6 +14,7 @@ import {
   paymentStateSql,
   statusGroupsCondition,
 } from '../utils/manager-order-conditions';
+import { countManagerOrders } from '../utils/manager-orders-count';
 import { MANAGER_ORDERS_SORT } from '../utils/manager-orders-sort';
 
 const CLIENT_ALIAS = 'client_user';
@@ -32,7 +33,7 @@ export class ManagerOrdersService {
         managerOrderConditions(this.db, query.filters),
       ),
       fetch: (options) => this.fetch(options),
-      count: (where) => this.count(where),
+      count: (where) => countManagerOrders(this.db, where),
       maxId: (where) => this.maxId(where),
       idOf: (row) => row.orderId,
     });
@@ -72,16 +73,6 @@ export class ManagerOrdersService {
       .orderBy(...orderBy)
       .limit(limit)
       .offset(offset);
-  }
-
-  private async count(where: SQL | undefined): Promise<number> {
-    const [row] = await this.db
-      .select({ total: count() })
-      .from(orders)
-      .innerJoin(packages, eq(packages.orderId, orders.orderId))
-      .where(where);
-
-    return row?.total ?? 0;
   }
 
   private async maxId(where: SQL | undefined): Promise<number | null> {

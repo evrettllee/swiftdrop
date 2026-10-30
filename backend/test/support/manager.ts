@@ -4,6 +4,12 @@ import { ROLE } from '@/common/enums/role.enum';
 import { TICKET_TOPIC } from '@/common/enums/support-ticket.enum';
 import type { Database } from '@/database/database.module';
 import { supportTickets } from '@/database/schema';
+import {
+  CSV_BOM,
+  CSV_LINE_END,
+  CSV_SEPARATOR,
+  MANAGER_EXPORT_ROUTE,
+} from '@/modules/manager/constants/manager-export.constants';
 import { MANAGER_ORDERS_ROUTES } from '@/modules/manager/constants/manager-orders.constants';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
@@ -103,4 +109,25 @@ export function waitForStaffOrder(
 
     socket.on(SOCKET_EVENTS.STAFF_ORDER, listener);
   });
+}
+
+export function getManagerExport(
+  app: NestExpressApplication,
+  cookies: string | null,
+  query: Record<string, string | number>,
+) {
+  const exportRequest = getApi(app, `${MANAGER_ORDERS_ROUTES.BASE}/${MANAGER_EXPORT_ROUTE}`)
+    .query(query)
+    .responseType('blob');
+
+  return cookies === null ? exportRequest : exportRequest.set(COOKIE_HEADER, cookies);
+}
+
+export function csvLines(body: Buffer): string[][] {
+  const text = body.toString('utf8');
+
+  return (text.startsWith(CSV_BOM) ? text.slice(CSV_BOM.length) : text)
+    .split(CSV_LINE_END)
+    .filter((line) => line.length > 0)
+    .map((line) => line.split(CSV_SEPARATOR));
 }

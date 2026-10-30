@@ -14,6 +14,7 @@ import {
   COURIER_ACCOUNT,
   createCourier,
   findCourierProfileId,
+  getCourierMe,
 } from '@test/support/couriers';
 import {
   createManager,
@@ -101,7 +102,7 @@ describe('Manager orders search and filters (e2e)', () => {
   });
 
   it('should filter by the courier, the payment and fragile parcels', async () => {
-    await createCourier(app, db);
+    await getCourierMe(app, await createCourier(app, db)).expect(HttpStatus.OK);
     const courierId = await findCourierProfileId(db, COURIER_ACCOUNT.email);
     await assignOrder(db, firstIds[0], courierId, ORDER_STATUS.COURIER_ASSIGNED);
     await insertPayment(db, firstIds[0], { status: PAYMENT_STATUS.PAID });

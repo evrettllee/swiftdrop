@@ -39,7 +39,7 @@ function toSearch(query: string, ctx: z.RefinementCtx): OrderSearch {
   return search;
 }
 
-const filterShape = {
+export const managerOrderFilterShape = {
   ...listPeriodShape,
   courierId: z.coerce
     .number({ error: MANAGER_ORDERS_VALIDATION_MESSAGES.COURIER_ID_INVALID })
@@ -54,9 +54,9 @@ const filterShape = {
   q: listSearchSchema.transform(toSearch).optional(),
 };
 
-type RawFilters = z.infer<z.ZodObject<typeof filterShape>>;
+type RawFilters = z.infer<z.ZodObject<typeof managerOrderFilterShape>>;
 
-function toFilters(raw: RawFilters): ManagerOrderFilters {
+export function toManagerOrderFilters(raw: RawFilters): ManagerOrderFilters {
   return {
     period: toDateRange(raw, APP_TIME_ZONE),
     courierId: raw.courierId ?? null,
@@ -66,20 +66,28 @@ function toFilters(raw: RawFilters): ManagerOrderFilters {
   };
 }
 
+export const managerStatusGroupsSchema = csvEnumSchema(MANAGER_STATUS_GROUP_VALUES).optional();
+
+export function hasValidPeriod(query: { from?: string; to?: string }): boolean {
+  return !(query.from && query.to && query.from > query.to);
+}
+
 export const managerOrdersSchema = z
   .strictObject(
     {
       ...listPaginationShape(MANAGER_ORDERS_PAGE_SIZE_DEFAULT),
-      ...filterShape,
+      ...managerOrderFilterShape,
       sort: listSortParamSchema,
-      status: csvEnumSchema(MANAGER_STATUS_GROUP_VALUES).optional(),
+      status: managerStatusGroupsSchema,
     },
     { error: unknownParameterError },
   )
   .transform((query, ctx) => {
     const list = resolveListQuery(query, MANAGER_ORDERS_SORT, ctx);
 
-    return list ? { ...list, filters: toFilters(query), status: query.status ?? null } : z.NEVER;
+    return list
+      ? { ...list, filters: toManagerOrderFilters(query), status: query.status ?? null }
+      : z.NEVER;
   });
 
 export type ManagerOrdersDto = z.infer<typeof managerOrdersSchema>;
@@ -87,15 +95,15 @@ export type ManagerOrdersDto = z.infer<typeof managerOrdersSchema>;
 export const managerOrderCountsSchema = z
   .strictObject(
     {
-      ...filterShape,
+      ...managerOrderFilterShape,
       until: listPaginationShape(MANAGER_ORDERS_PAGE_SIZE_DEFAULT).until,
     },
     { error: unknownParameterError },
   )
-  .refine((query) => !(query.from && query.to && query.from > query.to), {
+  .refine(hasValidPeriod, {
     error: LIST_VALIDATION_MESSAGES.PERIOD_INVALID,
     path: ['from'],
   })
-  .transform((query) => ({ filters: toFilters(query), until: query.until ?? null }));
+  .transform((query) => ({ filters: toManagerOrderFilters(query), until: query.until ?? null }));
 
 export type ManagerOrderCountsDto = z.infer<typeof managerOrderCountsSchema>;
