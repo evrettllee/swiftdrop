@@ -20,6 +20,6 @@ import { OrderTransactionsService } from './services/order-transactions.service'
     OrderEtaService,
     OrderTransactionsService,
   ],
-  exports: [OrderTransactionsService, OrderEtaService],
+  exports: [OrderTransactionsService, OrderEtaService, OrderEventsService],
 })
 export class TrackingModule {}

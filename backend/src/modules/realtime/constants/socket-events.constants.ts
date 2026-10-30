@@ -18,4 +18,17 @@ export const SOCKET_EVENTS = {
   MESSAGE_NEW: 'message:new',
   // One side read the messages to it up to an id; sent only when something was marked.
   MESSAGE_READ: 'message:read',
+  STAFF_ORDER: 'staff:order',
 } as const;
+
+export const STAFF_ORDER_EVENT_KIND = {
+  CREATED: 'created',
+  STATUS: 'status',
+  COURIER: 'courier',
+} as const;
+
+export const STAFF_ORDER_EVENT_KIND_VALUES = [
+  STAFF_ORDER_EVENT_KIND.CREATED,
+  STAFF_ORDER_EVENT_KIND.STATUS,
+  STAFF_ORDER_EVENT_KIND.COURIER,
+] as const;

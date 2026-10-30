@@ -1,3 +1,4 @@
+import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { ROLE } from '@/common/enums/role.enum';
 import type { AuthUser } from '@/modules/auth/types/auth.types';
 import type { CourierLocationSession } from '@/modules/couriers/types/courier-location.types';
@@ -7,6 +8,7 @@ import type {
   SOCKET_ROLES,
   STAFF_ROLES,
 } from '../constants/realtime.constants';
+import type { STAFF_ORDER_EVENT_KIND_VALUES } from '../constants/socket-events.constants';
 
 // Who opened a socket and until when their access token was valid at that moment.
 export type SocketSession = {
@@ -54,4 +56,14 @@ export type OrderJoinAck = { ok: true } | { ok: false; reason: OrderJoinRejectio
 export type EmitToOrderOptions = {
   // The sockets of this courier do not get the event, for example their own position.
   exceptCourierProfileId?: number;
+};
+
+export type StaffOrderEventKind = (typeof STAFF_ORDER_EVENT_KIND_VALUES)[number];
+
+export type StaffOrderEvent = {
+  orderId: number;
+  kind: StaffOrderEventKind;
+  status: OrderStatus;
+  statusChangedAt: string;
+  courierId: number | null;
 };

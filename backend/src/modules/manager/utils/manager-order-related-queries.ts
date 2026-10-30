@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
 import type { Database } from '@/database/database.module';
 import {
@@ -75,7 +75,11 @@ export function findTickets(db: Database, orderId: number) {
     })
     .from(supportTickets)
     .where(eq(supportTickets.orderId, orderId))
-    .orderBy(asc(supportTickets.ticketId));
+    .orderBy(
+      desc(supportTickets.awaitingStaff),
+      desc(supportTickets.lastMessageAt),
+      desc(supportTickets.ticketId),
+    );
 }
 
 export type SettledPaymentRow = Awaited<ReturnType<typeof findSettledPayments>>[number];

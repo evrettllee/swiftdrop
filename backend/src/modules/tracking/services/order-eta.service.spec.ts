@@ -11,6 +11,12 @@ import { OrderEtaStore } from './order-eta-store.service';
 import { OrderEtaService } from './order-eta.service';
 
 const ORDER_ID = 7;
+const STATUS_CHANGE = {
+  orderId: ORDER_ID,
+  estimatedDeliveryAt: null,
+  statusChangedAt: new Date(),
+  courierId: null,
+};
 const START_MS = Date.parse('2026-10-22T12:00:00Z');
 // After the pickup the trip is one leg, to the recipient.
 const TRIP = { durationS: 600, firstLegDurationS: 600, firstLegGeometry: 'leg' };
@@ -90,9 +96,7 @@ describe('OrderEtaService', () => {
   it('should ask at once on a new status, inside the interval', async () => {
     await service.refresh(ORDER_ID, false);
 
-    service.onStatusChanges([
-      { orderId: ORDER_ID, status: ORDER_STATUS.IN_TRANSIT, estimatedDeliveryAt: null },
-    ]);
+    service.onStatusChanges([{ ...STATUS_CHANGE, status: ORDER_STATUS.IN_TRANSIT }]);
     await new Promise(setImmediate);
 
     expect(trips.getTrip).toHaveBeenCalledTimes(2);
@@ -164,9 +168,7 @@ describe('OrderEtaService', () => {
   it('should forget the order once it is over', async () => {
     await service.refresh(ORDER_ID, false);
 
-    service.onStatusChanges([
-      { orderId: ORDER_ID, status: ORDER_STATUS.DELIVERED, estimatedDeliveryAt: null },
-    ]);
+    service.onStatusChanges([{ ...STATUS_CHANGE, status: ORDER_STATUS.DELIVERED }]);
 
     expect(store.size).toBe(0);
   });

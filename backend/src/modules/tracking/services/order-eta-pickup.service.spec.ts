@@ -101,7 +101,13 @@ describe('OrderEtaService arrival at the pickup point', () => {
     trips.getTrip.mockResolvedValue(TRIP_TO_RECIPIENT);
 
     service.onStatusChanges([
-      { orderId: ORDER_ID, status: ORDER_STATUS.PICKED_UP, estimatedDeliveryAt: null },
+      {
+        orderId: ORDER_ID,
+        status: ORDER_STATUS.PICKED_UP,
+        estimatedDeliveryAt: null,
+        statusChangedAt: new Date(),
+        courierId: null,
+      },
     ]);
     await new Promise(setImmediate);
 

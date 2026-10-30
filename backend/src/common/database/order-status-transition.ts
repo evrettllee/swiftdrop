@@ -30,6 +30,8 @@ export type OrderStatusChange = {
   orderId: number;
   status: OrderStatus;
   estimatedDeliveryAt: Date | null;
+  statusChangedAt: Date;
+  courierId: number | null;
 };
 
 // A transaction that keeps the status changes made in it, to announce them once it commits. Only
@@ -80,6 +82,8 @@ export async function transitionOrderStatus(
       orderId: orders.orderId,
       status: orders.status,
       estimatedDeliveryAt: orders.estimatedDeliveryAt,
+      statusChangedAt: orders.statusChangedAt,
+      courierId: orders.courierId,
     });
 
   if (updated) {
