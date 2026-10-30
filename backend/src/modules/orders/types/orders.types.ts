@@ -51,6 +51,7 @@ export type OrderHistoryEntry = {
 
 export type OrderHistoryRow = OrderHistoryEntry & {
   changedBy: number | null;
+  comment: string | null;
 };
 
 export type OrderCancelledBy = (typeof ORDER_CANCELLED_BY)[keyof typeof ORDER_CANCELLED_BY];
@@ -58,6 +59,7 @@ export type OrderCancelledBy = (typeof ORDER_CANCELLED_BY)[keyof typeof ORDER_CA
 export type OrderHistoryView = {
   history: OrderHistoryEntry[];
   cancelledBy: OrderCancelledBy | null;
+  cancelReason: string | null;
 };
 
 export type OrderPaymentView = {
@@ -83,6 +85,7 @@ export type OrderDetails = {
   delivery: OrderPointView;
   history: OrderHistoryEntry[];
   cancelledBy: OrderCancelledBy | null;
+  cancelReason: string | null;
   payment: OrderPaymentView | null;
 };
 

@@ -1,5 +1,6 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { MANAGER_ASSIGNMENT_ROUTES } from '@/modules/manager/constants/manager-assignment.constants';
+import { MANAGER_CANCEL_ROUTE } from '@/modules/manager/constants/manager-cancellation.constants';
 import { COOKIE_HEADER } from './auth';
 import { getApi, postApi } from './http';
 import { managerOrderPath } from './manager';
@@ -55,6 +56,17 @@ export function postRestartAssignment(
 ) {
   const path = managerOrderPath(MANAGER_ASSIGNMENT_ROUTES.RESTART_ASSIGNMENT, orderId);
   const request = postApi(app, path).send(body);
+
+  return cookies === null ? request : request.set(COOKIE_HEADER, cookies);
+}
+
+export function postManagerCancel(
+  app: NestExpressApplication,
+  cookies: string | null,
+  orderId: number,
+  body: object,
+) {
+  const request = postApi(app, managerOrderPath(MANAGER_CANCEL_ROUTE, orderId)).send(body);
 
   return cookies === null ? request : request.set(COOKIE_HEADER, cookies);
 }

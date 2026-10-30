@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PaymentsModule } from '@/modules/payments/payments.module';
 import { PricingModule } from '@/modules/pricing/pricing.module';
 import { RealtimeModule } from '@/modules/realtime/realtime.module';
+import { CancelOrderService } from './services/cancel-order.service';
 import { OrderCancellationService } from './services/order-cancellation.service';
 import { OrderDetailsService } from './services/order-details.service';
 import { OrderPlacementService } from './services/order-placement.service';
@@ -18,9 +19,11 @@ import { TrackingModule } from '@/modules/tracking/tracking.module';
     OrderPlacementService,
     OrdersQueryService,
     OrderDetailsService,
+    CancelOrderService,
     OrderCancellationService,
     UnpaidOrdersService,
     UnpaidOrdersJob,
   ],
+  exports: [CancelOrderService],
 })
 export class OrdersModule {}

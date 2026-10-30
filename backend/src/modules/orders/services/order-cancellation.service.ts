@@ -1,131 +1,47 @@
 import {
   ConflictException,
   HttpException,
-  Inject,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
-import { transitionOrderStatus } from '@/common/database/order-status-transition';
-import { isLockTimeout } from '@/common/database/pg-errors';
 import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
-import { describeError } from '@/common/utils/describe-error';
-import { DRIZZLE } from '@/database/database.constants';
-import type { Database } from '@/database/database.module';
-import { orders } from '@/database/schema';
-import { PaymentCancellationService } from '@/modules/payments/services/payment-cancellation.service';
-import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
-import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
-import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
-import {
-  CANCELLABLE_STATUSES,
-  FINISHED_STATUSES,
-  ORDERS_ERROR_MESSAGES,
-} from '../constants/orders.constants';
+import { FINISHED_STATUSES, ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';
 import type { CancelledOrder } from '../types/orders.types';
-
-// The order the cancellation changed, or nothing when its status did not allow it.
-type CancelledRow = { orderId: number } | undefined;
+import { CancelOrderService } from './cancel-order.service';
 
 @Injectable()
 export class OrderCancellationService {
   private readonly logger = new Logger(OrderCancellationService.name);
 
-  constructor(
-    @Inject(DRIZZLE) private readonly db: Database,
-    private readonly paymentCancellation: PaymentCancellationService,
-    private readonly events: RealtimeEventsService,
-    private readonly orderTransactions: OrderTransactionsService,
-  ) {}
+  constructor(private readonly cancelOrder: CancelOrderService) {}
 
   async cancel(clientId: number, orderId: number): Promise<CancelledOrder> {
-    const cancelled = await this.cancelInTransaction(clientId, orderId);
+    const outcome = await this.cancelOrder.cancel({
+      orderId,
+      clientId,
+      changedBy: clientId,
+      comment: null,
+    });
 
-    if (!cancelled) {
-      throw await this.explainRefusal(clientId, orderId);
+    if (!outcome.cancelled) {
+      throw explainRefusal(outcome.status);
     }
 
     this.logger.log(`Order ${orderId} cancelled by client ${clientId}`);
-    await this.tellCourier(orderId);
 
     return { orderId, status: ORDER_STATUS.CANCELLED };
   }
+}
 
-  // The order row may be held by a payment being started or settled: after the lock timeout the
-  // client is told to try again, nothing has changed.
-  private async cancelInTransaction(clientId: number, orderId: number): Promise<CancelledRow> {
-    try {
-      return await this.runCancellation(clientId, orderId);
-    } catch (error) {
-      if (isLockTimeout(error)) {
-        this.logger.warn(`Order ${orderId} is busy, its cancellation is refused for now`);
-        throw new ConflictException(ORDERS_ERROR_MESSAGES.BUSY);
-      }
-
-      throw error;
-    }
+function explainRefusal(status: OrderStatus | null): HttpException {
+  if (status === null) {
+    return new NotFoundException(ORDERS_ERROR_MESSAGES.NOT_FOUND);
   }
 
-  private runCancellation(clientId: number, orderId: number): Promise<CancelledRow> {
-    return this.orderTransactions.run(async (orderTx) => {
-      // The status check is part of the update, so a pickup that happens in between is never overwritten.
-      const updated = await transitionOrderStatus(orderTx, {
-        orderId,
-        clientId,
-        from: CANCELLABLE_STATUSES,
-        to: ORDER_STATUS.CANCELLED,
-        changedBy: clientId,
-      });
-
-      if (updated) {
-        // A failed refund throws and rolls the cancellation back, so the client can simply try again.
-        await this.paymentCancellation.releaseOrderPayments(orderId);
-      }
-
-      return updated;
-    });
-  }
-
-  // A courier already heading to the pickup point closes the order screen at once. The order is
-  // already cancelled here, so a failed notice is only logged: the courier sees it on the next request.
-  private async tellCourier(orderId: number): Promise<void> {
-    try {
-      const [order] = await this.db
-        .select({ courierId: orders.courierId })
-        .from(orders)
-        .where(eq(orders.orderId, orderId))
-        .limit(SINGLE_ROW_LIMIT);
-
-      if (order?.courierId) {
-        this.events.toCourier(order.courierId, SOCKET_EVENTS.ORDER_CANCELLED, { orderId });
-      }
-    } catch (error) {
-      this.logger.error(
-        `Courier of order ${orderId} not told of the cancellation: ${describeError(error)}`,
-      );
-    }
-  }
-
-  // A foreign order looks the same as a missing one, so ids cannot be probed.
-  private async explainRefusal(clientId: number, orderId: number): Promise<HttpException> {
-    const [order] = await this.db
-      .select({ status: orders.status })
-      .from(orders)
-      .where(and(eq(orders.orderId, orderId), eq(orders.clientId, clientId)))
-      .limit(SINGLE_ROW_LIMIT);
-
-    let error: HttpException = new NotFoundException(ORDERS_ERROR_MESSAGES.NOT_FOUND);
-
-    if (order) {
-      const isFinished = new Set<OrderStatus>(FINISHED_STATUSES).has(order.status);
-
-      error = new ConflictException(
-        isFinished ? ORDERS_ERROR_MESSAGES.ALREADY_FINISHED : ORDERS_ERROR_MESSAGES.CANNOT_CANCEL,
-      );
-    }
-
-    return error;
-  }
+  return new ConflictException(
+    FINISHED_STATUSES.includes(status)
+      ? ORDERS_ERROR_MESSAGES.ALREADY_FINISHED
+      : ORDERS_ERROR_MESSAGES.CANNOT_CANCEL,
+  );
 }

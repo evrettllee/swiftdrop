@@ -42,7 +42,7 @@ const expectedCourierIdSchema = z
   .max(DB_INTEGER_MAX, { error: MANAGER_ASSIGNMENT_MESSAGES.EXPECTED_COURIER_INVALID })
   .nullable();
 
-const reasonSchema = z
+export const reasonSchema = z
   .string({ error: MANAGER_ASSIGNMENT_MESSAGES.REASON_INVALID })
   .trim()
   .min(1, { error: MANAGER_ASSIGNMENT_MESSAGES.REASON_INVALID })
