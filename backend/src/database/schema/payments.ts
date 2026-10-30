@@ -47,6 +47,9 @@ export const payments = pgTable(
     uniqueIndex(PAYMENTS_ONE_PENDING_PER_ORDER_INDEX)
       .on(table.orderId)
       .where(sql`${table.status} = ${sql.raw(`'${PAYMENT_STATUS.PENDING}'`)}`),
+    index('payments_paid_at_idx')
+      .on(table.paidAt)
+      .where(sql`${table.status} = ${sqlLiteral(PAYMENT_STATUS.PAID)}`),
     check(
       'payments_paid_at_check',
       sql`${table.status} <> ${sqlLiteral(PAYMENT_STATUS.PAID)} OR ${table.paidAt} IS NOT NULL`,

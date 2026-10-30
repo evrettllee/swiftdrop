@@ -3,6 +3,7 @@ export * from './users';
 export * from './user-oauth-accounts';
 export * from './courier-profiles';
 export * from './vehicles';
+export * from './courier-shifts';
 export * from './refresh-tokens';
 export * from './password-reset-tokens';
 export * from './email-verification-tokens';

@@ -155,6 +155,20 @@
       "when": 1793383698245,
       "tag": "0021_service_zones_name_lower",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793384679551,
+      "tag": "0022_courier_shifts",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793385323866,
+      "tag": "0023_analytics_indexes",
+      "breakpoints": true
     }
   ]
 }

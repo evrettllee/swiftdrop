@@ -39,6 +39,7 @@ export const orderOffers = pgTable(
   },
   (table) => [
     index('order_offers_courier_id_idx').on(table.courierId),
+    index('order_offers_offered_at_idx').on(table.offeredAt),
     // An order is offered to the same courier at most once a round; also serves lookups by order.
     uniqueIndex('order_offers_order_courier_round_uidx').on(
       table.orderId,

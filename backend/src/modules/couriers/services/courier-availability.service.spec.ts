@@ -29,8 +29,10 @@ function setUp(wasAvailable: boolean, results: unknown[][], activeOrderId: numbe
     shiftEvents,
   );
 
-  return { service, log };
+  return { service, log, fake };
 }
+
+const methods = (fake: ReturnType<typeof queueDatabase>) => fake.calls.map((call) => call.method);
 
 describe('CourierAvailabilityService shift events', () => {
   it('should announce going on shift after the commit', async () => {
@@ -55,6 +57,35 @@ describe('CourierAvailabilityService shift events', () => {
     await service.set(9, true);
 
     expect(log).toEqual(['commit']);
+  });
+
+  it('should open a shift in the same transaction when the courier goes on the line', async () => {
+    const { service, fake } = setUp(false, [[{ vehicleId: 1 }], []]);
+
+    await service.set(9, true);
+
+    const values = fake.calls.find((call) => call.method === 'values')?.args[0];
+    expect(methods(fake)).toContain('insert');
+    expect(methods(fake)).toContain('onConflictDoNothing');
+    expect(values).toMatchObject({ courierId: 5 });
+  });
+
+  it('should close the open shift when the courier leaves the line', async () => {
+    const { service, fake } = setUp(true, [[]]);
+
+    await service.set(9, false);
+
+    const sets = fake.calls.filter((call) => call.method === 'set').map((call) => call.args[0]);
+    expect(methods(fake)).not.toContain('insert');
+    expect(sets[1]).toHaveProperty('endedAt');
+  });
+
+  it('should open no second shift when the courier is already on the line', async () => {
+    const { service, fake } = setUp(true, [[{ vehicleId: 1 }], []]);
+
+    await service.set(9, true);
+
+    expect(methods(fake)).not.toContain('insert');
   });
 
   it('should announce nothing when going off shift is refused for an active order', async () => {
