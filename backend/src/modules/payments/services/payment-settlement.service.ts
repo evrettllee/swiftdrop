@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
@@ -21,7 +21,7 @@ export class PaymentSettlementService {
   ): Promise<{ orderId: number } | undefined> {
     const [payment] = await executor
       .update(payments)
-      .set({ status: PAYMENT_STATUS.PAID, stripePaymentId: paymentRef })
+      .set({ status: PAYMENT_STATUS.PAID, stripePaymentId: paymentRef, paidAt: sql`now()` })
       .where(
         and(
           eq(payments.checkoutSessionId, sessionId),

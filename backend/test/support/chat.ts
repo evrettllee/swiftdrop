@@ -6,15 +6,12 @@ import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { ROLE } from '@/common/enums/role.enum';
 import type { Database } from '@/database/database.module';
 import { courierProfiles, messages, orders } from '@/database/schema';
+import type { OrderJoinAck, OrderJoinRejection } from '@/modules/realtime/types/realtime.types';
 import { CHAT_ROUTES } from '@/modules/chat/constants/chat.constants';
 import type { ChatSenderRole } from '@/modules/chat/types/chat.types';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { COOKIE_HEADER } from './auth';
 import { getApi, postApi } from './http';
-import type {
-  OrderJoinAck,
-  OrderJoinRejection,
-} from '@/modules/couriers/types/couriers-socket.types';
 import { addCourierSession } from './assignment';
 import { assignOrder, CAR, COURIER_ACCOUNT } from './couriers';
 import { MINSK_PICKUP } from './fixtures';

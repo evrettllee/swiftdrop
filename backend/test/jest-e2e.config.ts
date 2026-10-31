@@ -17,6 +17,7 @@ const config: Config = {
   globalSetup: '<rootDir>/global-setup.ts',
   setupFiles: ['<rootDir>/setup-env.ts'],
   maxWorkers: 1,
+  workerIdleMemoryLimit: '1GB',
 };
 
 export default config;

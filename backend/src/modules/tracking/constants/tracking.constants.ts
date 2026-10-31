@@ -1,13 +1,5 @@
 import { MS_PER_MINUTE, MS_PER_SECOND } from '@/common/constants/time.constants';
 
-// Events of the order room, for the client who owns the order and its courier.
-export const ORDER_ROOM_EVENTS = {
-  // The order got a new status; sent after the change is committed.
-  ORDER_STATUS: 'order:status',
-  // A new arrival estimate and the line of the courier to their next point.
-  ORDER_ETA: 'order:eta',
-} as const;
-
 // Arrival estimate
 // One estimate per order at most this often: the routing service is shared and external. A new
 // status is estimated at once, as the next point of the courier changes with it.

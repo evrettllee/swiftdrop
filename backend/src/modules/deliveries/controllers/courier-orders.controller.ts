@@ -9,8 +9,8 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
@@ -61,7 +61,7 @@ export class CourierOrdersController {
 
   // Before the pickup: to the pickup point and on to the recipient; after it: to the recipient.
   @Get(COURIER_ORDERS_ROUTES.CURRENT_ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   async currentRoute(@CurrentUser() user: AuthUser): Promise<RouteLines> {
     const courierProfileId = await this.profiles.getProfileId(user.userId);
     const order = await this.views.findActive(courierProfileId);
@@ -123,7 +123,7 @@ export class CourierOrdersController {
 
   // The trip of the parcel of a finished order, by the vehicle of the courier.
   @Get(COURIER_ORDERS_ROUTES.ORDER_ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   async finishedRoute(
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,

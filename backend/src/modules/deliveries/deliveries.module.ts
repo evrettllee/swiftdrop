@@ -5,7 +5,7 @@ import { ClientOrderCourierController } from './controllers/client-order-courier
 import { CourierOrdersController } from './controllers/courier-orders.controller';
 import { CourierStatsController } from './controllers/courier-stats.controller';
 import { ClientOrderCourierService } from './services/client-order-courier.service';
-import { ClientOrderRouteService } from './services/client-order-route.service';
+import { OrderRouteService } from './services/order-route.service';
 import { CourierHistoryOrderService } from './services/courier-history-order.service';
 import { CourierHistoryService } from './services/courier-history.service';
 import { CourierOrderViewsService } from './services/courier-order-views.service';
@@ -22,10 +22,11 @@ import { TrackingModule } from '@/modules/tracking/tracking.module';
     DeliveryProgressService,
     DeliveryHandoverService,
     ClientOrderCourierService,
-    ClientOrderRouteService,
+    OrderRouteService,
     CourierHistoryService,
     CourierHistoryOrderService,
     CourierStatsService,
   ],
+  exports: [OrderRouteService],
 })
 export class DeliveriesModule {}

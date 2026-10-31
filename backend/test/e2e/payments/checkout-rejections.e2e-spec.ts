@@ -17,6 +17,7 @@ import { MISSING_ORDER_ID } from '@test/support/constants';
 import { placeOrders, SECOND_CLIENT } from '@test/support/orders';
 import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '@test/support/payments';
 import { resetServiceArea } from '@test/support/pricing';
+import { statusChange } from '@test/support/order-status';
 
 // At this rate 9.23 BYN is one cent, below the 50 cents that Stripe accepts.
 const TINY_AMOUNT_RATE = 1000;
@@ -53,7 +54,7 @@ describe('Payments rejections (e2e)', () => {
     const [orderId] = await placeOrders(app, cookies, 1);
     await db
       .update(orders)
-      .set({ status: ORDER_STATUS.CANCELLED })
+      .set(statusChange(ORDER_STATUS.CANCELLED))
       .where(eq(orders.orderId, orderId));
 
     const response = await postPayment(app, cookies, { orderId }).expect(HttpStatus.CONFLICT);

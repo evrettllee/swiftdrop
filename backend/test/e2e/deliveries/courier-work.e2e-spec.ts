@@ -1,11 +1,12 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { eq } from 'drizzle-orm';
 import { MS_PER_DAY } from '@/common/constants/time.constants';
 import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
 import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
-import { orderStatusHistory } from '@/database/schema';
+import { orders, orderStatusHistory } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   COURIER_ORDERS_ROUTES,
@@ -17,6 +18,7 @@ import { COOKIE_HEADER, registerUser } from '@test/support/auth';
 import { assignOrder, CAR, COURIER_ACCOUNT } from '@test/support/couriers';
 import { MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '@test/support/fixtures';
 import { getApi } from '@test/support/http';
+import { statusChange } from '@test/support/order-status';
 import { placeOrders } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
 
@@ -42,6 +44,7 @@ describe('Courier history and today stats (e2e)', () => {
   // Ends the order with the courier and writes the final status to its history at that moment.
   async function finish(orderId: number, status: OrderStatus, at: Date = new Date()) {
     await assignOrder(db, orderId, courierId, status);
+    await db.update(orders).set(statusChange(status, at)).where(eq(orders.orderId, orderId));
     await db.insert(orderStatusHistory).values({ orderId, status, changedBy: null, changedAt: at });
   }
 

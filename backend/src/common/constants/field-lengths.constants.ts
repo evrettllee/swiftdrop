@@ -48,7 +48,8 @@ export const TARIFF_FIELD_LENGTH = {
 } as const;
 
 export const SERVICE_ZONE_FIELD_LENGTH = {
-  NAME: 100,
+  NAME_MIN: 1,
+  NAME: 80,
 } as const;
 
 export const ORDER_FIELD_LENGTH = {
@@ -58,13 +59,18 @@ export const ORDER_FIELD_LENGTH = {
   RECIPIENT_NAME: 150,
 } as const;
 
+export const ORDER_STATUS_HISTORY_FIELD_LENGTH = {
+  COMMENT: 500,
+} as const;
+
 export const PAYMENT_FIELD_LENGTH = {
   CHECKOUT_SESSION_ID: 255,
   STRIPE_PAYMENT_ID: 255,
 } as const;
 
 export const SUPPORT_TICKET_FIELD_LENGTH = {
-  SUBJECT: 255,
+  SUBJECT_MIN: 1,
+  SUBJECT: 80,
 } as const;
 
 export const MESSAGE_FIELD_LENGTH = {

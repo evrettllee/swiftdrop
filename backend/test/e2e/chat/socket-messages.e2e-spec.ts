@@ -4,7 +4,7 @@ import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import { CHAT_SOCKET_EVENTS } from '@/modules/chat/constants/chat.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import type {
   ChatHistory,
   MessageNewEvent,
@@ -51,14 +51,14 @@ describe('Chat over the order room (e2e)', () => {
     await joinOrderRoom(client, { orderId });
     await joinOrderRoom(courier, { orderId });
 
-    const arrived = waitForEvent<MessageNewEvent>(courier, CHAT_SOCKET_EVENTS.MESSAGE_NEW);
+    const arrived = waitForEvent<MessageNewEvent>(courier, SOCKET_EVENTS.MESSAGE_NEW);
     await sendChatMessage(app, clientCookies, orderId, { content: 'Подъезд 3' }).expect(
       HttpStatus.CREATED,
     );
     const { message } = await arrived;
     expect(message).toMatchObject({ senderRole: ROLE.CLIENT, content: 'Подъезд 3' });
 
-    const seen = waitForEvent<MessageReadEvent>(client, CHAT_SOCKET_EVENTS.MESSAGE_READ);
+    const seen = waitForEvent<MessageReadEvent>(client, SOCKET_EVENTS.MESSAGE_READ);
     await markChatRead(app, courierCookies, orderId, { upToMessageId: message.messageId }).expect(
       HttpStatus.OK,
     );

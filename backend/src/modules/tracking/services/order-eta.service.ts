@@ -5,15 +5,12 @@ import type { OrderStatusChange } from '@/common/database/order-status-transitio
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import { describeError } from '@/common/utils/describe-error';
 import { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
-import { CouriersGateway } from '@/modules/couriers/gateways/couriers.gateway';
 import { CourierLocationEventsService } from '@/modules/couriers/services/courier-location-events.service';
 import { isPositionStale } from '@/modules/deliveries/utils/courier-position';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
 import { routingProfileOf } from '@/modules/routing/utils/routing-courier';
-import {
-  ETA_RECALC_INTERVAL_MS,
-  ETA_SHUTDOWN_WAIT_MS,
-  ORDER_ROOM_EVENTS,
-} from '../constants/tracking.constants';
+import { ETA_RECALC_INTERVAL_MS, ETA_SHUTDOWN_WAIT_MS } from '../constants/tracking.constants';
 import type { CourierLeg, OrderEtaEntry, OrderEtaEvent } from '../types/tracking.types';
 import { etaPlan, pickupArrival } from '../utils/eta-points';
 import { PendingTasks } from '../utils/pending-tasks';
@@ -36,7 +33,7 @@ export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
     private readonly store: OrderEtaStore,
     private readonly data: OrderEtaDataService,
     private readonly trips: OsrmTripService,
-    private readonly gateway: CouriersGateway,
+    private readonly events: RealtimeEventsService,
     private readonly locationEvents: CourierLocationEventsService,
   ) {}
 
@@ -53,6 +50,13 @@ export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
       } else {
         this.store.delete(orderId);
       }
+    }
+  }
+
+  onCourierChanges(changes: readonly OrderStatusChange[]): void {
+    for (const { orderId } of changes) {
+      this.store.delete(orderId);
+      void this.refresh(orderId, true);
     }
   }
 
@@ -164,10 +168,6 @@ export class OrderEtaService implements OnModuleInit, OnApplicationShutdown {
   }
 
   private emit(event: OrderEtaEvent): void {
-    try {
-      this.gateway.emitToOrder(event.orderId, ORDER_ROOM_EVENTS.ORDER_ETA, event);
-    } catch (error) {
-      this.logger.error(`Estimate of order ${event.orderId} not sent: ${describeError(error)}`);
-    }
+    this.events.toOrder(event.orderId, SOCKET_EVENTS.ORDER_ETA, event);
   }
 }

@@ -88,6 +88,7 @@ describe('Order details (e2e)', () => {
       },
       history: [{ status: ORDER_STATUS.PENDING, changedAt: expect.any(String) }],
       cancelledBy: null,
+      cancelReason: null,
       payment: null,
     });
   });

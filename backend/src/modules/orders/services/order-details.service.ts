@@ -80,6 +80,7 @@ export class OrderDetailsService {
         status: orderStatusHistory.status,
         changedAt: orderStatusHistory.changedAt,
         changedBy: orderStatusHistory.changedBy,
+        comment: orderStatusHistory.comment,
       })
       .from(orderStatusHistory)
       .where(eq(orderStatusHistory.orderId, orderId))

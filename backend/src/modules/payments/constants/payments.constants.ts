@@ -43,6 +43,12 @@ export const PENDING_PAYMENT_OUTCOME = {
   LEFT_PENDING: 'left_pending',
 } as const;
 
+export const ORDER_REFUND = {
+  NONE: 'none',
+  PENDING: 'pending',
+  REFUNDED: 'refunded',
+} as const;
+
 // After the payment page the client comes back to the page of the order with this parameter.
 export const ORDER_PAGE_PATH = '/orders';
 export const PAYMENT_RETURN_PARAM = 'payment';

@@ -6,7 +6,7 @@ import {
   ORDER_JOIN_MAX_ATTEMPTS,
   ORDER_JOIN_REJECTIONS,
   ORDER_ROOMS_MAX_PER_SOCKET,
-} from '@/modules/couriers/constants/couriers-socket.constants';
+} from '@/modules/realtime/constants/realtime.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { OpenSockets, ORDER_JOIN_OK, orderJoinRefusal } from '@test/support/chat';

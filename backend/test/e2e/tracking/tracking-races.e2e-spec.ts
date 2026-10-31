@@ -5,8 +5,7 @@ import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
 import { orders } from '@/database/schema';
-import { COURIER_SOCKET_EVENTS } from '@/modules/couriers/constants/couriers-socket.constants';
-import { ORDER_ROOM_EVENTS } from '@/modules/tracking/constants/tracking.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
 import { registerUser } from '@test/support/auth';
 import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
@@ -17,6 +16,7 @@ import { readOrderStatus } from '@test/support/orders';
 import { createRoutingMocks, createRoutingTestApp, resetRouting } from '@test/support/routing';
 import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '@test/support/sockets';
 import { assignTrackedCourier, sendLocation } from '@test/support/tracking';
+import { statusChange } from '@test/support/order-status';
 
 // Older than the limit of positions per courier, so the next one is stored.
 const PAST_POSITION_MS = 10_000;
@@ -35,7 +35,7 @@ describe('Positions and estimates at the end of an order (e2e)', () => {
   function deliverUncommitted(tx: Transaction) {
     return tx
       .update(orders)
-      .set({ status: ORDER_STATUS.DELIVERED })
+      .set(statusChange(ORDER_STATUS.DELIVERED))
       .where(eq(orders.orderId, orderId));
   }
 
@@ -74,7 +74,7 @@ describe('Positions and estimates at the end of an order (e2e)', () => {
   // The window of a position at the delivery: a delivery not yet committed is not seen, so that one
   // position still goes to the room. Once the delivery is committed no position goes there.
   it('should send no position to the room once the delivery is committed', async () => {
-    const positions = collectEvents(client, COURIER_SOCKET_EVENTS.COURIER_LOCATION);
+    const positions = collectEvents(client, SOCKET_EVENTS.COURIER_LOCATION);
     const socket = await sockets.connect(baseUrl, courier.cookies);
 
     await whileRowsAreHeld(db, deliverUncommitted, () => sendLocation(socket));
@@ -98,7 +98,7 @@ describe('Positions and estimates at the end of an order (e2e)', () => {
   // The estimate reads the order before the change and skips the row the change holds.
   it('should save no estimate and send no order:eta while the status is being changed', async () => {
     await placeCourierAt(db, courier.courierProfileId, MINSK_PICKUP, new Date());
-    const estimates = collectEvents(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const estimates = collectEvents(client, SOCKET_EVENTS.ORDER_ETA);
     const before = await readEstimate();
 
     await whileRowsAreHeld(db, deliverUncommitted, () =>

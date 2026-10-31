@@ -20,6 +20,8 @@ import { AssignmentModule } from '@/modules/assignment/assignment.module';
 import { ChatModule } from '@/modules/chat/chat.module';
 import { CouriersModule } from '@/modules/couriers/couriers.module';
 import { DeliveriesModule } from '@/modules/deliveries/deliveries.module';
+import { ManagerModule } from '@/modules/manager/manager.module';
+import { SupportModule } from '@/modules/support/support.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
 import { PricingModule } from '@/modules/pricing/pricing.module';
@@ -49,6 +51,8 @@ import { ZonesModule } from '@/modules/zones/zones.module';
     DeliveriesModule,
     RoutingModule,
     ChatModule,
+    ManagerModule,
+    SupportModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

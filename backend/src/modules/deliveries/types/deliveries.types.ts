@@ -1,3 +1,4 @@
+import type { ListPage } from '@/common/types/page.types';
 import type { OrderTransitionChanges } from '@/common/database/order-status-transition';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { VehicleType } from '@/common/enums/vehicle-type.enum';
@@ -123,12 +124,7 @@ export type CourierHistoryItem = Omit<CourierHistoryRow, 'finishedAt'> & {
   finishedAt: string | null;
 };
 
-export type CourierHistoryPage = {
-  items: CourierHistoryItem[];
-  page: number;
-  limit: number;
-  total: number;
-};
+export type CourierHistoryPage = ListPage<CourierHistoryItem>;
 
 export type CourierTodayStats = {
   delivered: number;

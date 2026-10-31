@@ -1,22 +1,15 @@
 import { Module } from '@nestjs/common';
-import { CouriersModule } from '@/modules/couriers/couriers.module';
+import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { ChatMessagesController } from './controllers/chat-messages.controller';
-import { ChatSendThrottleGuard } from './guards/chat-send-throttle.guard';
 import { ChatHistoryService } from './services/chat-history.service';
 import { ChatReadService } from './services/chat-read.service';
 import { ChatSendService } from './services/chat-send.service';
 import { ChatUnreadService } from './services/chat-unread.service';
 
-// The order rooms live in the socket gateway of CouriersModule.
+// The order rooms live in the socket gateway of RealtimeModule.
 @Module({
-  imports: [CouriersModule],
+  imports: [RealtimeModule],
   controllers: [ChatMessagesController],
-  providers: [
-    ChatHistoryService,
-    ChatUnreadService,
-    ChatSendService,
-    ChatReadService,
-    ChatSendThrottleGuard,
-  ],
+  providers: [ChatHistoryService, ChatUnreadService, ChatSendService, ChatReadService],
 })
 export class ChatModule {}

@@ -16,6 +16,7 @@ import { registerUser } from '@test/support/auth';
 import { VALID_ORDER_PRICE } from '@test/support/fixtures';
 import { getOrders, placeOrders, SECOND_CLIENT } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
+import { statusChange } from '@test/support/order-status';
 
 type ListBody = { items: { orderId: number }[] };
 
@@ -51,6 +52,7 @@ describe('Orders list (e2e)', () => {
       total: 0,
       page: ORDERS_FIRST_PAGE,
       limit: ORDERS_PAGE_SIZE_DEFAULT,
+      until: null,
     });
   });
 
@@ -90,7 +92,7 @@ describe('Orders list (e2e)', () => {
     const [finishedId, activeId] = await placeOrders(app, cookies, 2);
     await db
       .update(orders)
-      .set({ status: ORDER_STATUS.DELIVERED })
+      .set(statusChange(ORDER_STATUS.DELIVERED))
       .where(eq(orders.orderId, finishedId));
 
     const finished = await getOrders(app, cookies, { filter: ORDER_LIST_FILTER.FINISHED }).expect(

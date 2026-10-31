@@ -21,6 +21,7 @@ export class DispatchOrdersService {
         pickup: { latitude: pickup.latitude, longitude: pickup.longitude },
         delivery: { latitude: delivery.latitude, longitude: delivery.longitude },
         parcel: parcelColumns(),
+        round: orders.assignmentRound,
       })
       .from(orders)
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))

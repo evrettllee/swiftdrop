@@ -1,5 +1,5 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
@@ -36,7 +36,7 @@ export class PaymentRefundService {
       await this.gateway.refund(payment.paymentRef);
       await this.db
         .update(payments)
-        .set({ status: PAYMENT_STATUS.REFUNDED })
+        .set({ status: PAYMENT_STATUS.REFUNDED, refundedAt: sql`now()` })
         .where(and(eq(payments.paymentId, paymentId), eq(payments.status, PAYMENT_STATUS.PAID)));
       this.logger.log(`Payment ${paymentId} refunded`);
       isRefunded = true;

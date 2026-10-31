@@ -2,13 +2,14 @@ import { Logger } from '@nestjs/common';
 import { DatabaseError } from 'pg';
 import { PG_LOCK_NOT_AVAILABLE_CODE } from '@/common/constants/database.constants';
 import type { Database } from '@/database/database.module';
-import { LOCATION_UPDATE_REJECTIONS } from '../constants/couriers-socket.constants';
+import { LOCATION_UPDATE_REJECTIONS } from '../constants/courier-location.constants';
 import { CourierLocationService } from './courier-location.service';
 
 const COURIER_ID = 7;
 const ORDER_ID = 42;
 const POINT = { latitude: 53.9, longitude: 27.56 };
 const SAVED_AT = new Date('2026-10-14T12:00:00Z');
+const SAVED = { courierProfileId: COURIER_ID, ...POINT, updatedAt: SAVED_AT.toISOString() };
 
 function lockTimeout(): Error {
   const cause = new DatabaseError('lock timeout', 0, 'error');
@@ -34,12 +35,13 @@ describe('CourierLocationService.record', () => {
     logError.mockRestore();
   });
 
-  it('should acknowledge the position with no event when there is no active order', async () => {
+  it('should acknowledge the position with no order event when there is no active order', async () => {
     save.mockResolvedValue({ locationUpdatedAt: SAVED_AT, activeOrderId: null });
 
     await expect(service.record(COURIER_ID, POINT)).resolves.toEqual({
       ack: { ok: true },
       event: null,
+      saved: SAVED,
     });
   });
 
@@ -49,6 +51,7 @@ describe('CourierLocationService.record', () => {
     await expect(service.record(COURIER_ID, POINT)).resolves.toEqual({
       ack: { ok: true },
       event: { orderId: ORDER_ID, ...POINT, updatedAt: SAVED_AT.toISOString() },
+      saved: SAVED,
     });
   });
 
@@ -61,6 +64,7 @@ describe('CourierLocationService.record', () => {
       await expect(service.record(COURIER_ID, POINT)).resolves.toEqual({
         ack: { ok: false, reason },
         event: null,
+        saved: null,
       });
     },
   );
@@ -71,6 +75,7 @@ describe('CourierLocationService.record', () => {
     await expect(service.record(COURIER_ID, POINT)).resolves.toEqual({
       ack: { ok: false, reason: LOCATION_UPDATE_REJECTIONS.BUSY },
       event: null,
+      saved: null,
     });
     expect(logError).not.toHaveBeenCalled();
   });
@@ -81,6 +86,7 @@ describe('CourierLocationService.record', () => {
     await expect(service.record(COURIER_ID, POINT)).resolves.toEqual({
       ack: { ok: false, reason: LOCATION_UPDATE_REJECTIONS.UNAVAILABLE },
       event: null,
+      saved: null,
     });
     expect(logError).toHaveBeenCalledTimes(1);
   });

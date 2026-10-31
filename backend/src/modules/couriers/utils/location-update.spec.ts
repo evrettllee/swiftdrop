@@ -1,21 +1,17 @@
-import { ROLE } from '@/common/enums/role.enum';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,
-} from '../constants/couriers-socket.constants';
-import type { CourierSocketData } from '../types/couriers-socket.types';
+} from '../constants/courier-location.constants';
+import type { CourierLocationSession } from '../types/courier-location.types';
 import { rejectLocationUpdate } from './location-update';
 
 const NOW_MS = 1_000_000;
 const LATER_MS = 2_000_000;
 
-function socketData(overrides: Partial<CourierSocketData> = {}): CourierSocketData {
+function socketData(overrides: Partial<CourierLocationSession> = {}): CourierLocationSession {
   return {
-    role: ROLE.COURIER,
-    userId: 1,
     courierProfileId: 1,
     sessionExpiresAtMs: LATER_MS,
-    orderJoinAttemptsMs: [],
     lastLocationAtMs: null,
     ...overrides,
   };

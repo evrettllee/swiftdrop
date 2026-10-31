@@ -13,6 +13,7 @@ const ORDER: DispatchOrder = {
   pickup: PICKUP,
   delivery: DELIVERY,
   parcel: { weightKg: 1, lengthCm: 20, widthCm: 15, heightCm: 10, isFragile: false },
+  round: 1,
 };
 
 const BY_CAR: CourierCandidate = {

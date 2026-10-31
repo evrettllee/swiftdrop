@@ -20,4 +20,4 @@ export const DB_PING_QUERY = 'SELECT 1';
 // pool), so without the limit such a wait would never end.
 export const DB_LOCK_TIMEOUT_MS = 5 * MS_PER_SECOND;
 // Session settings passed with every connection of the pool.
-export const DB_CONNECTION_OPTIONS = `-c lock_timeout=${DB_LOCK_TIMEOUT_MS}`;
+export const DB_CONNECTION_OPTIONS = `-c lock_timeout=${DB_LOCK_TIMEOUT_MS} -c jit=off`;

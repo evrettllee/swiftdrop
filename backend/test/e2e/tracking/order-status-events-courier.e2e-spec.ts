@@ -12,7 +12,7 @@ import {
 } from '@/modules/assignment/constants/assignment.constants';
 import { COURIER_ORDERS_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
-import { ORDER_ROOM_EVENTS } from '@/modules/tracking/constants/tracking.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
 import { createTestApp } from '@test/support/app';
 import { addCourierSession, insertOffer } from '@test/support/assignment';
 import { COOKIE_HEADER, registerUser } from '@test/support/auth';
@@ -132,7 +132,7 @@ describe('Order status events of the courier steps (e2e)', () => {
   it('should send the event only once the change can be read from the database', async () => {
     const client = await watchOrderStatus(sockets, baseUrl, clientCookies, orderId);
     const statusAtEvent = new Promise<string>((resolve) => {
-      client.socket.once(ORDER_ROOM_EVENTS.ORDER_STATUS, () => {
+      client.socket.once(SOCKET_EVENTS.ORDER_STATUS, () => {
         void readOrderStatus(db, orderId).then(resolve);
       });
     });

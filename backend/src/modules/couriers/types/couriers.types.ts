@@ -29,3 +29,8 @@ export type CourierProfileRow = {
   model: string | null;
   licensePlate: string | null;
 };
+
+export type CourierShiftEvent = {
+  courierProfileId: number;
+  isAvailable: boolean;
+};

@@ -1,13 +1,14 @@
 import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { withLockConflict } from '@/common/database/lock-conflict';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
-import { courierProfiles, vehicles } from '@/database/schema';
+import { courierProfiles, courierShifts, vehicles } from '@/database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
-import type { CourierMe } from '../types/couriers.types';
+import type { CourierMe, CourierShiftEvent } from '../types/couriers.types';
 import { CourierProfilesService } from './courier-profiles.service';
+import { CourierShiftEventsService } from './courier-shift-events.service';
 
 @Injectable()
 export class CourierAvailabilityService {
@@ -16,15 +17,20 @@ export class CourierAvailabilityService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly profiles: CourierProfilesService,
+    private readonly shiftEvents: CourierShiftEventsService,
   ) {}
 
   async set(userId: number, isAvailable: boolean): Promise<CourierMe> {
-    await withLockConflict(
+    const change = await withLockConflict(
       () => this.db.transaction((tx) => this.applyAvailability(tx, userId, isAvailable)),
       COURIERS_ERROR_MESSAGES.BUSY,
       () =>
         this.logger.warn(`Courier profile of user ${userId} is busy, availability change refused`),
     );
+
+    if (change) {
+      this.shiftEvents.publish(change);
+    }
 
     return this.profiles.getMe(userId);
   }
@@ -36,7 +42,7 @@ export class CourierAvailabilityService {
     tx: Transaction,
     userId: number,
     isAvailable: boolean,
-  ): Promise<void> {
+  ): Promise<CourierShiftEvent | null> {
     const profile = await this.profiles.lockOwnProfile(tx, userId);
 
     if (isAvailable && !(await this.hasVehicle(tx, profile.courierProfileId))) {
@@ -62,7 +68,36 @@ export class CourierAvailabilityService {
       .set({ isAvailable, ...location })
       .where(eq(courierProfiles.courierProfileId, profile.courierProfileId));
 
+    await this.recordShift(tx, profile.courierProfileId, isAvailable, profile.isAvailable);
+
     this.logger.log(`Courier ${profile.courierProfileId} is ${isAvailable ? 'on' : 'off'} shift`);
+
+    return profile.isAvailable === isAvailable
+      ? null
+      : { courierProfileId: profile.courierProfileId, isAvailable };
+  }
+
+  private async recordShift(
+    tx: Transaction,
+    courierId: number,
+    isAvailable: boolean,
+    wasAvailable: boolean,
+  ): Promise<void> {
+    if (!isAvailable) {
+      await tx
+        .update(courierShifts)
+        .set({ endedAt: sql`now()` })
+        .where(and(eq(courierShifts.courierId, courierId), isNull(courierShifts.endedAt)));
+
+      return;
+    }
+
+    if (!wasAvailable) {
+      await tx
+        .insert(courierShifts)
+        .values({ courierId, startedAt: sql`now()` })
+        .onConflictDoNothing();
+    }
   }
 
   private async hasVehicle(tx: Transaction, courierProfileId: number): Promise<boolean> {

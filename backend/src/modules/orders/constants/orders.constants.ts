@@ -3,6 +3,7 @@ import {
   PERSON_FIELD_LENGTH,
 } from '@/common/constants/field-lengths.constants';
 import {
+  ORDER_FINISHED_STATUSES,
   ORDER_ID_INVALID_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
 } from '@/common/constants/orders.constants';
@@ -10,6 +11,11 @@ import {
   NAME_ALLOWED_CHARACTERS,
   NAME_MIN_LENGTH,
 } from '@/common/constants/person-validation.constants';
+import {
+  LIST_FIRST_PAGE,
+  LIST_LIMIT_MAX,
+  LIST_VALIDATION_MESSAGES,
+} from '@/common/constants/list.constants';
 import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
@@ -41,11 +47,7 @@ export const ACTIVE_STATUSES: readonly OrderStatus[] = [
 ];
 
 // Finished orders: the "Finished" tab of the list; only these can be repeated.
-export const FINISHED_STATUSES: readonly OrderStatus[] = [
-  ORDER_STATUS.DELIVERED,
-  ORDER_STATUS.CANCELLED,
-  ORDER_STATUS.REJECTED,
-];
+export const FINISHED_STATUSES: readonly OrderStatus[] = ORDER_FINISHED_STATUSES;
 
 export const ORDER_CANCELLED_BY = {
   CLIENT: 'client',
@@ -66,10 +68,35 @@ export const ORDER_LIST_FILTER_VALUES = [
   ORDER_LIST_FILTER.FINISHED,
 ] as const;
 
-export const ORDERS_FIRST_PAGE = 1;
-export const ORDERS_PAGE_SIZE_MIN = 1;
-export const ORDERS_PAGE_SIZE_DEFAULT = 5;
-export const ORDERS_PAGE_SIZE_MAX = 50;
+export const ORDER_STATUS_GROUP = {
+  ACTIVE: 'active',
+  FINISHED: 'finished',
+  CANCELLED: 'cancelled',
+} as const;
+
+export const ORDER_STATUS_GROUP_VALUES = [
+  ORDER_STATUS_GROUP.ACTIVE,
+  ORDER_STATUS_GROUP.FINISHED,
+  ORDER_STATUS_GROUP.CANCELLED,
+] as const;
+
+export const ORDER_STATUS_GROUP_STATUSES: Record<
+  (typeof ORDER_STATUS_GROUP_VALUES)[number],
+  readonly OrderStatus[]
+> = {
+  active: ACTIVE_STATUSES,
+  finished: [ORDER_STATUS.DELIVERED],
+  cancelled: [ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED],
+};
+
+export const ORDERS_FIRST_PAGE = LIST_FIRST_PAGE;
+export const ORDERS_PAGE_SIZE_DEFAULT = 10;
+export const ORDERS_PAGE_SIZE_MAX = LIST_LIMIT_MAX;
+
+export const ORDERS_SORT_KEY = {
+  CREATED_AT: 'createdAt',
+  PRICE: 'price',
+} as const;
 
 // Payment
 // An unpaid order is cancelled after this time (a Stripe Checkout Session lives 30 minutes at least).
@@ -99,9 +126,10 @@ export const ORDERS_VALIDATION_MESSAGES = {
   RECIPIENT_NAME_TOO_SHORT: `Имя получателя должно содержать минимум ${NAME_MIN_LENGTH} символа`,
   RECIPIENT_NAME_TOO_LONG: `Имя получателя должно содержать не больше ${PERSON_FIELD_LENGTH.NAME} символов`,
   RECIPIENT_NAME_INVALID: `Имя получателя может содержать ${NAME_ALLOWED_CHARACTERS}`,
-  PAGE_INVALID: 'Некорректный номер страницы',
-  LIMIT_INVALID: `Размер страницы: от ${ORDERS_PAGE_SIZE_MIN} до ${ORDERS_PAGE_SIZE_MAX}`,
+  PAGE_INVALID: LIST_VALIDATION_MESSAGES.PAGE_INVALID,
+  LIMIT_INVALID: LIST_VALIDATION_MESSAGES.LIMIT_INVALID,
   FILTER_INVALID: 'Неизвестный фильтр заказов',
+  FILTER_AND_STATUS: 'Укажите либо filter, либо status',
   ORDER_ID_INVALID: ORDER_ID_INVALID_MESSAGE,
 } as const;
 

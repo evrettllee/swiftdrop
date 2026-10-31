@@ -51,7 +51,7 @@ export class CourierHistoryOrderService {
       .select({
         orderId: orders.orderId,
         status: orders.status,
-        finishedAt: orderStatusHistory.changedAt,
+        finishedAt: orders.finishedAt,
         pickup: addressPointColumns(pickup),
         delivery: addressPointColumns(delivery),
         parcel: parcelColumns(),
@@ -61,14 +61,6 @@ export class CourierHistoryOrderService {
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))
       .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
       .innerJoin(packages, eq(packages.orderId, orders.orderId))
-      // The final status is written to the history once, so this row is the moment it ended.
-      .leftJoin(
-        orderStatusHistory,
-        and(
-          eq(orderStatusHistory.orderId, orders.orderId),
-          eq(orderStatusHistory.status, orders.status),
-        ),
-      )
       .where(
         and(
           eq(orders.orderId, orderId),

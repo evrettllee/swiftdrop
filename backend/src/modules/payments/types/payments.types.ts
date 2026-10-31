@@ -1,5 +1,6 @@
 import type {
   CHECKOUT_SESSION_STATUS,
+  ORDER_REFUND,
   PAYMENT_EVENT,
   PAYMENT_RETURN_RESULT,
   PENDING_PAYMENT_OUTCOME,
@@ -36,6 +37,8 @@ export type CheckoutSessionState = {
   // The reference of the payment, it is known once the session is paid.
   paymentRef: string | null;
 };
+
+export type OrderRefund = (typeof ORDER_REFUND)[keyof typeof ORDER_REFUND];
 
 export type PendingPaymentOutcome =
   (typeof PENDING_PAYMENT_OUTCOME)[keyof typeof PENDING_PAYMENT_OUTCOME];

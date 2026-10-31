@@ -6,6 +6,8 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { addresses, orders, orderStatusHistory, packages } from '@/database/schema';
 import { PricingService } from '@/modules/pricing/services/pricing.service';
+import type { PriceQuote } from '@/modules/pricing/types/pricing.types';
+import { OrderEventsService } from '@/modules/tracking/services/order-events.service';
 import type { CreateOrderDto } from '../dto/create-order.dto';
 import { toAddressRow, toPackageRow } from '../mappers/order-rows.mapper';
 import { ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';
@@ -18,6 +20,7 @@ export class OrderPlacementService {
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly pricing: PricingService,
+    private readonly orderEvents: OrderEventsService,
   ) {}
 
   async place(clientId: number, dto: CreateOrderDto): Promise<CreatedOrder> {
@@ -29,7 +32,33 @@ export class OrderPlacementService {
     });
     const estimatedDeliveryAt = new Date(Date.now() + estimate.estimatedMinutes * MS_PER_MINUTE);
 
-    const orderId = await this.db.transaction(async (tx) => {
+    const created = await this.insertOrder(
+      clientId,
+      dto,
+      { estimate, tariffId },
+      estimatedDeliveryAt,
+    );
+    const { orderId } = created;
+
+    this.orderEvents.publishCreated(created);
+    this.logger.log(`Order ${orderId} placed by client ${clientId}`);
+
+    return {
+      orderId,
+      status: ORDER_STATUS.PENDING,
+      price: estimate.price,
+      currency: estimate.currency,
+      estimatedDeliveryAt,
+    };
+  }
+
+  private insertOrder(
+    clientId: number,
+    dto: CreateOrderDto,
+    { estimate, tariffId }: PriceQuote,
+    estimatedDeliveryAt: Date,
+  ) {
+    return this.db.transaction(async (tx) => {
       const [pickup, delivery] = await tx
         .insert(addresses)
         .values([toAddressRow(dto.pickup), toAddressRow(dto.delivery)])
@@ -55,7 +84,12 @@ export class OrderPlacementService {
           estimatedMinutes: estimate.estimatedMinutes,
           estimatedDeliveryAt,
         })
-        .returning({ orderId: orders.orderId });
+        .returning({
+          orderId: orders.orderId,
+          status: orders.status,
+          statusChangedAt: orders.statusChangedAt,
+          courierId: orders.courierId,
+        });
 
       if (!order) {
         throw new InternalServerErrorException(ORDERS_ERROR_MESSAGES.CREATE_FAILED);
@@ -66,17 +100,7 @@ export class OrderPlacementService {
         .insert(orderStatusHistory)
         .values({ orderId: order.orderId, status: ORDER_STATUS.PENDING, changedBy: clientId });
 
-      return order.orderId;
+      return order;
     });
-
-    this.logger.log(`Order ${orderId} placed by client ${clientId}`);
-
-    return {
-      orderId,
-      status: ORDER_STATUS.PENDING,
-      price: estimate.price,
-      currency: estimate.currency,
-      estimatedDeliveryAt,
-    };
   }
 }
