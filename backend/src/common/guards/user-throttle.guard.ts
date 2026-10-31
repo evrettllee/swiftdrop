@@ -1,4 +1,13 @@
-import { type CanActivate, type ExecutionContext, Inject } from '@nestjs/common';
+import {
+  applyDecorators,
+  type CanActivate,
+  type ExecutionContext,
+  Inject,
+  Injectable,
+  SetMetadata,
+  UseGuards,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { ThrottlerException, ThrottlerStorage } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { DEFAULT_THROTTLER_NAME } from '@/common/constants/http.constants';
@@ -10,14 +19,27 @@ export type UserThrottleOptions = {
   message: string;
 };
 
-export abstract class UserThrottleGuard implements CanActivate {
-  protected abstract readonly options: UserThrottleOptions;
+export const USER_THROTTLE_METADATA = 'swiftdrop:user-throttle';
 
-  constructor(@Inject(ThrottlerStorage) private readonly storage: ThrottlerStorage) {}
+@Injectable()
+export class UserThrottleGuard implements CanActivate {
+  constructor(
+    @Inject(ThrottlerStorage) private readonly storage: ThrottlerStorage,
+    private readonly reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const options = this.reflector.getAllAndOverride<UserThrottleOptions | undefined>(
+      USER_THROTTLE_METADATA,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!options) {
+      return true;
+    }
+
     const { user } = context.switchToHttp().getRequest<Request & { user: { userId: number } }>();
-    const { key, limit, ttlMs, message } = this.options;
+    const { key, limit, ttlMs, message } = options;
     const { isBlocked } = await this.storage.increment(
       `${key}:${user.userId}`,
       ttlMs,
@@ -32,4 +54,11 @@ export abstract class UserThrottleGuard implements CanActivate {
 
     return true;
   }
+}
+
+export function UserThrottle(options: UserThrottleOptions) {
+  return applyDecorators(
+    SetMetadata(USER_THROTTLE_METADATA, options),
+    UseGuards(UserThrottleGuard),
+  );
 }

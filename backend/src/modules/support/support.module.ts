@@ -2,11 +2,6 @@ import { Module } from '@nestjs/common';
 import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { SupportStaffController } from './controllers/support-staff.controller';
 import { SupportTicketsController } from './controllers/support-tickets.controller';
-import {
-  SupportMessageThrottleGuard,
-  SupportStaffMessageThrottleGuard,
-  SupportTicketCreateThrottleGuard,
-} from './guards/support-throttle.guards';
 import { SupportEventsService } from './services/support-events.service';
 import { SupportMessageWriterService } from './services/support-message-writer.service';
 import { SupportStaffTicketsService } from './services/support-staff-tickets.service';
@@ -26,9 +21,6 @@ import { SupportTicketsService } from './services/support-tickets.service';
     SupportStaffTicketsService,
     SupportMessageWriterService,
     SupportEventsService,
-    SupportTicketCreateThrottleGuard,
-    SupportMessageThrottleGuard,
-    SupportStaffMessageThrottleGuard,
   ],
 })
 export class SupportModule {}

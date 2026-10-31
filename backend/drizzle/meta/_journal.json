@@ -169,6 +169,13 @@
       "when": 1793385323866,
       "tag": "0023_analytics_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793478577793,
+      "tag": "0024_support_tickets_closed_index",
+      "breakpoints": true
     }
   ]
 }

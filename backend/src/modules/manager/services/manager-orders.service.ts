@@ -19,6 +19,7 @@ import { MANAGER_ORDERS_SORT } from '../utils/manager-orders-sort';
 
 const CLIENT_ALIAS = 'client_user';
 const COURIER_ALIAS = 'courier_user';
+const PAGE_ALIAS = 'page';
 
 @Injectable()
 export class ManagerOrdersService {
@@ -45,6 +46,14 @@ export class ManagerOrdersService {
     const client = alias(users, CLIENT_ALIAS);
     const courierUser = alias(users, COURIER_ALIAS);
     const { pickup, delivery } = aliasOrderAddresses();
+    const page = this.db
+      .select({ pageOrderId: orders.orderId })
+      .from(orders)
+      .where(where)
+      .orderBy(...orderBy)
+      .limit(limit)
+      .offset(offset)
+      .as(PAGE_ALIAS);
 
     return this.db
       .select({
@@ -59,27 +68,24 @@ export class ManagerOrdersService {
         courierId: orders.courierId,
         courier: { firstName: courierUser.firstName, lastName: courierUser.lastName },
         fragile: packages.isFragile,
-        paymentState: paymentStateSql(this.db),
+        paymentState: paymentStateSql(),
         sortValue,
       })
-      .from(orders)
+      .from(page)
+      .innerJoin(orders, eq(orders.orderId, page.pageOrderId))
       .innerJoin(packages, eq(packages.orderId, orders.orderId))
       .innerJoin(client, eq(client.userId, orders.clientId))
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))
       .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
       .leftJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
       .leftJoin(courierUser, eq(courierUser.userId, courierProfiles.userId))
-      .where(where)
-      .orderBy(...orderBy)
-      .limit(limit)
-      .offset(offset);
+      .orderBy(...orderBy);
   }
 
   private async maxId(where: SQL | undefined): Promise<number | null> {
     const [row] = await this.db
       .select({ maxId: max(orders.orderId) })
       .from(orders)
-      .innerJoin(packages, eq(packages.orderId, orders.orderId))
       .where(where);
 
     return row?.maxId ?? null;

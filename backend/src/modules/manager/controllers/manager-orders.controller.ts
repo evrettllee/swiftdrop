@@ -1,14 +1,17 @@
-import { Controller, Get, Param, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { Controller, Get, Param, Query, Res, StreamableFile } from '@nestjs/common';
 import type { Response } from 'express';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import { OrderRouteService } from '@/modules/deliveries/services/order-route.service';
 import type { ClientOrderRoute } from '@/modules/deliveries/types/deliveries.types';
 import { type OrderIdParamDto, orderIdParamSchema } from '@/modules/orders/dto/order-id-param.dto';
 import { ROUTING_THROTTLE } from '@/modules/routing/constants/routing.constants';
-import { MANAGER_EXPORT_ROUTE } from '../constants/manager-export.constants';
+import {
+  MANAGER_EXPORT_ROUTE,
+  MANAGER_EXPORT_THROTTLE,
+} from '../constants/manager-export.constants';
 import { MANAGER_ORDERS_ROUTES } from '../constants/manager-orders.constants';
 import type { ManagerOrderDetails } from '../dto/manager-order-details.dto';
 import {
@@ -21,7 +24,6 @@ import {
   type ManagerOrdersDto,
   managerOrdersSchema,
 } from '../dto/manager-orders.dto';
-import { ManagerExportThrottleGuard } from '../guards/manager-throttle.guards';
 import { ManagerOrderCountsService } from '../services/manager-order-counts.service';
 import { ManagerOrderDetailsService } from '../services/manager-order-details.service';
 import { ManagerOrdersExportService } from '../services/manager-orders-export.service';
@@ -55,7 +57,7 @@ export class ManagerOrdersController {
   }
 
   @Get(MANAGER_EXPORT_ROUTE)
-  @UseGuards(ManagerExportThrottleGuard)
+  @UserThrottle(MANAGER_EXPORT_THROTTLE)
   async export(
     @Query(new ZodValidationPipe(managerOrdersExportSchema)) query: ManagerOrdersExportDto,
     @Res({ passthrough: true }) response: Response,
@@ -75,7 +77,7 @@ export class ManagerOrdersController {
   }
 
   @Get(MANAGER_ORDERS_ROUTES.ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   route(
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
   ): Promise<ClientOrderRoute> {

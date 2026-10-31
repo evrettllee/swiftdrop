@@ -2,6 +2,7 @@ import { MESSAGE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants
 import { SUPPORT_TICKET_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import { ROLE } from '@/common/enums/role.enum';
+import type { UserThrottleOptions } from '@/common/guards/user-throttle.guard';
 import { TICKET_TOPIC, type TicketTopic } from '@/common/enums/support-ticket.enum';
 
 export const TICKET_ID_ROUTE_PARAM = ':ticketId';
@@ -48,18 +49,6 @@ export const LAST_MESSAGE_PREVIEW_LENGTH = 120;
 export const SUPPORT_TICKETS_PAGE_SIZE_DEFAULT = 20;
 export const SUPPORT_MESSAGES_PAGE_SIZE_DEFAULT = 30;
 
-export const SUPPORT_TICKET_CREATE_THROTTLE = {
-  KEY: 'support-ticket-create',
-  LIMIT: 5,
-  TTL_MS: 60 * MS_PER_MINUTE,
-} as const;
-
-export const SUPPORT_MESSAGE_THROTTLE = {
-  KEY: 'support-message-send',
-  LIMIT: 20,
-  TTL_MS: MS_PER_MINUTE,
-} as const;
-
 export const SUPPORT_ERROR_CODE = {
   TICKET_ALREADY_OPEN: 'TICKET_ALREADY_OPEN',
   TICKET_CLOSED: 'TICKET_CLOSED',
@@ -91,3 +80,17 @@ export const SUPPORT_MESSAGES = {
   TOO_MANY_MESSAGES: 'Слишком много сообщений. Подождите минуту',
   BUSY: 'Обращение сейчас обновляется. Попробуйте ещё раз',
 } as const;
+
+export const SUPPORT_TICKET_CREATE_THROTTLE: UserThrottleOptions = {
+  key: 'support-ticket-create',
+  limit: 5,
+  ttlMs: 60 * MS_PER_MINUTE,
+  message: SUPPORT_MESSAGES.TOO_MANY_TICKETS,
+};
+
+export const SUPPORT_MESSAGE_THROTTLE: UserThrottleOptions = {
+  key: 'support-message-send',
+  limit: 20,
+  ttlMs: MS_PER_MINUTE,
+  message: SUPPORT_MESSAGES.TOO_MANY_MESSAGES,
+};

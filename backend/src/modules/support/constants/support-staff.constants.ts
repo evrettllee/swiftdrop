@@ -1,7 +1,8 @@
 import { SORT_DIRECTION } from '@/common/constants/list.constants';
 import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import { ROLE } from '@/common/enums/role.enum';
-import { TICKET_ID_ROUTE_PARAM } from './support.constants';
+import type { UserThrottleOptions } from '@/common/guards/user-throttle.guard';
+import { SUPPORT_MESSAGES, TICKET_ID_ROUTE_PARAM } from './support.constants';
 
 export const SUPPORT_STAFF_ROUTES = {
   BASE: 'manager/support',
@@ -37,11 +38,12 @@ export const SUPPORT_QUEUE_DEFAULT_DIRECTION = {
   [SUPPORT_VIEW.CLOSED]: SORT_DIRECTION.DESC,
 } as const;
 
-export const SUPPORT_STAFF_MESSAGE_THROTTLE = {
-  KEY: 'support-staff-message-send',
-  LIMIT: 60,
-  TTL_MS: MS_PER_MINUTE,
-} as const;
+export const SUPPORT_STAFF_MESSAGE_THROTTLE: UserThrottleOptions = {
+  key: 'support-staff-message-send',
+  limit: 60,
+  ttlMs: MS_PER_MINUTE,
+  message: SUPPORT_MESSAGES.TOO_MANY_MESSAGES,
+};
 
 export const CLOSED_BY = {
   AUTHOR: 'author',

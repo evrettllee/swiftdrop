@@ -21,6 +21,15 @@ const TEST_SETTINGS: Record<string, string> = {
 const PAYLOAD =
   '{ "id": "evt_swiftdrop",  "object": "event", "type": "customer.created",\n  "data": { "object": { "note": "Доставка" } } }';
 
+const JSON_BODY_LIMIT_BYTES = 100 * 1024;
+
+function paddedPayload(bytes: number): string {
+  const head = '{"id":"evt_swiftdrop","object":"event","type":"customer.created","pad":"';
+  const tail = '"}';
+
+  return `${head}${'x'.repeat(bytes - head.length - tail.length)}${tail}`;
+}
+
 describe('Payment webhook signature over the raw body (e2e)', () => {
   let app: NestExpressApplication;
 
@@ -56,5 +65,16 @@ describe('Payment webhook signature over the raw body (e2e)', () => {
     const compact = JSON.stringify(JSON.parse(PAYLOAD));
 
     await postSigned(compact, PAYLOAD).expect(HttpStatus.BAD_REQUEST);
+  });
+
+  it('should take a JSON body up to 100 KB and refuse a larger one with 413', async () => {
+    await postSigned(
+      paddedPayload(JSON_BODY_LIMIT_BYTES),
+      paddedPayload(JSON_BODY_LIMIT_BYTES),
+    ).expect(HttpStatus.OK);
+    await postSigned(
+      paddedPayload(JSON_BODY_LIMIT_BYTES + 1),
+      paddedPayload(JSON_BODY_LIMIT_BYTES + 1),
+    ).expect(HttpStatus.PAYLOAD_TOO_LARGE);
   });
 });

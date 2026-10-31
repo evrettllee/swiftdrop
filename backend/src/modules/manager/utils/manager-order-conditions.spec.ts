@@ -81,13 +81,25 @@ describe('paymentCondition', () => {
     expect(render(paymentCondition(db, ['paid', 'unpaid']))?.sql).toContain(' or ');
   });
 
-  it('should name the state by paid first, then refunded, else unpaid', () => {
-    const query = render(paymentStateSql(db));
+  it('should name the state by paid first, then refunded, else unpaid, in one lookup', () => {
+    const query = render(paymentStateSql());
+    const text = query?.sql.replace(/\s+/g, ' ');
 
-    expect(query?.sql).toMatch(
-      /^CASE WHEN exists .* THEN \$\d+ WHEN exists .* THEN \$\d+ ELSE \$\d+ END$/,
+    expect(text).toMatch(
+      /^coalesce\(\( select CASE WHEN .* THEN \$\d+ ELSE \$\d+ END from "payments"/,
     );
-    expect(query?.params).toEqual(['paid', 'paid', 'refunded', 'refunded', 'unpaid']);
+    expect(text).toContain('where "payments"."order_id" = "orders"."order_id"');
+    expect(text).toContain('order by "payments"."status" = $6 desc limit 1');
+    expect(text).not.toContain('exists');
+    expect(query?.params).toEqual([
+      'paid',
+      'paid',
+      'refunded',
+      'paid',
+      'refunded',
+      'paid',
+      'unpaid',
+    ]);
   });
 });
 

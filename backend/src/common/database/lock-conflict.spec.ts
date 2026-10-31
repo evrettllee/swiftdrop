@@ -1,6 +1,7 @@
 import { ConflictException } from '@nestjs/common';
 import { DatabaseError } from 'pg';
 import {
+  PG_DEADLOCK_DETECTED_CODE,
   PG_LOCK_NOT_AVAILABLE_CODE,
   PG_UNIQUE_VIOLATION_CODE,
 } from '@/common/constants/database.constants';
@@ -26,6 +27,16 @@ describe('withLockConflict', () => {
   it('should answer 409 and call onBusy when a lock is not taken in time', async () => {
     const onBusy = jest.fn();
     const work = () => Promise.reject(failedQuery(PG_LOCK_NOT_AVAILABLE_CODE));
+
+    await expect(withLockConflict(work, BUSY_MESSAGE, onBusy)).rejects.toThrow(
+      new ConflictException(BUSY_MESSAGE),
+    );
+    expect(onBusy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should answer a deadlock with the same 409 as a lock timeout', async () => {
+    const onBusy = jest.fn();
+    const work = () => Promise.reject(failedQuery(PG_DEADLOCK_DETECTED_CODE));
 
     await expect(withLockConflict(work, BUSY_MESSAGE, onBusy)).rejects.toThrow(
       new ConflictException(BUSY_MESSAGE),

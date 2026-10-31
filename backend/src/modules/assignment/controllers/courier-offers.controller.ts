@@ -7,8 +7,8 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
@@ -45,7 +45,7 @@ export class CourierOffersController {
 
   // The way to the pickup point only: the delivery address is hidden until the accept.
   @Get(COURIER_OFFERS_ROUTES.CURRENT_ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   async currentRoute(@CurrentUser() user: AuthUser): Promise<RouteLines> {
     const courierProfileId = await this.profiles.getProfileId(user.userId);
     const offer = await this.views.findCurrent(courierProfileId);

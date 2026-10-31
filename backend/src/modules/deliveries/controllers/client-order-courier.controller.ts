@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
@@ -31,7 +31,7 @@ export class ClientOrderCourierController {
   // The trip of the parcel and, while the order is with the courier, their way to the next point and
   // their last known position.
   @Get(CLIENT_ORDER_COURIER_ROUTES.ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   route(
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,

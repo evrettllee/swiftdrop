@@ -1,21 +1,24 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
-import { MANAGER_ANALYTICS_ROUTES } from '../constants/manager-analytics.constants';
+import {
+  MANAGER_ANALYTICS_ROUTES,
+  MANAGER_ANALYTICS_THROTTLE,
+} from '../constants/manager-analytics.constants';
 import {
   type AnalyticsCouriersDto,
   analyticsCouriersSchema,
   type AnalyticsSummaryDto,
   analyticsSummarySchema,
 } from '../dto/manager-analytics.dto';
-import { ManagerAnalyticsThrottleGuard } from '../guards/manager-throttle.guards';
 import { ManagerAnalyticsService } from '../services/manager-analytics.service';
 import type { AnalyticsCouriersPage, AnalyticsSummary } from '../types/manager-analytics.types';
 
 @Controller(MANAGER_ANALYTICS_ROUTES.BASE)
 @Roles(ROLE.MANAGER, ROLE.ADMIN)
-@UseGuards(ManagerAnalyticsThrottleGuard)
+@UserThrottle(MANAGER_ANALYTICS_THROTTLE)
 export class ManagerAnalyticsController {
   constructor(private readonly analytics: ManagerAnalyticsService) {}
 

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, count, eq, inArray, lte, sql } from 'drizzle-orm';
+import { and, count, inArray, lte, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
-import { orders, packages } from '@/database/schema';
+import { orders } from '@/database/schema';
 import {
   MANAGER_STATUS_GROUP,
   MANAGER_STATUS_GROUP_STATUSES,
@@ -33,7 +33,6 @@ export class ManagerOrderCountsService {
         all: count(),
       })
       .from(orders)
-      .innerJoin(packages, eq(packages.orderId, orders.orderId))
       .where(
         and(
           managerOrderConditions(this.db, query.filters),

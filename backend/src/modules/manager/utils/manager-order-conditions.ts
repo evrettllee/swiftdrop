@@ -36,8 +36,26 @@ function hasPayment(db: Database, status: PaymentStatus): SQL {
   );
 }
 
-export function paymentStateSql(db: Database): SQL<PaymentState> {
-  return sql<PaymentState>`CASE WHEN ${hasPayment(db, PAYMENT_STATUS.PAID)} THEN ${PAYMENT_STATE.PAID} WHEN ${hasPayment(db, PAYMENT_STATUS.REFUNDED)} THEN ${PAYMENT_STATE.REFUNDED} ELSE ${PAYMENT_STATE.UNPAID} END`;
+export function paymentStateSql(): SQL<PaymentState> {
+  const isPaid = sql`${payments.status} = ${PAYMENT_STATUS.PAID}`;
+
+  return sql<PaymentState>`coalesce((
+    select CASE WHEN ${isPaid} THEN ${PAYMENT_STATE.PAID} ELSE ${PAYMENT_STATE.REFUNDED} END
+    from ${payments}
+    where ${payments.orderId} = ${orders.orderId}
+      and ${payments.status} in (${PAYMENT_STATUS.PAID}, ${PAYMENT_STATUS.REFUNDED})
+    order by ${isPaid} desc
+    limit 1
+  ), ${PAYMENT_STATE.UNPAID})`;
+}
+
+function fragileCondition(db: Database): SQL {
+  return exists(
+    db
+      .select({ one: sql`1` })
+      .from(packages)
+      .where(and(eq(packages.orderId, orders.orderId), eq(packages.isFragile, true))),
+  );
 }
 
 function paymentStateCondition(db: Database, state: PaymentState): SQL | undefined {
@@ -138,7 +156,7 @@ export function managerOrderConditions(
     periodCondition(filters.period),
     filters.courierId === null ? undefined : eq(orders.courierId, filters.courierId),
     paymentCondition(db, filters.payment),
-    filters.fragile ? eq(packages.isFragile, true) : undefined,
+    filters.fragile ? fragileCondition(db) : undefined,
     searchCondition(db, filters.search),
   );
 }

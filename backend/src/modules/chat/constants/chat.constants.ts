@@ -2,6 +2,7 @@ import { MESSAGE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants
 import { ORDER_BUSY_MESSAGE, ORDER_NOT_FOUND_MESSAGE } from '@/common/constants/orders.constants';
 import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import type { UserThrottleOptions } from '@/common/guards/user-throttle.guard';
 import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 
 // Routes: the chat of an order lives under the order.
@@ -51,3 +52,10 @@ export const CHAT_ERROR_MESSAGES = {
   BUSY: ORDER_BUSY_MESSAGE,
   TOO_MANY_MESSAGES: 'Слишком много сообщений. Подождите минуту',
 } as const;
+
+export const CHAT_SEND_THROTTLE: UserThrottleOptions = {
+  key: CHAT_SEND_THROTTLE_KEY,
+  limit: CHAT_SEND_THROTTLE_LIMIT,
+  ttlMs: CHAT_SEND_THROTTLE_TTL_MS,
+  message: CHAT_ERROR_MESSAGES.TOO_MANY_MESSAGES,
+};

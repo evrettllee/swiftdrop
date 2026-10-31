@@ -37,7 +37,7 @@ describe('Manager export and analytics limits per user (e2e)', () => {
   });
 
   it('should take 10 exports a minute from one user and not count them for another', async () => {
-    for (let index = 0; index < MANAGER_EXPORT_THROTTLE.LIMIT; index += 1) {
+    for (let index = 0; index < MANAGER_EXPORT_THROTTLE.limit; index += 1) {
       await getManagerExport(app, manager, {}).expect(HttpStatus.BAD_REQUEST);
     }
 
@@ -48,7 +48,7 @@ describe('Manager export and analytics limits per user (e2e)', () => {
   it('should take 30 analytics requests a minute from one user across both reports', async () => {
     const { SUMMARY, COURIERS } = MANAGER_ANALYTICS_ROUTES;
 
-    for (let index = 0; index < MANAGER_ANALYTICS_THROTTLE.LIMIT; index += 1) {
+    for (let index = 0; index < MANAGER_ANALYTICS_THROTTLE.limit; index += 1) {
       const route = index % 2 === 0 ? SUMMARY : COURIERS;
 
       await getAnalytics(app, manager, route, BAD_ANALYTICS_QUERY).expect(HttpStatus.BAD_REQUEST);

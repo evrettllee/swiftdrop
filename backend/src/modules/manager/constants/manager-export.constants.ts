@@ -1,4 +1,5 @@
 import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import type { UserThrottleOptions } from '@/common/guards/user-throttle.guard';
 
 export const MANAGER_EXPORT_ROUTE = 'export';
 
@@ -16,12 +17,6 @@ export const EXPORT_FLAG_TRUE = 'true';
 
 export const MANAGER_EXPORT_ROW_LIMIT = 5000;
 
-export const MANAGER_EXPORT_THROTTLE = {
-  KEY: 'manager-export',
-  LIMIT: 10,
-  TTL_MS: MS_PER_MINUTE,
-} as const;
-
 export const EXPORT_TOO_LARGE_CODE = 'EXPORT_TOO_LARGE';
 
 export const MANAGER_EXPORT_MESSAGES = {
@@ -30,6 +25,13 @@ export const MANAGER_EXPORT_MESSAGES = {
   TOO_LARGE: `Выгрузка ограничена ${MANAGER_EXPORT_ROW_LIMIT} строками, сузьте фильтр`,
   TOO_MANY: 'Слишком много выгрузок. Подождите минуту',
 } as const;
+
+export const MANAGER_EXPORT_THROTTLE: UserThrottleOptions = {
+  key: 'manager-export',
+  limit: 10,
+  ttlMs: MS_PER_MINUTE,
+  message: MANAGER_EXPORT_MESSAGES.TOO_MANY,
+};
 
 export const EXPORT_CONTENT_TYPE: Record<ExportFormat, string> = {
   csv: 'text/csv; charset=utf-8',

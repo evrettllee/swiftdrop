@@ -1,7 +1,7 @@
 import { eq, type SQL } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '@/database/database.module';
-import { courierProfiles, orders, packages, users } from '@/database/schema';
+import { courierProfiles, orders, users } from '@/database/schema';
 import { aliasOrderAddresses } from '@/modules/orders/utils/order-address-columns';
 import type { ManagerExportRow } from '../types/manager-export.types';
 import { paymentStateSql } from './manager-order-conditions';
@@ -32,11 +32,10 @@ export function managerExportQuery(
       delivery: { street: delivery.street, house: delivery.house },
       courier: withPhones ? { ...COURIER_NAME, phone: courier.phone } : COURIER_NAME,
       price: orders.price,
-      paymentState: paymentStateSql(db),
+      paymentState: paymentStateSql(),
       finishedAt: orders.finishedAt,
     })
     .from(orders)
-    .innerJoin(packages, eq(packages.orderId, orders.orderId))
     .innerJoin(client, eq(client.userId, orders.clientId))
     .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))
     .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))

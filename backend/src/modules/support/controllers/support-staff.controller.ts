@@ -1,20 +1,14 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import type { AuthUser } from '@/modules/auth/types/auth.types';
-import { SUPPORT_STAFF_ROUTES } from '../constants/support-staff.constants';
+import {
+  SUPPORT_STAFF_MESSAGE_THROTTLE,
+  SUPPORT_STAFF_ROUTES,
+} from '../constants/support-staff.constants';
 import { type StaffTicketsDto, staffTicketsSchema } from '../dto/support-staff.dto';
 import {
   type SendTicketMessageDto,
@@ -24,7 +18,6 @@ import {
   type TicketMessagesDto,
   ticketMessagesSchema,
 } from '../dto/support.dto';
-import { SupportStaffMessageThrottleGuard } from '../guards/support-throttle.guards';
 import { SupportStaffTicketsService } from '../services/support-staff-tickets.service';
 import { SupportTicketClosingService } from '../services/support-ticket-closing.service';
 import { SupportTicketMessagesService } from '../services/support-ticket-messages.service';
@@ -75,7 +68,7 @@ export class SupportStaffController {
   }
 
   @Post(SUPPORT_STAFF_ROUTES.MESSAGES)
-  @UseGuards(SupportStaffMessageThrottleGuard)
+  @UserThrottle(SUPPORT_STAFF_MESSAGE_THROTTLE)
   async send(
     @CurrentUser() user: AuthUser,
     @Param(ticketParam) params: TicketIdParamDto,

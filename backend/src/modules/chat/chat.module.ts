@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { ChatMessagesController } from './controllers/chat-messages.controller';
-import { ChatSendThrottleGuard } from './guards/chat-send-throttle.guard';
 import { ChatHistoryService } from './services/chat-history.service';
 import { ChatReadService } from './services/chat-read.service';
 import { ChatSendService } from './services/chat-send.service';
@@ -11,12 +10,6 @@ import { ChatUnreadService } from './services/chat-unread.service';
 @Module({
   imports: [RealtimeModule],
   controllers: [ChatMessagesController],
-  providers: [
-    ChatHistoryService,
-    ChatUnreadService,
-    ChatSendService,
-    ChatReadService,
-    ChatSendThrottleGuard,
-  ],
+  providers: [ChatHistoryService, ChatUnreadService, ChatSendService, ChatReadService],
 })
 export class ChatModule {}

@@ -8,14 +8,19 @@ import {
   Param,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import type { AuthUser } from '@/modules/auth/types/auth.types';
-import { SUPPORT_AUTHOR_ROLES, SUPPORT_ROUTES } from '../constants/support.constants';
+import {
+  SUPPORT_AUTHOR_ROLES,
+  SUPPORT_MESSAGE_THROTTLE,
+  SUPPORT_ROUTES,
+  SUPPORT_TICKET_CREATE_THROTTLE,
+} from '../constants/support.constants';
 import {
   type CreateTicketDto,
   createTicketSchema,
@@ -28,10 +33,6 @@ import {
   type TicketMessagesDto,
   ticketMessagesSchema,
 } from '../dto/support.dto';
-import {
-  SupportMessageThrottleGuard,
-  SupportTicketCreateThrottleGuard,
-} from '../guards/support-throttle.guards';
 import { SupportTicketCreationService } from '../services/support-ticket-creation.service';
 import { SupportTicketMessagesService } from '../services/support-ticket-messages.service';
 import { SupportTicketsService } from '../services/support-tickets.service';
@@ -66,7 +67,7 @@ export class SupportTicketsController {
   ) {}
 
   @Post()
-  @UseGuards(SupportTicketCreateThrottleGuard)
+  @UserThrottle(SUPPORT_TICKET_CREATE_THROTTLE)
   create(
     @CurrentUser() user: AuthUser,
     @Body(new ZodValidationPipe(createTicketSchema)) dto: CreateTicketDto,
@@ -100,7 +101,7 @@ export class SupportTicketsController {
   }
 
   @Post(SUPPORT_ROUTES.MESSAGES)
-  @UseGuards(SupportMessageThrottleGuard)
+  @UserThrottle(SUPPORT_MESSAGE_THROTTLE)
   async send(
     @CurrentUser() user: AuthUser,
     @Param(ticketParam) params: TicketIdParamDto,

@@ -14,6 +14,11 @@ const STATUS = {
 };
 const CANCELLED_STATUSES = sqlLiteralList(MANAGER_STATUS_GROUP_STATUSES.cancelled);
 const STAFF_ROLES = sqlLiteralList([ROLE.MANAGER, ROLE.ADMIN]);
+const TIMELINE_STATUSES = sqlLiteralList([
+  ORDER_STATUS.CONFIRMED,
+  ORDER_STATUS.COURIER_ASSIGNED,
+  ORDER_STATUS.CANCELLED,
+]);
 const SECONDS_PER_MINUTE = sql.raw('60');
 
 export function placedInPeriod(start: Date, end: Date): SQL {
@@ -23,7 +28,8 @@ export function placedInPeriod(start: Date, end: Date): SQL {
   )`;
 }
 
-const timeline = sql`select
+function timelineSql(start: Date, end: Date): SQL {
+  return sql`select ${orderStatusHistory.orderId} as order_id,
     min(${orderStatusHistory.changedAt}) filter (where ${orderStatusHistory.status} = ${STATUS.CONFIRMED}) as confirmed_at,
     min(${orderStatusHistory.changedAt}) filter (where ${orderStatusHistory.status} = ${STATUS.ASSIGNED}) as assigned_at,
     (array_agg(${orderStatusHistory.changedBy} order by ${orderStatusHistory.changedAt}, ${orderStatusHistory.statusHistoryId})
@@ -31,12 +37,16 @@ const timeline = sql`select
     (array_agg(${orderStatusHistory.changedBy} order by ${orderStatusHistory.changedAt} desc, ${orderStatusHistory.statusHistoryId} desc)
       filter (where ${orderStatusHistory.status} = ${STATUS.CANCELLED}))[1] as cancelled_by
   from ${orderStatusHistory}
-  where ${orderStatusHistory.orderId} = ${orders.orderId}`;
+  where ${orderStatusHistory.status} in (${TIMELINE_STATUSES}) and ${orderStatusHistory.orderId} in (
+    select ${orders.orderId} from ${orders} where ${orders.createdAt} >= ${start} and ${orders.createdAt} < ${end}
+  )
+  group by ${orderStatusHistory.orderId}`;
+}
 
-const assignedByStaff = sql`exists (
-    select 1 from ${users} inner join ${roles} on ${roles.roleId} = ${users.roleId}
-    where ${users.userId} = timeline.assigned_by and ${roles.name} in (${STAFF_ROLES})
-  )`;
+const assignedByStaff = sql`coalesce(timeline.assigned_by in (
+    select ${users.userId} from ${users} inner join ${roles} on ${roles.roleId} = ${users.roleId}
+    where ${roles.name} in (${STAFF_ROLES})
+  ), false)`;
 
 const cancelledBy = sql`case when ${orders.status} = ${STATUS.CANCELLED} then
     case
@@ -53,7 +63,7 @@ export function orderFactsSql(start: Date, end: Date): SQL {
     timeline.confirmed_at, timeline.assigned_at,
     ${assignedByStaff} as assigned_by_staff, ${cancelledBy} as cancelled_by
   from ${orders}
-  left join lateral (${timeline}) as timeline on true
+  left join (${timelineSql(start, end)}) as timeline on timeline.order_id = ${orders.orderId}
   where ${placedInPeriod(start, end)}`;
 }
 

@@ -1,25 +1,15 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { Roles } from '@/modules/auth/decorators/roles.decorator';
 import type { AuthUser } from '@/modules/auth/types/auth.types';
 import { type OrderIdParamDto, orderIdParamSchema } from '@/modules/orders/dto/order-id-param.dto';
-import { CHAT_ROUTES } from '../constants/chat.constants';
+import { CHAT_ROUTES, CHAT_SEND_THROTTLE } from '../constants/chat.constants';
 import { type ChatHistoryDto, chatHistorySchema } from '../dto/chat-history.dto';
 import { type MarkReadDto, markReadSchema } from '../dto/mark-read.dto';
 import { type SendMessageDto, sendMessageSchema } from '../dto/send-message.dto';
-import { ChatSendThrottleGuard } from '../guards/chat-send-throttle.guard';
 import { ChatHistoryService } from '../services/chat-history.service';
 import { ChatReadService } from '../services/chat-read.service';
 import { ChatSendService } from '../services/chat-send.service';
@@ -47,7 +37,7 @@ export class ChatMessagesController {
   // The CSRF header is checked by the global guard, as for every POST.
   @Post(CHAT_ROUTES.MESSAGES)
   @Roles(ROLE.CLIENT, ROLE.COURIER)
-  @UseGuards(ChatSendThrottleGuard)
+  @UserThrottle(CHAT_SEND_THROTTLE)
   send(
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,
