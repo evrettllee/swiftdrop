@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, lt } from 'drizzle-orm';
 import { transitionOrderStatus } from '@/common/database/order-status-transition';
-import { isLockTimeout } from '@/common/database/pg-errors';
+import { isLockConflict } from '@/common/database/lock-conflict';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { describeError } from '@/common/utils/describe-error';
 import { DRIZZLE } from '@/database/database.constants';
@@ -66,7 +66,7 @@ export class UnpaidOrdersService {
         return Boolean(updated);
       });
     } catch (error) {
-      if (isLockTimeout(error)) {
+      if (isLockConflict(error)) {
         // Another operation holds the order (a payment being started or settled): nothing is
         // wrong, the order is looked at again on the next run.
         this.logger.warn(`Order ${orderId} is busy, it is left for the next run`);

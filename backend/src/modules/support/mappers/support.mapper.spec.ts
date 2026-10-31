@@ -49,6 +49,12 @@ describe('ticket titles and previews', () => {
     expect(previewText('я'.repeat(200))).toHaveLength(120);
     expect(previewText('Коротко')).toBe('Коротко');
   });
+
+  it('should keep an emoji made of several code points whole at the cut', () => {
+    const family = '\u{1F468}‍\u{1F469}‍\u{1F467}';
+
+    expect(previewText(`${'я'.repeat(119)}${family}хвост`)).toBe(`${'я'.repeat(119)}${family}`);
+  });
 });
 
 describe('toTicketListItem and toTicketDetails', () => {

@@ -5,7 +5,7 @@ import {
   PG_LOCK_NOT_AVAILABLE_CODE,
   PG_UNIQUE_VIOLATION_CODE,
 } from '@/common/constants/database.constants';
-import { withLockConflict } from './lock-conflict';
+import { isLockConflict, withLockConflict } from './lock-conflict';
 
 const BUSY_MESSAGE = 'busy';
 const RESULT = 42;
@@ -16,6 +16,15 @@ function failedQuery(code: string): Error {
 
   return new Error('Failed query', { cause });
 }
+
+describe('isLockConflict', () => {
+  it('should take a lock timeout and a deadlock for a lock conflict and nothing else', () => {
+    expect(isLockConflict(failedQuery(PG_LOCK_NOT_AVAILABLE_CODE))).toBe(true);
+    expect(isLockConflict(failedQuery(PG_DEADLOCK_DETECTED_CODE))).toBe(true);
+    expect(isLockConflict(failedQuery(PG_UNIQUE_VIOLATION_CODE))).toBe(false);
+    expect(isLockConflict(new Error('network'))).toBe(false);
+  });
+});
 
 describe('withLockConflict', () => {
   it('should return the result when the work succeeds', async () => {

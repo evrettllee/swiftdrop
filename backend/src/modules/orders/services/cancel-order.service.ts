@@ -5,7 +5,7 @@ import {
   type OrderTransaction,
   transitionOrderStatus,
 } from '@/common/database/order-status-transition';
-import { isLockTimeout } from '@/common/database/pg-errors';
+import { isLockConflict } from '@/common/database/lock-conflict';
 import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { describeError } from '@/common/utils/describe-error';
@@ -51,7 +51,7 @@ export class CancelOrderService {
         this.cancelInTransaction(orderTx, request),
       );
     } catch (error) {
-      if (isLockTimeout(error)) {
+      if (isLockConflict(error)) {
         this.logger.warn(`Order ${request.orderId} is busy, its cancellation is refused for now`);
         throw new ConflictException(ORDERS_ERROR_MESSAGES.BUSY);
       }

@@ -146,9 +146,9 @@ describe('CancelOrderService', () => {
     expect(events.removeCourierFromOrder).not.toHaveBeenCalled();
   });
 
-  it('should answer busy when the order stays locked', async () => {
-    const timeout = Object.assign(new DatabaseError('lock timeout', 0, 'error'), { code: '55P03' });
-    const { service } = setUp(SUCCESS, timeout);
+  it.each(['55P03', '40P01'])('should answer busy on a lock conflict %s', async (code) => {
+    const conflict = Object.assign(new DatabaseError('lock conflict', 0, 'error'), { code });
+    const { service } = setUp(SUCCESS, conflict);
 
     await expect(service.cancel(STAFF_REQUEST)).rejects.toThrow(ConflictException);
   });

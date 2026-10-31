@@ -19,8 +19,16 @@ export function ticketTitle(topic: TicketTopic, subject: string | null): string 
   return subject ?? TICKET_TOPIC_LABELS[topic];
 }
 
+const GRAPHEMES = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
+function firstGraphemes(text: string, count: number): string {
+  return Array.from(GRAPHEMES.segment(text), ({ segment }) => segment)
+    .slice(0, count)
+    .join('');
+}
+
 export function previewText(text: string): string {
-  return [...text].slice(0, LAST_MESSAGE_PREVIEW_LENGTH).join('');
+  return firstGraphemes(text, LAST_MESSAGE_PREVIEW_LENGTH);
 }
 
 export function shortAddress({ city, street, house, apartment }: TicketDeliveryAddress): string {
@@ -70,7 +78,7 @@ export function toTicketDetails(row: TicketDetailsRow): TicketDetails {
 
 export function staffName(firstName: string, lastName: string, viewer: MessageViewer): string {
   return viewer === 'staff'
-    ? `${firstName} ${[...lastName].slice(0, 1).join('')}.`
+    ? `${firstName} ${firstGraphemes(lastName, 1)}.`
     : `${firstName}, ${STAFF_AUTHOR_SUFFIX}`;
 }
 

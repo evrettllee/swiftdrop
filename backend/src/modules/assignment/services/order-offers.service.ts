@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { ROW_LOCK_NO_KEY_UPDATE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
-import { isLockTimeout } from '@/common/database/pg-errors';
+import { isLockConflict } from '@/common/database/lock-conflict';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
@@ -28,7 +28,7 @@ export class OrderOffersService {
     try {
       offerId = await this.db.transaction((tx) => this.insertOffer(tx, orderId, plan, now));
     } catch (error) {
-      if (!isLockTimeout(error)) {
+      if (!isLockConflict(error)) {
         throw error;
       }
 
