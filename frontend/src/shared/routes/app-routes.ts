@@ -14,6 +14,15 @@ export const APP_ROUTES = {
   COURIER_HISTORY_ORDER: '/courier/history/:orderId',
   COURIER_PROFILE: '/courier/profile',
   COURIER_VEHICLE: '/courier/vehicle',
+  MANAGER_ORDERS: '/manager/orders',
+  MANAGER_ORDER: '/manager/orders/:orderId',
+  MANAGER_MAP: '/manager/map',
+  MANAGER_SUPPORT: '/manager/support',
+  MANAGER_ZONES: '/manager/zones',
+  MANAGER_ZONE_NEW: '/manager/zones/new',
+  MANAGER_ZONE: '/manager/zones/:zoneId',
+  MANAGER_ANALYTICS: '/manager/analytics',
+  MANAGER_PROFILE: '/manager/profile',
 } as const;
 
 // The router pattern of the page of one order and the path to a concrete order.

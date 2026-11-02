@@ -1,8 +1,8 @@
 import { XIcon } from '@phosphor-icons/react';
-import { type MouseEvent, type ReactNode, useEffect, useId, useRef } from 'react';
+import { type ReactNode, useId } from 'react';
 import { ICON_SIZE, ICON_WEIGHT, UI_TEXTS } from '@/shared/config';
-import { useBodyScrollLock } from '@/shared/lib/dom';
 import { IconButton } from '@/shared/ui/icon-button';
+import { useModalDialog } from './useModalDialog';
 
 // A centered window on the desktop, a sheet from the bottom on a phone (design system §10).
 const DIALOG_CLASS =
@@ -20,41 +20,18 @@ type DialogProps = {
 };
 
 // Built on <dialog>: the browser keeps the focus inside, closes it on Escape and gives the focus
-// back to the button that opened it.
+// back to the button that opened it. The page under the window does not scroll, and a click on the
+// dimmed backdrop closes it.
 export function Dialog({ isOpen, onClose, title, actions, children }: DialogProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const { ref, onClick } = useModalDialog(isOpen, onClose);
   const titleId = useId();
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-
-    if (dialog === null) {
-      return;
-    }
-
-    if (isOpen && !dialog.open) {
-      dialog.showModal();
-    } else if (!isOpen && dialog.open) {
-      dialog.close();
-    }
-  }, [isOpen]);
-
-  // The page under the window does not scroll.
-  useBodyScrollLock(isOpen);
-
-  // A click on the dimmed backdrop lands on the <dialog> itself, a click inside lands on its content.
-  function handleClick(event: MouseEvent<HTMLDialogElement>): void {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  }
 
   return (
     <dialog
-      ref={dialogRef}
+      ref={ref}
       aria-labelledby={titleId}
       onClose={onClose}
-      onClick={handleClick}
+      onClick={onClick}
       className={DIALOG_CLASS}
     >
       <div className="flex flex-col px-4 pt-2 pb-6 lg:p-0">

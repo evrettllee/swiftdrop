@@ -11,10 +11,11 @@ type AccountSidebarProps = {
   homeTo: string;
   navLabel: string;
   items: readonly NavItem[];
+  userCaption?: string;
 };
 
 // The menu of the desktop: on a phone the bottom navigation takes its place.
-export function AccountSidebar({ homeTo, navLabel, items }: AccountSidebarProps) {
+export function AccountSidebar({ homeTo, navLabel, items, userCaption }: AccountSidebarProps) {
   const user = useAuthStore((state) => state.user);
 
   return (
@@ -34,9 +35,14 @@ export function AccountSidebar({ homeTo, navLabel, items }: AccountSidebarProps)
       {user === null ? null : (
         <div className="mt-auto flex items-center gap-3 px-3">
           <Avatar initials={getInitials(user.firstName, user.lastName)} />
-          <span className="min-w-0 truncate text-small font-semibold">
-            {user.firstName} {user.lastName}
-          </span>
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate text-small font-semibold">
+              {user.firstName} {user.lastName}
+            </span>
+            {userCaption === undefined ? null : (
+              <span className="truncate text-small text-fg-secondary">{userCaption}</span>
+            )}
+          </div>
         </div>
       )}
     </aside>
