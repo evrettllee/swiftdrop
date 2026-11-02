@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { DESKTOP_MEDIA_QUERY } from '@/shared/config';
+import { useMinuteNow } from '@/shared/lib/clock';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
 import {
@@ -12,7 +13,6 @@ import {
 import { MANAGER_ORDERS_TEXTS, TAB_LABELS } from '../config/texts';
 import { appliedFilters, emptyResultText, exportScope } from '../model/applied-filters';
 import { useManagerOrders } from '../model/useManagerOrders';
-import { useMinuteNow } from '../model/useMinuteNow';
 import { AppliedFilters } from './AppliedFilters';
 import { NewOrdersNotice } from './NewOrdersNotice';
 import { OrdersContent } from './OrdersContent';

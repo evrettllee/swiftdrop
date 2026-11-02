@@ -61,5 +61,11 @@ export function getManagerOrderPath(orderId: number): string {
   return `${APP_ROUTES.MANAGER_ORDERS}/${orderId}`;
 }
 
+export const MANAGER_TICKET_PARAM = 'ticket';
+
+export function getManagerTicketPath(ticketId: number): string {
+  return `${APP_ROUTES.MANAGER_SUPPORT}?${new URLSearchParams({ [MANAGER_TICKET_PARAM]: String(ticketId) })}`;
+}
+
 // The router pattern for every address that matches no page.
 export const CATCH_ALL_ROUTE = '*';

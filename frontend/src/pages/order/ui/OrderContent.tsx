@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { OrderHeader } from '@/entities/order';
 import { useIncomingMessageToast, useOrderChatView } from '@/features/order-chat';
 import { CHAT_SENDER_ROLE, type ClientOrderCourier, type OrderDetails } from '@/shared/api';
 import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
@@ -9,7 +10,6 @@ import { CancelOrderDialog } from './CancelOrderDialog';
 import { OrderChat } from './OrderChat';
 import { OrderCourier } from './OrderCourier';
 import { OrderDeliveryCode } from './OrderDeliveryCode';
-import { OrderHeader } from './OrderHeader';
 import { OrderPaymentPanel } from './OrderPaymentPanel';
 import { OrderProgress } from './OrderProgress';
 import { OrderRecipient } from './OrderRecipient';
@@ -55,7 +55,7 @@ export function OrderContent({
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
-      <OrderHeader order={order} />
+      <OrderHeader orderId={order.orderId} status={order.status} createdAt={order.createdAt} />
       <div className={SIDE_COLUMN_LAYOUT_CLASS}>
         <div className={`contents lg:flex lg:flex-col lg:gap-8 ${MAIN_COLUMN_CLASS}`}>
           <OrderStatusLine order={order} paymentReturn={paymentReturn} tracking={live.tracking} />

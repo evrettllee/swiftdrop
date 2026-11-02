@@ -1,10 +1,9 @@
 import { memo } from 'react';
-import { OrderRoutePoints } from '@/entities/order';
+import { type OrderTracking, OrderRoutePoints } from '@/entities/order';
 import type { OrderDetails, VehicleType } from '@/shared/api';
 import { Section } from '@/shared/ui/section';
 import { ORDER_DETAILS_TEXTS } from '../config/texts';
 import { FINISHED_STATUSES } from '../model/order-status-groups';
-import type { OrderTracking } from '../model/order-tracking';
 import { OrderRouteMap } from './OrderRouteMap';
 
 type OrderRouteProps = {

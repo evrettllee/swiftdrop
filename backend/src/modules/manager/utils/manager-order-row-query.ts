@@ -21,6 +21,7 @@ const ORDER_DETAILS_COLUMNS = {
   createdAt: orders.createdAt,
   statusChangedAt: orders.statusChangedAt,
   finishedAt: orders.finishedAt,
+  estimatedDeliveryAt: orders.estimatedDeliveryAt,
   client: {
     id: client.userId,
     firstName: client.firstName,

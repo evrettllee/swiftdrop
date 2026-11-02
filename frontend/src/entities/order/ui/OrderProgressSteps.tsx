@@ -58,7 +58,18 @@ export function OrderProgressSteps({ title, steps }: OrderProgressStepsProps) {
               className={`${STEP_CLASS} ${look.line}`}
             >
               <span aria-hidden="true" className={`${MARKER_CLASS} ${look.marker}`} />
-              <span className={`min-w-0 flex-1 ${look.label}`}>{step.label}</span>
+              {step.notes === undefined || step.notes.length === 0 ? (
+                <span className={`min-w-0 flex-1 ${look.label}`}>{step.label}</span>
+              ) : (
+                <span className="flex min-w-0 flex-1 flex-col py-2">
+                  <span className={look.label}>{step.label}</span>
+                  {step.notes.map((note) => (
+                    <span key={note} className="text-small text-pretty text-fg-secondary">
+                      {note}
+                    </span>
+                  ))}
+                </span>
+              )}
               {isReached && step.time !== null ? (
                 <span className="shrink-0 text-small font-normal text-fg-secondary tabular-nums">
                   {formatTime(step.time)}

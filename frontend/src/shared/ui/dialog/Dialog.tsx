@@ -14,8 +14,15 @@ const WIDTH_CLASSES = {
   wide: 'lg:w-120',
 } as const;
 
+const DIVIDER_CLASSES = {
+  header: '-mx-4 border-b border-border px-4 pb-3 lg:mx-0',
+  body: 'pt-4',
+  footer: '-mx-4 border-t border-border px-4 pt-3 lg:mx-0',
+} as const;
+
 type DialogProps = {
   width?: keyof typeof WIDTH_CLASSES;
+  hasDividers?: boolean;
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -30,6 +37,7 @@ type DialogProps = {
 // dimmed backdrop closes it.
 export function Dialog({
   width = 'default',
+  hasDividers = false,
   isOpen,
   onClose,
   title,
@@ -52,7 +60,9 @@ export function Dialog({
           aria-hidden="true"
           className="mx-auto mb-2 h-1 w-10 rounded-full bg-handle lg:hidden"
         />
-        <div className="flex items-center justify-between gap-4 py-1 lg:border-b lg:border-border lg:px-6 lg:py-5">
+        <div
+          className={`flex items-center justify-between gap-4 py-1 lg:border-b lg:border-border lg:px-6 lg:py-5 ${hasDividers ? DIVIDER_CLASSES.header : ''}`}
+        >
           <h2 id={titleId} className="text-heading-sm font-semibold text-balance">
             {title}
           </h2>
@@ -64,10 +74,14 @@ export function Dialog({
             <XIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />
           </IconButton>
         </div>
-        <div className="flex flex-col gap-4 pt-2 pb-6 text-pretty text-fg-secondary lg:p-6">
+        <div
+          className={`flex flex-col gap-4 pb-6 text-pretty text-fg-secondary lg:p-6 ${hasDividers ? DIVIDER_CLASSES.body : 'pt-2'}`}
+        >
           {children}
         </div>
-        <div className="flex flex-col gap-2 *:w-full lg:flex-row-reverse lg:justify-start lg:gap-3 lg:border-t lg:border-border lg:bg-surface-muted lg:px-6 lg:py-4 lg:*:w-auto">
+        <div
+          className={`flex flex-col gap-2 *:w-full lg:flex-row-reverse lg:justify-start lg:gap-3 lg:border-t lg:border-border lg:bg-surface-muted lg:px-6 lg:py-4 lg:*:w-auto ${hasDividers ? DIVIDER_CLASSES.footer : ''}`}
+        >
           {actions}
         </div>
       </div>

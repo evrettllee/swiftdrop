@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { type ClientOrderRoute, ORDER_STATUS, ROUTE_SEGMENT_KIND } from '@/shared/api';
 import { COURIER_LEG_TARGET } from '@/shared/realtime';
-import { COURIER_POSITION_STALE_MS } from '../config/tracking';
 import { FakeClock } from '@/shared/lib/clock';
+import { COURIER_POSITION_STALE_MS } from '../config/tracking';
 import { OrderTracking } from './order-tracking';
 
 const START_MS = Date.parse('2026-10-24T12:00:00Z');

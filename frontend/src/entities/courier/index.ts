@@ -1,5 +1,9 @@
 export { VEHICLE_TYPE_META, VEHICLE_TYPE_ORDER } from './config/vehicle-types';
-export { formatVehicleDetails } from './lib/vehicle-details';
+export {
+  formatCourierVehicle,
+  formatCourierVehicleShort,
+  formatVehicleDetails,
+} from './lib/vehicle-details';
 export { setCourierPosition, useCourierPosition } from './model/courier-position';
 export type { CourierProfileStatus } from './model/courier-profile';
 export {

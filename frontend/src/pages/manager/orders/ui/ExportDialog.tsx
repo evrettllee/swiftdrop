@@ -39,6 +39,7 @@ export function ExportDialog({ isOpen, onClose, query, count, scope }: ExportDia
   return (
     <Dialog
       width="wide"
+      hasDividers
       isOpen={isOpen}
       onClose={close}
       title={EXPORT_TEXTS.TITLE}

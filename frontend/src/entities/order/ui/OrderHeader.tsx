@@ -1,35 +1,45 @@
 import { ArrowLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
 import { memo } from 'react';
 import { Link } from 'react-router';
-import { formatOrderNumber, OrderStatusBadge } from '@/entities/order';
-import type { OrderDetails } from '@/shared/api';
+import type { OrderStatus } from '@/shared/api';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { formatFullDateTime, formatShortDateTime } from '@/shared/lib/format';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
 import { PageTitle } from '@/shared/ui/page-title';
-import { ORDER_DETAILS_TEXTS } from '../config/texts';
+import { ORDER_HEADER_TEXTS } from '../config/texts';
+import { formatOrderNumber } from '../lib/order-number';
+import { STATUS_AUDIENCE, type StatusAudience } from '../model/order-status';
+import { OrderStatusBadge } from './OrderStatusBadge';
 
 type OrderHeaderProps = {
-  order: OrderDetails;
+  orderId: number;
+  status: OrderStatus;
+  createdAt: Date;
+  ordersPath?: string;
+  audience?: StatusAudience;
 };
 
-// The desktop shows the breadcrumbs and the full date under the title, a phone shows the back
-// button above the title and the status with the short date under it.
-export const OrderHeader = memo(function OrderHeader({ order }: OrderHeaderProps) {
-  const orderNumber = formatOrderNumber(order.orderId);
+export const OrderHeader = memo(function OrderHeader({
+  orderId,
+  status,
+  createdAt,
+  ordersPath = APP_ROUTES.ORDERS,
+  audience = STATUS_AUDIENCE.CLIENT,
+}: OrderHeaderProps) {
+  const orderNumber = formatOrderNumber(orderId);
 
   return (
     <header className="flex flex-col gap-2 lg:gap-4">
       <nav
-        aria-label={ORDER_DETAILS_TEXTS.BREADCRUMBS_LABEL}
+        aria-label={ORDER_HEADER_TEXTS.BREADCRUMBS_LABEL}
         className="hidden items-center gap-1 text-small lg:flex"
       >
         <Link
-          to={APP_ROUTES.ORDERS}
+          to={ordersPath}
           className={`rounded-sm text-fg-secondary hover:text-fg ${COLOR_TRANSITION_CLASS}`}
         >
-          {ORDER_DETAILS_TEXTS.ORDERS}
+          {ORDER_HEADER_TEXTS.ORDERS}
         </Link>
         <CaretRightIcon
           size={ICON_SIZE.SMALL}
@@ -44,27 +54,27 @@ export const OrderHeader = memo(function OrderHeader({ order }: OrderHeaderProps
       <div className="-ms-4 self-start lg:hidden">
         <LinkButton
           variant="text"
-          to={APP_ROUTES.ORDERS}
+          to={ordersPath}
           icon={<ArrowLeftIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />}
         >
-          {ORDER_DETAILS_TEXTS.BACK_TO_ORDERS}
+          {ORDER_HEADER_TEXTS.BACK_TO_ORDERS}
         </LinkButton>
       </div>
       <div className="flex flex-wrap items-baseline gap-4">
-        <PageTitle className="tabular-nums">{ORDER_DETAILS_TEXTS.title(orderNumber)}</PageTitle>
+        <PageTitle className="tabular-nums">{ORDER_HEADER_TEXTS.title(orderNumber)}</PageTitle>
         <span role="status" className="hidden lg:inline-flex">
-          <OrderStatusBadge status={order.status} />
+          <OrderStatusBadge status={status} audience={audience} />
         </span>
       </div>
       <p className="hidden text-small text-fg-secondary tabular-nums lg:block">
-        {ORDER_DETAILS_TEXTS.createdAt(formatFullDateTime(order.createdAt))}
+        {ORDER_HEADER_TEXTS.createdAt(formatFullDateTime(createdAt))}
       </p>
       <div className="flex items-center justify-between gap-4 lg:hidden">
         <span role="status">
-          <OrderStatusBadge status={order.status} />
+          <OrderStatusBadge status={status} audience={audience} />
         </span>
         <span className="text-small text-fg-secondary tabular-nums">
-          {formatShortDateTime(order.createdAt)}
+          {formatShortDateTime(createdAt)}
         </span>
       </div>
     </header>

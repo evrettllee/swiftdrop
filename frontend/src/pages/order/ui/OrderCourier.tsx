@@ -1,5 +1,6 @@
 import { ChatTextIcon, PhoneIcon } from '@phosphor-icons/react';
 import { type Ref, useId } from 'react';
+import { formatCourierVehicle, formatCourierVehicleShort } from '@/entities/courier';
 import type { ClientOrderCourier } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { buildTelHref, getNameInitials } from '@/shared/lib/format';
@@ -8,7 +9,6 @@ import { CountBadge } from '@/shared/ui/badge';
 import { OutlineIconButton, OutlineIconLink } from '@/shared/ui/icon-button';
 import { Section } from '@/shared/ui/section';
 import { ORDER_COURIER_TEXTS } from '../config/tracking';
-import { formatCourierVehicle, formatCourierVehicleShort } from '../lib/courier';
 
 type OrderCourierProps = {
   courier: NonNullable<ClientOrderCourier['courier']>;

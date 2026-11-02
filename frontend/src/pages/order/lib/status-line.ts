@@ -1,3 +1,4 @@
+import { type OrderTrackingState, PAYMENT_VIEW } from '@/entities/order';
 import {
   ORDER_CANCELLED_BY,
   ORDER_STATUS,
@@ -6,11 +7,9 @@ import {
 } from '@/shared/api';
 import { MS_PER_MINUTE } from '@/shared/config';
 import { formatTime } from '@/shared/lib/format';
-import { PAYMENT_VIEW } from '../config/payment';
 import { UNPAID_ORDER_TTL_MINUTES } from '../config/payment-return';
 import { STATUS_LINE_TEXTS } from '../config/texts';
 import { ORDER_COURIER_TEXTS } from '../config/tracking';
-import type { OrderTrackingState } from '../model/tracking-state';
 import { minutesSince, minutesUntil } from './minutes';
 import { getPaymentView } from './payment';
 

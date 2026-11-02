@@ -1,11 +1,7 @@
 import { UI_TEXTS } from '@/shared/config';
 
 export const ORDER_DETAILS_TEXTS = {
-  BREADCRUMBS_LABEL: 'Хлебные крошки',
-  ORDERS: UI_TEXTS.ORDERS,
   BACK_TO_ORDERS: 'Все заказы',
-  title: (orderNumber: string) => `Заказ ${orderNumber}`,
-  createdAt: (date: string) => `Оформлен ${date}`,
   LOAD_FAILED: 'Не удалось загрузить заказ. Попробуйте ещё раз',
   LOAD_FAILED_TITLE: 'Не удалось загрузить заказ',
   NOT_FOUND_TITLE: 'Заказ не найден',
@@ -38,9 +34,6 @@ export const CANCEL_TEXTS = {
 // The lines of the price itself are PRICE_TEXTS of the price entity.
 export const PAYMENT_TEXTS = {
   SECTION: 'Оплата',
-  PAID: 'Оплачено',
-  UNPAID: 'Не оплачено',
-  REFUNDED: 'Деньги возвращены',
   RETRY_PAY: 'Попробовать снова',
   CANCEL: CANCEL_ORDER,
   CANCEL_HINT: 'Отменить можно, пока курьер не забрал посылку.',

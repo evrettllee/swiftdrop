@@ -115,8 +115,8 @@ describe('Manager order details (e2e)', () => {
       pricing: { price: VALID_ORDER_PRICE },
       payment: { state: 'paid', refundedAt: null },
       history: [
-        { status: ORDER_STATUS.PENDING, actor: 'client', comment: null },
-        { status: ORDER_STATUS.CONFIRMED, actor: 'system', comment: null },
+        { status: ORDER_STATUS.PENDING, actor: 'client', actorName: null, comment: null },
+        { status: ORDER_STATUS.CONFIRMED, actor: 'system', actorName: null, comment: null },
       ],
       offers: [
         { round: 1, courier: { id: declinedId, vehicleType: null }, status: 'expired' },
@@ -136,6 +136,7 @@ describe('Manager order details (e2e)', () => {
       },
     });
     expect(typeof (body.payment as Record<string, unknown>).paidAt).toBe('string');
+    expect(typeof body.estimatedDeliveryAt).toBe('string');
     expect(JSON.stringify(body)).not.toMatch(/passwordHash|otpCode|changedBy|userId|Token/);
   });
 

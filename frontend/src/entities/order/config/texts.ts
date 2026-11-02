@@ -1,4 +1,13 @@
 import { ORDER_STATUS, type OrderStatus } from '@/shared/api';
+import { UI_TEXTS } from '@/shared/config';
+
+export const ORDER_HEADER_TEXTS = {
+  BREADCRUMBS_LABEL: 'Хлебные крошки',
+  ORDERS: UI_TEXTS.ORDERS,
+  BACK_TO_ORDERS: 'Все заказы',
+  title: (orderNumber: string) => `Заказ ${orderNumber}`,
+  createdAt: (date: string) => `Оформлен ${date}`,
+} as const;
 
 export const ORDER_TEXTS = {
   ORDER_NUMBER_PREFIX: '№',

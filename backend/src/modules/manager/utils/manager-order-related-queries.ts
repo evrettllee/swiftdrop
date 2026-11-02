@@ -32,6 +32,8 @@ export function findHistory(db: Database, orderId: number) {
       changedAt: orderStatusHistory.changedAt,
       changedBy: orderStatusHistory.changedBy,
       role: roles.name,
+      firstName: users.firstName,
+      lastName: users.lastName,
       comment: orderStatusHistory.comment,
     })
     .from(orderStatusHistory)
