@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 import { MANAGER_LAYOUT_TEXTS } from '../../src/app/layouts/manager-layout/navigation';
-import { MANAGER_ORDERS_API_PATHS } from '../../src/shared/api/endpoints/manager-orders';
+import { MANAGER_ORDERS_API_PATHS } from '../../src/shared/staff-api/manager-orders';
 import { ORDER_STATUS } from '../../src/shared/api/endpoints/order';
-import { SUPPORT_STAFF_API_PATHS } from '../../src/shared/api/endpoints/support';
+import { SUPPORT_STAFF_API_PATHS } from '../../src/shared/staff-api/support';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';
 import { SOCKET_EVENTS } from '../../src/shared/realtime/socket-events';
 import { ROLE } from '../../src/shared/session/auth-user';
@@ -33,6 +33,9 @@ async function stubCounts(page: Page): Promise<CountsStub> {
       },
     });
   });
+  await page.route(/\/api\/manager\/orders(\?.*)?$/, (route) =>
+    route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20, until: null } }),
+  );
   await page.route(`**${API_BASE_PATH}${SUPPORT_STAFF_API_PATHS.COUNTS}`, (route) => {
     counts.supportRequests += 1;
 

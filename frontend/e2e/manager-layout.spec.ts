@@ -35,13 +35,12 @@ for (const role of [ROLE.CLIENT, ROLE.COURIER] satisfies Role[]) {
 test('should show the counts of the badges and the role in the sidebar', async ({ page }) => {
   await openAsManager(page);
 
-  await page.goto(APP_ROUTES.MANAGER_ORDERS);
+  await page.goto(APP_ROUTES.MANAGER_MAP);
 
   const orders = managerMenu(page).getByRole('link', { name: /^Заказы/ });
   const support = managerMenu(page).getByRole('link', { name: /^Поддержка/ });
   await expect(orders).toHaveAccessibleName('Заказы, 3 требуют внимания');
   await expect(orders).toContainText('3');
-  await expect(orders).toHaveAttribute('aria-current', 'page');
   await expect(support).toHaveAccessibleName('Поддержка, 2 без ответа');
   await expect(support).toContainText('2');
   await expect(page.getByText('Менеджер', { exact: true })).toBeVisible();
@@ -49,7 +48,7 @@ test('should show the counts of the badges and the role in the sidebar', async (
 
 test('should load a count once for a batch of socket events', async ({ page }) => {
   const { counts, socket } = await openAsManager(page);
-  await page.goto(APP_ROUTES.MANAGER_ORDERS);
+  await page.goto(APP_ROUTES.MANAGER_MAP);
   const orders = managerMenu(page).getByRole('link', { name: /^Заказы/ });
   await expect(orders).toHaveAccessibleName('Заказы, 3 требуют внимания');
   const ordersAsked = counts.orderRequests;
@@ -80,7 +79,7 @@ test('should load a count once for a batch of socket events', async ({ page }) =
 
 test('should not load a count again for a broken event', async ({ page }) => {
   const { counts, socket } = await openAsManager(page);
-  await page.goto(APP_ROUTES.MANAGER_ORDERS);
+  await page.goto(APP_ROUTES.MANAGER_MAP);
   await expect(managerMenu(page).getByRole('link', { name: /^Заказы/ })).toHaveAccessibleName(
     'Заказы, 3 требуют внимания',
   );

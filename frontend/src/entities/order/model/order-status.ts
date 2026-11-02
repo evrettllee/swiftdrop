@@ -1,6 +1,6 @@
 import { ORDER_STATUS, type OrderStatus } from '@/shared/api';
 import { STATUS_TONE, type StatusTone } from '../config/status-tone';
-import { ORDER_STATUS_LABELS } from '../config/texts';
+import { ORDER_STATUS_LABELS, STAFF_ORDER_STATUS_LABELS } from '../config/texts';
 
 type StatusMeta = {
   label: string;
@@ -27,3 +27,19 @@ export const ORDER_STATUS_META: Record<OrderStatus, StatusMeta> = {
   [ORDER_STATUS.CANCELLED]: meta(ORDER_STATUS.CANCELLED, STATUS_TONE.CANCELLED),
   [ORDER_STATUS.REJECTED]: meta(ORDER_STATUS.REJECTED, STATUS_TONE.CANCELLED),
 };
+
+export const STATUS_AUDIENCE = {
+  CLIENT: 'client',
+  STAFF: 'staff',
+} as const;
+
+export type StatusAudience = (typeof STATUS_AUDIENCE)[keyof typeof STATUS_AUDIENCE];
+
+export function getOrderStatusMeta(status: OrderStatus, audience: StatusAudience): StatusMeta {
+  const meta = ORDER_STATUS_META[status];
+  const staffLabel = STAFF_ORDER_STATUS_LABELS[status];
+
+  return audience === STATUS_AUDIENCE.STAFF && staffLabel !== undefined
+    ? { label: staffLabel, tone: STATUS_TONE.NEW, isRing: false }
+    : meta;
+}

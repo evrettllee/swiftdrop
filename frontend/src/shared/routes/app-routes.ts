@@ -57,5 +57,9 @@ export function getCourierHistoryOrderPath(orderId: number, page: number): strin
   return page > 1 ? `${path}?${new URLSearchParams({ [HISTORY_PAGE_PARAM]: String(page) })}` : path;
 }
 
+export function getManagerOrderPath(orderId: number): string {
+  return `${APP_ROUTES.MANAGER_ORDERS}/${orderId}`;
+}
+
 // The router pattern for every address that matches no page.
 export const CATCH_ALL_ROUTE = '*';

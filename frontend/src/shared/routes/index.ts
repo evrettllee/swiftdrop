@@ -3,6 +3,7 @@ export {
   CATCH_ALL_ROUTE,
   getCourierHistoryOrderPath,
   getCourierHistoryPath,
+  getManagerOrderPath,
   getOrderPath,
   HISTORY_PAGE_PARAM,
   ORDER_DETAILS_PATTERN,

@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { dateSchema, supportTicketStatusSchema } from '@/shared/api';
+import { dateSchema } from '@/shared/api';
+import { supportTicketStatusSchema } from '@/shared/staff-api';
 import { SOCKET_EVENTS } from './socket-events';
 
 export const SUPPORT_TICKET_EVENT_KIND = {

@@ -99,9 +99,7 @@ test('should leave the order waiting for the payment when a client places it and
   await page.goto(APP_ROUTES.ORDER_NEW);
   const orderId = await placeOrder(page, TEST_ORDER);
 
-  await page.goto(
-    `${getOrderPath(orderId)}?${PAYMENT_RETURN_PARAM}=${PAYMENT_RETURN.CANCELLED}`,
-  );
+  await page.goto(`${getOrderPath(orderId)}?${PAYMENT_RETURN_PARAM}=${PAYMENT_RETURN.CANCELLED}`);
   await expect(orderStatus(page, ORDER_STATUS_META[ORDER_STATUS.PENDING].label)).toBeVisible();
   // The payment did not go through, so the pay button offers to try again.
   await expect(page.getByRole('button', { name: PAYMENT_TEXTS.RETRY_PAY })).toBeVisible();

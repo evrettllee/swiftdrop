@@ -61,12 +61,6 @@ export {
   GEOCODING_MIN_QUERY_LENGTH,
 } from './endpoints/geocoding/geocoding-params';
 export { findAddressByPoint, searchAddresses } from './endpoints/geocoding/search-addresses';
-export type { ManagerOrderCounts } from './endpoints/manager-orders';
-export {
-  getManagerOrderCounts,
-  MANAGER_ORDERS_API_PATHS,
-  managerOrderCountsSchema,
-} from './endpoints/manager-orders';
 export type { OrderDetails, OrderListItem, OrderStatus } from './endpoints/order';
 export {
   dateSchema,
@@ -93,14 +87,8 @@ export {
   ROUTING_API_PATHS,
   routeLinesSchema,
 } from './endpoints/routing';
-export type { SupportCounts, SupportTicketStatus } from './endpoints/support';
-export {
-  getSupportCounts,
-  SUPPORT_STAFF_API_PATHS,
-  SUPPORT_TICKET_STATUS,
-  supportCountsSchema,
-  supportTicketStatusSchema,
-} from './endpoints/support';
+export type { DownloadedFile } from './download';
+export { downloadFile } from './download';
 export type { HttpOptions } from './http';
 export {
   ApiError,

@@ -15,6 +15,7 @@ import { ManagerAnalyticsService } from './services/manager-analytics.service';
 import { ManagerOrderCountsService } from './services/manager-order-counts.service';
 import { ManagerOrderDetailsService } from './services/manager-order-details.service';
 import { ManagerCourierCandidatesService } from './services/manager-courier-candidates.service';
+import { ManagerCourierLookupService } from './services/manager-courier-lookup.service';
 import { ManagerExportLimits } from './services/manager-export-limits';
 import { ManagerAssignmentRestartService } from './services/manager-assignment-restart.service';
 import { ManagerCouriersMapService } from './services/manager-couriers-map.service';
@@ -57,6 +58,7 @@ import { ManagerZonesService } from './services/manager-zones.service';
     ManagerAssignmentRestartService,
     ManagerOrderCancellationService,
     ManagerCouriersMapService,
+    ManagerCourierLookupService,
     ManagerZonesService,
     ManagerZoneWritesService,
     ManagerAnalyticsService,

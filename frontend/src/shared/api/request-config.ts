@@ -1,6 +1,7 @@
 export const API_BASE_PATH = '/api';
 export const JSON_CONTENT_TYPE = 'application/json';
 export const CONTENT_TYPE_HEADER = 'Content-Type';
+export const CONTENT_DISPOSITION_HEADER = 'Content-Disposition';
 // The session cookies go only to the backend of the same origin (the /api proxy).
 export const REQUEST_CREDENTIALS: RequestCredentials = 'same-origin';
 

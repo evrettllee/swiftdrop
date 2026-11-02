@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { http } from '../http';
+import { http } from '@/shared/api';
 
 export const SUPPORT_STAFF_API_PATHS = {
   COUNTS: '/manager/support/counts',

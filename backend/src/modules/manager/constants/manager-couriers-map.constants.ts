@@ -1,6 +1,7 @@
 export const MANAGER_COURIERS_ROUTES = {
   BASE: 'manager/couriers',
   MAP: 'map',
+  LOOKUP: 'lookup',
 } as const;
 
 export const COURIERS_MAP_LIMIT = 500;

@@ -9,10 +9,11 @@ export type RadioCardProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' 
   description?: string;
   // Shown at the end of the card, for example a limit or a price.
   aside?: ReactNode;
+  isCompact?: boolean;
 };
 
 const CARD_CLASS = joinClassNames(
-  'group flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface p-4 text-body',
+  'group flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface text-body',
   COLOR_TRANSITION_CLASS,
   'has-checked:border-accent has-checked:bg-selected',
   'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent',
@@ -21,7 +22,7 @@ const CARD_CLASS = joinClassNames(
 
 // The dot of the chosen card is drawn by ::after of the circle.
 const CIRCLE_CLASS = joinClassNames(
-  'mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-fg-muted',
+  'grid size-5 shrink-0 place-items-center rounded-full border border-fg-muted',
   'after:hidden after:size-2.5 after:rounded-full after:bg-accent',
   'peer-checked:border-accent peer-checked:after:block',
 );
@@ -33,12 +34,16 @@ export function RadioCard({
   title,
   description,
   aside,
+  isCompact = false,
   ...inputProps
 }: RadioCardProps) {
   return (
-    <label className={CARD_CLASS}>
+    <label className={joinClassNames(CARD_CLASS, isCompact ? 'items-center px-4 py-3' : 'p-4')}>
       <input type="radio" className="peer sr-only" {...inputProps} />
-      <span aria-hidden="true" className={CIRCLE_CLASS} />
+      <span
+        aria-hidden="true"
+        className={joinClassNames(CIRCLE_CLASS, isCompact ? '' : 'mt-0.5')}
+      />
       {CardIcon === undefined ? null : (
         <CardIcon
           size={ICON_SIZE.LARGE}
@@ -48,7 +53,7 @@ export function RadioCard({
         />
       )}
       <span className="flex min-w-0 grow flex-col">
-        <span className="font-semibold">{title}</span>
+        <span className={isCompact ? '' : 'font-semibold'}>{title}</span>
         {description === undefined ? null : (
           <span className="text-small text-fg-secondary">{description}</span>
         )}

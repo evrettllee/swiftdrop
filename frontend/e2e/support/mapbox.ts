@@ -89,6 +89,10 @@ export async function stubMapbox(page: Page): Promise<void> {
       return fulfillFeatures(route, ALL_ADDRESSES.slice(0, 1));
     }
 
-    return route.fulfill({ headers: CORS_HEADERS, contentType: PNG_CONTENT_TYPE, body: EMPTY_TILE });
+    return route.fulfill({
+      headers: CORS_HEADERS,
+      contentType: PNG_CONTENT_TYPE,
+      body: EMPTY_TILE,
+    });
   });
 }

@@ -17,7 +17,9 @@ const HTTP_NO_CONTENT = 204;
 const SECOND_ORDER_WAIT_MS = 1000;
 
 function isOrderPost(url: URL, method: string): boolean {
-  return method === HTTP_METHOD.POST && url.pathname === `${API_BASE_PATH}${ORDERS_API_PATHS.ORDERS}`;
+  return (
+    method === HTTP_METHOD.POST && url.pathname === `${API_BASE_PATH}${ORDERS_API_PATHS.ORDERS}`
+  );
 }
 
 // Counts the orders the page asks to place, each answered after `delayMs`.

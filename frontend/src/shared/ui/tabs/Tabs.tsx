@@ -1,5 +1,6 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 import { COLOR_TRANSITION_CLASS, ID_PART } from '@/shared/config';
+import { formatCount } from '@/shared/lib/format';
 
 type TabItem<TId extends string> = {
   id: TId;
@@ -108,8 +109,10 @@ export function Tabs<TId extends string>({
           >
             {tab.label}
             {tab.count === undefined || tab.count === null ? null : (
-              <span className="text-small font-normal text-fg-secondary tabular-nums">
-                {tab.count}
+              <span
+                className={`text-small font-normal tabular-nums ${isActive ? 'text-accent' : 'text-fg-secondary'}`}
+              >
+                {formatCount(tab.count)}
               </span>
             )}
           </button>

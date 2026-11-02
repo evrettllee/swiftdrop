@@ -29,3 +29,8 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [ORDER_STATUS.CANCELLED]: 'Отменён',
   [ORDER_STATUS.REJECTED]: 'Отклонён',
 };
+
+export const STAFF_ORDER_STATUS_LABELS: Partial<Record<OrderStatus, string>> = {
+  [ORDER_STATUS.PENDING]: 'Ждёт оплаты',
+  [ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT]: 'Ждёт назначения',
+};

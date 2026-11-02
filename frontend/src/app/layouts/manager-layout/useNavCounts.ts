@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getManagerOrderCounts, getSupportCounts } from '@/shared/api';
+import { getManagerOrderCounts, getSupportCounts } from '@/shared/staff-api';
 import {
   CONNECTION_STATUS,
   SOCKET_EVENTS,

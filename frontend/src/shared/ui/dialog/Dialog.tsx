@@ -6,10 +6,16 @@ import { useModalDialog } from './useModalDialog';
 
 // A centered window on the desktop, a sheet from the bottom on a phone (design system §10).
 const DIALOG_CLASS =
-  'fixed inset-x-0 top-auto bottom-0 m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-xl bg-surface text-fg shadow-up backdrop:bg-scrim lg:inset-0 lg:m-auto lg:h-fit lg:w-105 lg:max-w-[calc(100%-2rem)] lg:rounded-lg lg:shadow-lg dark:border dark:border-border ' +
+  'fixed inset-x-0 top-auto bottom-0 m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-xl bg-surface text-fg shadow-up backdrop:bg-scrim lg:inset-0 lg:m-auto lg:h-fit lg:max-w-[calc(100%-2rem)] lg:rounded-lg lg:shadow-lg dark:border dark:border-border ' +
   'transition-[opacity,translate,scale] duration-250 ease-out starting:translate-y-4 starting:opacity-0 lg:starting:translate-y-0 lg:starting:scale-98 motion-reduce:transition-none';
 
+const WIDTH_CLASSES = {
+  default: 'lg:w-105',
+  wide: 'lg:w-120',
+} as const;
+
 type DialogProps = {
+  width?: keyof typeof WIDTH_CLASSES;
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -22,7 +28,14 @@ type DialogProps = {
 // Built on <dialog>: the browser keeps the focus inside, closes it on Escape and gives the focus
 // back to the button that opened it. The page under the window does not scroll, and a click on the
 // dimmed backdrop closes it.
-export function Dialog({ isOpen, onClose, title, actions, children }: DialogProps) {
+export function Dialog({
+  width = 'default',
+  isOpen,
+  onClose,
+  title,
+  actions,
+  children,
+}: DialogProps) {
   const { ref, onClick } = useModalDialog(isOpen, onClose);
   const titleId = useId();
 
@@ -32,7 +45,7 @@ export function Dialog({ isOpen, onClose, title, actions, children }: DialogProp
       aria-labelledby={titleId}
       onClose={onClose}
       onClick={onClick}
-      className={DIALOG_CLASS}
+      className={`${DIALOG_CLASS} ${WIDTH_CLASSES[width]}`}
     >
       <div className="flex flex-col px-4 pt-2 pb-6 lg:p-0">
         <div
