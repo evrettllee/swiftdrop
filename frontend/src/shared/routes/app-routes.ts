@@ -21,6 +21,8 @@ export const APP_ROUTES = {
   MANAGER_ZONES: '/manager/zones',
   MANAGER_ZONE_NEW: '/manager/zones/new',
   MANAGER_ZONE: '/manager/zones/:zoneId',
+  MANAGER_ZONES_PAGE: '/manager/zones/:zoneId?',
+  MANAGER_ZONE_CONTOUR: '/manager/zones/:zoneId/contour',
   MANAGER_ANALYTICS: '/manager/analytics',
   MANAGER_PROFILE: '/manager/profile',
 } as const;
@@ -59,6 +61,16 @@ export function getCourierHistoryOrderPath(orderId: number, page: number): strin
 
 export function getManagerOrderPath(orderId: number): string {
   return `${APP_ROUTES.MANAGER_ORDERS}/${orderId}`;
+}
+
+export const ZONE_ID_PARAM = 'zoneId';
+
+export function getManagerZonePath(zoneId: number): string {
+  return `${APP_ROUTES.MANAGER_ZONES}/${zoneId}`;
+}
+
+export function getManagerZoneContourPath(zoneId: number): string {
+  return `${getManagerZonePath(zoneId)}/contour`;
 }
 
 export const MANAGER_TICKET_PARAM = 'ticket';

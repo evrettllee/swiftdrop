@@ -11,7 +11,6 @@ import { CARD_TEXTS } from '../config/texts';
 import type { LiveCourier } from '../lib/courier-state';
 import { etaMinutes, orderLinkOf, positionAgo, stateLabel } from '../lib/courier-view';
 import { vehicleLabel } from '../lib/vehicle';
-import { useOrderEta } from '../model/useOrderEta';
 import { StateMark } from './StateMark';
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
@@ -26,12 +25,12 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 type CourierCardProps = {
   courier: LiveCourier;
   now: number;
+  eta: Date | null;
   onClose: () => void;
 };
 
-export function CourierCard({ courier, now, onClose }: CourierCardProps) {
+export function CourierCard({ courier, now, eta, onClose }: CourierCardProps) {
   const order = orderLinkOf(courier);
-  const eta = useOrderEta(courier.activeOrder?.orderId ?? null);
   const position = positionAgo(courier, now);
   const telHref = courier.phone === null ? null : buildTelHref(courier.phone);
 

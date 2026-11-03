@@ -2,8 +2,10 @@ import { DESKTOP_MEDIA_QUERY } from '@/shared/config';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { BlockLoader } from '@/shared/ui/page-loader';
 import { PageTitle } from '@/shared/ui/page-title';
+import { RouteOverlay } from '@/shared/ui/route-map';
 import { CARD_TEXTS, MANAGER_MAP_TEXTS as TEXTS } from '../config/texts';
 import { useManagerMap } from '../model/useManagerMap';
+import { useSelectedOrder } from '../model/useSelectedOrder';
 import { CourierCard } from './CourierCard';
 import { CouriersList } from './CouriersList';
 import { CouriersMapView } from './CouriersMapView';
@@ -15,9 +17,15 @@ export function ManagerMapPage() {
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const page = useManagerMap();
   const { params, selected, select } = page;
+  const order = useSelectedOrder(selected?.activeOrder?.orderId ?? null, page.selectedPoint);
   const card =
     selected === null ? null : (
-      <CourierCard courier={selected} now={page.now} onClose={() => select(null)} />
+      <CourierCard
+        courier={selected}
+        now={page.now}
+        eta={order?.estimatedDeliveryAt ?? null}
+        onClose={() => select(null)}
+      />
     );
 
   return (
@@ -41,6 +49,11 @@ export function ManagerMapPage() {
             fitPoints={page.fitPoints}
             selected={selected}
             card={isDesktop ? card : null}
+            routeLayer={
+              order === null ? null : (
+                <RouteOverlay pickup={order.pickup} delivery={order.delivery} route={order.route} />
+              )
+            }
             className="h-90 lg:h-full"
             onSelect={select}
           />

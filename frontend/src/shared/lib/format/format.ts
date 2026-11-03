@@ -36,3 +36,11 @@ export function formatShortDateTime(date: Date): string {
 export function formatTime(date: Date): string {
   return timeFormat.format(date);
 }
+
+export function formatShortDay(date: Date): string {
+  return shortDateFormat.format(date).replace(SHORT_MONTH_DOT, '');
+}
+
+export function formatShortDate(date: Date): string {
+  return `${formatShortDay(date)} ${date.getFullYear()}`;
+}

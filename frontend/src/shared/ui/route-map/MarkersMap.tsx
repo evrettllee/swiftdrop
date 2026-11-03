@@ -3,7 +3,7 @@ import { CITY_CENTER } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { MAP_ZOOM } from './map';
 import { MovableMapFrame } from './MovableMapFrame';
-import { useFitOnce } from './useFitOnce';
+import { type FitPadding, MARKERS_FIT_PADDING, useFitOnce } from './useFitOnce';
 import { useMovableMap } from './useMovableMap';
 
 const [CENTER_LATITUDE, CENTER_LONGITUDE] = CITY_CENTER;
@@ -12,14 +12,22 @@ const CITY_POINT: GeoPoint = { latitude: CENTER_LATITUDE, longitude: CENTER_LONG
 type MarkersMapProps = {
   label: string;
   fitPoints: readonly GeoPoint[];
+  fitPadding?: FitPadding;
   overlay?: ReactNode;
   className: string;
   children: ReactNode;
 };
 
-export function MarkersMap({ label, fitPoints, overlay, className, children }: MarkersMapProps) {
+export function MarkersMap({
+  label,
+  fitPoints,
+  fitPadding = MARKERS_FIT_PADDING,
+  overlay,
+  className,
+  children,
+}: MarkersMapProps) {
   const frame = useMovableMap();
-  useFitOnce(frame.map, fitPoints);
+  useFitOnce(frame.map, fitPoints, fitPadding);
 
   return (
     <MovableMapFrame

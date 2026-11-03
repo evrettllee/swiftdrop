@@ -74,13 +74,14 @@ export function TableHeaderCell({
 }
 
 type TableRowProps = {
+  isSelected?: boolean;
   children: ReactNode;
 };
 
-export function TableRow({ children }: TableRowProps) {
+export function TableRow({ isSelected = false, children }: TableRowProps) {
   return (
     <tr
-      className={`relative hover:bg-surface-muted has-[a:focus-visible]:bg-surface-muted has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-accent [&:last-child>td]:border-b-0 ${COLOR_TRANSITION_CLASS}`}
+      className={`relative ${isSelected ? 'bg-selected' : 'hover:bg-surface-muted'} has-[a:focus-visible]:bg-surface-muted has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-accent [&:last-child>td]:border-b-0 ${COLOR_TRANSITION_CLASS}`}
     >
       {children}
     </tr>

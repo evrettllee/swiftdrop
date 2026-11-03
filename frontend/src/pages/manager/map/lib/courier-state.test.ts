@@ -1,7 +1,14 @@
 import { expect, test } from '@playwright/test';
 import type { CourierMapItem } from '@/shared/staff-api';
 import { MAP_FILTER } from '../config/map';
-import { filterChips, isInFilter, liveCounts, liveState, statesOf } from './courier-state';
+import {
+  compareCouriers,
+  filterChips,
+  isInFilter,
+  liveCounts,
+  liveState,
+  statesOf,
+} from './courier-state';
 import { toLiveCouriers } from './live-couriers';
 
 const NOW = 1_000_000_000;
@@ -113,4 +120,19 @@ test('should move the counts of the loaded couriers to their state on the page',
     on_order: 2,
     no_signal: 1,
   });
+});
+
+test('should group the list by the state and sort the group by the name, then by the id', () => {
+  const items = [
+    item(1, { name: 'Яна Белая' }),
+    item(2, { name: 'Борис Зуев', positionAgeSec: 120 }),
+    item(3, { name: 'Олег Ким', activeOrder: { orderId: 5, status: 'in_transit' } }),
+    item(4, { name: 'Анна Ли', openOfferOrderId: 6 }),
+    item(5, { name: 'Анна Ли' }),
+    item(6, { name: 'Анна Ли' }),
+    item(7, { name: 'Вера Ан', activeOrder: { orderId: 8, status: 'picked_up' } }),
+  ];
+  const sorted = toLiveCouriers(items, NOW, new Map(), NOW).sort(compareCouriers);
+
+  expect(sorted.map(({ courierId }) => courierId)).toEqual([7, 3, 4, 2, 5, 6, 1]);
 });

@@ -61,6 +61,10 @@ export function Dialog({
     <dialog
       ref={ref}
       aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
       onClose={onClose}
       onClick={onClick}
       className={`${DIALOG_CLASS} ${WIDTH_CLASSES[width]} ${isBodyScrolling ? SCROLL_CLASSES.dialog : SCROLL_CLASSES.whole}`}

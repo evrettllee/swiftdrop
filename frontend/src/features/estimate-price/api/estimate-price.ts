@@ -25,9 +25,7 @@ export async function estimatePrice(
   options: HttpOptions = {},
 ): Promise<PriceEstimate> {
   try {
-    return priceEstimateSchema.parse(
-      await http.post(PRICING_API_PATHS.ESTIMATES, input, options),
-    );
+    return priceEstimateSchema.parse(await http.post(PRICING_API_PATHS.ESTIMATES, input, options));
   } catch (error) {
     throw toEstimateError(error);
   }

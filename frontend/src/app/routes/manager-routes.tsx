@@ -47,7 +47,7 @@ export const managerRoutes: RouteObject = {
           ),
         },
         {
-          path: APP_ROUTES.MANAGER_ZONES,
+          path: APP_ROUTES.MANAGER_ZONES_PAGE,
           Component: lazy(() =>
             import('@/pages/manager/zones').then((module) => ({
               default: module.ManagerZonesPage,
@@ -63,10 +63,10 @@ export const managerRoutes: RouteObject = {
           ),
         },
         {
-          path: APP_ROUTES.MANAGER_ZONE,
+          path: APP_ROUTES.MANAGER_ZONE_CONTOUR,
           Component: lazy(() =>
-            import('@/pages/manager/zones').then((module) => ({
-              default: module.ManagerZonesPage,
+            import('@/pages/manager/zone-contour').then((module) => ({
+              default: module.ManagerZoneContourPage,
             })),
           ),
         },

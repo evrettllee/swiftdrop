@@ -70,7 +70,10 @@ test('should lose the signal of a courier when the position grows older than a m
   );
   await page.goto(MAP_PATH);
 
-  const row = page.getByRole('region', { name: 'Курьеры на линии' }).getByRole('listitem').first();
+  const row = page
+    .getByRole('region', { name: 'Курьеры на линии' })
+    .getByRole('listitem')
+    .filter({ hasText: 'Алина Гордей' });
   await expect(row).toContainText('Свободен');
   await page.clock.runFor(10_000);
   await expect(row).toContainText('Свободен');
@@ -118,4 +121,37 @@ test('should put the card under the map and the list under the card on a phone',
   expect(listBox?.y ?? 0).toBeGreaterThan((cardBox?.y ?? 0) + (cardBox?.height ?? 0) - 1);
   await expect(map.getByRole('button', { name: 'Приблизить' })).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(PHONE.width);
+});
+
+test('should draw the route of the order of the chosen courier only', async ({ page }) => {
+  const stub = await stubCouriersMap(page);
+  await page.goto(MAP_PATH);
+  const lines = mapRegion(page).locator('.route-line');
+
+  await page
+    .getByRole('region', { name: 'Курьеры на линии' })
+    .getByRole('button', { name: /Алина Гордей/ })
+    .click();
+  await page.waitForTimeout(BATCH_WAIT_MS);
+  await expect(lines).toHaveCount(0);
+  expect(stub.routeRequests).toBe(0);
+
+  await page
+    .getByRole('region', { name: 'Курьеры на линии' })
+    .getByRole('button', { name: /Андрей Король/ })
+    .click();
+  await expect(lines).toHaveCount(2);
+  await expect(mapRegion(page).locator('.route-line--live')).toHaveCount(1);
+});
+
+test('should group the list by the state', async ({ page }) => {
+  await stubCouriersMap(page);
+  await page.goto(MAP_PATH);
+
+  await expect(
+    page
+      .getByRole('region', { name: 'Курьеры на линии' })
+      .getByRole('listitem')
+      .locator('span.truncate:not(.text-small)'),
+  ).toHaveText(['Андрей Король', 'Егор Тарасевич', 'Никита Волчек', 'Алина Гордей', 'Игорь Рыбак']);
 });

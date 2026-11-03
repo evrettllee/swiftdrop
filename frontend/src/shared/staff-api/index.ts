@@ -127,3 +127,23 @@ export {
   supportCountsSchema,
   supportTicketStatusSchema,
 } from './support';
+export type {
+  ManagerZone,
+  ManagerZoneDetails,
+  TariffOption,
+  ZoneChanges,
+  ZoneErrorBody,
+  ZoneErrorCode,
+  ZonePolygon,
+} from './manager-zones';
+export {
+  getManagerZone,
+  getManagerZones,
+  getTariffOptions,
+  MANAGER_ZONES_API_PATHS,
+  readZoneError,
+  updateManagerZone,
+  ZONE_ERROR_CODE,
+  ZONE_NAME_MAX_LENGTH,
+  ZONE_PRIORITY,
+} from './manager-zones';

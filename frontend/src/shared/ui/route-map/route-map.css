@@ -301,3 +301,49 @@
 .leaflet-container .map-panel a {
   color: revert-layer;
 }
+
+.map-zone {
+  fill: var(--accent);
+  fill-opacity: 0.12;
+  stroke: var(--accent);
+  stroke-width: 1.5px;
+  cursor: pointer;
+}
+
+.map-zone--selected {
+  fill-opacity: 0.2;
+  stroke-width: 2px;
+}
+
+.map-zone--off {
+  fill: none;
+  stroke: var(--fg-muted);
+  stroke-dasharray: 6 6;
+}
+
+.leaflet-pane > svg path.map-zone--off.leaflet-interactive {
+  pointer-events: visible;
+}
+
+.map-zone--off.map-zone--selected {
+  stroke: var(--accent);
+}
+
+.map-zone-label.leaflet-tooltip {
+  padding: 0;
+  color: var(--fg);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: 1.5;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.map-zone-label.map-zone--off.leaflet-tooltip {
+  color: var(--fg-secondary);
+}
+
+.map-zone-label.leaflet-tooltip::before {
+  display: none;
+}

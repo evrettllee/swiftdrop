@@ -1,6 +1,7 @@
 import { COURIER_POSITION_STALE_MS } from '@/entities/order';
 import type { OrderStatus } from '@/shared/api';
-import { MS_PER_SECOND } from '@/shared/config';
+import { APP_LOCALE, MS_PER_SECOND } from '@/shared/config';
+import type { GeoPoint } from '@/shared/lib/geo';
 import { COURIER_MAP_STATE, type CourierMapItem, type CourierMapState } from '@/shared/staff-api';
 import { MAP_FILTER, MAP_FILTER_ORDER, type MapFilter } from '../config/map';
 
@@ -82,4 +83,27 @@ export function filterChips(counts: StateCounts): FilterChip[] {
       count: FILTER_STATES[filter].reduce((sum, state) => sum + counts[state], 0),
     })),
   ];
+}
+
+export function pointOf(courier: LiveCourier | null): GeoPoint | null {
+  return courier === null || courier.lat === null || courier.lng === null
+    ? null
+    : { latitude: courier.lat, longitude: courier.lng };
+}
+
+const STATE_RANK: Record<CourierMapState, number> = {
+  [COURIER_MAP_STATE.ON_ORDER]: 0,
+  [COURIER_MAP_STATE.OFFER]: 1,
+  [COURIER_MAP_STATE.NO_SIGNAL]: 2,
+  [COURIER_MAP_STATE.FREE]: 3,
+};
+
+const nameCollator = new Intl.Collator(APP_LOCALE);
+
+export function compareCouriers(left: LiveCourier, right: LiveCourier): number {
+  return (
+    STATE_RANK[left.state] - STATE_RANK[right.state] ||
+    nameCollator.compare(left.name, right.name) ||
+    left.courierId - right.courierId
+  );
 }

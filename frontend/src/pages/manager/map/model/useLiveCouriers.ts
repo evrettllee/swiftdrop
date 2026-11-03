@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useNow } from '@/shared/lib/clock';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { NO_SIGNAL_TICK_MS, type MapFilter } from '../config/map';
-import { filterChips, isInFilter, liveCounts } from '../lib/courier-state';
+import { compareCouriers, filterChips, isInFilter, liveCounts } from '../lib/courier-state';
 import { toLiveCouriers } from '../lib/live-couriers';
 import type { MapAnswer } from './useCouriersMap';
 import { useLivePositions } from './useLivePositions';
@@ -23,7 +23,7 @@ export function useLiveCouriers(answer: MapAnswer | null, filter: MapFilter | nu
     [data, receivedAt, updates, now],
   );
   const shown = useMemo(
-    () => couriers.filter((courier) => isInFilter(courier.state, filter)),
+    () => couriers.filter((courier) => isInFilter(courier.state, filter)).sort(compareCouriers),
     [couriers, filter],
   );
   const fitPoints = useMemo(

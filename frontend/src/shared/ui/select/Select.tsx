@@ -1,7 +1,8 @@
 import { CaretDownIcon, type Icon } from '@phosphor-icons/react';
 import { useId } from 'react';
-import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT, ID_PART } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
+import { FieldError } from '@/shared/ui/field-error';
 import { SELECT_LABEL, type SelectLabel } from './select-label';
 
 export type SelectOption<TValue extends string> = {
@@ -28,6 +29,7 @@ type SelectProps<TValue extends string> = {
   value: TValue;
   onChange: (value: TValue) => void;
   icon?: Icon;
+  error?: string;
   className?: string;
   fieldClassName?: string;
   selectClassName?: string;
@@ -40,11 +42,14 @@ export function Select<TValue extends string>({
   value,
   onChange,
   icon: LeadIcon,
+  error,
   className = '',
   fieldClassName = '',
   selectClassName = '',
 }: SelectProps<TValue>) {
   const id = useId();
+  const errorId = `${id}-${ID_PART.ERROR}`;
+  const hasError = error !== undefined;
 
   function handleChange(next: string): void {
     const option = options.find((item) => item.value === next);
@@ -71,9 +76,12 @@ export function Select<TValue extends string>({
         <select
           id={id}
           value={value}
+          aria-invalid={hasError}
+          aria-describedby={hasError ? errorId : undefined}
           onChange={(event) => handleChange(event.target.value)}
           className={joinClassNames(
-            'h-11 w-full min-w-0 cursor-pointer appearance-none rounded-sm border border-border bg-surface pe-10 text-body text-fg shadow-sm hover:bg-surface-muted focus:border-accent',
+            'h-11 w-full min-w-0 cursor-pointer appearance-none rounded-sm border bg-surface pe-10 text-body text-fg shadow-sm hover:bg-surface-muted',
+            hasError ? 'border-danger' : 'border-border focus:border-accent',
             COLOR_TRANSITION_CLASS,
             LeadIcon === undefined ? 'ps-3' : 'ps-10',
             selectClassName,
@@ -92,6 +100,7 @@ export function Select<TValue extends string>({
           className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-fg-secondary"
         />
       </div>
+      {hasError ? <FieldError id={errorId}>{error}</FieldError> : null}
     </div>
   );
 }

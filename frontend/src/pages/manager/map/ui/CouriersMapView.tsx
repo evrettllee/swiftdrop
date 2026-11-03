@@ -3,17 +3,13 @@ import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { MapAnchoredPanel, MarkersMap, PinMarker } from '@/shared/ui/route-map';
 import type { GeoPoint } from '@/shared/lib/geo';
 import { CARD_TEXTS, MANAGER_MAP_TEXTS as TEXTS, markerLabel } from '../config/texts';
-import type { LiveCourier } from '../lib/courier-state';
+import { type LiveCourier, pointOf } from '../lib/courier-state';
 import { pinTone, stateLabel } from '../lib/courier-view';
 import { vehicleIcon } from '../lib/vehicle';
 import { MapLegend } from './MapLegend';
 
 const PANEL_CLASS =
   'w-80 rounded-lg border border-transparent bg-surface p-4 text-fg shadow-lg dark:border-border';
-
-function pointOf({ lat, lng }: LiveCourier): GeoPoint | null {
-  return lat === null || lng === null ? null : { latitude: lat, longitude: lng };
-}
 
 type CourierPinProps = {
   courier: LiveCourier;
@@ -46,6 +42,7 @@ type CouriersMapViewProps = {
   fitPoints: readonly GeoPoint[];
   selected: LiveCourier | null;
   card: ReactNode;
+  routeLayer: ReactNode;
   className: string;
   onSelect: (courierId: number) => void;
 };
@@ -55,10 +52,11 @@ export function CouriersMapView({
   fitPoints,
   selected,
   card,
+  routeLayer,
   className,
   onSelect,
 }: CouriersMapViewProps) {
-  const selectedPoint = selected === null ? null : pointOf(selected);
+  const selectedPoint = pointOf(selected);
 
   return (
     <MarkersMap
@@ -67,6 +65,7 @@ export function CouriersMapView({
       overlay={<MapLegend />}
       className={className}
     >
+      {routeLayer}
       {couriers.map((courier) => {
         const point = pointOf(courier);
 

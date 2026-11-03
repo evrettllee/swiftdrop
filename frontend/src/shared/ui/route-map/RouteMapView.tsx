@@ -1,13 +1,9 @@
 import { type ReactNode } from 'react';
-import { Marker } from 'react-leaflet';
-import { ROUTE_POINT } from '@/shared/config';
 import type { GeoPoint } from '@/shared/lib/geo';
 import type { MapRoute } from '@/shared/lib/route-lines';
-import { toLatLng } from './lat-lng';
 import { MAP_TEXTS, MAP_VIEW_CONTROLS_FIT_PADDING, MAP_ZOOM } from './map';
-import { MARKER_ICONS } from './marker-icons';
 import { MovableMapFrame } from './MovableMapFrame';
-import { RouteLines } from './RouteLines';
+import { RouteOverlay } from './RouteOverlay';
 import { RouteUnavailableBadge } from './RouteUnavailableBadge';
 import { useFitRoute } from './useFitRoute';
 import { useMovableMap } from './useMovableMap';
@@ -56,19 +52,7 @@ export function RouteMapView({
       overlay={route.isUnavailable ? <RouteUnavailableBadge /> : null}
       className={className}
     >
-      <RouteLines lines={route.lines} />
-      <Marker
-        position={toLatLng(pickup)}
-        icon={MARKER_ICONS[ROUTE_POINT.PICKUP]}
-        interactive={false}
-        keyboard={false}
-      />
-      <Marker
-        position={toLatLng(delivery)}
-        icon={MARKER_ICONS[ROUTE_POINT.DELIVERY]}
-        interactive={false}
-        keyboard={false}
-      />
+      <RouteOverlay pickup={pickup} delivery={delivery} route={route} />
       {children}
     </MovableMapFrame>
   );

@@ -9,9 +9,11 @@ import {
   type RawManagerOrder,
 } from './manager-order-fixtures';
 import { stubMapbox } from './mapbox';
+import { COURIER_SEGMENT, PARCEL_SEGMENT } from './routing';
 
 const MAP_URL = /\/api\/manager\/couriers\/map(\?.*)?$/;
 const ORDER_URL = /\/api\/manager\/orders\/(\d+)$/;
+const ROUTE_URL = /\/api\/manager\/orders\/\d+\/route$/;
 
 export const MAP_PATH = '/manager/map';
 export const OFFER_ORDER_ID = 48240;
@@ -82,6 +84,7 @@ export type CouriersMapStub = {
   requests: URL[];
   order: RawManagerOrder;
   orderRequests: number[];
+  routeRequests: number;
   socket: AppSocketStub;
 };
 
@@ -104,6 +107,7 @@ export async function stubCouriersMap(page: Page): Promise<CouriersMapStub> {
     requests: [],
     order: { ...assignedOrder(), status: 'in_transit', estimatedDeliveryAt: minutesAhead(12) },
     orderRequests: [],
+    routeRequests: 0,
     socket,
   };
 
@@ -121,6 +125,17 @@ export async function stubCouriersMap(page: Page): Promise<CouriersMapStub> {
     stub.orderRequests.push(Number(ORDER_URL.exec(route.request().url())?.[1]));
 
     return route.fulfill({ json: stub.order });
+  });
+  await page.route(ROUTE_URL, (route) => {
+    stub.routeRequests += 1;
+
+    return route.fulfill({
+      json: {
+        segments: [COURIER_SEGMENT, PARCEL_SEGMENT],
+        courierPosition: null,
+        pickupEtaAt: null,
+      },
+    });
   });
 
   return stub;
