@@ -12,6 +12,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" vite.config.ts",
     "lint": "oxlint --type-aware src/ e2e/ playwright.config.ts playwright.unit.config.ts",
     "lint:fsd": "steiger ./src",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p e2e/tsconfig.json",
     "test:unit": "playwright test --config playwright.unit.config.ts",
     "test:e2e": "playwright test",
     "preview": "vite preview"

@@ -43,6 +43,37 @@ export function vehicleChips(suitable: readonly CourierCandidate[]): VehicleChip
   ];
 }
 
+export function withoutCourier<T extends CourierCandidate>(
+  candidates: readonly T[],
+  courierId: number | null,
+): T[] {
+  return candidates.filter((candidate) => candidate.courierId !== courierId);
+}
+
+export type CandidatesView = {
+  shown: CourierCandidates | null;
+  choosable: CourierCandidate[];
+  chips: VehicleChip[];
+};
+
+export function candidatesView(
+  data: CourierCandidates | null,
+  vehicle: VehicleFilter,
+  currentId: number | null,
+): CandidatesView {
+  if (data === null) {
+    return { shown: null, choosable: [], chips: [] };
+  }
+
+  const shown = filterCandidates(data, vehicle);
+
+  return {
+    shown,
+    choosable: withoutCourier(shown.suitable, currentId),
+    chips: vehicleChips(withoutCourier(data.suitable, currentId)),
+  };
+}
+
 export function filterByVehicle<T extends CourierCandidate>(
   candidates: readonly T[],
   filter: VehicleFilter,

@@ -33,7 +33,9 @@ test('should reassign with the reason and the courier of the loaded order', asyn
 
   const current = dialog.getByRole('radio', { name: /Андрей Король/ });
   await expect(current).toBeDisabled();
-  await expect(current).toHaveAccessibleName(/Текущий курьер заказа/);
+  await expect(current).toHaveAccessibleName(/Сейчас назначен/);
+  await expect(dialog.getByText('Подходят для посылки 2,5 кг: 3 курьера')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: /^Все/ })).toHaveText('Все3');
   await dialog.locator('label', { hasText: 'Егор Тарасевич' }).click();
   await dialog.getByRole('textbox', { name: 'Причина' }).fill(REASON);
   await expect(dialog.getByText(`${REASON.length} / 500`)).toBeVisible();

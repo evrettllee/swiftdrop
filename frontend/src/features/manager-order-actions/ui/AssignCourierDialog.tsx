@@ -32,6 +32,28 @@ function titleOf(target: StaffOrderTarget, isReassign: boolean, isDesktop: boole
   return isDesktop ? ASSIGN_TEXTS.assignTitle(orderNumber) : ASSIGN_TEXTS.ASSIGN_TITLE_SHORT;
 }
 
+function LoadFailed({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-start gap-2">
+      <InlineAlert variant="error" title={ASSIGN_TEXTS.LOAD_FAILED} />
+      <Button variant="secondary" onClick={onRetry}>
+        {ERROR_TEXTS.RETRY}
+      </Button>
+    </div>
+  );
+}
+
+function SuitableLine({ text, isPending }: { text: string; isPending: boolean }) {
+  return (
+    <p
+      aria-hidden={isPending}
+      className={`text-small text-fg-secondary tabular-nums ${isPending ? 'invisible' : ''}`}
+    >
+      {text}
+    </p>
+  );
+}
+
 export function AssignCourierDialog(props: AssignCourierDialogProps) {
   const { target, isReassign, isOpen, onClose } = props;
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
@@ -78,25 +100,21 @@ export function AssignCourierDialog(props: AssignCourierDialogProps) {
         onRefresh={assign.refresh}
       />
       {choice.isLost ? <InlineAlert variant="warning" title={ASSIGN_TEXTS.COURIER_GONE} /> : null}
-      {answer?.isFailed === true ? (
-        <div className="flex flex-col items-start gap-2">
-          <InlineAlert variant="error" title={ASSIGN_TEXTS.LOAD_FAILED} />
-          <Button variant="secondary" onClick={candidates.reload}>
-            {ERROR_TEXTS.RETRY}
-          </Button>
-        </div>
-      ) : null}
+      {answer?.isFailed === true ? <LoadFailed onRetry={candidates.reload} /> : null}
       {shown === null ? null : (
         <div aria-busy={candidates.isLoading} className="flex flex-col gap-4">
-          <p className="text-small text-fg-secondary tabular-nums">
-            {shown.suitable.length === 0
-              ? emptyText(candidates.searchText, assign.vehicle)
-              : suitableSummary(shown.suitable.length, target.parcelWeightKg)}
-          </p>
+          <SuitableLine
+            text={
+              assign.suitableCount === 0
+                ? emptyText(candidates.searchText, assign.vehicle)
+                : suitableSummary(assign.suitableCount, assign.weight.weightKg)
+            }
+            isPending={assign.weight.isLoading}
+          />
           <CandidateLists
             candidates={shown}
             selectedId={choice.selectedId}
-            currentCourierId={isReassign ? (target.courier?.id ?? null) : null}
+            currentCourierId={assign.currentId}
             isDesktop={isDesktop}
             onSelect={choice.select}
           />

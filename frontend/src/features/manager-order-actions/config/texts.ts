@@ -34,7 +34,7 @@ export const ASSIGN_TEXTS = {
   positionAge: (seconds: number) => `позиция ${seconds} с назад`,
   PICKUP: 'до забора',
   NO_DISTANCE: '–',
-  CURRENT: 'Текущий курьер заказа',
+  CURRENT: 'Сейчас назначен',
   COURIER_GONE: 'Курьер больше недоступен',
   LOAD_FAILED: 'Не удалось загрузить курьеров',
   SUBMIT_ASSIGN: 'Назначить',

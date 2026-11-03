@@ -1,6 +1,10 @@
 export { AreaMap } from './AreaMap';
 export { CourierEtaMarker } from './CourierEtaMarker';
 export { CourierRouteMap } from './CourierRouteMap';
+export { MapAnchoredPanel } from './MapAnchoredPanel';
+export { PIN_TONE, type PinTone } from './map-pin';
+export { MarkersMap } from './MarkersMap';
+export { PinMarker } from './PinMarker';
 export { PositionMap } from './PositionMap';
 export { RouteMap } from './RouteMap';
 export { RouteMapView } from './RouteMapView';

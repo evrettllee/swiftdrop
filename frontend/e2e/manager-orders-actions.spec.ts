@@ -1,9 +1,21 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { stubOrderActions } from './support/manager-actions';
+import { awaitingOrder } from './support/manager-order';
 import { FIRST_ORDER_ID, settleRequests, stubManagerOrders } from './support/manager-orders';
 
 const PHONE = { width: 375, height: 812 };
+
+async function stubRowDetails(page: Page): Promise<string[]> {
+  const details: string[] = [];
+  await page.route(new RegExp(`/api/manager/orders/${FIRST_ORDER_ID}$`), (route) => {
+    details.push(route.request().url());
+
+    return route.fulfill({ json: { ...awaitingOrder(), id: FIRST_ORDER_ID } });
+  });
+
+  return details;
+}
 
 test('should assign from the attention tab and read the table and the counts again', async ({
   page,
@@ -12,6 +24,7 @@ test('should assign from the attention tab and read the table and the counts aga
   orders.status = ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT;
   orders.total = 3;
   const actions = await stubOrderActions(page);
+  const details = await stubRowDetails(page);
   await page.goto('/manager/orders?status=attention');
 
   const row = page.getByRole('row').filter({ hasText: `№${FIRST_ORDER_ID}` });
@@ -19,7 +32,8 @@ test('should assign from the attention tab and read the table and the counts aga
   const dialog = page.getByRole('dialog', {
     name: `Назначить курьера на заказ №${FIRST_ORDER_ID}`,
   });
-  await expect(dialog.getByText('Подходят для посылки: 4 курьера')).toBeVisible();
+  await expect(dialog.getByText('Подходят для посылки 2,5 кг: 4 курьера')).toBeVisible();
+  expect(details.length).toBeGreaterThan(0);
   await settleRequests(page);
   const [lists, counts] = [orders.lists.length, orders.counts.length];
 
@@ -70,6 +84,7 @@ test('should assign from a card on a phone, with the unsuitable couriers folded'
   const orders = await stubManagerOrders(page);
   orders.status = ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT;
   await stubOrderActions(page);
+  await stubRowDetails(page);
   await page.goto('/manager/orders?status=attention');
 
   const card = page.getByRole('article').filter({ hasText: `№${FIRST_ORDER_ID}` });

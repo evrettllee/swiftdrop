@@ -34,6 +34,18 @@ export {
 } from './manager-actions-params';
 export type { SearchKind } from './manager-search';
 export { isSearchTooShort, isSearchUsable, SEARCH_KIND, searchKindOf } from './manager-search';
+export type {
+  CourierMapItem,
+  CourierMapState,
+  CouriersMap,
+  CouriersMapQuery,
+} from './manager-couriers-map';
+export {
+  COURIER_MAP_STATE,
+  courierMapItemSchema,
+  COURIERS_MAP_API_PATH,
+  getCouriersMap,
+} from './manager-couriers-map';
 export type { CourierLookupItem } from './manager-couriers';
 export {
   COURIER_LOOKUP_LIMIT,

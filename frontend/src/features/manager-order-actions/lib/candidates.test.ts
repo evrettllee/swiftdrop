@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { CourierCandidate, UnsuitableCandidate } from '@/shared/staff-api';
 import {
   candidateLine,
+  candidatesView,
   distanceText,
   filterCandidates,
   keepSelection,
@@ -79,4 +80,16 @@ test('should keep the chosen courier while they fit and drop them with a notice 
   expect(keepSelection(2, [candidate(2)])).toEqual({ selectedId: 2, isLost: false });
   expect(keepSelection(2, [candidate(3)])).toEqual({ selectedId: null, isLost: true });
   expect(keepSelection(null, [])).toEqual({ selectedId: null, isLost: false });
+});
+
+test('should leave the current courier out of the counts while keeping the card', () => {
+  const data = { suitable: [candidate(12), candidate(2, { vehicleType: 'foot' })], unsuitable: [] };
+  const view = candidatesView(data, 'all', 12);
+
+  expect(view.shown?.suitable.map(({ courierId }) => courierId)).toEqual([12, 2]);
+  expect(view.choosable.map(({ courierId }) => courierId)).toEqual([2]);
+  expect(view.chips.map(({ label, count }) => [label, count])).toEqual([
+    ['Все', 1],
+    ['Пеший', 1],
+  ]);
 });
