@@ -50,6 +50,9 @@ export const MANAGER_ORDERS_TEXTS = {
   waitingLong: (minutes: number) => `Ждёт ${formatCount(minutes)} мин`,
   actions: (orderNumber: string) => `Действия с заказом ${orderNumber}`,
   OPEN_ORDER: 'Открыть заказ',
+  ASSIGN: 'Назначить',
+  ASSIGN_COURIER: 'Назначить курьера',
+  CANCEL_ORDER: 'Отменить заказ',
   PAGE_SIZE: 'Показывать по',
   SHOW_MORE: 'Показать ещё',
   shown: (shown: number, total: number) =>

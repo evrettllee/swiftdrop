@@ -1,4 +1,8 @@
-export { VEHICLE_TYPE_META, VEHICLE_TYPE_ORDER } from './config/vehicle-types';
+export {
+  STAFF_VEHICLE_LABELS,
+  VEHICLE_TYPE_META,
+  VEHICLE_TYPE_ORDER,
+} from './config/vehicle-types';
 export {
   formatCourierVehicle,
   formatCourierVehicleShort,

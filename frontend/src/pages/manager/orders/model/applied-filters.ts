@@ -4,7 +4,7 @@ import type { OrdersParams } from '../config/list-params';
 import { EMPTY_TEXTS, FILTER_TEXTS, PAYMENT_LABELS, TAB_LABELS } from '../config/texts';
 import { detectPreset, formatCalendarDay } from '../lib/period';
 import type { OrdersView } from './orders-view';
-import { SEARCH_KIND, searchKindOf } from './orders-view';
+import { SEARCH_KIND, searchKindOf } from '@/shared/staff-api';
 
 export const APPLIED_FILTER = {
   PERIOD: 'period',

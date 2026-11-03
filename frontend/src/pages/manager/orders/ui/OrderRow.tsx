@@ -8,15 +8,17 @@ import { TABLE_ALIGN, TableCell, TableRow } from '@/shared/ui/table';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
 import { isAwaitingAssignment, shortPersonName } from '../lib/order-row';
 import { ClientPhone, OrderRoute, WaitingTime } from './OrderCells';
-import { RowMenu } from './RowMenu';
+import type { RowAction } from '../lib/row-actions';
+import { RowActions } from './RowActions';
 
 type OrderRowProps = {
   order: ManagerOrderListItem;
   now: number;
   isAttention: boolean;
+  onAction: RowAction;
 };
 
-function CourierAndStatus({ order, now }: Omit<OrderRowProps, 'isAttention'>) {
+function CourierAndStatus({ order, now }: Pick<OrderRowProps, 'order' | 'now'>) {
   return (
     <>
       <TableCell className="whitespace-nowrap">
@@ -36,7 +38,7 @@ function CourierAndStatus({ order, now }: Omit<OrderRowProps, 'isAttention'>) {
   );
 }
 
-export function OrderRow({ order, now, isAttention }: OrderRowProps) {
+export function OrderRow({ order, now, isAttention, onAction }: OrderRowProps) {
   const number = formatOrderNumber(order.id);
 
   return (
@@ -73,8 +75,8 @@ export function OrderRow({ order, now, isAttention }: OrderRowProps) {
       <TableCell align={TABLE_ALIGN.END} className="font-semibold whitespace-nowrap tabular-nums">
         {formatMoney(order.price, APP_CURRENCY)}
       </TableCell>
-      <TableCell align={TABLE_ALIGN.END} className="w-15">
-        <RowMenu orderId={order.id} orderNumber={number} />
+      <TableCell align={TABLE_ALIGN.END} className={isAttention ? 'w-45' : 'w-15'}>
+        <RowActions order={order} hasAssign={isAttention} onAction={onAction} />
       </TableCell>
     </TableRow>
   );

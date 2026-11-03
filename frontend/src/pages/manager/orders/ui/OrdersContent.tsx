@@ -1,6 +1,7 @@
 import { LIST_STATUS } from '@/shared/config';
 import { ORDERS_TAB } from '../config/list';
 import type { OrdersParams } from '../config/list-params';
+import type { RowAction } from '../lib/row-actions';
 import type { OrdersView } from '../model/orders-view';
 import type { useOrdersFeed } from '../model/useOrdersFeed';
 import type { useOrdersPage } from '../model/useOrdersPage';
@@ -17,6 +18,7 @@ type OrdersContentProps = {
   now: number;
   emptyText: string;
   onChange: (patch: Partial<OrdersParams>) => void;
+  onAction: RowAction;
 };
 
 export function OrdersContent({
@@ -28,6 +30,7 @@ export function OrdersContent({
   now,
   emptyText,
   onChange,
+  onAction,
 }: OrdersContentProps) {
   const list = isDesktop ? page : feed;
 
@@ -58,8 +61,14 @@ export function OrdersContent({
       isBusy={page.status === LIST_STATUS.LOADING}
       onPage={(next) => onChange({ page: next })}
       onLimit={(limit) => onChange({ limit })}
+      onAction={onAction}
     />
   ) : (
-    <OrdersFeed feed={feed} now={now} isAttention={view.tab === ORDERS_TAB.ATTENTION} />
+    <OrdersFeed
+      feed={feed}
+      now={now}
+      isAttention={view.tab === ORDERS_TAB.ATTENTION}
+      onAction={onAction}
+    />
   );
 }

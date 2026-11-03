@@ -10,10 +10,11 @@ export type RadioCardProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' 
   // Shown at the end of the card, for example a limit or a price.
   aside?: ReactNode;
   isCompact?: boolean;
+  isTruncated?: boolean;
 };
 
 const CARD_CLASS = joinClassNames(
-  'group flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface text-body',
+  'group relative flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface text-body',
   COLOR_TRANSITION_CLASS,
   'has-checked:border-accent has-checked:bg-selected',
   'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent',
@@ -35,8 +36,11 @@ export function RadioCard({
   description,
   aside,
   isCompact = false,
+  isTruncated = false,
   ...inputProps
 }: RadioCardProps) {
+  const lineClass = isTruncated ? 'truncate' : '';
+
   return (
     <label className={joinClassNames(CARD_CLASS, isCompact ? 'items-center px-4 py-3' : 'p-4')}>
       <input type="radio" className="peer sr-only" {...inputProps} />
@@ -53,9 +57,11 @@ export function RadioCard({
         />
       )}
       <span className="flex min-w-0 grow flex-col">
-        <span className={isCompact ? '' : 'font-semibold'}>{title}</span>
+        <span className={joinClassNames(isCompact ? '' : 'font-semibold', lineClass)}>{title}</span>
         {description === undefined ? null : (
-          <span className="text-small text-fg-secondary">{description}</span>
+          <span className={joinClassNames('text-small text-fg-secondary', lineClass)}>
+            {description}
+          </span>
         )}
       </span>
       {aside === undefined ? null : (

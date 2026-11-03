@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { type CourierLookupItem, lookupCouriers } from '@/shared/staff-api';
 import { LIST_SEARCH_DEBOUNCE_MS } from '@/shared/lib/list-params';
-import { isSearchUsable } from './orders-view';
+import { isSearchUsable } from '@/shared/staff-api';
 
 export const SUGGESTIONS_STATUS = {
   IDLE: 'idle',

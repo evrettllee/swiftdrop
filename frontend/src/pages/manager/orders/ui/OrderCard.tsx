@@ -8,15 +8,17 @@ import { getManagerOrderPath } from '@/shared/routes';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
 import { shortPersonName } from '../lib/order-row';
 import { ClientPhone, OrderRoute, WaitingTime } from './OrderCells';
-import { RowMenu } from './RowMenu';
+import type { RowAction } from '../lib/row-actions';
+import { RowActions } from './RowActions';
 
 type OrderCardProps = {
   order: ManagerOrderListItem;
   now: number;
   isAttention: boolean;
+  onAction: RowAction;
 };
 
-export function OrderCard({ order, now, isAttention }: OrderCardProps) {
+export function OrderCard({ order, now, isAttention, onAction }: OrderCardProps) {
   const number = formatOrderNumber(order.id);
 
   return (
@@ -64,7 +66,7 @@ export function OrderCard({ order, now, isAttention }: OrderCardProps) {
       )}
       <div className="flex items-center justify-between gap-4">
         <span className="font-semibold tabular-nums">{formatMoney(order.price, APP_CURRENCY)}</span>
-        <RowMenu orderId={order.id} orderNumber={number} />
+        <RowActions order={order} hasAssign={isAttention} onAction={onAction} />
       </div>
     </article>
   );

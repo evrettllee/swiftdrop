@@ -9,6 +9,7 @@ export const ORDER_COURIER_RETRIES_WHEN_FINISHED = 1;
 export const ORDER_COURIER_TEXTS = {
   SECTION: 'Курьер',
   SEARCHING: 'Ищем курьера рядом с точкой забора',
+  VEHICLE_SEPARATOR: ', ',
   CALL: 'Позвонить курьеру',
   CHAT: 'Чат с курьером',
   chatUnread: (count: number) => `Непрочитанных сообщений: ${count}`,

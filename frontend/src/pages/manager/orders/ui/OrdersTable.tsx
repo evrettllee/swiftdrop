@@ -4,6 +4,7 @@ import { Table, TABLE_ALIGN, TABLE_SORT, TableHeaderCell } from '@/shared/ui/tab
 import { ORDERS_TAB, type OrdersTab, type PageSize } from '../config/list';
 import { ASCENDING_SORTS, COLUMN_OF_SORT, SORT_COLUMN, type SortColumn } from '../config/table';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
+import type { RowAction } from '../lib/row-actions';
 import { OrderRow } from './OrderRow';
 import { PageSizeSelect } from './PageSizeSelect';
 
@@ -59,6 +60,7 @@ type OrdersTableProps = {
   isBusy: boolean;
   onPage: (page: number) => void;
   onLimit: (limit: PageSize) => void;
+  onAction: RowAction;
 };
 
 export function OrdersTable({
@@ -73,6 +75,7 @@ export function OrdersTable({
   isBusy,
   onPage,
   onLimit,
+  onAction,
 }: OrdersTableProps) {
   const isAttention = tab === ORDERS_TAB.ATTENTION;
 
@@ -94,7 +97,13 @@ export function OrdersTable({
         <OrdersTableHead isAttention={isAttention} sort={sort} />
         <tbody>
           {items.map((order) => (
-            <OrderRow key={order.id} order={order} now={now} isAttention={isAttention} />
+            <OrderRow
+              key={order.id}
+              order={order}
+              now={now}
+              isAttention={isAttention}
+              onAction={onAction}
+            />
           ))}
         </tbody>
       </Table>

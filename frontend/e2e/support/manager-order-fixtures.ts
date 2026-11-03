@@ -70,7 +70,11 @@ export function awaitingOrder() {
       estimatedMinutes: 27,
       tariffName: 'Минск, стандарт',
     },
-    payment: { state: 'paid', paidAt: minutesAgo(40), refundedAt: null as string | null },
+    payment: {
+      state: 'paid',
+      paidAt: minutesAgo(40) as string | null,
+      refundedAt: null as string | null,
+    },
     history: [
       entry(ORDER_STATUS.PENDING, 41, 'client'),
       entry(ORDER_STATUS.CONFIRMED, 40),

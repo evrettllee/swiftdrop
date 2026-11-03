@@ -4,7 +4,7 @@ import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import type { ManagerOrderActions } from '@/shared/staff-api';
 import { Button } from '@/shared/ui/button';
 import { Divider } from '@/shared/ui/divider';
-import { ORDER_ACTION, type OrderAction } from '../config/actions';
+import { ORDER_ACTION, type OrderAction } from '@/features/manager-order-actions';
 import { ACTION_TEXTS, MANAGER_ORDER_TEXTS } from '../config/texts';
 import { Panel } from './Panel';
 

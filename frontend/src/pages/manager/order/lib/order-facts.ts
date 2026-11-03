@@ -1,15 +1,28 @@
-import { VEHICLE_TYPE_META } from '@/entities/courier';
+import { STAFF_VEHICLE_LABELS } from '@/entities/courier';
 import type { CourierVehicle } from '@/shared/api';
 import { formatTime } from '@/shared/lib/format';
+import type { StaffOrderTarget } from '@/features/manager-order-actions';
 import {
   type ManagerOrderActions,
   type ManagerOrderCourier,
+  type ManagerOrderDetails,
   type ManagerOrderOffer,
   type ManagerOrderTicket,
   SUPPORT_TICKET_STATUS,
 } from '@/shared/staff-api';
 import { ACTOR_LABELS, OFFERS_TEXTS, TICKET_TEXTS, TICKET_TOPIC_LABELS } from '../config/texts';
 import { minutesSince, secondsToMinutes } from './minutes';
+
+export function toActionTarget(order: ManagerOrderDetails): StaffOrderTarget {
+  return {
+    orderId: order.id,
+    status: order.status,
+    courier: order.courier === null ? null : { id: order.courier.id, name: order.courier.name },
+    price: order.pricing.price,
+    paymentState: order.payment.state,
+    parcelWeightKg: order.parcel.weight,
+  };
+}
 
 export function hasActions(actions: ManagerOrderActions): boolean {
   return Object.values(actions).some(Boolean);
@@ -29,7 +42,7 @@ export function toCourierVehicle(
 export function offerVehicleLabel(offer: ManagerOrderOffer): string | null {
   return offer.courier.vehicleType === null
     ? null
-    : VEHICLE_TYPE_META[offer.courier.vehicleType].label;
+    : STAFF_VEHICLE_LABELS[offer.courier.vehicleType];
 }
 
 export function offerPickupText(offer: ManagerOrderOffer): string {

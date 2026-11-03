@@ -2,6 +2,7 @@ import { LIST_STATUS } from '@/shared/config';
 import { Button } from '@/shared/ui/button';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
+import type { RowAction } from '../lib/row-actions';
 import type { useOrdersFeed } from '../model/useOrdersFeed';
 import { OrderCard } from './OrderCard';
 
@@ -9,16 +10,23 @@ type OrdersFeedProps = {
   feed: ReturnType<typeof useOrdersFeed>;
   now: number;
   isAttention: boolean;
+  onAction: RowAction;
 };
 
-export function OrdersFeed({ feed, now, isAttention }: OrdersFeedProps) {
+export function OrdersFeed({ feed, now, isAttention, onAction }: OrdersFeedProps) {
   const isLoading = feed.status === LIST_STATUS.LOADING;
 
   return (
     <div className="flex flex-col gap-4" aria-busy={isLoading}>
       <div className="flex flex-col gap-4">
         {feed.items.map((order) => (
-          <OrderCard key={order.id} order={order} now={now} isAttention={isAttention} />
+          <OrderCard
+            key={order.id}
+            order={order}
+            now={now}
+            isAttention={isAttention}
+            onAction={onAction}
+          />
         ))}
       </div>
       {feed.status === LIST_STATUS.ERROR ? (

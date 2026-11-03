@@ -1,4 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import {
+  type OrderAction,
+  OrderActionDialog,
+  type StaffOrderTarget,
+} from '@/features/manager-order-actions';
 import { DESKTOP_MEDIA_QUERY } from '@/shared/config';
 import { useMinuteNow } from '@/shared/lib/clock';
 import { useMediaQuery } from '@/shared/lib/dom';
@@ -11,6 +16,7 @@ import {
   TAB_STATUS_GROUP,
 } from '../config/list';
 import { MANAGER_ORDERS_TEXTS, TAB_LABELS } from '../config/texts';
+import { rowActionTarget } from '../lib/row-actions';
 import { appliedFilters, emptyResultText, exportScope } from '../model/applied-filters';
 import { useManagerOrders } from '../model/useManagerOrders';
 import { AppliedFilters } from './AppliedFilters';
@@ -25,6 +31,10 @@ export function ManagerOrdersPage() {
   const nowDate = useMemo(() => new Date(now), [now]);
   const orders = useManagerOrders(isDesktop);
   const { params, view, counts, changeParams } = orders;
+  const [rowAction, setRowAction] = useState<{
+    target: StaffOrderTarget;
+    action: OrderAction;
+  } | null>(null);
   const chips = appliedFilters(view.filter, nowDate, orders.courierName);
   const tabs = ORDERS_TABS.map((id) => ({
     id,
@@ -76,11 +86,20 @@ export function ManagerOrdersPage() {
                 now={now}
                 emptyText={emptyResultText(view, nowDate)}
                 onChange={changeParams}
+                onAction={(order, action) =>
+                  setRowAction({ target: rowActionTarget(order), action })
+                }
               />
             </div>
           </TabPanel>
         ))}
       </div>
+      <OrderActionDialog
+        target={rowAction?.target ?? null}
+        action={rowAction?.action ?? null}
+        onClose={() => setRowAction(null)}
+        onChanged={orders.refresh}
+      />
     </div>
   );
 }

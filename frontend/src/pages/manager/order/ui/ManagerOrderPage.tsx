@@ -22,7 +22,7 @@ export function ManagerOrderPage() {
   useLiveOrder(orderId, reload);
 
   if (order !== null) {
-    return <OrderView order={order} />;
+    return <OrderView order={order} onChanged={reload} />;
   }
 
   if (load === ORDER_LOAD.NOT_FOUND) {

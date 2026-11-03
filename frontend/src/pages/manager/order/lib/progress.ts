@@ -1,7 +1,11 @@
 import { buildOrderProgress, type ProgressStep } from '@/entities/order';
 import { ORDER_STATUS } from '@/shared/api';
 import { formatTime } from '@/shared/lib/format';
-import type { ManagerOrderDetails, ManagerOrderHistoryEntry } from '@/shared/staff-api';
+import {
+  type ManagerOrderDetails,
+  type ManagerOrderHistoryEntry,
+  ORDER_ACTOR,
+} from '@/shared/staff-api';
 import { PROGRESS_STEPS, PROGRESS_STOP_LABELS } from '../config/progress';
 import { ACTOR_LABELS, PROGRESS_TEXTS } from '../config/texts';
 
@@ -15,10 +19,14 @@ function noteOf(entry: ManagerOrderHistoryEntry, isRepeat: boolean): string {
     .join(PROGRESS_TEXTS.NOTE_SEPARATOR);
 }
 
+function isNoted(entry: ManagerOrderHistoryEntry): boolean {
+  return entry.actor === ORDER_ACTOR.STAFF || (entry.comment !== null && entry.comment !== '');
+}
+
 function notesOf(history: ManagerOrderDetails['history'], status: string): string[] {
   return history
     .filter((entry) => entry.status === status)
-    .map((entry, index) => noteOf(entry, index > 0));
+    .flatMap((entry, index) => (isNoted(entry) ? [noteOf(entry, index > 0)] : []));
 }
 
 export function buildManagerProgress(order: ManagerOrderDetails): ProgressStep[] {

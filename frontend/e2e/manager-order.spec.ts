@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
+import { stubOrderActions } from './support/manager-actions';
 import {
   assignedOrder,
   awaitingOrder,
@@ -53,25 +54,6 @@ test('should show an order that waits for a manager with the offers and its acti
   await expect(page.getByRole('link', { name: 'Виктор Шуляк' })).toHaveCount(0);
 });
 
-test('should open an empty window named after the action and close it', async ({ page }) => {
-  await stubManagerOrder(page, awaitingOrder());
-  await page.goto(ORDER_PATH);
-
-  const cases = [
-    ['Назначить курьера', 'Назначить курьера на заказ №48231'],
-    ['Запустить автоназначение', 'Запустить автоназначение для заказа №48231?'],
-    ['Отменить заказ', 'Отменить заказ №48231?'],
-  ] as const;
-
-  for (const [button, title] of cases) {
-    await actions(page).getByRole('button', { name: button }).click();
-    const dialog = page.getByRole('dialog', { name: title });
-    await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: 'Закрыть' }).first().click();
-    await expect(dialog).toHaveCount(0);
-  }
-});
-
 test('should show the courier assigned by hand, who assigned and the ticket of the order', async ({
   page,
 }) => {
@@ -101,9 +83,10 @@ test('should show the courier assigned by hand, who assigned and the ticket of t
   ]);
   await expect(actions(page).getByText('Можно, пока курьер не забрал посылку.')).toBeVisible();
 
+  await stubOrderActions(page);
   await courier.getByRole('button', { name: 'Переназначить' }).click();
   await expect(
-    page.getByRole('dialog', { name: 'Переназначить курьера на заказе №48231' }),
+    page.getByRole('dialog', { name: 'Переназначить курьера на заказ №48231' }),
   ).toBeVisible();
   await page.keyboard.press('Escape');
 
@@ -126,7 +109,7 @@ test('should show a delivered order without actions', async ({ page }) => {
   await expect(actions(page)).toHaveCount(0);
   await expect(
     page.getByRole('region', { name: 'Ход заказа' }).getByText('Курьер', { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
 });
 
 test('should show who cancelled the order and why, with the refund', async ({ page }) => {

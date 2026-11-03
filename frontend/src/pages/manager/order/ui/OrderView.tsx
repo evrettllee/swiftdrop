@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { OrderHeader, STATUS_AUDIENCE } from '@/entities/order';
+import {
+  ORDER_ACTION,
+  type OrderAction,
+  OrderActionDialog,
+} from '@/features/manager-order-actions';
 import { MAIN_COLUMN_CLASS, SIDE_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
 import { APP_ROUTES } from '@/shared/routes';
 import type { ManagerOrderDetails } from '@/shared/staff-api';
 import { Divider } from '@/shared/ui/divider';
-import { ORDER_ACTION, type OrderAction } from '../config/actions';
-import { hasActions } from '../lib/order-facts';
+import { hasActions, toActionTarget } from '../lib/order-facts';
 import { useCourierTracking } from '../model/useCourierTracking';
-import { ActionDialog } from './ActionDialog';
 import { ActionsPanel } from './ActionsPanel';
 import { ClientSection } from './ClientSection';
 import { CourierSection } from './CourierSection';
@@ -24,16 +27,12 @@ const SECOND_ON_PHONE = 'max-lg:-order-1';
 
 type OrderViewProps = {
   order: ManagerOrderDetails;
+  onChanged: () => void;
 };
 
-export function OrderView({ order }: OrderViewProps) {
+export function OrderView({ order, onChanged }: OrderViewProps) {
   const tracking = useCourierTracking(order);
-  const [dialog, setDialog] = useState<{ action: OrderAction; isOpen: boolean }>({
-    action: ORDER_ACTION.ASSIGN,
-    isOpen: false,
-  });
-  const open = (action: OrderAction) => setDialog({ action, isOpen: true });
-  const close = () => setDialog((current) => ({ ...current, isOpen: false }));
+  const [action, setAction] = useState<OrderAction | null>(null);
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
@@ -55,7 +54,9 @@ export function OrderView({ order }: OrderViewProps) {
               <Divider />
               <CourierSection
                 courier={order.courier}
-                onReassign={order.actions.canReassign ? () => open(ORDER_ACTION.REASSIGN) : null}
+                onReassign={
+                  order.actions.canReassign ? () => setAction(ORDER_ACTION.REASSIGN) : null
+                }
               />
             </>
           )}
@@ -72,7 +73,11 @@ export function OrderView({ order }: OrderViewProps) {
         </div>
         <div className={`contents lg:flex lg:flex-col lg:gap-6 ${SIDE_COLUMN_CLASS}`}>
           {hasActions(order.actions) ? (
-            <ActionsPanel actions={order.actions} className={SECOND_ON_PHONE} onAction={open} />
+            <ActionsPanel
+              actions={order.actions}
+              className={SECOND_ON_PHONE}
+              onAction={setAction}
+            />
           ) : null}
           {order.tickets.length === 0 ? null : (
             <TicketsPanel tickets={order.tickets} className={SECOND_ON_PHONE} />
@@ -80,11 +85,11 @@ export function OrderView({ order }: OrderViewProps) {
           <PaymentPanel order={order} />
         </div>
       </div>
-      <ActionDialog
-        orderId={order.id}
-        action={dialog.action}
-        isOpen={dialog.isOpen}
-        onClose={close}
+      <OrderActionDialog
+        target={toActionTarget(order)}
+        action={action}
+        onClose={() => setAction(null)}
+        onChanged={onChanged}
       />
     </div>
   );

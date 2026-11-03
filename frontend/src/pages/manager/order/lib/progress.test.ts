@@ -30,11 +30,12 @@ test('should show the manual search step only when the order went through it', (
   ]);
 });
 
-test('should name who changed each step and give the reason of a reassignment', () => {
+test('should note only the actions of the staff and the entries with a reason', () => {
   const order = managerOrder({
     status: ORDER_STATUS.COURIER_ASSIGNED,
     history: [
-      ...BASE_HISTORY,
+      BASE_HISTORY[0],
+      { ...BASE_HISTORY[1], comment: 'Оплата подтверждена' },
       {
         status: ORDER_STATUS.COURIER_ASSIGNED,
         changedAt: at(10),
@@ -54,8 +55,8 @@ test('should name who changed each step and give the reason of a reassignment', 
   const steps = buildManagerProgress(order);
 
   expect(steps.map((step) => step.notes)).toEqual([
-    ['Клиент'],
-    ['Система'],
+    [],
+    ['Система · Оплата подтверждена'],
     ['Ольга М.', '15:07 · Ольга М. · Курьер заболел'],
     [],
     [],

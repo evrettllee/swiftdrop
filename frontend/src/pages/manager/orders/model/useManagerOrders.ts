@@ -24,6 +24,11 @@ export function useManagerOrders(isDesktop: boolean) {
     onCountsChange: counts.reload,
   });
   const { clearNew } = live;
+  const reloadCounts = counts.reload;
+  const refresh = useCallback(() => {
+    reloadList();
+    reloadCounts();
+  }, [reloadList, reloadCounts]);
 
   const showNew = useCallback(() => {
     clearNew();
@@ -44,6 +49,7 @@ export function useManagerOrders(isDesktop: boolean) {
     counts: counts.counts,
     newCount: live.newCount,
     showNew,
+    refresh,
     changeParams: update,
     courierName: courier.courierName,
     rememberCourier: courier.rememberCourier,

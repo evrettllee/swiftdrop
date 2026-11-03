@@ -22,6 +22,14 @@ export const VEHICLE_TYPE_META: Record<VehicleType, VehicleTypeMeta> = {
   [VEHICLE_TYPE.TRUCK]: { label: 'Грузовой', icon: TruckIcon },
 };
 
+export const STAFF_VEHICLE_LABELS: Record<VehicleType, string> = {
+  [VEHICLE_TYPE.FOOT]: 'Пеший',
+  [VEHICLE_TYPE.BICYCLE]: VEHICLE_TYPE_META[VEHICLE_TYPE.BICYCLE].label,
+  [VEHICLE_TYPE.SCOOTER]: VEHICLE_TYPE_META[VEHICLE_TYPE.SCOOTER].label,
+  [VEHICLE_TYPE.CAR]: VEHICLE_TYPE_META[VEHICLE_TYPE.CAR].label,
+  [VEHICLE_TYPE.TRUCK]: VEHICLE_TYPE_META[VEHICLE_TYPE.TRUCK].label,
+};
+
 // From the lightest to the heaviest transport.
 export const VEHICLE_TYPE_ORDER: readonly VehicleType[] = [
   VEHICLE_TYPE.FOOT,

@@ -6,12 +6,20 @@ import { useModalDialog } from './useModalDialog';
 
 // A centered window on the desktop, a sheet from the bottom on a phone (design system §10).
 const DIALOG_CLASS =
-  'fixed inset-x-0 top-auto bottom-0 m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-xl bg-surface text-fg shadow-up backdrop:bg-scrim lg:inset-0 lg:m-auto lg:h-fit lg:max-w-[calc(100%-2rem)] lg:rounded-lg lg:shadow-lg dark:border dark:border-border ' +
+  'fixed inset-x-0 top-auto bottom-0 m-0 max-h-[90dvh] w-full max-w-none rounded-t-xl bg-surface text-fg shadow-up backdrop:bg-scrim lg:inset-0 lg:m-auto lg:h-fit lg:max-w-[calc(100%-2rem)] lg:rounded-lg lg:shadow-lg dark:border dark:border-border ' +
   'transition-[opacity,translate,scale] duration-250 ease-out starting:translate-y-4 starting:opacity-0 lg:starting:translate-y-0 lg:starting:scale-98 motion-reduce:transition-none';
 
 const WIDTH_CLASSES = {
   default: 'lg:w-105',
   wide: 'lg:w-120',
+  large: 'lg:w-160',
+} as const;
+
+const SCROLL_CLASSES = {
+  dialog: 'overflow-hidden',
+  whole: 'overflow-y-auto',
+  frame: 'h-full max-h-[90dvh]',
+  body: 'min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain',
 } as const;
 
 const DIVIDER_CLASSES = {
@@ -23,6 +31,7 @@ const DIVIDER_CLASSES = {
 type DialogProps = {
   width?: keyof typeof WIDTH_CLASSES;
   hasDividers?: boolean;
+  isBodyScrolling?: boolean;
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -38,6 +47,7 @@ type DialogProps = {
 export function Dialog({
   width = 'default',
   hasDividers = false,
+  isBodyScrolling = false,
   isOpen,
   onClose,
   title,
@@ -53,9 +63,11 @@ export function Dialog({
       aria-labelledby={titleId}
       onClose={onClose}
       onClick={onClick}
-      className={`${DIALOG_CLASS} ${WIDTH_CLASSES[width]}`}
+      className={`${DIALOG_CLASS} ${WIDTH_CLASSES[width]} ${isBodyScrolling ? SCROLL_CLASSES.dialog : SCROLL_CLASSES.whole}`}
     >
-      <div className="flex flex-col px-4 pt-2 pb-6 lg:p-0">
+      <div
+        className={`flex flex-col px-4 pt-2 pb-6 lg:p-0 ${isBodyScrolling ? SCROLL_CLASSES.frame : ''}`}
+      >
         <div
           aria-hidden="true"
           className="mx-auto mb-2 h-1 w-10 rounded-full bg-handle lg:hidden"
@@ -75,7 +87,7 @@ export function Dialog({
           </IconButton>
         </div>
         <div
-          className={`flex flex-col gap-4 pb-6 text-pretty text-fg-secondary lg:p-6 ${hasDividers ? DIVIDER_CLASSES.body : 'pt-2'}`}
+          className={`flex flex-col gap-4 pb-6 text-pretty text-fg-secondary lg:p-6 ${hasDividers ? DIVIDER_CLASSES.body : 'pt-2'} ${isBodyScrolling ? SCROLL_CLASSES.body : ''}`}
         >
           {children}
         </div>

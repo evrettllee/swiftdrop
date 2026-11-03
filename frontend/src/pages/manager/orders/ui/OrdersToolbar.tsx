@@ -1,11 +1,15 @@
 import { ArrowsDownUpIcon } from '@phosphor-icons/react';
-import type { ManagerOrdersSort } from '@/shared/staff-api';
+import {
+  isSearchTooShort,
+  MANAGER_SEARCH_MAX_LENGTH,
+  type ManagerOrdersSort,
+} from '@/shared/staff-api';
 import { Select, SELECT_LABEL } from '@/shared/ui/select';
 import type { OrdersParams } from '../config/list-params';
 import { MANAGER_ORDERS_TEXTS, SORT_LABELS } from '../config/texts';
 import { type OrdersView, sortParamOf } from '../model/orders-view';
 import { FiltersControl } from './FiltersControl';
-import { SearchField } from './SearchField';
+import { SearchField } from '@/shared/ui/search-field';
 
 type OrdersToolbarProps = {
   view: OrdersView;
@@ -32,6 +36,11 @@ export function OrdersToolbar({
     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-3">
       <SearchField
         value={searchText}
+        label={MANAGER_ORDERS_TEXTS.SEARCH_LABEL}
+        clearLabel={MANAGER_ORDERS_TEXTS.SEARCH_CLEAR}
+        maxLength={MANAGER_SEARCH_MAX_LENGTH}
+        hint={isSearchTooShort(searchText) ? MANAGER_ORDERS_TEXTS.SEARCH_TOO_SHORT : null}
+        className="lg:max-w-110 lg:grow"
         placeholder={
           isDesktop
             ? MANAGER_ORDERS_TEXTS.SEARCH_PLACEHOLDER

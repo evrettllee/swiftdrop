@@ -99,9 +99,4 @@ export const ACTION_TEXTS = {
   REASSIGN_SHORT: 'Переназначить',
   REASSIGN_HINT: 'Можно, пока курьер не забрал посылку.',
   CANCEL: 'Отменить заказ',
-  CLOSE: UI_TEXTS.CLOSE,
-  assignTitle: (orderNumber: string) => `Назначить курьера на заказ ${orderNumber}`,
-  restartTitle: (orderNumber: string) => `Запустить автоназначение для заказа ${orderNumber}?`,
-  reassignTitle: (orderNumber: string) => `Переназначить курьера на заказе ${orderNumber}`,
-  cancelTitle: (orderNumber: string) => `Отменить заказ ${orderNumber}?`,
 } as const;

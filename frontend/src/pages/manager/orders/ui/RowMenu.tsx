@@ -1,19 +1,30 @@
 import { DotsThreeIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { formatOrderNumber } from '@/entities/order';
+import { ORDER_ACTION, type OrderAction } from '@/features/manager-order-actions';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE } from '@/shared/config';
 import { getManagerOrderPath } from '@/shared/routes';
+import type { ManagerOrderListItem } from '@/shared/staff-api';
 import { Popover, POPOVER_ALIGN } from '@/shared/ui/popover';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
+import { canAssignRow, canCancelRow, type RowAction } from '../lib/row-actions';
+
+const ITEM_CLASS = `flex min-h-11 w-full items-center px-4 text-start text-body text-fg hover:bg-surface-muted ${COLOR_TRANSITION_CLASS}`;
 
 type RowMenuProps = {
-  orderId: number;
-  orderNumber: string;
+  order: ManagerOrderListItem;
+  onAction: RowAction;
 };
 
-export function RowMenu({ orderId, orderNumber }: RowMenuProps) {
+export function RowMenu({ order, onAction }: RowMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const label = MANAGER_ORDERS_TEXTS.actions(orderNumber);
+  const label = MANAGER_ORDERS_TEXTS.actions(formatOrderNumber(order.id));
+
+  function choose(action: OrderAction): void {
+    setIsOpen(false);
+    onAction(order, action);
+  }
 
   return (
     <div className="relative z-10 inline-flex">
@@ -34,12 +45,23 @@ export function RowMenu({ orderId, orderNumber }: RowMenuProps) {
           </button>
         )}
       >
-        <Link
-          to={getManagerOrderPath(orderId)}
-          className={`flex min-h-11 items-center px-4 text-start text-body text-fg hover:bg-surface-muted ${COLOR_TRANSITION_CLASS}`}
-        >
+        <Link to={getManagerOrderPath(order.id)} className={ITEM_CLASS}>
           {MANAGER_ORDERS_TEXTS.OPEN_ORDER}
         </Link>
+        {canAssignRow(order) ? (
+          <button type="button" className={ITEM_CLASS} onClick={() => choose(ORDER_ACTION.ASSIGN)}>
+            {MANAGER_ORDERS_TEXTS.ASSIGN_COURIER}
+          </button>
+        ) : null}
+        {canCancelRow(order) ? (
+          <button
+            type="button"
+            className={`${ITEM_CLASS} text-danger`}
+            onClick={() => choose(ORDER_ACTION.CANCEL)}
+          >
+            {MANAGER_ORDERS_TEXTS.CANCEL_ORDER}
+          </button>
+        ) : null}
       </Popover>
     </div>
   );
