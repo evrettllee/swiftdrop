@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { ORDERS_PARAMS_CONFIG, type OrdersParams } from '../config/list-params';
 import { shortPersonName, waitingMinutes, isLongWait } from '../lib/order-row';
-import { calendarToday, detectPreset, presetPeriod } from '../lib/period';
+import { calendarToday } from '@/shared/lib/calendar';
+import { detectPreset, presetPeriod } from '../lib/period';
 import { appliedFilters, emptyResultText, exportScope } from './applied-filters';
 import { toOrdersView } from './orders-view';
 

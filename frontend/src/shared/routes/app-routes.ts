@@ -24,6 +24,7 @@ export const APP_ROUTES = {
   MANAGER_ZONES_PAGE: '/manager/zones/:zoneId?',
   MANAGER_ZONE_CONTOUR: '/manager/zones/:zoneId/contour',
   MANAGER_ANALYTICS: '/manager/analytics',
+  MANAGER_ANALYTICS_COURIERS: '/manager/analytics/couriers',
   MANAGER_PROFILE: '/manager/profile',
 } as const;
 

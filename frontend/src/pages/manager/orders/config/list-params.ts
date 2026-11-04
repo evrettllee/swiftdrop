@@ -10,22 +10,12 @@ import {
   type ManagerStatusGroup,
   type PaymentState,
 } from '@/shared/staff-api';
+import { isCalendarDate } from '@/shared/lib/calendar';
 import type { ListParamsConfig } from '@/shared/lib/list-params';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZES, type PageSize } from './list';
 
-const CALENDAR_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const PAGE_MAX = 10_000;
 const ID_MAX = 2_147_483_647;
-
-function isCalendarDate(value: string): boolean {
-  if (!CALENDAR_DATE.test(value)) {
-    return false;
-  }
-
-  const date = new Date(`${value}T00:00:00Z`);
-
-  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
-}
 
 const dateParam = z.string().refine(isCalendarDate);
 

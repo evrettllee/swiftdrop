@@ -79,6 +79,14 @@ export const managerRoutes: RouteObject = {
           ),
         },
         {
+          path: APP_ROUTES.MANAGER_ANALYTICS_COURIERS,
+          Component: lazy(() =>
+            import('@/pages/manager/analytics').then((module) => ({
+              default: module.ManagerAnalyticsCouriersPage,
+            })),
+          ),
+        },
+        {
           path: APP_ROUTES.MANAGER_PROFILE,
           Component: lazy(() =>
             import('@/pages/profile').then((module) => ({

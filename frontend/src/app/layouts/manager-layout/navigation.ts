@@ -67,7 +67,7 @@ const ANALYTICS_ITEM: NavItem = {
   to: APP_ROUTES.MANAGER_ANALYTICS,
   label: MANAGER_LAYOUT_TEXTS.NAV_ANALYTICS,
   icon: ChartBarIcon,
-  isExact: true,
+  isExact: false,
 };
 
 const MAP_ITEM: NavItem = {

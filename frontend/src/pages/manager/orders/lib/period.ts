@@ -1,14 +1,6 @@
-import { APP_TIME_ZONE } from '@/shared/config';
+import { calendarToday, shiftCalendarDate } from '@/shared/lib/calendar';
 import { PERIOD_PRESET, PERIOD_PRESET_DAYS, type PeriodPreset } from '../config/list';
 
-const calendarFormat = new Intl.DateTimeFormat('en-CA', {
-  timeZone: APP_TIME_ZONE,
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 const DAY_PART_START = 8;
 const MONTH_PART_START = 5;
 const MONTH_PART_END = 7;
@@ -17,16 +9,6 @@ export type Period = {
   from: string | null;
   to: string | null;
 };
-
-export function calendarToday(now: Date): string {
-  return calendarFormat.format(now);
-}
-
-export function shiftCalendarDate(date: string, days: number): string {
-  const shifted = new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY_MS);
-
-  return shifted.toISOString().slice(0, 10);
-}
 
 export function presetPeriod(preset: PeriodPreset, now: Date): Period {
   if (preset === PERIOD_PRESET.WEEK || preset === PERIOD_PRESET.MONTH) {
