@@ -347,3 +347,11 @@
 .map-zone-label.leaflet-tooltip::before {
   display: none;
 }
+
+.map-zone--ghost {
+  fill: var(--fg-muted);
+  fill-opacity: 0.08;
+  stroke: var(--fg-muted);
+  stroke-width: 1px;
+  cursor: inherit;
+}

@@ -96,6 +96,7 @@ export const MAP_CLASS = {
   ZONE_SELECTED: 'map-zone--selected',
   ZONE_OFF: 'map-zone--off',
   ZONE_LABEL: 'map-zone-label',
+  ZONE_GHOST: 'map-zone--ghost',
   PIN: 'map-pin',
   PIN_BODY: 'map-pin__body',
   PIN_HALO: 'map-pin__halo',

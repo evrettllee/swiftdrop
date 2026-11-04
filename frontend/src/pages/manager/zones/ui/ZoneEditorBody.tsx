@@ -2,7 +2,7 @@ import { Button } from '@/shared/ui/button';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { BlockLoader } from '@/shared/ui/page-loader';
 import { EDIT_TEXTS } from '../config/texts';
-import { DETAILS_STATUS } from '../model/useZoneDetails';
+import { DETAILS_STATUS } from '@/entities/zone';
 import type { useZoneEditor } from '../model/useZoneEditor';
 import { ZoneForm } from './ZoneForm';
 import { ZoneNotices } from './ZoneNotices';

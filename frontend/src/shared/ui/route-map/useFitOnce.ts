@@ -35,6 +35,7 @@ export function useFitOnce(
     }
 
     isFitted.current = true;
+    map.invalidateSize();
 
     if (points.length === 1) {
       map.setView(toLatLng(points[0]), MAP_ZOOM.FOCUS, { animate: false });

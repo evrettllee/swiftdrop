@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useTariffs } from './useTariffs';
-import { useZoneDetails } from './useZoneDetails';
+import { useTariffs, useZoneDetails } from '@/entities/zone';
 import { useZoneDraft } from './useZoneDraft';
 import { useZoneLive } from './useZoneLive';
 import { useZoneSave } from './useZoneSave';

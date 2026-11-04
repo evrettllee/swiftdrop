@@ -1,12 +1,5 @@
 import type { ManagerZone } from '@/shared/staff-api';
-import {
-  Table,
-  TABLE_ALIGN,
-  TABLE_SORT,
-  TableCell,
-  TableHeaderCell,
-  TableRow,
-} from '@/shared/ui/table';
+import { Table, TABLE_ALIGN, TableCell, TableHeaderCell, TableRow } from '@/shared/ui/table';
 import { COLUMN_TEXTS, MANAGER_ZONES_TEXTS as TEXTS } from '../config/texts';
 import { zoneArea, zoneUpdated } from '../lib/zone-format';
 import { ZoneEditLink } from './ZoneEditLink';
@@ -29,7 +22,7 @@ export function ZonesTable({ zones, selectedId, isPending, onSelect, onToggle }:
     >
       <thead>
         <tr>
-          <TableHeaderCell sort={TABLE_SORT.ASCENDING}>{COLUMN_TEXTS.ZONE}</TableHeaderCell>
+          <TableHeaderCell>{COLUMN_TEXTS.ZONE}</TableHeaderCell>
           <TableHeaderCell>{COLUMN_TEXTS.TARIFF}</TableHeaderCell>
           <TableHeaderCell align={TABLE_ALIGN.END}>{COLUMN_TEXTS.PRIORITY}</TableHeaderCell>
           <TableHeaderCell align={TABLE_ALIGN.END}>{COLUMN_TEXTS.AREA}</TableHeaderCell>

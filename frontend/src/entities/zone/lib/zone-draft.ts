@@ -4,7 +4,7 @@ import {
   ZONE_PRIORITY,
   type ZoneChanges,
 } from '@/shared/staff-api';
-import { ERROR_TEXTS } from '../config/texts';
+import { ZONE_ERROR_TEXTS as ERROR_TEXTS } from '../config/texts';
 
 const PRIORITY_PATTERN = /^\d{1,3}$/;
 
@@ -26,7 +26,7 @@ export function draftOf(zone: ManagerZone): ZoneDraft {
   };
 }
 
-function priorityOf(text: string): number | null {
+export function priorityOf(text: string): number | null {
   const trimmed = text.trim();
 
   if (!PRIORITY_PATTERN.test(trimmed)) {

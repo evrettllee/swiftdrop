@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import type { GeoPoint } from '@/shared/lib/geo';
 import type { ManagerZone } from '@/shared/staff-api';
 import { AREAS_FIT_PADDING, MarkersMap, ZonePolygon } from '@/shared/ui/route-map';
+import { type PolygonCache, ringOf } from '@/entities/zone';
 import { MANAGER_ZONES_TEXTS as TEXTS } from '../config/texts';
-import { type PolygonCache, ringOf } from '../lib/polygon-cache';
 
 const NO_POINTS: readonly GeoPoint[] = [];
 

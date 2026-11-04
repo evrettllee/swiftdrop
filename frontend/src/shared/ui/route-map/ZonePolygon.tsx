@@ -20,24 +20,37 @@ type ZonePolygonProps = {
   label: string;
   isActive: boolean;
   isSelected: boolean;
-  onSelect: () => void;
+  isGhost?: boolean;
+  onSelect?: () => void;
 };
 
-export function ZonePolygon({ ring, label, isActive, isSelected, onSelect }: ZonePolygonProps) {
+export function ZonePolygon({
+  ring,
+  label,
+  isActive,
+  isSelected,
+  isGhost = false,
+  onSelect,
+}: ZonePolygonProps) {
   const positions = useMemo<LatLngTuple[]>(() => ring.map(toLatLng), [ring]);
   const labelPoint = useMemo(() => topPoint(ring), [ring]);
   const className = joinClassNames(
     MAP_CLASS.ZONE,
     isSelected ? MAP_CLASS.ZONE_SELECTED : '',
     isActive ? '' : MAP_CLASS.ZONE_OFF,
+    isGhost ? MAP_CLASS.ZONE_GHOST : '',
   );
-  const eventHandlers = useMemo(() => ({ click: onSelect }), [onSelect]);
+  const eventHandlers = useMemo(
+    () => (onSelect === undefined ? {} : { click: onSelect }),
+    [onSelect],
+  );
 
   return (
     <Polygon
       key={className}
       positions={positions}
       pathOptions={{ className }}
+      interactive={onSelect !== undefined}
       eventHandlers={eventHandlers}
     >
       {labelPoint === null ? null : (

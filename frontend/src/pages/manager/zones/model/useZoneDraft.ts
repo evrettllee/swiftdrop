@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { ManagerZone } from '@/shared/staff-api';
-import { zoneCacheKey } from '../lib/polygon-cache';
-import { draftOf, isDraftChanged, type ZoneDraft } from '../lib/zone-draft';
+import { draftOf, isDraftChanged, zoneCacheKey, type ZoneDraft } from '@/entities/zone';
 
 type StoredDraft = { key: string; draft: ZoneDraft };
 

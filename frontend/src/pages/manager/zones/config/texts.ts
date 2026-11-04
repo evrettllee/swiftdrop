@@ -1,5 +1,4 @@
 import { UI_TEXTS } from '@/shared/config';
-import { ZONE_NAME_MAX_LENGTH, ZONE_PRIORITY } from '@/shared/staff-api';
 
 export const MANAGER_ZONES_TEXTS = {
   TITLE: 'Зоны обслуживания',
@@ -80,18 +79,6 @@ export const EDIT_TEXTS = {
   RETRY: UI_TEXTS.RETRY,
   REFRESH: 'Обновить',
   CHANGED_ELSEWHERE: 'Зону изменили в другом окне',
-} as const;
-
-export const ERROR_TEXTS = {
-  NAME_INVALID: `Название: от 1 до ${ZONE_NAME_MAX_LENGTH} символов`,
-  PRIORITY_INVALID: `Приоритет: целое число от ${ZONE_PRIORITY.MIN} до ${ZONE_PRIORITY.MAX}`,
-  ZONE_CHANGED: 'Зону уже изменили. Обновите, чтобы увидеть новые данные',
-  NAME_TAKEN: 'Зона с таким названием уже есть',
-  LAST_ACTIVE: 'Нельзя выключить последнюю активную зону: без неё нельзя оформить заказ',
-  TARIFF_NOT_FOUND: 'Тариф не найден',
-  BUSY: 'Зоны сейчас меняет другой сотрудник. Попробуйте ещё раз',
-  FAILED: 'Не удалось сохранить зону',
-  FAILED_TEXT: 'Проверьте соединение и попробуйте ещё раз.',
 } as const;
 
 export const DISCARD_TEXTS = {

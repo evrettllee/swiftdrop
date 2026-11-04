@@ -36,6 +36,7 @@ async function stubCounts(page: Page): Promise<CountsStub> {
   await page.route(/\/api\/manager\/orders(\?.*)?$/, (route) =>
     route.fulfill({ json: { items: [], total: 0, page: 1, limit: 20, until: null } }),
   );
+  await page.route(/\/api\/manager\/zones$/, (route) => route.fulfill({ json: [] }));
   await page.route(/\/api\/manager\/couriers\/map(\?.*)?$/, (route) =>
     route.fulfill({
       json: { items: [], counts: { free: 0, on_order: 0, offer: 0, no_signal: 0 } },

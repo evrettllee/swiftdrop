@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { type ManagerZone, updateManagerZone } from '@/shared/staff-api';
 import { showToast } from '@/shared/ui/toast';
+import { toZoneFailure, ZONE_FAILURE } from '@/entities/zone';
 import { TOGGLE_TEXTS } from '../config/texts';
-import { toZoneFailure, ZONE_FAILURE } from '../lib/zone-failure';
 
 const TOAST_KEY = 'zone-toggle';
 

@@ -1,7 +1,7 @@
 import { Button } from '@/shared/ui/button';
 import { InlineAlert } from '@/shared/ui/inline-alert';
+import { ZONE_FAILURE, type ZoneFailure } from '@/entities/zone';
 import { EDIT_TEXTS } from '../config/texts';
-import { ZONE_FAILURE, type ZoneFailure } from '../lib/zone-failure';
 
 type ZoneNoticesProps = {
   failure: ZoneFailure | null;

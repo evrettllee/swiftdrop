@@ -7,9 +7,14 @@ import { FieldError } from '@/shared/ui/field-error';
 import { Input } from '@/shared/ui/input';
 import { Select } from '@/shared/ui/select';
 import { Switch } from '@/shared/ui/switch';
+import {
+  type DraftErrors,
+  fieldError,
+  ZONE_FIELD,
+  type ZoneDraft,
+  type ZoneFailure,
+} from '@/entities/zone';
 import { EDIT_TEXTS } from '../config/texts';
-import type { DraftErrors, ZoneDraft } from '../lib/zone-draft';
-import { fieldError, ZONE_FIELD, type ZoneFailure } from '../lib/zone-failure';
 
 type ZoneFormProps = {
   zone: ManagerZone;

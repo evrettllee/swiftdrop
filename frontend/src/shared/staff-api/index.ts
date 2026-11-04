@@ -40,12 +40,7 @@ export type {
   CouriersMap,
   CouriersMapQuery,
 } from './manager-couriers-map';
-export {
-  COURIER_MAP_STATE,
-  courierMapItemSchema,
-  COURIERS_MAP_API_PATH,
-  getCouriersMap,
-} from './manager-couriers-map';
+export { COURIER_MAP_STATE, getCouriersMap } from './manager-couriers-map';
 export type { CourierLookupItem } from './manager-couriers';
 export {
   COURIER_LOOKUP_LIMIT,
@@ -130,17 +125,19 @@ export {
 export type {
   ManagerZone,
   ManagerZoneDetails,
+  NewZone,
+  PolygonErrorReason,
   TariffOption,
   ZoneChanges,
-  ZoneErrorBody,
   ZoneErrorCode,
   ZonePolygon,
 } from './manager-zones';
 export {
+  createManagerZone,
   getManagerZone,
   getManagerZones,
   getTariffOptions,
-  MANAGER_ZONES_API_PATHS,
+  POLYGON_ERROR_REASON,
   readZoneError,
   updateManagerZone,
   ZONE_ERROR_CODE,

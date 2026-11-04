@@ -1,9 +1,15 @@
 import { useRef, useState } from 'react';
 import { type ManagerZone, updateManagerZone } from '@/shared/staff-api';
 import { showToast } from '@/shared/ui/toast';
+import {
+  changesOf,
+  type DraftErrors,
+  draftErrors,
+  toZoneFailure,
+  type ZoneDraft,
+  type ZoneFailure,
+} from '@/entities/zone';
 import { EDIT_TEXTS } from '../config/texts';
-import { changesOf, draftErrors, type DraftErrors, type ZoneDraft } from '../lib/zone-draft';
-import { toZoneFailure, type ZoneFailure } from '../lib/zone-failure';
 
 const TOAST_KEY = 'zone-saved';
 
