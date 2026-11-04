@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef } from 'react';
-import type { ChatMessage } from '@/shared/api';
 
 const NEAR_EDGE_PX = 64;
 
-type ChatScrollSource = {
-  messages: readonly ChatMessage[];
-  ownRole: ChatMessage['senderRole'];
+export type ChatScrollSource = {
+  firstKey: number | null;
+  lastKey: number | null;
+  isLastOwn: boolean;
   isLoaded: boolean;
   hasOlder: boolean;
   isLoadingOlder: boolean;
@@ -13,8 +13,9 @@ type ChatScrollSource = {
 };
 
 export function useChatScroll({
-  messages,
-  ownRole,
+  firstKey,
+  lastKey,
+  isLastOwn,
   isLoaded,
   hasOlder,
   isLoadingOlder,
@@ -23,8 +24,6 @@ export function useChatScroll({
   const scroller = useRef<HTMLDivElement>(null);
   const isAtBottom = useRef(true);
   const fromBottom = useRef<number | null>(null);
-  const firstId = messages[0]?.messageId ?? null;
-  const last = messages.at(-1) ?? null;
 
   function requestOlder(): void {
     const element = scroller.current;
@@ -42,15 +41,15 @@ export function useChatScroll({
       element.scrollTop = element.scrollHeight - fromBottom.current;
       fromBottom.current = null;
     }
-  }, [firstId]);
+  }, [firstKey]);
 
   useLayoutEffect(() => {
     const element = scroller.current;
 
-    if (element !== null && isLoaded && (isAtBottom.current || last?.senderRole === ownRole)) {
+    if (element !== null && isLoaded && (isAtBottom.current || isLastOwn)) {
       element.scrollTop = element.scrollHeight;
     }
-  }, [isLoaded, last?.messageId, last?.senderRole, ownRole]);
+  }, [isLoaded, lastKey, isLastOwn]);
 
   function handleScroll(): void {
     const element = scroller.current;

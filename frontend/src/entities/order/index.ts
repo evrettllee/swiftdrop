@@ -3,6 +3,8 @@ export { formatParcelSize, formatParcelWeight } from './lib/parcel-format';
 export { formatOrderNumber } from './lib/order-number';
 export { withCourierLine } from './lib/courier-line';
 export { buildOrderProgress } from './lib/progress';
+export { ORDER_OUTCOME_TEXTS } from './config/outcome';
+export { type CancelEntry, cancelledLine, deliveredLine } from './lib/order-outcome';
 export { COURIER_POSITION_STALE_MS } from './config/tracking';
 export { PAYMENT_VIEW, PAYMENT_VIEW_LABELS, type PaymentView } from './config/payment-view';
 export type { ProgressSpec, ProgressStep } from './model/order-progress';

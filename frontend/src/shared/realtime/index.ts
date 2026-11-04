@@ -17,3 +17,5 @@ export { onTypedSocketEvent } from './typed-events';
 export { useAppSocket } from './useAppSocket';
 export { useOrderRoom } from './useOrderRoom';
 export { useSocketEventBatch } from './useSocketEventBatch';
+export type { TicketRoomState } from './ticket-room';
+export { useTicketRoom } from './useTicketRoom';

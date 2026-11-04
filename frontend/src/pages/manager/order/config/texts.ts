@@ -45,14 +45,9 @@ export const STATUS_LINE_TEXTS = {
   reassignedByStaff: (time: string, name: string) => `Переназначен в ${time}, ${name}`,
   acceptedAt: (time: string) => `Курьер принял заказ в ${time}.`,
   deliveryBy: (time: string) => `Доставка ориентировочно к ${time}.`,
-  deliveredAt: (time: string) => `Доставлен в ${time}`,
   recipient: (name: string) => `Получатель: ${name}.`,
   CANCELLED_TITLE: 'Заказ отменён',
   REJECTED_TITLE: 'Заказ отклонён',
-  cancelledByStaff: (time: string, name: string) => `Отменён сотрудником в ${time}, ${name}`,
-  cancelledByClient: (time: string) => `Отменён клиентом в ${time}.`,
-  cancelledBySystem: (time: string) => `Отменён автоматически в ${time}.`,
-  cancelledAt: (time: string) => `Отменён в ${time}.`,
   reason: (comment: string) => `Причина: ${comment}`,
 } as const;
 

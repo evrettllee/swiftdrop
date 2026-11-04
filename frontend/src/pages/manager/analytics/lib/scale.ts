@@ -1,4 +1,4 @@
-const NICE_STEPS = [1, 2, 5, 10] as const;
+const NICE_STEPS = [1, 1.5, 2, 2.5, 5, 10] as const;
 const PRECISION = 12;
 const DECIMAL_BASE = 10;
 

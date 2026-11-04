@@ -1,3 +1,4 @@
+import { cancelledLine, deliveredLine } from '@/entities/order';
 import { ORDER_STATUS } from '@/shared/api';
 import { formatCount, formatTime, pluralize } from '@/shared/lib/format';
 import {
@@ -81,29 +82,10 @@ function assignmentText(order: ManagerOrderDetails): string | null {
   );
 }
 
-function cancelHead(entry: ManagerOrderHistoryEntry): string {
-  const time = formatTime(entry.changedAt);
-
-  switch (entry.actor) {
-    case ORDER_ACTOR.STAFF:
-      return endSentence(TEXTS.cancelledByStaff(time, actorName(entry)));
-    case ORDER_ACTOR.CLIENT:
-      return TEXTS.cancelledByClient(time);
-    case ORDER_ACTOR.SYSTEM:
-      return TEXTS.cancelledBySystem(time);
-    default:
-      return TEXTS.cancelledAt(time);
-  }
-}
-
 function cancelText(entry: ManagerOrderHistoryEntry | null, fallback: Date): string {
-  if (entry === null) {
-    return TEXTS.cancelledAt(formatTime(fallback));
-  }
+  const head = endSentence(cancelledLine(entry, fallback, entry === null ? '' : actorName(entry)));
 
-  const head = cancelHead(entry);
-
-  return entry.comment === null || entry.comment === ''
+  return entry === null || entry.comment === null || entry.comment === ''
     ? head
     : `${head} ${TEXTS.reason(entry.comment)}`;
 }
@@ -147,7 +129,7 @@ export function getStatusLine(source: StatusLineSource): StatusLine {
     case ORDER_STATUS.DELIVERED:
       return {
         tone: STATUS_LINE_TONE.SUCCESS,
-        title: TEXTS.deliveredAt(formatTime(order.finishedAt ?? order.statusChangedAt)),
+        title: deliveredLine(order.finishedAt ?? order.statusChangedAt),
         text: TEXTS.recipient(order.recipient.name),
       };
     case ORDER_STATUS.CANCELLED:

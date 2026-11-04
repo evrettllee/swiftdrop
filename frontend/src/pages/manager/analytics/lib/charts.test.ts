@@ -10,11 +10,13 @@ function hours(values: Record<number, number>) {
   return Array.from({ length: 24 }, (_, hour) => ({ hour, avgOrders: values[hour] ?? 0 }));
 }
 
-test('should build the Y scale from steps of 1, 2 and 5 times a power of ten', () => {
-  expect(niceScale(58, 4)).toEqual({ top: 80, ticks: [0, 20, 40, 60, 80] });
+test('should build the Y scale from steps of 1, 1.5, 2, 2.5 and 5 times a power of ten', () => {
+  expect(niceScale(58, 4)).toEqual({ top: 60, ticks: [0, 15, 30, 45, 60] });
   expect(niceScale(40, 4)).toEqual({ top: 40, ticks: [0, 10, 20, 30, 40] });
-  expect(niceScale(5.1, 4)).toEqual({ top: 8, ticks: [0, 2, 4, 6, 8] });
-  expect(niceScale(0.9, 4)).toEqual({ top: 2, ticks: [0, 0.5, 1, 1.5, 2] });
+  expect(niceScale(5.1, 4)).toEqual({ top: 6, ticks: [0, 1.5, 3, 4.5, 6] });
+  expect(niceScale(0.9, 4)).toEqual({ top: 1, ticks: [0, 0.25, 0.5, 0.75, 1] });
+  expect(niceScale(9, 4)).toEqual({ top: 10, ticks: [0, 2.5, 5, 7.5, 10] });
+  expect(niceScale(30, 4)).toEqual({ top: 40, ticks: [0, 10, 20, 30, 40] });
   expect(niceScale(0.3, 4)).toEqual({ top: 0.4, ticks: [0, 0.1, 0.2, 0.3, 0.4] });
   expect(niceScale(7, 4)).toEqual({ top: 8, ticks: [0, 2, 4, 6, 8] });
   expect(niceScale(0, 4)).toEqual({ top: 4, ticks: [0, 1, 2, 3, 4] });

@@ -8,7 +8,7 @@ export {
   REDUCED_MOTION_QUERY,
   SCROLL_LOCK_OVERFLOW,
 } from './dom';
-export { CHAT_MESSAGE_MAX_LENGTH } from './chat';
+export { CHAT_MESSAGE_MAX_LENGTH, CHAT_UI_TEXTS } from './chat';
 export { DELIVERY_CODE_LENGTH } from './delivery-code';
 export { IS_MAPBOX_CONFIGURED, MAPBOX_TOKEN } from './env';
 export { CHECKBOX_CHECKED_VALUE, CHECKBOX_UNCHECKED_VALUE, INVALID_FIELD_SELECTOR } from './forms';

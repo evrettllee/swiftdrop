@@ -57,7 +57,8 @@ test('should draw the stacked days and the hours with a summary and a tip', asyn
   await expect(days.getByText('58', { exact: true })).toBeVisible();
   await expect(bars.nth(6).locator('[data-segment]')).toHaveCount(2);
   await expect(bars.nth(6).locator('[data-segment="progress"]')).toBeVisible();
-  await expect(days.getByText('80', { exact: true })).toBeVisible();
+  await expect(days.getByText('60', { exact: true })).toBeVisible();
+  await expect(days.getByText('45', { exact: true })).toBeVisible();
 
   await bars.nth(4).hover();
   const tip = days.locator('[data-chart-tip]');
