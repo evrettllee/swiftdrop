@@ -40,28 +40,16 @@ export function getOrderPath(orderId: number): string {
   return `${APP_ROUTES.ORDERS}/${orderId}`;
 }
 
-// The page of the history of a courier in its address, so the order page can lead back to it.
-export const HISTORY_PAGE_PARAM = 'page';
-
-const HISTORY_PAGE_PATTERN = /^[1-9]\d{0,3}$/;
-
-// The page of the history from the address; anything but a whole number from 1 is the first page.
-export function parseHistoryPage(raw: string | null): number {
-  return raw !== null && HISTORY_PAGE_PATTERN.test(raw) ? Number(raw) : 1;
+function withSearch(path: string, listSearch: string): string {
+  return listSearch === '' ? path : `${path}?${listSearch}`;
 }
 
-// For example "/courier/history?page=2"; the first page has no parameter.
-export function getCourierHistoryPath(page: number): string {
-  return page > 1
-    ? `${APP_ROUTES.COURIER_HISTORY}?${new URLSearchParams({ [HISTORY_PAGE_PARAM]: String(page) })}`
-    : APP_ROUTES.COURIER_HISTORY;
+export function getCourierHistoryPath(listSearch = ''): string {
+  return withSearch(APP_ROUTES.COURIER_HISTORY, listSearch);
 }
 
-// For example "/courier/history/48213?page=2": the page of the history it was opened from.
-export function getCourierHistoryOrderPath(orderId: number, page: number): string {
-  const path = `${APP_ROUTES.COURIER_HISTORY}/${orderId}`;
-
-  return page > 1 ? `${path}?${new URLSearchParams({ [HISTORY_PAGE_PARAM]: String(page) })}` : path;
+export function getCourierHistoryOrderPath(orderId: number, listSearch = ''): string {
+  return withSearch(`${APP_ROUTES.COURIER_HISTORY}/${orderId}`, listSearch);
 }
 
 export function getManagerOrderPath(orderId: number): string {

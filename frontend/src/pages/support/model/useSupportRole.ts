@@ -12,8 +12,6 @@ export type SupportRole = {
   orderPath: (orderId: number, status: OrderStatus) => string;
 };
 
-const FIRST_HISTORY_PAGE = 1;
-
 const SUPPORT_ROLES: Record<AuthorRole, SupportRole> = {
   [ROLE.CLIENT]: {
     role: ROLE.CLIENT,
@@ -28,9 +26,7 @@ const SUPPORT_ROLES: Record<AuthorRole, SupportRole> = {
     profilePath: APP_ROUTES.COURIER_PROFILE,
     topics: TOPICS_BY_ROLE[ROLE.COURIER],
     orderPath: (orderId, status) =>
-      isFinishedStatus(status)
-        ? getCourierHistoryOrderPath(orderId, FIRST_HISTORY_PAGE)
-        : APP_ROUTES.COURIER_WORK,
+      isFinishedStatus(status) ? getCourierHistoryOrderPath(orderId) : APP_ROUTES.COURIER_WORK,
   },
 };
 

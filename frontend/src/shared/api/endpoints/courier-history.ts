@@ -16,12 +16,32 @@ export const courierHistoryItemSchema = z.object({
 export type CourierHistoryItem = z.infer<typeof courierHistoryItemSchema>;
 
 // Response of GET /api/couriers/me/orders/history
+export const courierHistorySummarySchema = z.object({
+  count: z.number(),
+  distanceKm: z.number(),
+});
+
+export type CourierHistorySummary = z.infer<typeof courierHistorySummarySchema>;
+
 export const courierHistoryPageSchema = z.object({
   items: z.array(courierHistoryItemSchema),
   page: z.number(),
   limit: z.number(),
   total: z.number(),
+  until: z.number().nullable(),
+  summary: courierHistorySummarySchema.optional(),
 });
+
+export type CourierHistoryPage = z.infer<typeof courierHistoryPageSchema>;
+
+export const courierHistoryCursorPageSchema = z.object({
+  items: z.array(courierHistoryItemSchema),
+  nextCursor: z.string().nullable(),
+  total: z.number().optional(),
+  summary: courierHistorySummarySchema.optional(),
+});
+
+export type CourierHistoryCursorPage = z.infer<typeof courierHistoryCursorPageSchema>;
 
 const pointSchema = z.object({
   city: z.string(),

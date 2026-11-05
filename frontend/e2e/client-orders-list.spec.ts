@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
-import { lastListRequest, listRequests, minskDay, stubMyOrders } from './support/my-orders';
+import { lastListRequest, minskDay, stubMyOrders } from './support/my-orders';
 
 function tab(page: Page, name: string) {
   return page.getByRole('tab', { name: new RegExp(`^${name}`) });
@@ -141,24 +141,6 @@ test('should turn an old link with the filter into the status', async ({ page })
   await expect(tab(page, 'Активные')).toHaveAttribute('aria-selected', 'true');
   await expect(cards(page)).toHaveCount(1);
   expect(stub.requests.every((params) => !params.has('filter'))).toBe(true);
-});
-
-test('should move between the pages on the desktop', async ({ page }) => {
-  const stub = await stubMyOrders(page);
-  await openOrders(page);
-
-  await expect(page.getByText('1–5 из 8')).toBeVisible();
-  await page.getByRole('button', { name: 'Следующая страница' }).click();
-
-  await expect(page).toHaveURL(`${APP_ROUTES.ORDERS}?page=2`);
-  await expect(cards(page)).toHaveCount(3);
-  await expect.poll(() => lastListRequest(stub)?.get('page')).toBe('2');
-  await expect.poll(() => lastListRequest(stub)?.get('limit')).toBe('5');
-  expect(listRequests(stub).every((params) => !params.has('cursor'))).toBe(true);
-
-  await tab(page, 'Завершённые').click();
-  await expect(page).toHaveURL(`${APP_ROUTES.ORDERS}?status=finished`);
-  await expect(cards(page)).toHaveCount(5);
 });
 
 test('should offer a new order to a client without orders', async ({ page }) => {

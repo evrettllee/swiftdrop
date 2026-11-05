@@ -26,6 +26,7 @@ const HISTORY_PATH = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.HIST
 const TODAY_PATH = `${COURIER_STATS_ROUTES.BASE}/${COURIER_STATS_ROUTES.TODAY}`;
 // Far enough back to be another day in any time zone.
 const TWO_DAYS_MS = 2 * MS_PER_DAY;
+const HOUR_MS = MS_PER_DAY / 24;
 
 describe('Courier history and today stats (e2e)', () => {
   let app: NestExpressApplication;
@@ -70,19 +71,19 @@ describe('Courier history and today stats (e2e)', () => {
     await app.close();
   });
 
-  it('should list the finished orders the newest first and leave out the active one', async () => {
+  it('should list the finished orders the last finished first and leave out the active one', async () => {
+    await finish(cancelledId, ORDER_STATUS.CANCELLED, new Date(Date.now() - HOUR_MS));
     await finish(deliveredId, ORDER_STATUS.DELIVERED);
-    await finish(cancelledId, ORDER_STATUS.CANCELLED);
     await assignOrder(db, activeId, courierId, ORDER_STATUS.IN_TRANSIT);
 
     const response = await get(HISTORY_PATH).expect(HttpStatus.OK);
 
     expect(response.body.total).toBe(2);
     expect(response.body.items.map((item: { orderId: number }) => item.orderId)).toEqual([
-      cancelledId,
       deliveredId,
+      cancelledId,
     ]);
-    expect(response.body.items[1]).toMatchObject({
+    expect(response.body.items[0]).toMatchObject({
       status: ORDER_STATUS.DELIVERED,
       finishedAt: expect.any(String),
       distanceKm: ROUTE.distanceKm,
@@ -91,13 +92,13 @@ describe('Courier history and today stats (e2e)', () => {
   });
 
   it('should return the requested page of the history', async () => {
+    await finish(cancelledId, ORDER_STATUS.CANCELLED, new Date(Date.now() - HOUR_MS));
     await finish(deliveredId, ORDER_STATUS.DELIVERED);
-    await finish(cancelledId, ORDER_STATUS.CANCELLED);
 
     const response = await get(HISTORY_PATH, { page: 2, limit: 1 }).expect(HttpStatus.OK);
 
     expect(response.body.items.map((item: { orderId: number }) => item.orderId)).toEqual([
-      deliveredId,
+      cancelledId,
     ]);
   });
 

@@ -13,6 +13,7 @@ import {
   historyCards,
   historyItem,
   isHistoryUrl,
+  isNextCursorUrl,
   NEWEST_ORDER_ID,
   openHistory,
   PHONE_VIEWPORT,
@@ -92,11 +93,11 @@ test('should mark a cancelled order and link every card to its order', async () 
   await expect(cards().first()).toContainText(ORDER_STATUS_LABELS[ORDER_STATUS.CANCELLED]);
   await expect(cards().first().getByRole('link')).toHaveAttribute(
     'href',
-    getCourierHistoryOrderPath(NEWEST_ORDER_ID, 1),
+    getCourierHistoryOrderPath(NEWEST_ORDER_ID),
   );
   await expect(cards().nth(1).getByRole('link')).toHaveAttribute(
     'href',
-    getCourierHistoryOrderPath(NEWEST_ORDER_ID - 1, 1),
+    getCourierHistoryOrderPath(NEWEST_ORDER_ID - 1),
   );
 });
 
@@ -133,7 +134,7 @@ test('should keep the shown cards when the next page fails', async () => {
   await openHistory(page);
   await expect(cards()).toHaveCount(PAGE_SIZE);
 
-  await page.route(isHistoryUrl(2), (route) =>
+  await page.route(isNextCursorUrl(), (route) =>
     route.fulfill({ status: HTTP_STATUS.SERVICE_UNAVAILABLE, json: { message: 'Unavailable' } }),
   );
   await page.getByRole('button', { name: HISTORY_TEXTS.SHOW_MORE }).click();

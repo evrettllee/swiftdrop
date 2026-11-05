@@ -1,13 +1,16 @@
 import { expect, test } from '@playwright/test';
 import { LIST_STATUS } from '@/shared/config';
-import { buildOrderListItem } from './order-list-item-fixture';
-import { appendFeed, failFeed, feedView, startFeed } from './orders-feed';
+import { appendFeed, failFeed, feedView, startFeed } from './list-feed';
+
+function buildOrderListItem(orderId: number) {
+  return { orderId };
+}
 
 const FIRST = { items: [buildOrderListItem(3), buildOrderListItem(2)], nextCursor: 'c1', total: 3 };
 const NEXT = { items: [buildOrderListItem(1)], nextCursor: null };
 
 test('should show the first page with the total of the whole list', () => {
-  const view = feedView(startFeed('a', FIRST), 'a');
+  const view = feedView(startFeed<{ orderId: number }, typeof FIRST>('a', FIRST), 'a');
 
   expect(view.status).toBe(LIST_STATUS.READY);
   expect(view.items.map((item) => item.orderId)).toEqual([3, 2]);
@@ -16,7 +19,10 @@ test('should show the first page with the total of the whole list', () => {
 });
 
 test('should add the next page to the end and keep the total of the first one', () => {
-  const view = feedView(appendFeed(startFeed('a', FIRST), 'a', NEXT), 'a');
+  const view = feedView(
+    appendFeed(startFeed<{ orderId: number }, typeof FIRST>('a', FIRST), 'a', NEXT),
+    'a',
+  );
 
   expect(view.items.map((item) => item.orderId)).toEqual([3, 2, 1]);
   expect(view.total).toBe(3);
@@ -24,7 +30,7 @@ test('should add the next page to the end and keep the total of the first one', 
 });
 
 test('should start over when the filters change', () => {
-  const loaded = appendFeed(startFeed('a', FIRST), 'a', NEXT);
+  const loaded = appendFeed(startFeed<{ orderId: number }, typeof FIRST>('a', FIRST), 'a', NEXT);
   const view = feedView(loaded, 'b');
 
   expect(view.status).toBe(LIST_STATUS.LOADING);
@@ -40,7 +46,10 @@ test('should not add a late page of the old filters to the new list', () => {
 });
 
 test('should keep the loaded orders when the next page fails', () => {
-  const view = feedView(failFeed(startFeed('a', FIRST), 'a', 'Нет сети'), 'a');
+  const view = feedView(
+    failFeed(startFeed<{ orderId: number }, typeof FIRST>('a', FIRST), 'a', 'Нет сети'),
+    'a',
+  );
 
   expect(view.status).toBe(LIST_STATUS.ERROR);
   expect(view.items).toHaveLength(2);

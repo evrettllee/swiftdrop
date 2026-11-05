@@ -5,8 +5,11 @@ export {
   isCalendarDate,
   shiftCalendarDate,
 } from './calendar';
-export type { Period, PeriodPreset } from './period';
+export type { CalendarPeriod, CalendarPreset, Period, PeriodPreset } from './period';
 export {
+  CALENDAR_PERIOD,
+  CALENDAR_PERIODS,
+  calendarPeriod,
   detectPreset,
   formatCalendarDay,
   isPeriodValid,

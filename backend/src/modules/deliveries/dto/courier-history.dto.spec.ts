@@ -1,6 +1,9 @@
 import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
 import { encodeListCursor } from '@/common/utils/list-cursor';
-import { HISTORY_PAGE_SIZE_DEFAULT } from '../constants/deliveries.constants';
+import {
+  HISTORY_PAGE_SIZE_DEFAULT,
+  HISTORY_VALIDATION_MESSAGES,
+} from '../constants/deliveries.constants';
 import { courierHistorySchema } from './courier-history.dto';
 
 function messagesOf(query: Record<string, unknown>): string[] {
@@ -10,19 +13,20 @@ function messagesOf(query: Record<string, unknown>): string[] {
 }
 
 describe('courierHistorySchema', () => {
-  it('should read no parameters as the first page of ten by id, newest first', () => {
+  it('should read no parameters as the first page of ten, the last finished first', () => {
     const result = courierHistorySchema.safeParse({});
 
     expect(result.success && result.data).toEqual({
       pagination: { mode: 'page', page: 1, limit: HISTORY_PAGE_SIZE_DEFAULT, until: null },
-      sort: { key: 'id', direction: 'desc' },
+      sort: { key: 'finishedAt', direction: 'desc' },
       period: { start: null, end: null },
+      search: null,
     });
   });
 
   it('should take the cursor of the id sort', () => {
     const cursor = encodeListCursor({ k: 'id', d: 'desc', v: '12', id: 12 });
-    const result = courierHistorySchema.safeParse({ cursor });
+    const result = courierHistorySchema.safeParse({ cursor, sort: 'id:desc' });
 
     expect(result.success && result.data.pagination).toMatchObject({
       mode: 'cursor',
@@ -42,7 +46,7 @@ describe('courierHistorySchema', () => {
 
   it('should take the cursor of the finish time sort', () => {
     const cursor = encodeListCursor({ k: 'finishedAt', d: 'desc', v: '1792261697859619', id: 241 });
-    const result = courierHistorySchema.safeParse({ cursor, sort: 'finishedAt:desc' });
+    const result = courierHistorySchema.safeParse({ cursor });
 
     expect(result.success && result.data.pagination).toMatchObject({
       position: { value: '1792261697859619', id: 241 },
@@ -56,6 +60,25 @@ describe('courierHistorySchema', () => {
       start: new Date('2026-10-28T21:00:00.000Z'),
       end: new Date('2026-10-29T21:00:00.000Z'),
     });
+  });
+
+  it.each([
+    ['48232', { orderId: 48232 }],
+    [' 48232 ', { orderId: 48232 }],
+    ['0', { orderId: null }],
+    ['99999999999', { orderId: null }],
+  ])('should read the search %j as the number of an order', (q, search) => {
+    const result = courierHistorySchema.safeParse({ q });
+
+    expect(result.success && result.data.search).toEqual(search);
+  });
+
+  it.each(['Немига', '№48232', '48 232'])('should refuse the search %j', (q) => {
+    expect(messagesOf({ q })).toEqual([HISTORY_VALIDATION_MESSAGES.SEARCH_NOT_NUMBER]);
+  });
+
+  it('should refuse an empty search', () => {
+    expect(messagesOf({ q: '  ' })).toEqual([LIST_VALIDATION_MESSAGES.SEARCH_INVALID]);
   });
 
   it('should refuse a filter it does not support', () => {

@@ -11,5 +11,5 @@ export const HISTORY_SORT: SortSpec<HistorySortKey> = {
     finishedAt: { column: orders.finishedAt, kind: SORT_VALUE_KIND.TIMESTAMP },
   },
   idColumn: orders.orderId,
-  defaultSort: { key: HISTORY_SORT_KEY.ID, direction: SORT_DIRECTION.DESC },
+  defaultSort: { key: HISTORY_SORT_KEY.FINISHED_AT, direction: SORT_DIRECTION.DESC },
 };

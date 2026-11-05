@@ -1,62 +1,53 @@
-import { useRef } from 'react';
-import { LIST_STATUS } from '@/shared/config';
-import { Button } from '@/shared/ui/button';
-import { Pagination } from '@/shared/ui/pagination';
-import { HISTORY_PAGE_SIZE } from '../config/list';
+import { MagnifyingGlassIcon } from '@phosphor-icons/react';
+import type { ReactNode } from 'react';
+import { useSearchParams } from 'react-router';
+import type { CourierHistoryItem } from '@/shared/api';
+import { LIST_STATUS, type ListStatus } from '@/shared/config';
+import { EmptyState } from '@/shared/ui/empty-state';
 import { HISTORY_TEXTS } from '../config/texts';
-import type { HistoryList as HistoryListState } from '../model/useHistoryList';
 import { HistoryCard } from './HistoryCard';
+import { HistoryListSkeleton } from './HistoryListSkeleton';
 import { HistoryLoadError } from './HistoryLoadError';
 
+export type HistoryEmpty = { title: string; text: string };
+
 type HistoryListProps = {
-  list: HistoryListState;
+  status: ListStatus;
+  items: readonly CourierHistoryItem[];
+  empty: HistoryEmpty;
+  onRetry: () => void;
+  footer: ReactNode;
 };
 
-// The cards with the pagination of the desktop and "show more" of a phone. A failed page keeps
-// the cards and tells the failure under them.
-export function HistoryList({ list }: HistoryListProps) {
-  const listRef = useRef<HTMLUListElement>(null);
-  const isLoading = list.status === LIST_STATUS.LOADING;
+export function HistoryList({ status, items, empty, onRetry, footer }: HistoryListProps) {
+  const [searchParams] = useSearchParams();
+  const listSearch = searchParams.toString();
 
-  function goToPage(page: number): void {
-    list.goToPage(page);
-    listRef.current?.scrollIntoView({ block: 'start' });
+  if (items.length === 0 && status === LIST_STATUS.LOADING) {
+    return <HistoryListSkeleton />;
+  }
+
+  if (items.length === 0 && status === LIST_STATUS.ERROR) {
+    return <HistoryLoadError onRetry={onRetry} />;
+  }
+
+  if (items.length === 0) {
+    return <EmptyState icon={MagnifyingGlassIcon} title={empty.title} text={empty.text} />;
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-4 lg:gap-6">
       <ul
-        ref={listRef}
         aria-label={HISTORY_TEXTS.LIST_LABEL}
-        aria-busy={isLoading}
-        className="flex scroll-mt-4 flex-col gap-4"
+        aria-busy={status === LIST_STATUS.LOADING}
+        className="flex flex-col gap-4"
       >
-        {list.items.map((item) => (
-          <HistoryCard key={item.orderId} item={item} page={list.page} />
+        {items.map((item) => (
+          <HistoryCard key={item.orderId} item={item} listSearch={listSearch} />
         ))}
       </ul>
-      {list.status === LIST_STATUS.ERROR ? <HistoryLoadError onRetry={list.retry} /> : null}
-      {list.totalPages > 1 ? (
-        <div className="hidden lg:block">
-          <Pagination
-            page={list.page}
-            totalPages={list.totalPages}
-            total={list.total}
-            pageSize={HISTORY_PAGE_SIZE}
-            onChange={goToPage}
-          />
-        </div>
-      ) : null}
-      <div className="flex flex-col items-center gap-2 lg:hidden">
-        <span className="text-small text-fg-secondary tabular-nums">
-          {HISTORY_TEXTS.shown(list.items.length, list.total)}
-        </span>
-        {list.hasMore ? (
-          <Button variant="secondary" fullWidth loading={isLoading} onClick={list.showMore}>
-            {HISTORY_TEXTS.SHOW_MORE}
-          </Button>
-        ) : null}
-      </div>
-    </>
+      {status === LIST_STATUS.ERROR ? <HistoryLoadError onRetry={onRetry} /> : null}
+      {footer}
+    </div>
   );
 }

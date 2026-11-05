@@ -127,7 +127,11 @@ export type CourierHistoryItem = Omit<CourierHistoryRow, 'finishedAt'> & {
   finishedAt: string | null;
 };
 
-export type CourierHistoryPage = ListPage<CourierHistoryItem>;
+export type CourierHistorySummary = { count: number; distanceKm: number };
+
+export type CourierHistoryPage = ListPage<CourierHistoryItem> & {
+  summary?: CourierHistorySummary;
+};
 
 export type CourierTodayStats = {
   delivered: number;

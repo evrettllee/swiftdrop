@@ -9,6 +9,7 @@ const ordersPageSchema = z.object({
   total: z.number(),
   page: z.number(),
   limit: z.number(),
+  until: z.number().nullable(),
 });
 
 const ordersCursorPageSchema = z.object({
@@ -43,9 +44,9 @@ export async function getOrdersPage(
   query: OrdersQuery,
   page: number,
   signal: AbortSignal,
-  limit: number = ORDERS_PAGE_SIZE,
+  { limit = ORDERS_PAGE_SIZE, until = null }: { limit?: number; until?: number | null } = {},
 ): Promise<OrdersPage> {
-  const params = queryOf(query, { page, limit });
+  const params = queryOf(query, until === null ? { page, limit } : { page, limit, until });
 
   return ordersPageSchema.parse(await http.get(`${ORDERS_API_PATHS.ORDERS}?${params}`, { signal }));
 }
@@ -63,7 +64,9 @@ export async function getOrdersCursorPage(
 }
 
 export async function countOrders(query: OrdersQuery, signal: AbortSignal): Promise<number> {
-  const page = await getOrdersPage(query, ORDERS_FIRST_PAGE, signal, ORDER_COUNT_PROBE_LIMIT);
+  const page = await getOrdersPage(query, ORDERS_FIRST_PAGE, signal, {
+    limit: ORDER_COUNT_PROBE_LIMIT,
+  });
 
   return page.total;
 }

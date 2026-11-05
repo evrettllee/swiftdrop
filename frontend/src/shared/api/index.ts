@@ -29,8 +29,15 @@ export {
 } from './endpoints/courier-offer';
 export type { ClientOrderCourier } from './endpoints/client-order-courier';
 export { clientOrderCourierSchema } from './endpoints/client-order-courier';
-export type { CourierHistoryItem, CourierHistoryOrder } from './endpoints/courier-history';
+export type {
+  CourierHistoryCursorPage,
+  CourierHistoryItem,
+  CourierHistoryOrder,
+  CourierHistoryPage,
+  CourierHistorySummary,
+} from './endpoints/courier-history';
 export {
+  courierHistoryCursorPageSchema,
   courierHistoryItemSchema,
   courierHistoryOrderSchema,
   courierHistoryPageSchema,

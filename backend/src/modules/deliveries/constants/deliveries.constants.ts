@@ -97,6 +97,12 @@ export const HISTORY_SORT_KEY = {
   FINISHED_AT: 'finishedAt',
 } as const;
 
+export const HISTORY_NUMBER_SEARCH = /^\d+$/;
+export const HISTORY_DISTANCE_DECIMALS = 1;
+export const HISTORY_VALIDATION_MESSAGES = {
+  SEARCH_NOT_NUMBER: 'Введите номер заказа цифрами',
+} as const;
+
 // Validation
 export const DELIVERIES_VALIDATION_MESSAGES = {
   CODE_INVALID: `Введите ${DELIVERY_CODE_LENGTH} цифры кода`,

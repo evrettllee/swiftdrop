@@ -25,7 +25,7 @@ export async function stubSupportPages(page: Page): Promise<void> {
     route.fulfill({ json: { items: [], total: 0, page: 1, limit: 10 } }),
   );
   await page.route(/\/api\/couriers\/me\/orders\/history(\?.*)?$/, (route) =>
-    route.fulfill({ json: { items: [], page: 1, limit: 10, total: 0 } }),
+    route.fulfill({ json: { items: [], page: 1, limit: 10, total: 0, until: null } }),
   );
 }
 

@@ -33,7 +33,13 @@ export function useMyOrders() {
     () => ({ status, q, from, to, sort }),
     [status, q, from, to, sort],
   );
-  const pages = useOrdersPage({ query, page, isEnabled: isDesktop && !isLegacy });
+  const pages = useOrdersPage({
+    query,
+    page,
+    until: params.until,
+    onUntil: params.setUntil,
+    isEnabled: isDesktop && !isLegacy,
+  });
   const feed = useOrdersFeed({ query, isEnabled: !isDesktop && !isLegacy });
   const counts = useOrderCounts(query);
   const tab: OrdersTab = status ?? ORDERS_TAB.ALL;

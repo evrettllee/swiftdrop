@@ -77,8 +77,11 @@ export type MyOrdersStub = {
 function answer(stub: MyOrdersStub, route: Route) {
   const params = new URL(route.request().url()).searchParams;
   stub.requests.push(params);
+  const until = params.get('until');
   const found = sorted(
-    stub.orders.filter((item) => matches(item, params)),
+    stub.orders.filter(
+      (item) => matches(item, params) && (until === null || item.orderId <= Number(until)),
+    ),
     params.get('sort'),
   );
   const limit = Number(params.get('limit') ?? '10');
@@ -88,7 +91,17 @@ function answer(stub: MyOrdersStub, route: Route) {
     const page = Number(params.get('page') ?? '1');
     const items = found.slice((page - 1) * limit, page * limit);
 
-    return route.fulfill({ json: { items, total: found.length, page, limit, until: null } });
+    const top = found.length === 0 ? null : Math.max(...found.map((item) => item.orderId));
+
+    return route.fulfill({
+      json: {
+        items,
+        total: found.length,
+        page,
+        limit,
+        until: until === null ? top : Number(until),
+      },
+    });
   }
 
   const offset = cursor === '' ? 0 : Number(cursor);

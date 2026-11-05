@@ -49,7 +49,7 @@ test('should mark the history item current on the page of a finished order', asy
     PARCEL_SEGMENT,
   ]);
   await stubHistoryOrder(page, () => answerAs(ORDER_STATUS.DELIVERED));
-  await page.goto(getCourierHistoryOrderPath(orderId, 1));
+  await page.goto(getCourierHistoryOrderPath(orderId));
 
   await expect(menuLink(page, COURIER_LAYOUT_TEXTS.NAV_HISTORY)).toHaveAttribute(
     'aria-current',

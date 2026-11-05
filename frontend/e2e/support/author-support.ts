@@ -120,7 +120,7 @@ async function stubRole(page: Page, role: typeof ROLE.CLIENT | typeof ROLE.COURI
     buildOrderStubState(buildTestOrder(COURIER_ORDER_ID, ORDER_STATUS.IN_TRANSIT)),
   );
   await page.route(HISTORY_URL, (route) =>
-    route.fulfill({ json: { items: [], page: 1, limit: 10, total: 0 } }),
+    route.fulfill({ json: { items: [], page: 1, limit: 10, total: 0, until: null } }),
   );
 }
 
