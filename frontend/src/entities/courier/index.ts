@@ -13,6 +13,7 @@ export type { CourierProfileStatus } from './model/courier-profile';
 export {
   COURIER_PROFILE_STATUS,
   dropActiveOrder,
+  getCourierProfile,
   refreshCourierProfile,
   setCourierProfile,
   setCourierVehicle,

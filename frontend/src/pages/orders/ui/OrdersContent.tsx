@@ -1,7 +1,7 @@
 import { LIST_STATUS } from '@/shared/config';
 import { Button } from '@/shared/ui/button';
 import { Pagination } from '@/shared/ui/pagination';
-import { ORDERS_PAGE_SIZE } from '../config/list';
+import { LIST_PAGE_SIZE } from '@/shared/lib/list-params';
 import { ORDERS_TEXTS } from '../config/texts';
 import type { MyOrders } from '../model/useMyOrders';
 import { type OrdersListEmpty, OrdersList } from './OrdersList';
@@ -28,7 +28,7 @@ export function OrdersContent({ orders, empty }: OrdersContentProps) {
               page={params.values.page}
               totalPages={pages.totalPages}
               total={pages.total}
-              pageSize={ORDERS_PAGE_SIZE}
+              pageSize={LIST_PAGE_SIZE}
               onChange={(page) => params.update({ page })}
             />
           ) : null

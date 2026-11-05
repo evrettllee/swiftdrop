@@ -6,7 +6,8 @@ import {
 } from '@/shared/staff-api';
 import { Select, SELECT_LABEL } from '@/shared/ui/select';
 import type { OrdersParams } from '../config/list-params';
-import { MANAGER_ORDERS_TEXTS, SORT_LABELS } from '../config/texts';
+import { sortLabel } from '../config/sort-labels';
+import { MANAGER_ORDERS_TEXTS } from '../config/texts';
 import { type OrdersView, sortParamOf } from '../model/orders-view';
 import { FiltersControl } from './FiltersControl';
 import { SearchField } from '@/shared/ui/search-field';
@@ -30,7 +31,7 @@ export function OrdersToolbar({
   onChange,
   onCourierChosen,
 }: OrdersToolbarProps) {
-  const sortOptions = view.sorts.map((sort) => ({ value: sort, label: SORT_LABELS[sort] }));
+  const sortOptions = view.sorts.map((sort) => ({ value: sort, label: sortLabel(view.tab, sort) }));
 
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-3">

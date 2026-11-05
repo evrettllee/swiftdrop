@@ -9,6 +9,7 @@ export const HISTORY_SORT: SortSpec<HistorySortKey> = {
   whitelist: {
     id: { column: orders.orderId, kind: SORT_VALUE_KIND.INTEGER },
     finishedAt: { column: orders.finishedAt, kind: SORT_VALUE_KIND.TIMESTAMP },
+    distanceKm: { column: orders.distanceKm, kind: SORT_VALUE_KIND.DECIMAL },
   },
   idColumn: orders.orderId,
   defaultSort: { key: HISTORY_SORT_KEY.FINISHED_AT, direction: SORT_DIRECTION.DESC },

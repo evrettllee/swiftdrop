@@ -4,10 +4,19 @@ import {
   type AnalyticsCourierSort,
   type AnalyticsCourierSortKey,
 } from '@/shared/analytics-api';
-import { Table, TABLE_ALIGN, TableCell, TableHeaderCell, TableRow } from '@/shared/ui/table';
+import {
+  HEADER_SORT_DIRECTION,
+  headerSortState,
+  nextHeaderSort,
+  Table,
+  TABLE_ALIGN,
+  type TableAlign,
+  TableCell,
+  TableHeaderCell,
+  TableRow,
+} from '@/shared/ui/table';
 import { COURIER_TEXTS as TEXTS } from '../config/texts';
 import type { CourierRow } from '../lib/courier-row';
-import { nextSort, tableSortOf } from '../lib/courier-sort';
 
 const COLUMNS: readonly { key: AnalyticsCourierSortKey; label: string }[] = [
   { key: KEY.DELIVERED, label: TEXTS.DELIVERED },
@@ -24,19 +33,29 @@ type HeaderProps = {
   onSort?: (sort: AnalyticsCourierSort) => void;
 };
 
-function HeaderLabel({ column, sort, onSort }: HeaderProps & { column: (typeof COLUMNS)[0] }) {
-  if (onSort === undefined) {
-    return column.label;
-  }
+type Column = { key: AnalyticsCourierSortKey; label: string };
+
+function CouriersHeaderCell({
+  column,
+  sort,
+  onSort,
+  align,
+}: HeaderProps & { column: Column; align?: TableAlign }) {
+  const firstDirection =
+    column.key === KEY.NAME ? HEADER_SORT_DIRECTION.ASC : HEADER_SORT_DIRECTION.DESC;
 
   return (
-    <button
-      type="button"
-      onClick={() => onSort(nextSort(sort, column.key))}
-      className="-mx-1 rounded-sm px-1 uppercase hover:text-accent"
+    <TableHeaderCell
+      align={align}
+      sort={headerSortState(sort, column.key)}
+      onSort={
+        onSort === undefined
+          ? undefined
+          : () => onSort(nextHeaderSort(sort, column.key, firstDirection))
+      }
     >
       {column.label}
-    </button>
+    </TableHeaderCell>
   );
 }
 
@@ -44,17 +63,15 @@ function CouriersHead({ sort, onSort }: HeaderProps) {
   return (
     <thead>
       <tr>
-        <TableHeaderCell sort={tableSortOf(sort, KEY.NAME)}>
-          <HeaderLabel column={NAME_COLUMN} sort={sort} onSort={onSort} />
-        </TableHeaderCell>
+        <CouriersHeaderCell column={NAME_COLUMN} sort={sort} onSort={onSort} />
         {COLUMNS.map((column) => (
-          <TableHeaderCell
+          <CouriersHeaderCell
             key={column.key}
+            column={column}
+            sort={sort}
+            onSort={onSort}
             align={TABLE_ALIGN.END}
-            sort={tableSortOf(sort, column.key)}
-          >
-            <HeaderLabel column={column} sort={sort} onSort={onSort} />
-          </TableHeaderCell>
+          />
         ))}
       </tr>
     </thead>

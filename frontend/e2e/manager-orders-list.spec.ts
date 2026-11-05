@@ -76,7 +76,7 @@ test('should open the order from its row and from the menu of the row', async ({
   await page.goto(APP_ROUTES.MANAGER_ORDERS);
 
   await page.getByRole('button', { name: 'Действия с заказом №48235' }).click();
-  await page.getByRole('link', { name: MANAGER_ORDERS_TEXTS.OPEN_ORDER }).click();
+  await page.getByRole('menuitem', { name: MANAGER_ORDERS_TEXTS.OPEN_ORDER }).click();
   await expect(page).toHaveURL('/manager/orders/48235');
 
   await page.goBack();

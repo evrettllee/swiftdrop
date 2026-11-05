@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { ASSIGNMENT_EVENT, type AssignmentPlace, decideAssignment } from './assignment';
+import {
+  ASSIGNMENT_EVENT,
+  type AssignmentPlace,
+  decideAssignment,
+  missedAssignment,
+} from './assignment';
 
 const ORDER_ID = 48232;
 const OTHER_ORDER_ID = 48219;
@@ -59,4 +64,21 @@ test('should keep the current order when another one is taken away', () => {
 
   expect(decision.dropActiveOrder).toBe(false);
   expect(decision.toast).toBeNull();
+});
+
+test('should find the order assigned or taken away while the connection was lost', () => {
+  expect(missedAssignment(null, ORDER_ID)).toEqual({
+    event: ASSIGNMENT_EVENT.ASSIGNED,
+    orderId: ORDER_ID,
+  });
+  expect(missedAssignment(ORDER_ID, null)).toEqual({
+    event: ASSIGNMENT_EVENT.UNASSIGNED,
+    orderId: ORDER_ID,
+  });
+  expect(missedAssignment(OTHER_ORDER_ID, ORDER_ID)).toEqual({
+    event: ASSIGNMENT_EVENT.ASSIGNED,
+    orderId: ORDER_ID,
+  });
+  expect(missedAssignment(ORDER_ID, ORDER_ID)).toBeNull();
+  expect(missedAssignment(null, null)).toBeNull();
 });

@@ -34,7 +34,7 @@ type CourierChangeSource = {
   reload: () => void;
 };
 
-type PendingChange = { hasCourier: boolean };
+type PendingChange = { isReplaced: boolean };
 
 type ChangingState = { courier: ClientOrderCourier['courier'] } | null;
 
@@ -42,9 +42,13 @@ export function useCourierChange({ orderId, tracking, courier, reload }: Courier
   const [changes, setChanges] = useState(0);
   const [changing, setChanging] = useState<ChangingState>(null);
   const pending = useRef<PendingChange | null>(null);
+  const knownCourierId = useRef<number | null>(null);
   const startChange = useEffectEvent((courierId: number | null) => {
+    const isReplaced =
+      courierId !== null && courier !== null && courierId !== knownCourierId.current;
+    knownCourierId.current = courierId;
     tracking.applyCourierChange();
-    pending.current = { hasCourier: courierId !== null };
+    pending.current = { isReplaced: isReplaced || pending.current?.isReplaced === true };
     setChanging({ courier });
   });
 
@@ -69,7 +73,7 @@ export function useCourierChange({ orderId, tracking, courier, reload }: Courier
 
     setChanges((count) => count + 1);
 
-    if (change.hasCourier) {
+    if (change.isReplaced) {
       showToast({
         key: COURIER_CHANGE_TOAST_KEY,
         variant: 'info',

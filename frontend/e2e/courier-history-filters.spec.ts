@@ -27,8 +27,8 @@ test('should open this week with its summary and keep it out of the address', as
   await expect(periodButton(page, 'Эта неделя')).toBeVisible();
   await expect(summary(page)).toContainText('23 доставки');
   await expect(summary(page)).toContainText('183,5 км');
-  await expect(historyCards(page)).toHaveCount(5);
-  await expect(page.getByText('1–5 из 23')).toBeVisible();
+  await expect(historyCards(page)).toHaveCount(20);
+  await expect(page.getByText('1–20 из 23')).toBeVisible();
   await expect(page).toHaveURL(APP_ROUTES.COURIER_HISTORY);
   await expect.poll(() => lastListRequest(stub)?.get('from')).toBe(week.from);
   await expect.poll(() => lastListRequest(stub)?.get('to')).toBe(week.to);
@@ -92,14 +92,14 @@ test('should choose the presets and an own period, keep them after a reload and 
   await expect(page).toHaveURL(
     `${APP_ROUTES.COURIER_HISTORY}?period=custom&from=${thisMonday()}&to=${thisMonday()}`,
   );
-  await expect(historyCards(page)).toHaveCount(5);
+  await expect(historyCards(page)).toHaveCount(20);
 
   await page.goBack();
   await expect(page).toHaveURL(`${APP_ROUTES.COURIER_HISTORY}?period=last_week`);
 
   await chips(page).getByRole('button', { name: 'Сбросить всё' }).click();
   await expect(page).toHaveURL(APP_ROUTES.COURIER_HISTORY);
-  await expect(historyCards(page)).toHaveCount(5);
+  await expect(historyCards(page)).toHaveCount(20);
 });
 
 test('should sum the whole time', async ({ page }) => {
@@ -125,14 +125,14 @@ test('should sort the oldest first and keep it after a reload', async ({ page })
 
 test('should keep the pages in place when a new delivery comes', async ({ page }) => {
   const stub = await openCourierHistory(page);
-  await expect(page.getByText('1–5 из 23')).toBeVisible();
+  await expect(page.getByText('1–20 из 23')).toBeVisible();
 
   stub.items.unshift({ ...stub.items[0], orderId: NEWEST_ORDER_ID + 1 });
   await page.getByRole('button', { name: 'Следующая страница' }).click();
 
   await expect(page).toHaveURL(`${APP_ROUTES.COURIER_HISTORY}?page=2`);
-  await expect(page.getByText('6–10 из 23')).toBeVisible();
-  await expect(historyCards(page).first()).toContainText(`№${NEWEST_ORDER_ID - 5}`);
+  await expect(page.getByText('21–23 из 23')).toBeVisible();
+  await expect(historyCards(page).first()).toContainText(`№${NEWEST_ORDER_ID - 20}`);
   await expect.poll(() => lastListRequest(stub)?.get('until')).toBe(String(NEWEST_ORDER_ID));
 });
 

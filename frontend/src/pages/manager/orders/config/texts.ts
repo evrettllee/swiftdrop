@@ -1,10 +1,8 @@
 import {
   EXPORT_FORMAT,
-  MANAGER_ORDERS_SORT,
   MANAGER_SEARCH_TEXT_MIN_LENGTH,
   PAYMENT_STATE,
   type ExportFormat,
-  type ManagerOrdersSort,
   type PaymentState,
 } from '@/shared/staff-api';
 import { UI_TEXTS } from '@/shared/config';
@@ -100,14 +98,6 @@ export const PAYMENT_LABELS: Record<PaymentState, string> = {
   [PAYMENT_STATE.PAID]: 'Оплачен',
   [PAYMENT_STATE.REFUNDED]: 'Деньги возвращены',
   [PAYMENT_STATE.UNPAID]: 'Не оплачен',
-};
-
-export const SORT_LABELS: Record<ManagerOrdersSort, string> = {
-  [MANAGER_ORDERS_SORT.NEWEST]: 'Сначала новые',
-  [MANAGER_ORDERS_SORT.OLDEST]: 'Сначала старые',
-  [MANAGER_ORDERS_SORT.PRICE_HIGH]: 'Сначала дороже',
-  [MANAGER_ORDERS_SORT.PRICE_LOW]: 'Сначала дешевле',
-  [MANAGER_ORDERS_SORT.LONGEST_WAITING]: 'Дольше всего ждёт',
 };
 
 export const TAB_LABELS: Record<OrdersTab, string> = {

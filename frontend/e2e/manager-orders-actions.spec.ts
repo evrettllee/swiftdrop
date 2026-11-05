@@ -57,10 +57,13 @@ test('should offer to assign and cancel in the menu by the status of the row', a
   await page.goto('/manager/orders');
 
   await page.getByRole('button', { name: `Действия с заказом №${FIRST_ORDER_ID}` }).click();
-  const menu = page.getByRole('dialog', { name: `Действия с заказом №${FIRST_ORDER_ID}` });
-  await expect(menu.getByRole('link')).toHaveText(['Открыть заказ']);
-  await expect(menu.getByRole('button')).toHaveText(['Назначить курьера', 'Отменить заказ']);
-  await menu.getByRole('button', { name: 'Отменить заказ' }).click();
+  const menu = page.getByRole('menu', { name: `Действия с заказом №${FIRST_ORDER_ID}` });
+  await expect(menu.getByRole('menuitem')).toHaveText([
+    'Открыть заказ',
+    'Назначить курьера',
+    'Отменить заказ',
+  ]);
+  await menu.getByRole('menuitem', { name: 'Отменить заказ' }).click();
   await expect(
     page.getByRole('dialog', { name: `Отменить заказ №${FIRST_ORDER_ID}?` }),
   ).toBeVisible();
@@ -72,9 +75,8 @@ test('should leave only the link in the menu of an order on its way', async ({ p
   await page.goto('/manager/orders');
 
   await page.getByRole('button', { name: `Действия с заказом №${FIRST_ORDER_ID}` }).click();
-  const menu = page.getByRole('dialog', { name: `Действия с заказом №${FIRST_ORDER_ID}` });
-  await expect(menu.getByRole('link')).toHaveText(['Открыть заказ']);
-  await expect(menu.getByRole('button')).toHaveCount(0);
+  const menu = page.getByRole('menu', { name: `Действия с заказом №${FIRST_ORDER_ID}` });
+  await expect(menu.getByRole('menuitem')).toHaveText(['Открыть заказ']);
 });
 
 test('should assign from a card on a phone, with the unsuitable couriers folded', async ({

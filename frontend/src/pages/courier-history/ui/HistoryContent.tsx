@@ -1,7 +1,7 @@
 import { LIST_STATUS } from '@/shared/config';
 import { Button } from '@/shared/ui/button';
 import { Pagination } from '@/shared/ui/pagination';
-import { HISTORY_PAGE_SIZE } from '../config/list';
+import { LIST_PAGE_SIZE } from '@/shared/lib/list-params';
 import { HISTORY_TEXTS } from '../config/texts';
 import type { HistoryState } from '../model/useHistory';
 import { type HistoryEmpty, HistoryList } from './HistoryList';
@@ -27,7 +27,7 @@ export function HistoryContent({ history, empty }: HistoryContentProps) {
               page={params.values.page}
               totalPages={pages.totalPages}
               total={pages.total}
-              pageSize={HISTORY_PAGE_SIZE}
+              pageSize={LIST_PAGE_SIZE}
               onChange={(page) => params.update({ page })}
             />
           ) : null

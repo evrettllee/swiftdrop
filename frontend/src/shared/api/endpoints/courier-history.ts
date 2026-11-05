@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { http } from '../http';
+import { COURIER_ORDERS_API_PATHS } from './courier-order';
 import { dateSchema, orderStatusSchema } from './order';
 
 // A finished order of the courier (the CourierHistoryItem of the backend). `finishedAt` is null
@@ -71,3 +73,12 @@ export const courierHistoryOrderSchema = z.object({
 });
 
 export type CourierHistoryOrder = z.infer<typeof courierHistoryOrderSchema>;
+
+export async function getCourierHistoryOrder(
+  orderId: number,
+  signal?: AbortSignal,
+): Promise<CourierHistoryOrder> {
+  return courierHistoryOrderSchema.parse(
+    await http.get(COURIER_ORDERS_API_PATHS.historyOrder(orderId), { signal }),
+  );
+}

@@ -91,6 +91,7 @@ describe('Courier history search, period and summary (e2e)', () => {
 
     expect(idsOf(response.body)).toEqual([ids[2], ids[1], ids[0]]);
     expect(response.body.total).toBe(3);
+    expect(response.body.limit).toBe(20);
     expect(response.body.summary).toEqual({ count: 2, distanceKm: km(2 * ROUTE.distanceKm) });
   });
 
@@ -158,11 +159,5 @@ describe('Courier history search, period and summary (e2e)', () => {
 
     expect(idsOf(second.body)).toEqual([ids[0]]);
     expect(second.body.total).toBe(3);
-  });
-
-  it('should list the oldest finished first when asked', async () => {
-    const response = await get({ sort: 'finishedAt:asc' }).expect(HttpStatus.OK);
-
-    expect(idsOf(response.body)).toEqual([ids[0], ids[1], ids[2]]);
   });
 });

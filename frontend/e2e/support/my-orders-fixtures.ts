@@ -131,3 +131,19 @@ export function myOrders(): RawMyOrder[] {
     ),
   ];
 }
+
+export function olderOrders(count: number): RawMyOrder[] {
+  return Array.from({ length: count }, (_, index) =>
+    order(
+      47900 - index,
+      'delivered',
+      7 + index / 10,
+      80 + index,
+      [
+        ['Немига', '5'],
+        ['Сурганова', '47а'],
+      ],
+      'Ольга М.',
+    ),
+  );
+}

@@ -2,7 +2,7 @@ import { LIST_STATUS } from '@/shared/config';
 import { ORDERS_TAB } from '../config/list';
 import type { OrdersParams } from '../config/list-params';
 import type { RowAction } from '../lib/row-actions';
-import type { OrdersView } from '../model/orders-view';
+import { type OrdersView, sortParamOf } from '../model/orders-view';
 import type { useOrdersFeed } from '../model/useOrdersFeed';
 import type { useOrdersPage } from '../model/useOrdersPage';
 import { OrdersFeed } from './OrdersFeed';
@@ -52,6 +52,7 @@ export function OrdersContent({
     <OrdersTable
       tab={view.tab}
       sort={view.sort}
+      sorts={view.sorts}
       items={page.items}
       now={now}
       page={values.page}
@@ -62,6 +63,7 @@ export function OrdersContent({
       onPage={(next) => onChange({ page: next })}
       onLimit={(limit) => onChange({ limit })}
       onAction={onAction}
+      onSort={(sort) => onChange({ sort: sortParamOf(view.tab, sort) })}
     />
   ) : (
     <OrdersFeed

@@ -2,7 +2,9 @@ import type { PaymentState } from '@/shared/staff-api';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { RadioCard } from '@/shared/ui/radio-card';
 import type { ManagerOrdersSort } from '@/shared/staff-api';
-import { FILTER_TEXTS, MANAGER_ORDERS_TEXTS, PAYMENT_LABELS, SORT_LABELS } from '../config/texts';
+import type { OrdersTab } from '../config/list';
+import { sortLabel } from '../config/sort-labels';
+import { FILTER_TEXTS, MANAGER_ORDERS_TEXTS, PAYMENT_LABELS } from '../config/texts';
 import type { FilterDraft } from '../model/filter-draft';
 import { PAYMENT_STATES } from '../model/useFilterDraft';
 
@@ -41,12 +43,13 @@ export function FlagFields({ draft, onToggle, onChange }: FlagFieldsProps) {
 }
 
 type SortChoicesProps = {
+  tab: OrdersTab;
   sorts: readonly ManagerOrdersSort[];
   value: ManagerOrdersSort;
   onChange: (sort: ManagerOrdersSort) => void;
 };
 
-export function SortChoices({ sorts, value, onChange }: SortChoicesProps) {
+export function SortChoices({ tab, sorts, value, onChange }: SortChoicesProps) {
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="mb-2 text-caption font-semibold tracking-caps text-fg-secondary uppercase">
@@ -57,7 +60,7 @@ export function SortChoices({ sorts, value, onChange }: SortChoicesProps) {
           key={sort}
           name="manager-orders-sort"
           density="compact"
-          title={SORT_LABELS[sort]}
+          title={sortLabel(tab, sort)}
           checked={value === sort}
           onChange={() => onChange(sort)}
         />

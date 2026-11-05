@@ -3,6 +3,7 @@ import { DESKTOP_MEDIA_QUERY, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
+import { placePrimaryAction } from '@/shared/ui/empty-state';
 import { PageTitle } from '@/shared/ui/page-title';
 import { MANAGER_ZONES_TEXTS as TEXTS } from '../config/texts';
 import { useZonesPage } from '../model/useZonesPage';
@@ -16,6 +17,16 @@ export function ManagerZonesPage() {
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const page = useZonesPage();
   const { toggle } = page;
+  const zones = page.list.zones;
+  const newZone = placePrimaryAction(
+    <LinkButton
+      to={APP_ROUTES.MANAGER_ZONE_NEW}
+      icon={<PlusIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />}
+    >
+      {TEXTS.NEW_ZONE}
+    </LinkButton>,
+    { isLoading: zones === null && !page.list.isFailed, isEmpty: zones?.length === 0 },
+  );
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6">
@@ -24,12 +35,7 @@ export function ManagerZonesPage() {
           <span className="lg:hidden">{TEXTS.TITLE_SHORT}</span>
           <span className="hidden lg:inline">{TEXTS.TITLE}</span>
         </PageTitle>
-        <LinkButton
-          to={APP_ROUTES.MANAGER_ZONE_NEW}
-          icon={<PlusIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />}
-        >
-          {TEXTS.NEW_ZONE}
-        </LinkButton>
+        {newZone.header}
       </div>
       <ZonesToolbar
         search={page.search}
@@ -45,7 +51,8 @@ export function ManagerZonesPage() {
         onSelect={page.select}
       />
       <ZonesContent
-        all={page.list.zones}
+        all={zones}
+        newZone={newZone.empty}
         zones={page.shown}
         search={page.search}
         isDesktop={isDesktop}

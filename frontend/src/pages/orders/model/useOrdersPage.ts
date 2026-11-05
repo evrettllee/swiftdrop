@@ -1,7 +1,7 @@
 import { getApiErrorMessage, type OrderListItem } from '@/shared/api';
 import { usePagedList } from '@/shared/lib/list-feed';
 import { getOrdersPage, type OrdersPage, type OrdersQuery } from '../api/list-orders';
-import { ORDERS_PAGE_SIZE } from '../config/list';
+import { LIST_PAGE_SIZE } from '@/shared/lib/list-params';
 import { ORDERS_TEXTS } from '../config/texts';
 
 function messageOf(error: unknown): string {
@@ -20,7 +20,7 @@ export function useOrdersPage({ query, page, until, onUntil, isEnabled }: Orders
   return usePagedList<OrderListItem, OrdersPage>({
     key: JSON.stringify(query),
     page,
-    pageSize: ORDERS_PAGE_SIZE,
+    pageSize: LIST_PAGE_SIZE,
     until,
     onUntil,
     isEnabled,

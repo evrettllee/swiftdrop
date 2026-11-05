@@ -38,6 +38,8 @@ export type SupportAuthorRole = (typeof SUPPORT_AUTHOR_ROLE)[keyof typeof SUPPOR
 export const SUPPORT_SORT = {
   LONGEST_WAITING: 'lastMessageAt:asc',
   NEWEST: 'lastMessageAt:desc',
+  NEWEST_CREATED: 'createdAt:desc',
+  OLDEST_CREATED: 'createdAt:asc',
 } as const;
 
 export type SupportSort = (typeof SUPPORT_SORT)[keyof typeof SUPPORT_SORT];

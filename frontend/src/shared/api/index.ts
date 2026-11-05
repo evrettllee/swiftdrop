@@ -40,6 +40,7 @@ export {
   courierHistoryCursorPageSchema,
   courierHistoryItemSchema,
   courierHistoryOrderSchema,
+  getCourierHistoryOrder,
   courierHistoryPageSchema,
 } from './endpoints/courier-history';
 export type { CourierOrder, CurrentCourierOrder } from './endpoints/courier-order';

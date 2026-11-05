@@ -17,7 +17,7 @@ export function CourierOptions({ listId, items, active, isShown, onChoose }: Cou
       role="listbox"
       aria-label={FILTER_TEXTS.COURIER}
       hidden={!isShown || items.length === 0}
-      className="absolute inset-x-0 top-full z-10 mt-1 max-h-60 overflow-y-auto rounded-md border border-border bg-surface py-1 shadow-lg dark:border-border-elevated"
+      className="absolute inset-x-0 top-full z-10 mt-1 max-h-60 overflow-y-auto rounded-md border border-border-elevated bg-surface-elevated py-1 shadow-lg"
     >
       {items.map((item, index) => (
         <li

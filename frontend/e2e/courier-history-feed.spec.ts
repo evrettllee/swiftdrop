@@ -15,13 +15,13 @@ test('should show more deliveries by the cursor under the summary', async ({ pag
   const stub = await openCourierHistory(page);
 
   await expect(summary(page)).toContainText('23 доставки');
-  await expect(page.getByText('Показано 5 из 23')).toBeVisible();
+  await expect(page.getByText('Показано 20 из 23')).toBeVisible();
   await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('');
 
   await page.getByRole('button', { name: 'Показать ещё' }).click();
 
-  await expect(historyCards(page)).toHaveCount(10);
-  await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('5');
+  await expect(historyCards(page)).toHaveCount(23);
+  await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('20');
   await expect(summary(page)).toContainText('23 доставки');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(375);
 });
@@ -41,6 +41,6 @@ test('should tell an empty period and reset it with the chip', async ({ page }) 
     .click();
 
   await expect(page).toHaveURL(APP_ROUTES.COURIER_HISTORY);
-  await expect(historyCards(page)).toHaveCount(5);
+  await expect(historyCards(page)).toHaveCount(20);
   await expect(chips(page)).toHaveCount(0);
 });

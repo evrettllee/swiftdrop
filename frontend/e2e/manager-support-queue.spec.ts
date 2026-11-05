@@ -69,3 +69,20 @@ test('should say that every ticket is answered when the queue is empty', async (
 
   await expect(page.getByRole('heading', { name: 'Все обращения отвечены' })).toBeVisible();
 });
+
+test('should offer the four sorts of the queue and sort by the creation time', async ({ page }) => {
+  const stub = await stubSupport(page);
+  await page.goto(SUPPORT_PATH);
+  const sort = page.getByRole('combobox', { name: 'Сортировка' });
+
+  await expect(sort.getByRole('option')).toHaveText([
+    'Дольше без ответа',
+    'Недавние сообщения',
+    'Новые обращения',
+    'Старые обращения',
+  ]);
+  await sort.selectOption('Старые обращения');
+
+  await expect(page).toHaveURL(/sort=createdAt%3Aasc/);
+  await expect.poll(() => ticketsOf(stub, 'awaiting').at(-1)?.get('sort')).toBe('createdAt:asc');
+});

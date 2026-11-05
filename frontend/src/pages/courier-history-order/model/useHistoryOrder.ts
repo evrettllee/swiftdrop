@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ApiError, type CourierHistoryOrder, HTTP_STATUS } from '@/shared/api';
+import {
+  ApiError,
+  type CourierHistoryOrder,
+  getCourierHistoryOrder,
+  HTTP_STATUS,
+} from '@/shared/api';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
-import { getHistoryOrder } from '../api/get-history-order';
 
 type OrderAnswer = {
   key: string;
@@ -37,7 +41,7 @@ export function useHistoryOrder(orderId: number) {
 
     const controller = new AbortController();
 
-    getHistoryOrder(orderId, controller.signal).then(
+    getCourierHistoryOrder(orderId, controller.signal).then(
       (order) => {
         if (!controller.signal.aborted) {
           setAnswer({ key, status: LIST_STATUS.READY, order, isNotFound: false });

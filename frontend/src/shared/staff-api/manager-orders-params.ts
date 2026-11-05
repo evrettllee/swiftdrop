@@ -39,6 +39,7 @@ export const MANAGER_ORDERS_SORT = {
   PRICE_HIGH: 'price:desc',
   PRICE_LOW: 'price:asc',
   LONGEST_WAITING: 'statusChangedAt:asc',
+  RECENTLY_CHANGED: 'statusChangedAt:desc',
 } as const;
 
 export type ManagerOrdersSort = (typeof MANAGER_ORDERS_SORT)[keyof typeof MANAGER_ORDERS_SORT];

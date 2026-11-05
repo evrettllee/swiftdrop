@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { LIST_STATUS } from '@/shared/config';
 import {
   appendFeed,
@@ -9,18 +17,21 @@ import {
   noFeed,
   startFeed,
 } from './list-feed';
+import type { FeedCache } from './feed-cache';
+import { useFeedMemory, useInitialFeed } from './useFeedMemory';
 
 export const LIST_CURSOR_FIRST = '';
 
-type CursorFeedOptions<P> = {
+type CursorFeedOptions<T, P extends CursorPage<T>> = {
   key: string;
   isEnabled: boolean;
   load: (cursor: string, signal: AbortSignal) => Promise<P>;
   messageOf: (error: unknown) => string;
+  cache?: FeedCache<T, P>;
 };
 
-function run<P>(
-  options: CursorFeedOptions<P>,
+function run<T, P extends CursorPage<T>>(
+  options: CursorFeedOptions<T, P>,
   cursor: string,
   { signal }: AbortController,
   onPage: (page: P) => void,
@@ -50,33 +61,16 @@ function useLatest<V>(value: V) {
   return ref;
 }
 
-export function useCursorFeed<T, P extends CursorPage<T>>(options: CursorFeedOptions<P>) {
-  const [reloads, setReloads] = useState(0);
-  const [feed, setFeed] = useState<ListFeed<T, P>>(noFeed);
-  const latest = useLatest(options);
+function useShowMore<T, P extends CursorPage<T>>(
+  feed: ListFeed<T, P>,
+  key: string,
+  latest: RefObject<CursorFeedOptions<T, P>>,
+  setFeed: Dispatch<SetStateAction<ListFeed<T, P>>>,
+) {
   const moreRef = useRef<AbortController | null>(null);
-  const key = `${options.key}|${reloads}`;
-  const { isEnabled } = options;
+  const abortMore = useCallback(() => moreRef.current?.abort(), []);
 
-  useEffect(() => {
-    if (!isEnabled) {
-      return undefined;
-    }
-
-    const controller = new AbortController();
-    moreRef.current?.abort();
-    run(
-      latest.current,
-      LIST_CURSOR_FIRST,
-      controller,
-      (page) => setFeed(startFeed<T, P>(key, page)),
-      (message) => setFeed(failFeed(noFeed<T, P>(), key, message)),
-    );
-
-    return () => controller.abort();
-  }, [key, isEnabled, latest]);
-
-  useEffect(() => () => moreRef.current?.abort(), []);
+  useEffect(() => abortMore, [abortMore]);
 
   const showMore = useCallback(() => {
     const cursor = feed.nextCursor;
@@ -86,7 +80,7 @@ export function useCursorFeed<T, P extends CursorPage<T>>(options: CursorFeedOpt
     }
 
     const controller = new AbortController();
-    moreRef.current?.abort();
+    abortMore();
     moreRef.current = controller;
     setFeed((previous) => ({ ...previous, status: LIST_STATUS.LOADING, message: null }));
     run(
@@ -96,7 +90,37 @@ export function useCursorFeed<T, P extends CursorPage<T>>(options: CursorFeedOpt
       (page) => setFeed((previous) => appendFeed(previous, key, page)),
       (message) => setFeed((previous) => failFeed(previous, key, message)),
     );
-  }, [feed.key, feed.nextCursor, key, latest]);
+  }, [feed.key, feed.nextCursor, key, latest, setFeed, abortMore]);
+
+  return { showMore, abortMore };
+}
+
+export function useCursorFeed<T, P extends CursorPage<T>>(options: CursorFeedOptions<T, P>) {
+  const [reloads, setReloads] = useState(0);
+  const key = `${options.key}|${reloads}`;
+  const { feed, setFeed, isRestored } = useInitialFeed(options.cache, options.key, key);
+  const latest = useLatest(options);
+  const { isEnabled } = options;
+  const { showMore, abortMore } = useShowMore(feed, key, latest, setFeed);
+  useFeedMemory(options.cache, options.key, feed, key);
+
+  useEffect(() => {
+    if (!isEnabled || isRestored(key)) {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    abortMore();
+    run(
+      latest.current,
+      LIST_CURSOR_FIRST,
+      controller,
+      (page) => setFeed(startFeed<T, P>(key, page)),
+      (message) => setFeed(failFeed(noFeed<T, P>(), key, message)),
+    );
+
+    return () => controller.abort();
+  }, [key, isEnabled, latest, isRestored, setFeed, abortMore]);
 
   const retry = useCallback(() => {
     if (feed.key === key && feed.items.length > 0) {

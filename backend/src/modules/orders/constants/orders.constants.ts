@@ -78,7 +78,7 @@ export const ORDER_STATUS_GROUP_STATUSES: Record<
 };
 
 export const ORDERS_FIRST_PAGE = LIST_FIRST_PAGE;
-export const ORDERS_PAGE_SIZE_DEFAULT = 10;
+export const ORDERS_PAGE_SIZE_DEFAULT = 20;
 export const ORDERS_PAGE_SIZE_MAX = LIST_LIMIT_MAX;
 
 export const ORDERS_SORT_KEY = {

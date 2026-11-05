@@ -1,3 +1,4 @@
 export type { PopoverTriggerProps } from './Popover';
 export { Popover } from './Popover';
-export { POPOVER_ALIGN } from './popover-align';
+export type { PopoverAlign, PopoverKind } from './popover-align';
+export { POPOVER_ALIGN, POPOVER_KIND } from './popover-align';

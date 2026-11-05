@@ -39,7 +39,6 @@ export const ORDERS_SORTS: readonly OrdersSort[] = [
 export const ORDERS_TABS_ID_PREFIX = 'orders-tab';
 export const ORDERS_FIRST_PAGE = 1;
 export const ORDERS_PAGE_MAX = 10_000;
-export const ORDERS_PAGE_SIZE = 5;
 export const ORDERS_SEARCH_MAX_LENGTH = 100;
 export const ORDERS_CURSOR_FIRST = '';
 export const ORDER_COUNT_PROBE_LIMIT = 1;

@@ -43,6 +43,7 @@ export function FiltersForm({ view, courierName, layout, onApply }: FiltersFormP
       <div className={`flex flex-col gap-6 ${isSheet ? 'pb-4' : 'p-4'}`}>
         {isSheet ? (
           <SortChoices
+            tab={view.tab}
             sorts={view.sorts}
             value={draft.sort}
             onChange={(sort) => change({ sort })}

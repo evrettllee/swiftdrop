@@ -22,7 +22,6 @@ export const SUPPORT_TOPIC = {
 export type SupportTopic = (typeof SUPPORT_TOPIC)[keyof typeof SUPPORT_TOPIC];
 
 export const SUPPORT_SUBJECT_MAX_LENGTH = 80;
-export const MY_TICKETS_LIMIT = 20;
 
 export const myTicketItemSchema = z.object({
   id: z.number(),

@@ -9,14 +9,15 @@ import { DESKTOP_MEDIA_QUERY, LIST_STATUS } from '@/shared/config';
 import { calendarDateToUtc, calendarToday } from '@/shared/lib/calendar';
 import { useMinuteNow } from '@/shared/lib/clock';
 import { useMediaQuery } from '@/shared/lib/dom';
-import { useCursorFeed, usePagedList } from '@/shared/lib/list-feed';
-import { useListParams } from '@/shared/lib/list-params';
+import { createFeedCache, useCursorFeed, usePagedList } from '@/shared/lib/list-feed';
+import { LIST_PAGE_SIZE, useListParams } from '@/shared/lib/list-params';
 import { getHistoryCursorPage, getHistoryPage, type HistoryQuery } from '../api/get-history';
-import { HISTORY_PAGE_SIZE } from '../config/list';
 import { HISTORY_PARAMS_CONFIG, type HistoryParams } from '../config/list-params';
 import { HISTORY_TEXTS } from '../config/texts';
 import { historyPeriod } from '../lib/history-period';
 import { useWholeHistoryCount } from './useHistoryCount';
+
+const HISTORY_FEED_CACHE = createFeedCache<CourierHistoryItem, CourierHistoryCursorPage>();
 
 function messageOf(error: unknown): string {
   return getApiErrorMessage(error, HISTORY_TEXTS.LOAD_ERROR);
@@ -42,7 +43,7 @@ export function useHistory() {
   const pages = usePagedList<CourierHistoryItem, CourierHistoryPage>({
     key,
     page: params.values.page,
-    pageSize: HISTORY_PAGE_SIZE,
+    pageSize: LIST_PAGE_SIZE,
     until: params.until,
     onUntil: params.setUntil,
     isEnabled: isDesktop,
@@ -54,6 +55,7 @@ export function useHistory() {
     isEnabled: !isDesktop,
     load: (cursor, signal) => getHistoryCursorPage(query, cursor, signal),
     messageOf,
+    cache: HISTORY_FEED_CACHE,
   });
   const wholeCount = useWholeHistoryCount();
   const list = isDesktop ? pages : feed;

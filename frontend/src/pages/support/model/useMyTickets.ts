@@ -2,12 +2,8 @@ import { useState } from 'react';
 import { useLoad } from '@/shared/lib/async';
 import { SOCKET_EVENTS, type TypedSocketEvent, useSocketEventBatch } from '@/shared/realtime';
 import { SUPPORT_TICKET_STATUS, type SupportTicketStatus } from '@/shared/staff-api';
-import {
-  getMyTickets,
-  MY_TICKETS_LIMIT,
-  type MyTicketItem,
-  type MyTicketsPage,
-} from '@/shared/support-api';
+import { getMyTickets, type MyTicketItem, type MyTicketsPage } from '@/shared/support-api';
+import { LIST_PAGE_SIZE } from '@/shared/lib/list-params';
 import { SUPPORT_TEXTS } from '../config/texts';
 
 const TICKET_EVENTS: readonly TypedSocketEvent[] = [SOCKET_EVENTS.SUPPORT_TICKET];
@@ -52,7 +48,7 @@ function useMorePages(status: SupportTicketStatus, first: MyTicketsPage | null) 
     setMore({ ...current, isLoading: true, isFailed: false });
 
     try {
-      const page = await getMyTickets({ status, cursor, limit: MY_TICKETS_LIMIT });
+      const page = await getMyTickets({ status, cursor, limit: LIST_PAGE_SIZE });
       setMore((value) =>
         value.base === first
           ? {
@@ -83,7 +79,7 @@ export function useMyTickets(status: SupportTicketStatus) {
   const other = otherStatus(status);
   const first = useLoad(
     `list:${status}`,
-    (signal) => getMyTickets({ status, cursor: null, limit: MY_TICKETS_LIMIT }, { signal }),
+    (signal) => getMyTickets({ status, cursor: null, limit: LIST_PAGE_SIZE }, { signal }),
     SUPPORT_TEXTS.LOAD_FAILED,
   );
   const otherFirst = useLoad(

@@ -6,8 +6,8 @@ import {
   courierHistoryPageSchema,
   http,
 } from '@/shared/api';
-import { serializeListParam } from '@/shared/lib/list-params';
-import { HISTORY_COUNT_PROBE_LIMIT, HISTORY_FIRST_PAGE, HISTORY_PAGE_SIZE } from '../config/list';
+import { LIST_PAGE_SIZE, serializeListParam } from '@/shared/lib/list-params';
+import { HISTORY_COUNT_PROBE_LIMIT, HISTORY_FIRST_PAGE } from '../config/list';
 import type { HistoryParams } from '../config/list-params';
 
 export type HistoryQuery = Pick<HistoryParams, 'q' | 'from' | 'to' | 'sort'>;
@@ -37,7 +37,7 @@ export async function getHistoryPage(
   page: number,
   until: number | null,
   signal: AbortSignal,
-  limit: number = HISTORY_PAGE_SIZE,
+  limit: number = LIST_PAGE_SIZE,
 ): Promise<CourierHistoryPage> {
   return courierHistoryPageSchema.parse(
     await http.get(pathOf(query, { page, limit, until }), { signal }),
@@ -50,7 +50,7 @@ export async function getHistoryCursorPage(
   signal: AbortSignal,
 ): Promise<CourierHistoryCursorPage> {
   return courierHistoryCursorPageSchema.parse(
-    await http.get(pathOf(query, { cursor, limit: HISTORY_PAGE_SIZE }), { signal }),
+    await http.get(pathOf(query, { cursor, limit: LIST_PAGE_SIZE }), { signal }),
   );
 }
 

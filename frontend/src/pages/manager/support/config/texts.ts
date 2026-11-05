@@ -56,7 +56,9 @@ export const ROLE_NAMES: Record<SupportAuthorRole, string> = {
 
 export const SORT_LABELS: Record<SupportSort, string> = {
   [SUPPORT_SORT.LONGEST_WAITING]: 'Дольше без ответа',
-  [SUPPORT_SORT.NEWEST]: 'Сначала новые',
+  [SUPPORT_SORT.NEWEST]: 'Недавние сообщения',
+  [SUPPORT_SORT.NEWEST_CREATED]: 'Новые обращения',
+  [SUPPORT_SORT.OLDEST_CREATED]: 'Старые обращения',
 };
 
 export const EMPTY_TEXTS = {

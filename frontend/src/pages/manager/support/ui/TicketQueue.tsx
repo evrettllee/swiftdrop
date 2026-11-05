@@ -6,7 +6,7 @@ import { EmptyState } from '@/shared/ui/empty-state';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { Pagination } from '@/shared/ui/pagination';
 import { Spinner } from '@/shared/ui/spinner';
-import { SUPPORT_PAGE_SIZE } from '../config/params';
+import { LIST_PAGE_SIZE } from '@/shared/lib/list-params';
 import { MANAGER_SUPPORT_TEXTS as TEXTS } from '../config/texts';
 import type { QueueEmpty } from '../lib/queue-empty';
 import type { Loaded } from '@/shared/lib/async';
@@ -72,13 +72,13 @@ function QueueBody({
           />
         ))}
       </ul>
-      {data.total > SUPPORT_PAGE_SIZE ? (
+      {data.total > LIST_PAGE_SIZE ? (
         <div className="mt-auto border-t border-border px-2 pt-3">
           <Pagination
             page={page}
-            totalPages={Math.ceil(data.total / SUPPORT_PAGE_SIZE)}
+            totalPages={Math.ceil(data.total / LIST_PAGE_SIZE)}
             total={data.total}
-            pageSize={SUPPORT_PAGE_SIZE}
+            pageSize={LIST_PAGE_SIZE}
             onChange={onPage}
           />
         </div>

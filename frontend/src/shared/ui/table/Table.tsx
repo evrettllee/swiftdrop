@@ -35,16 +35,33 @@ export function Table({ label, footer, children }: TableProps) {
 type TableHeaderCellProps = Omit<ThHTMLAttributes<HTMLTableCellElement>, 'align'> & {
   align?: TableAlign;
   sort?: TableSort;
+  onSort?: () => void;
 };
+
+const HEADER_CONTENT_CLASS = 'inline-flex items-center gap-1';
 
 export function TableHeaderCell({
   align = TABLE_ALIGN.START,
   sort,
+  onSort,
   className = '',
   children,
   ...rest
 }: TableHeaderCellProps) {
   const SortIcon = sort === TABLE_SORT.ASCENDING ? ArrowUpIcon : ArrowDownIcon;
+  const content = (
+    <>
+      {children}
+      {sort === undefined ? null : (
+        <SortIcon
+          size={ICON_SIZE.SMALL}
+          weight={ICON_WEIGHT}
+          aria-hidden="true"
+          className="text-accent"
+        />
+      )}
+    </>
+  );
 
   return (
     <th
@@ -58,17 +75,17 @@ export function TableHeaderCell({
       )}
       {...rest}
     >
-      <span className="inline-flex items-center gap-1">
-        {children}
-        {sort === undefined ? null : (
-          <SortIcon
-            size={ICON_SIZE.SMALL}
-            weight={ICON_WEIGHT}
-            aria-hidden="true"
-            className="text-accent"
-          />
-        )}
-      </span>
+      {onSort === undefined ? (
+        <span className={HEADER_CONTENT_CLASS}>{content}</span>
+      ) : (
+        <button
+          type="button"
+          onClick={onSort}
+          className={`-mx-1 min-h-11 rounded-sm px-1 uppercase hover:text-accent ${HEADER_CONTENT_CLASS} ${COLOR_TRANSITION_CLASS}`}
+        >
+          {content}
+        </button>
+      )}
     </th>
   );
 }

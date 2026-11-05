@@ -6,11 +6,7 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { orders } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
-import {
-  ORDER_STATUS_GROUP,
-  ORDERS_FIRST_PAGE,
-  ORDERS_PAGE_SIZE_DEFAULT,
-} from '@/modules/orders/constants/orders.constants';
+import { ORDER_STATUS_GROUP, ORDERS_FIRST_PAGE } from '@/modules/orders/constants/orders.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
 import { VALID_ORDER_PRICE } from '@test/support/fixtures';
@@ -51,7 +47,7 @@ describe('Orders list (e2e)', () => {
       items: [],
       total: 0,
       page: ORDERS_FIRST_PAGE,
-      limit: ORDERS_PAGE_SIZE_DEFAULT,
+      limit: 20,
       until: null,
     });
   });

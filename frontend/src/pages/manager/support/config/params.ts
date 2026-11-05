@@ -13,8 +13,6 @@ import {
 const PAGE_MAX = 10_000;
 const ID_MAX = 2_147_483_647;
 
-export const SUPPORT_PAGE_SIZE = 20;
-
 export type SupportParams = {
   view: SupportView;
   role: SupportAuthorRole | null;

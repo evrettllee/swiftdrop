@@ -6,11 +6,12 @@ import { ORDER_ACTION, type OrderAction } from '@/features/manager-order-actions
 import { COLOR_TRANSITION_CLASS, ICON_SIZE } from '@/shared/config';
 import { getManagerOrderPath } from '@/shared/routes';
 import type { ManagerOrderListItem } from '@/shared/staff-api';
-import { Popover, POPOVER_ALIGN } from '@/shared/ui/popover';
+import { Popover, POPOVER_ALIGN, POPOVER_KIND } from '@/shared/ui/popover';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
 import { canAssignRow, canCancelRow, type RowAction } from '../lib/row-actions';
 
-const ITEM_CLASS = `flex min-h-11 w-full items-center px-4 text-start text-body text-fg hover:bg-surface-muted ${COLOR_TRANSITION_CLASS}`;
+const ITEM_BASE_CLASS = `flex min-h-11 w-full items-center px-4 text-start text-body outline-none hover:bg-surface-muted focus-visible:bg-surface-muted ${COLOR_TRANSITION_CLASS}`;
+const ITEM_CLASS = `${ITEM_BASE_CLASS} text-fg`;
 
 type RowMenuProps = {
   order: ManagerOrderListItem;
@@ -33,6 +34,7 @@ export function RowMenu({ order, onAction }: RowMenuProps) {
         onOpenChange={setIsOpen}
         label={label}
         align={POPOVER_ALIGN.END}
+        kind={POPOVER_KIND.MENU}
         panelClassName="w-56 py-1"
         trigger={(props) => (
           <button
@@ -45,18 +47,24 @@ export function RowMenu({ order, onAction }: RowMenuProps) {
           </button>
         )}
       >
-        <Link to={getManagerOrderPath(order.id)} className={ITEM_CLASS}>
+        <Link role="menuitem" to={getManagerOrderPath(order.id)} className={ITEM_CLASS}>
           {MANAGER_ORDERS_TEXTS.OPEN_ORDER}
         </Link>
         {canAssignRow(order) ? (
-          <button type="button" className={ITEM_CLASS} onClick={() => choose(ORDER_ACTION.ASSIGN)}>
+          <button
+            type="button"
+            role="menuitem"
+            className={ITEM_CLASS}
+            onClick={() => choose(ORDER_ACTION.ASSIGN)}
+          >
             {MANAGER_ORDERS_TEXTS.ASSIGN_COURIER}
           </button>
         ) : null}
         {canCancelRow(order) ? (
           <button
             type="button"
-            className={`${ITEM_CLASS} text-danger`}
+            role="menuitem"
+            className={`${ITEM_BASE_CLASS} text-danger`}
             onClick={() => choose(ORDER_ACTION.CANCEL)}
           >
             {MANAGER_ORDERS_TEXTS.CANCEL_ORDER}

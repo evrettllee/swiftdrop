@@ -1,4 +1,5 @@
 import { MagnifyingGlassIcon, PentagonIcon } from '@phosphor-icons/react';
+import type { ReactNode } from 'react';
 import type { ManagerZone } from '@/shared/staff-api';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
@@ -10,6 +11,7 @@ import { type ZoneListProps, ZonesTable } from './ZonesTable';
 
 type ZonesContentProps = ZoneListProps & {
   all: readonly ManagerZone[] | null;
+  newZone: ReactNode;
   search: string;
   isDesktop: boolean;
   isFailed: boolean;
@@ -18,6 +20,7 @@ type ZonesContentProps = ZoneListProps & {
 
 export function ZonesContent({
   all,
+  newZone,
   search,
   isDesktop,
   isFailed,
@@ -40,7 +43,11 @@ export function ZonesContent({
   }
 
   if (all.length === 0) {
-    return <EmptyState icon={PentagonIcon} title={TEXTS.EMPTY_TITLE} text={TEXTS.EMPTY_TEXT} />;
+    return (
+      <EmptyState icon={PentagonIcon} title={TEXTS.EMPTY_TITLE} text={TEXTS.EMPTY_TEXT}>
+        {newZone}
+      </EmptyState>
+    );
   }
 
   if (list.zones.length === 0) {

@@ -36,6 +36,10 @@ export function useCourierProfileStatus(): CourierProfileStatus {
   return useCourierProfileStore((state) => state.status);
 }
 
+export function getCourierProfile(): CourierMe | null {
+  return useCourierProfileStore.getState().profile;
+}
+
 export async function loadCourierProfile(signal?: AbortSignal): Promise<void> {
   useCourierProfileStore.setState({ status: COURIER_PROFILE_STATUS.LOADING });
 

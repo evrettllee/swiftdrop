@@ -120,3 +120,16 @@ test('should close the input of an open chat until the new courier comes', async
   await expect(page.getByText(ORDER_COURIER_TEXTS.CHANGED_IN_CHAT)).toHaveCount(0);
   await expect(page.getByText(NEW_COURIER_NAME).first()).toBeVisible();
 });
+
+test('should show the first courier without a toast', async ({ page }) => {
+  const order = await stubLiveOrder(page);
+  await stubChangingCourier(page, order);
+  await openLiveOrder(page, order);
+
+  pushCourier(order, NEW_COURIER_ID);
+  pushStatus(order, LIVE_ORDER_ID, ORDER_STATUS.COURIER_ASSIGNED);
+
+  await expect(page.getByText(COURIER_NAME)).toBeVisible();
+  await page.waitForTimeout(500);
+  await expect(page.getByText(ORDER_COURIER_TEXTS.CHANGED)).toHaveCount(0);
+});

@@ -57,6 +57,8 @@ export const PERIOD_LABELS: Record<CalendarPeriod, string> = {
 export const SORT_LABELS: Record<HistorySort, string> = {
   [HISTORY_SORT.NEWEST]: 'Сначала новые',
   [HISTORY_SORT.OLDEST]: 'Сначала старые',
+  [HISTORY_SORT.FARTHEST]: 'Сначала дальние',
+  [HISTORY_SORT.NEAREST]: 'Сначала ближние',
 };
 
 export const HISTORY_SUMMARY_TEXTS = {

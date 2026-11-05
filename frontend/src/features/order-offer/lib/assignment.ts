@@ -63,3 +63,16 @@ export function decideAssignment(
     ? decideAssigned(orderId, place)
     : decideUnassigned(orderId, place);
 }
+
+export type MissedAssignment = { event: AssignmentEvent; orderId: number };
+
+export function missedAssignment(
+  before: number | null,
+  after: number | null,
+): MissedAssignment | null {
+  if (after !== null) {
+    return after === before ? null : { event: ASSIGNMENT_EVENT.ASSIGNED, orderId: after };
+  }
+
+  return before === null ? null : { event: ASSIGNMENT_EVENT.UNASSIGNED, orderId: before };
+}

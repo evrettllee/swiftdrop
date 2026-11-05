@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import type { ListParams } from '@/shared/lib/list-params';
+import { LIST_PAGE_SIZE, type ListParams } from '@/shared/lib/list-params';
 import { SOCKET_EVENTS, type TypedSocketEvent, useSocketEventBatch } from '@/shared/realtime';
 import { getSupportCounts, isSearchUsable } from '@/shared/staff-api';
 import { getSupportTickets, SUPPORT_VIEW, type SupportTicketsQuery } from '@/shared/support-api';
-import { SUPPORT_PAGE_SIZE, type SupportParams } from '../config/params';
+import type { SupportParams } from '../config/params';
 import { MANAGER_SUPPORT_TEXTS as TEXTS } from '../config/texts';
 import { useLoad } from '@/shared/lib/async';
 
@@ -45,7 +45,7 @@ export function useSupportQueue(params: ListParams<SupportParams>) {
       q: search,
       sort: values.sort,
       page: values.page,
-      limit: SUPPORT_PAGE_SIZE,
+      limit: LIST_PAGE_SIZE,
     }),
     [values.view, values.role, search, values.sort, values.page],
   );

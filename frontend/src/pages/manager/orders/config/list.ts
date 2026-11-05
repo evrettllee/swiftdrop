@@ -65,12 +65,17 @@ const COMMON_SORTS: readonly ManagerOrdersSort[] = [
   MANAGER_ORDERS_SORT.OLDEST,
   MANAGER_ORDERS_SORT.PRICE_HIGH,
   MANAGER_ORDERS_SORT.PRICE_LOW,
+  MANAGER_ORDERS_SORT.LONGEST_WAITING,
+  MANAGER_ORDERS_SORT.RECENTLY_CHANGED,
+];
+
+const ATTENTION_SORTS: readonly ManagerOrdersSort[] = [
+  MANAGER_ORDERS_SORT.LONGEST_WAITING,
+  MANAGER_ORDERS_SORT.RECENTLY_CHANGED,
 ];
 
 export function tabSorts(tab: OrdersTab): readonly ManagerOrdersSort[] {
-  return tab === ORDERS_TAB.ATTENTION
-    ? [MANAGER_ORDERS_SORT.LONGEST_WAITING, ...COMMON_SORTS]
-    : COMMON_SORTS;
+  return tab === ORDERS_TAB.ATTENTION ? ATTENTION_SORTS : COMMON_SORTS;
 }
 
 export function defaultTabSort(tab: OrdersTab): ManagerOrdersSort {

@@ -90,11 +90,12 @@ export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,
   ORDER_STATUS.CANCELLED,
 ];
-export const HISTORY_PAGE_SIZE_DEFAULT = 10;
+export const HISTORY_PAGE_SIZE_DEFAULT = 20;
 
 export const HISTORY_SORT_KEY = {
   ID: 'id',
   FINISHED_AT: 'finishedAt',
+  DISTANCE_KM: 'distanceKm',
 } as const;
 
 export const HISTORY_NUMBER_SEARCH = /^\d+$/;

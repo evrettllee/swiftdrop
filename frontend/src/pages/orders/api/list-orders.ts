@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { http, orderListItemSchema, ORDERS_API_PATHS } from '@/shared/api';
-import { serializeListParam } from '@/shared/lib/list-params';
-import { ORDER_COUNT_PROBE_LIMIT, ORDERS_FIRST_PAGE, ORDERS_PAGE_SIZE } from '../config/list';
+import { LIST_PAGE_SIZE, serializeListParam } from '@/shared/lib/list-params';
+import { ORDER_COUNT_PROBE_LIMIT, ORDERS_FIRST_PAGE } from '../config/list';
 import type { OrdersParams } from '../config/list-params';
 
 const ordersPageSchema = z.object({
@@ -44,7 +44,7 @@ export async function getOrdersPage(
   query: OrdersQuery,
   page: number,
   signal: AbortSignal,
-  { limit = ORDERS_PAGE_SIZE, until = null }: { limit?: number; until?: number | null } = {},
+  { limit = LIST_PAGE_SIZE, until = null }: { limit?: number; until?: number | null } = {},
 ): Promise<OrdersPage> {
   const params = queryOf(query, until === null ? { page, limit } : { page, limit, until });
 
@@ -56,7 +56,7 @@ export async function getOrdersCursorPage(
   cursor: string,
   signal: AbortSignal,
 ): Promise<OrdersCursorPage> {
-  const params = queryOf(query, { cursor, limit: ORDERS_PAGE_SIZE });
+  const params = queryOf(query, { cursor, limit: LIST_PAGE_SIZE });
 
   return ordersCursorPageSchema.parse(
     await http.get(`${ORDERS_API_PATHS.ORDERS}?${params}`, { signal }),

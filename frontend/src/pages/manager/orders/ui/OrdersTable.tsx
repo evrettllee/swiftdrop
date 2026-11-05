@@ -1,8 +1,14 @@
 import type { ManagerOrderListItem, ManagerOrdersSort } from '@/shared/staff-api';
 import { Pagination } from '@/shared/ui/pagination';
-import { Table, TABLE_ALIGN, TABLE_SORT, TableHeaderCell } from '@/shared/ui/table';
+import {
+  headerSortState,
+  nextHeaderSort,
+  Table,
+  TABLE_ALIGN,
+  TableHeaderCell,
+} from '@/shared/ui/table';
 import { ORDERS_TAB, type OrdersTab, type PageSize } from '../config/list';
-import { ASCENDING_SORTS, COLUMN_OF_SORT, SORT_COLUMN, type SortColumn } from '../config/table';
+import { SORT_KEY, type SortableKey } from '../config/table';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
 import type { RowAction } from '../lib/row-actions';
 import { OrderRow } from './OrderRow';
@@ -11,22 +17,30 @@ import { PageSizeSelect } from './PageSizeSelect';
 type OrdersTableHeadProps = {
   isAttention: boolean;
   sort: ManagerOrdersSort;
+  sorts: readonly ManagerOrdersSort[];
+  onSort: (sort: ManagerOrdersSort) => void;
 };
 
-function OrdersTableHead({ isAttention, sort }: OrdersTableHeadProps) {
-  const direction = ASCENDING_SORTS.has(sort) ? TABLE_SORT.ASCENDING : TABLE_SORT.DESCENDING;
-  const sortOf = (column: SortColumn) => (COLUMN_OF_SORT[sort] === column ? direction : undefined);
+function OrdersTableHead({ isAttention, sort, sorts, onSort }: OrdersTableHeadProps) {
+  const sortProps = (key: SortableKey) => {
+    const next = nextHeaderSort(sort, key);
+
+    return {
+      sort: headerSortState(sort, key),
+      onSort: sorts.includes(next) ? () => onSort(next) : undefined,
+    };
+  };
 
   return (
     <thead>
       <tr>
-        <TableHeaderCell sort={sortOf(SORT_COLUMN.ORDER)}>
+        <TableHeaderCell {...sortProps(SORT_KEY.CREATED_AT)}>
           {MANAGER_ORDERS_TEXTS.COLUMN_ORDER}
         </TableHeaderCell>
         <TableHeaderCell className="w-48">{MANAGER_ORDERS_TEXTS.COLUMN_CLIENT}</TableHeaderCell>
         <TableHeaderCell>{MANAGER_ORDERS_TEXTS.COLUMN_ROUTE}</TableHeaderCell>
         {isAttention ? (
-          <TableHeaderCell sort={sortOf(SORT_COLUMN.WAITING)}>
+          <TableHeaderCell sort={headerSortState(sort, SORT_KEY.STATUS_CHANGED_AT)}>
             {MANAGER_ORDERS_TEXTS.COLUMN_WAITING}
           </TableHeaderCell>
         ) : (
@@ -37,7 +51,7 @@ function OrdersTableHead({ isAttention, sort }: OrdersTableHeadProps) {
             <TableHeaderCell>{MANAGER_ORDERS_TEXTS.COLUMN_STATUS}</TableHeaderCell>
           </>
         )}
-        <TableHeaderCell align={TABLE_ALIGN.END} sort={sortOf(SORT_COLUMN.SUM)}>
+        <TableHeaderCell align={TABLE_ALIGN.END} {...sortProps(SORT_KEY.PRICE)}>
           {MANAGER_ORDERS_TEXTS.COLUMN_SUM}
         </TableHeaderCell>
         <TableHeaderCell>
@@ -51,6 +65,7 @@ function OrdersTableHead({ isAttention, sort }: OrdersTableHeadProps) {
 type OrdersTableProps = {
   tab: OrdersTab;
   sort: ManagerOrdersSort;
+  sorts: readonly ManagerOrdersSort[];
   items: readonly ManagerOrderListItem[];
   now: number;
   page: number;
@@ -61,11 +76,13 @@ type OrdersTableProps = {
   onPage: (page: number) => void;
   onLimit: (limit: PageSize) => void;
   onAction: RowAction;
+  onSort: (sort: ManagerOrdersSort) => void;
 };
 
 export function OrdersTable({
   tab,
   sort,
+  sorts,
   items,
   now,
   page,
@@ -76,6 +93,7 @@ export function OrdersTable({
   onPage,
   onLimit,
   onAction,
+  onSort,
 }: OrdersTableProps) {
   const isAttention = tab === ORDERS_TAB.ATTENTION;
 
@@ -94,7 +112,7 @@ export function OrdersTable({
           />
         }
       >
-        <OrdersTableHead isAttention={isAttention} sort={sort} />
+        <OrdersTableHead isAttention={isAttention} sort={sort} sorts={sorts} onSort={onSort} />
         <tbody>
           {items.map((order) => (
             <OrderRow

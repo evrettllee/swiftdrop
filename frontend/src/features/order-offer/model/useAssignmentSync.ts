@@ -12,7 +12,9 @@ import {
   type AssignmentEvent,
   type AssignmentToast,
   decideAssignment,
+  type MissedAssignment,
 } from '../lib/assignment';
+import { syncMissedAssignment } from './missed-assignment';
 import { dismissOffer, useOfferStore, vibrateOffer } from './offer-store';
 
 const ASSIGNMENT_TOAST_KEY = 'assignment';
@@ -40,15 +42,33 @@ function showAssignmentToast(orderId: number, toast: AssignmentToast, openWork: 
   });
 }
 
+function announceMissed({ event, orderId }: MissedAssignment, openWork: () => void): void {
+  const isAssigned = event === ASSIGNMENT_EVENT.ASSIGNED;
+  const isOnWorkPage = window.location.pathname === APP_ROUTES.COURIER_WORK;
+  showAssignmentToast(orderId, { event, hasOpenLink: isAssigned && !isOnWorkPage }, openWork);
+
+  if (isAssigned) {
+    signalAssignment();
+  }
+}
+
+function signalAssignment(): void {
+  vibrateOffer();
+  void playBeep();
+}
+
 export function useAssignmentSync(): void {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const activeOrderId = useCourierProfile()?.activeOrderId ?? null;
 
+  const isOnWorkPage = pathname === APP_ROUTES.COURIER_WORK;
+  const openWork = () => void navigate(APP_ROUTES.COURIER_WORK);
+
   const handle = useEffectEvent((event: AssignmentEvent, orderId: number) => {
     const decision = decideAssignment(event, orderId, {
       activeOrderId,
-      isOnWorkPage: pathname === APP_ROUTES.COURIER_WORK,
+      isOnWorkPage,
       hasOpenOffer: useOfferStore.getState().offer !== null,
     });
 
@@ -61,12 +81,11 @@ export function useAssignmentSync(): void {
     }
 
     if (decision.toast !== null) {
-      showAssignmentToast(orderId, decision.toast, () => void navigate(APP_ROUTES.COURIER_WORK));
+      showAssignmentToast(orderId, decision.toast, openWork);
     }
 
     if (decision.signal) {
-      vibrateOffer();
-      void playBeep();
+      signalAssignment();
     }
 
     void refreshCourierProfile();
@@ -90,5 +109,5 @@ export function useAssignmentSync(): void {
     };
   }, []);
 
-  useSocketReconnect(() => void refreshCourierProfile());
+  useSocketReconnect(() => void syncMissedAssignment((missed) => announceMissed(missed, openWork)));
 }

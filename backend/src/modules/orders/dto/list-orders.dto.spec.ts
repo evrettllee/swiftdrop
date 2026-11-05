@@ -28,7 +28,7 @@ describe('listOrdersSchema defaults', () => {
     const result = parse({});
 
     expect(result.success && result.data).toEqual({
-      pagination: { mode: 'page', page: 1, limit: ORDERS_PAGE_SIZE_DEFAULT, until: null },
+      pagination: { mode: 'page', page: 1, limit: 20, until: null },
       sort: { key: 'createdAt', direction: 'desc' },
       period: { start: null, end: null },
       status: null,

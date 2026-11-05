@@ -1,6 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { lastListRequest, listRequests, minskDay, stubMyOrders } from './support/my-orders';
+import { myOrders, olderOrders } from './support/my-orders-fixtures';
+
+const MANY_ORDERS = [...myOrders(), ...olderOrders(17)];
 
 test.use({ viewport: { width: 375, height: 812 } });
 
@@ -14,32 +17,32 @@ async function openOrders(page: Page) {
 }
 
 test('should show more orders by the cursor and count the shown ones', async ({ page }) => {
-  const stub = await stubMyOrders(page);
+  const stub = await stubMyOrders(page, MANY_ORDERS);
   await openOrders(page);
 
-  await expect(cards(page)).toHaveCount(5);
-  await expect(page.getByText('Показано 5 из 8')).toBeVisible();
+  await expect(cards(page)).toHaveCount(20);
+  await expect(page.getByText('Показано 20 из 25')).toBeVisible();
   await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('');
   expect(listRequests(stub).every((params) => !params.has('page'))).toBe(true);
 
   await page.getByRole('button', { name: 'Показать ещё' }).click();
 
-  await expect(cards(page)).toHaveCount(8);
-  await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('5');
+  await expect(cards(page)).toHaveCount(25);
+  await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('20');
   await expect(page.getByRole('button', { name: 'Показать ещё' })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(375);
 });
 
 test('should start the list over when the filters change', async ({ page }) => {
-  const stub = await stubMyOrders(page);
+  const stub = await stubMyOrders(page, MANY_ORDERS);
   await openOrders(page);
   await page.getByRole('button', { name: 'Показать ещё' }).click();
-  await expect(cards(page)).toHaveCount(8);
+  await expect(cards(page)).toHaveCount(25);
 
   await page.getByRole('tab', { name: /^Завершённые/ }).click();
 
-  await expect(cards(page)).toHaveCount(5);
-  await expect(page.getByText('Показано 5 из 6')).toBeVisible();
+  await expect(cards(page)).toHaveCount(20);
+  await expect(page.getByText('Показано 20 из 23')).toBeVisible();
   await expect.poll(() => lastListRequest(stub)?.get('cursor')).toBe('');
   await expect.poll(() => lastListRequest(stub)?.get('status')).toBe('finished');
 });

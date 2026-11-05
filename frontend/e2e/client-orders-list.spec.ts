@@ -28,7 +28,7 @@ test('should count the orders of each tab and keep the tab in the address', asyn
   await expect(tab(page, 'Отменённые')).toContainText('1');
   await expect(tab(page, 'Все')).toContainText('8');
   await expect(tab(page, 'Все')).toHaveAttribute('aria-selected', 'true');
-  await expect(cards(page)).toHaveCount(5);
+  await expect(cards(page)).toHaveCount(8);
 
   await tab(page, 'Отменённые').click();
   await expect(page).toHaveURL(`${APP_ROUTES.ORDERS}?status=cancelled`);
@@ -65,7 +65,7 @@ test('should search by the number and the street and keep it after a reload', as
 
   await chips(page).getByRole('button', { name: 'Убрать фильтр Поиск 48156' }).click();
   await expect(page).toHaveURL(APP_ROUTES.ORDERS);
-  await expect(cards(page)).toHaveCount(5);
+  await expect(cards(page)).toHaveCount(8);
 });
 
 test('should choose a period and an own period, keep them in the address and go back', async ({
@@ -160,5 +160,5 @@ test('should tell that nothing is found and reset it with the chips', async ({ p
   await expect(page.getByRole('tabpanel').getByRole('link')).toHaveCount(0);
 
   await chips(page).getByRole('button', { name: 'Сбросить всё' }).click();
-  await expect(cards(page)).toHaveCount(5);
+  await expect(cards(page)).toHaveCount(8);
 });

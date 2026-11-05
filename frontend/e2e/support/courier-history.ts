@@ -5,10 +5,11 @@ import { COURIER_ORDERS_API_PATHS } from '../../src/shared/api/endpoints/courier
 import { ORDER_STATUS } from '../../src/shared/api/endpoints/order';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';
 import { CALENDAR_PERIOD, calendarPeriod } from '../../src/shared/lib/calendar/period';
+import { LIST_PAGE_SIZE } from '../../src/shared/lib/list-params/page-size';
 import { APP_ROUTES } from '../../src/shared/routes/app-routes';
 
 export const HISTORY_TOTAL = 23;
-export const HISTORY_PAGE_SIZE = 5;
+export const HISTORY_PAGE_SIZE = LIST_PAGE_SIZE;
 export const NEWEST_ORDER_ID = 48213;
 export const DESKTOP_VIEWPORT = { width: 1440, height: 1000 };
 export const PHONE_VIEWPORT = { width: 375, height: 812 };
@@ -74,12 +75,16 @@ function matches(item: HistoryItemBody, params: URLSearchParams): boolean {
   );
 }
 
+function sortValue(item: HistoryItemBody, key: string): number {
+  return key === 'distanceKm' ? item.distanceKm : Date.parse(item.finishedAt ?? '');
+}
+
 function sorted(items: HistoryItemBody[], sort: string | null): HistoryItemBody[] {
-  const sign = sort === 'finishedAt:asc' ? 1 : -1;
+  const [key, direction] = (sort ?? 'finishedAt:desc').split(':');
+  const sign = direction === 'asc' ? 1 : -1;
 
   return items.toSorted(
-    (a, b) =>
-      sign * ((a.finishedAt ?? '').localeCompare(b.finishedAt ?? '') || a.orderId - b.orderId),
+    (a, b) => sign * (sortValue(a, key) - sortValue(b, key) || a.orderId - b.orderId),
   );
 }
 

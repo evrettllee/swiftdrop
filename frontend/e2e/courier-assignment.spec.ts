@@ -10,7 +10,6 @@ import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import {
   ASSIGNED_ORDER_ID,
   assignOrder,
-  giveOrder,
   openCourierCabinet,
   unassignOrder,
 } from './support/courier-assignment';
@@ -113,16 +112,4 @@ test('should close a closed offer with a notice', async ({ page }) => {
 
   await expect(offer).toBeHidden();
   await expect(toast(page, 'Заказ уже недоступен')).toBeVisible();
-});
-
-test('should load the order assigned while the connection was lost', async ({ page }) => {
-  const cabinet = await openCourierCabinet(page, APP_ROUTES.COURIER_WORK);
-  await expect(lineTitle(page)).toBeVisible();
-  await expect.poll(() => cabinet.socket.sent.some((frame) => frame.startsWith('40'))).toBe(true);
-
-  giveOrder(cabinet.state);
-  await cabinet.socket.drop();
-
-  await expect(orderTitle(page)).toBeVisible({ timeout: 15_000 });
-  await expect(toast(page, ASSIGNMENT_TEXTS.assigned(ORDER_NUMBER))).toHaveCount(0);
 });

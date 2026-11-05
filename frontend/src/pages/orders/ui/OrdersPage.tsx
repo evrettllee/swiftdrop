@@ -4,7 +4,7 @@ import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { useMinuteNow } from '@/shared/lib/clock';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
-import { EmptyState } from '@/shared/ui/empty-state';
+import { EmptyState, placePrimaryAction } from '@/shared/ui/empty-state';
 import { PageTitle } from '@/shared/ui/page-title';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
 import { ORDERS_TAB, ORDERS_TABS, ORDERS_TABS_ID_PREFIX } from '../config/list';
@@ -44,20 +44,20 @@ export function OrdersPage() {
     ? { ...NOT_FOUND_TEXTS, isSearch: true }
     : { ...EMPTY_TAB_TEXTS[tab], isSearch: false };
   const tabs = ORDERS_TABS.map((id) => ({ id, label: ORDER_TAB_LABELS[id], count: counts[id] }));
+  const newOrder = placePrimaryAction(<NewOrderButton />, {
+    isLoading: !hasFilters && counts.all === null,
+    isEmpty: hasNoOrders,
+  });
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6">
       <header className="flex items-center justify-between gap-6">
         <PageTitle>{ORDERS_TEXTS.PAGE_TITLE}</PageTitle>
-        {hasNoOrders ? null : (
-          <div className="hidden lg:block">
-            <NewOrderButton />
-          </div>
-        )}
+        {newOrder.header === null ? null : <div className="hidden lg:block">{newOrder.header}</div>}
       </header>
       {hasNoOrders ? (
         <EmptyState icon={PackageIcon} {...NO_ORDERS_TEXTS}>
-          <NewOrderButton />
+          {newOrder.empty}
         </EmptyState>
       ) : (
         <>

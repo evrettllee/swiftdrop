@@ -1,9 +1,6 @@
 import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
 import { encodeListCursor } from '@/common/utils/list-cursor';
-import {
-  HISTORY_PAGE_SIZE_DEFAULT,
-  HISTORY_VALIDATION_MESSAGES,
-} from '../constants/deliveries.constants';
+import { HISTORY_VALIDATION_MESSAGES } from '../constants/deliveries.constants';
 import { courierHistorySchema } from './courier-history.dto';
 
 function messagesOf(query: Record<string, unknown>): string[] {
@@ -13,11 +10,11 @@ function messagesOf(query: Record<string, unknown>): string[] {
 }
 
 describe('courierHistorySchema', () => {
-  it('should read no parameters as the first page of ten, the last finished first', () => {
+  it('should read no parameters as the first page of twenty, the last finished first', () => {
     const result = courierHistorySchema.safeParse({});
 
     expect(result.success && result.data).toEqual({
-      pagination: { mode: 'page', page: 1, limit: HISTORY_PAGE_SIZE_DEFAULT, until: null },
+      pagination: { mode: 'page', page: 1, limit: 20, until: null },
       sort: { key: 'finishedAt', direction: 'desc' },
       period: { start: null, end: null },
       search: null,
@@ -50,6 +47,17 @@ describe('courierHistorySchema', () => {
 
     expect(result.success && result.data.pagination).toMatchObject({
       position: { value: '1792261697859619', id: 241 },
+    });
+  });
+
+  it('should sort by the distance and take the cursor of that sort', () => {
+    const cursor = encodeListCursor({ k: 'distanceKm', d: 'asc', v: '7.98', id: 241 });
+    const sorted = courierHistorySchema.safeParse({ sort: 'distanceKm:asc' });
+    const result = courierHistorySchema.safeParse({ cursor, sort: 'distanceKm:asc' });
+
+    expect(sorted.success && sorted.data.sort).toEqual({ key: 'distanceKm', direction: 'asc' });
+    expect(result.success && result.data.pagination).toMatchObject({
+      position: { value: '7.98', id: 241 },
     });
   });
 

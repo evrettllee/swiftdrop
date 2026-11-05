@@ -5,6 +5,7 @@ import { useAppSocket } from '@/shared/realtime';
 import { getSupportTicketPath } from '@/shared/routes';
 import { SUPPORT_TICKET_STATUS } from '@/shared/staff-api';
 import { Button } from '@/shared/ui/button';
+import { placePrimaryAction } from '@/shared/ui/empty-state';
 import { PageTitle } from '@/shared/ui/page-title';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
 import { showToast } from '@/shared/ui/toast';
@@ -31,6 +32,13 @@ export function SupportPage() {
       {SUPPORT_TEXTS.NEW}
     </Button>
   );
+  const list = {
+    isLoading: tickets.first.data === null,
+    isEmpty: tickets.items.length === 0,
+    hasEmptyAction: params.status === SUPPORT_TICKET_STATUS.OPEN,
+  };
+  const desktopNew = placePrimaryAction(newButton(false), list);
+  const phoneNew = placePrimaryAction(newButton(true), list);
   const tabs = STATUSES.map((id) => ({ id, label: TAB_LABELS[id], count: tickets.counts[id] }));
   const goToTicket = (ticketId: number) =>
     void navigate(getSupportTicketPath(role.supportPath, ticketId), { replace: true });
@@ -46,9 +54,11 @@ export function SupportPage() {
       </Link>
       <header className="flex flex-wrap items-center justify-between gap-4">
         <PageTitle>{SUPPORT_TEXTS.TITLE}</PageTitle>
-        <div className="hidden lg:block">{newButton(false)}</div>
+        {desktopNew.header === null ? null : (
+          <div className="hidden lg:block">{desktopNew.header}</div>
+        )}
       </header>
-      <div className="lg:hidden">{newButton(true)}</div>
+      {phoneNew.header === null ? null : <div className="lg:hidden">{phoneNew.header}</div>}
       <div className="flex flex-col gap-4 lg:gap-6">
         <Tabs
           layout="fit"
@@ -64,7 +74,7 @@ export function SupportPage() {
               status={id}
               tickets={tickets}
               supportPath={role.supportPath}
-              newButton={newButton(false)}
+              newButton={desktopNew.empty}
             />
           </TabPanel>
         ))}

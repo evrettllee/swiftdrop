@@ -13,7 +13,6 @@ export {
   createTicketFailureOf,
   getMyTicket,
   getMyTickets,
-  MY_TICKETS_LIMIT,
   SUPPORT_SUBJECT_MAX_LENGTH,
   SUPPORT_TOPIC,
 } from './support-author';
