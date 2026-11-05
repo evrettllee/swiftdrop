@@ -8,6 +8,7 @@ import {
   COURIER_ORDERS_API_PATHS,
   type CourierOrder,
 } from '../../src/shared/api/endpoints/courier-order';
+import type { OrderSupportTicket } from '../../src/shared/api/endpoints/order';
 import { COURIER_OFFERS_API_PATHS } from '../../src/shared/api/endpoints/courier-offer';
 import type { OrderStatus } from '../../src/shared/api/endpoints/order';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';
@@ -17,7 +18,7 @@ const CITY = 'Минск';
 
 // The order the cabinet shows; the test changes it, the stubs answer with what it is now.
 export type OrderStubState = {
-  order: CourierOrder | null;
+  order: (CourierOrder & { supportTicket?: OrderSupportTicket | null }) | null;
   profile: CourierMe;
 };
 
@@ -64,7 +65,9 @@ export async function stubCourierOnOrder(page: Page, state: OrderStubState): Pro
       state.profile = { ...state.profile, activeOrderId: null };
     }
 
-    return route.fulfill({ json: { order: state.order } });
+    return route.fulfill({
+      json: { order: state.order === null ? null : { supportTicket: null, ...state.order } },
+    });
   });
 }
 

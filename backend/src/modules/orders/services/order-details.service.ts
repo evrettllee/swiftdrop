@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { CURRENCY } from '@/common/constants/money.constants';
+import { findOpenOrderTicket } from '@/common/database/order-support-ticket';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { orders, orderStatusHistory, packages, payments } from '@/database/schema';
@@ -23,9 +24,10 @@ export class OrderDetailsService {
     }
 
     // Read only after the order proved to be the client's, and at once: they do not depend on each other.
-    const [historyRows, payment] = await Promise.all([
+    const [historyRows, payment, supportTicket] = await Promise.all([
       this.findHistory(orderId),
       this.findLatestPayment(orderId),
+      findOpenOrderTicket(this.db, clientId, orderId),
     ]);
     const { recipientName, recipientPhone, price, ...rest } = row;
 
@@ -36,6 +38,7 @@ export class OrderDetailsService {
       recipient: { name: recipientName, phone: recipientPhone },
       ...toOrderHistory(historyRows, clientId),
       payment,
+      supportTicket,
     };
   }
 

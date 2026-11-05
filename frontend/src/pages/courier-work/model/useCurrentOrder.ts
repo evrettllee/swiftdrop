@@ -1,14 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { refreshCourierProfile } from '@/entities/courier';
-import { type CourierOrder, getCurrentCourierOrder } from '@/shared/api';
+import { type CourierOrder, type CurrentCourierOrder, getCurrentCourierOrder } from '@/shared/api';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
-import { CONNECTION_STATUS, useConnectionStatus } from '@/shared/realtime';
+import {
+  CONNECTION_STATUS,
+  SOCKET_EVENTS,
+  type TypedSocketEvent,
+  useConnectionStatus,
+  useSocketEventBatch,
+} from '@/shared/realtime';
 
 type CurrentOrderState = {
   status: ListStatus;
   // The last order that came, kept on screen while it loads again.
-  order: CourierOrder | null;
+  order: CurrentCourierOrder | null;
 };
+
+const TICKET_EVENTS: readonly TypedSocketEvent[] = [SOCKET_EVENTS.SUPPORT_TICKET];
 
 const LOADING: CurrentOrderState = { status: LIST_STATUS.LOADING, order: null };
 const FAILED: CurrentOrderState = { status: LIST_STATUS.ERROR, order: null };
@@ -72,10 +80,15 @@ export function useCurrentOrder(activeOrderId: number) {
   }, [activeOrderId, version]);
 
   useReconnectReload(reload);
+  useSocketEventBatch(TICKET_EVENTS, reload);
 
   // The answer of a step is the order after it.
   const setOrder = useCallback(
-    (order: CourierOrder) => setState({ status: LIST_STATUS.READY, order }),
+    (order: CourierOrder) =>
+      setState((current) => ({
+        status: LIST_STATUS.READY,
+        order: { ...order, supportTicket: current.order?.supportTicket ?? null },
+      })),
     [],
   );
 

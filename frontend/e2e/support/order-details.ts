@@ -60,6 +60,7 @@ export function buildTestOrderDetails(
     history: buildTestHistory(status, createdAt),
     cancelledBy: null,
     payment: null,
+    supportTicket: null,
   };
 }
 

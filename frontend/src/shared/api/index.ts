@@ -35,7 +35,7 @@ export {
   courierHistoryOrderSchema,
   courierHistoryPageSchema,
 } from './endpoints/courier-history';
-export type { CourierOrder } from './endpoints/courier-order';
+export type { CourierOrder, CurrentCourierOrder } from './endpoints/courier-order';
 export {
   COURIER_ORDERS_API_PATHS,
   courierOrderSchema,
@@ -61,7 +61,14 @@ export {
   GEOCODING_MIN_QUERY_LENGTH,
 } from './endpoints/geocoding/geocoding-params';
 export { findAddressByPoint, searchAddresses } from './endpoints/geocoding/search-addresses';
-export type { OrderDetails, OrderListItem, OrderStatus } from './endpoints/order';
+export type {
+  OrderDetails,
+  OrderListItem,
+  OrderStatus,
+  OrderSupportTicket,
+} from './endpoints/order';
+export type { SupportTicketStatus } from './endpoints/support-ticket';
+export { SUPPORT_TICKET_STATUS, supportTicketStatusSchema } from './endpoints/support-ticket';
 export {
   dateSchema,
   ORDER_CANCEL_SEGMENT,
@@ -71,6 +78,7 @@ export {
   orderListItemSchema,
   ORDERS_API_PATHS,
   orderStatusSchema,
+  orderSupportTicketSchema,
 } from './endpoints/order';
 export { PAYMENT_STATUS, startPayment } from './endpoints/payment';
 export type { PackageParams, PriceEstimate } from './endpoints/pricing';

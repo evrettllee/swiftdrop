@@ -1,8 +1,10 @@
 import { memo, useId } from 'react';
 import { PaymentStatusRow } from '@/entities/order';
+import { OrderSupportEntry } from '@/features/order-support-entry';
 import { DeliveryPriceRows, formatDistanceKm, PRICE_TEXTS, PriceTotal } from '@/entities/price';
 import type { OrderDetails } from '@/shared/api';
 import { formatMoney } from '@/shared/lib/format';
+import { APP_ROUTES } from '@/shared/routes';
 import { Divider } from '@/shared/ui/divider';
 import { PriceRow } from '@/shared/ui/price-row';
 import { PAYMENT_TEXTS } from '../config/texts';
@@ -58,6 +60,13 @@ export const OrderPaymentPanel = memo(function OrderPaymentPanel({
         onCancel={onCancel}
       />
       <RepeatOrderAction order={order} />
+      <Divider />
+      <OrderSupportEntry
+        orderId={order.orderId}
+        ticket={order.supportTicket}
+        supportPath={APP_ROUTES.SUPPORT}
+        placement="start"
+      />
     </aside>
   );
 });

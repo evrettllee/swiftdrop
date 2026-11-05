@@ -1,5 +1,6 @@
 import { and, desc, eq, type SQL, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
+import { authorUnreadCount } from '@/common/database/order-support-ticket';
 import type { Database, Transaction } from '@/database/database.module';
 import { addresses, messages, orders, supportTickets } from '@/database/schema';
 
@@ -10,10 +11,6 @@ export const TICKET_STATE_COLUMNS = {
   awaitingStaff: supportTickets.awaitingStaff,
 };
 
-export function staffMessageCondition(): SQL {
-  return sql`${messages.senderId} <> ${supportTickets.userId}`;
-}
-
 export function lastMessageOf(executor: Database | Transaction) {
   return executor
     .select({ text: messages.content, senderId: messages.senderId, sentAt: messages.sentAt })
@@ -23,13 +20,6 @@ export function lastMessageOf(executor: Database | Transaction) {
     .limit(1)
     .as('last_message');
 }
-
-const unreadCount = sql<number>`(
-  select count(*)::int from ${messages}
-  where ${messages.ticketId} = ${supportTickets.ticketId}
-    and ${staffMessageCondition()}
-    and ${messages.isRead} = false
-)`;
 
 export function ticketFields(last: ReturnType<typeof lastMessageOf>) {
   return {
@@ -47,7 +37,7 @@ export function ticketFields(last: ReturnType<typeof lastMessageOf>) {
     lastMessageText: last.text,
     lastMessageSenderId: last.senderId,
     lastMessageSentAt: last.sentAt,
-    unreadCount: unreadCount.as('unread_count'),
+    unreadCount: authorUnreadCount().as('unread_count'),
   };
 }
 

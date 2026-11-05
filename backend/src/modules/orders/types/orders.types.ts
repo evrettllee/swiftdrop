@@ -1,3 +1,4 @@
+import type { OrderSupportTicket } from '@/common/database/order-support-ticket';
 import type { ListPage } from '@/common/types/page.types';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { PaymentStatus } from '@/common/enums/payment-status.enum';
@@ -87,6 +88,7 @@ export type OrderDetails = {
   cancelledBy: OrderCancelledBy | null;
   cancelReason: string | null;
   payment: OrderPaymentView | null;
+  supportTicket: OrderSupportTicket | null;
 };
 
 export type CancelledOrder = {

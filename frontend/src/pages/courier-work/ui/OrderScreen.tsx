@@ -1,6 +1,6 @@
 import type { LocationSharing } from '@/features/courier-location';
 import { useActiveOrderChat, useOrderChatView } from '@/features/order-chat';
-import type { CourierOrder, CourierVehicle } from '@/shared/api';
+import type { CourierOrder, CourierVehicle, CurrentCourierOrder } from '@/shared/api';
 import { Divider } from '@/shared/ui/divider';
 import { InlineAlert } from '@/shared/ui/inline-alert';
 import { ORDER_ACTION, type OrderStep } from '../config/order-steps';
@@ -11,13 +11,14 @@ import { CourierChatButton } from './CourierChatButton';
 import { GeoAlert } from './GeoAlert';
 import { OrderActionBar } from './OrderActionBar';
 import { OrderHeader } from './OrderHeader';
+import { OrderHelp } from './OrderHelp';
 import { OrderMap } from './OrderMap';
 import { OrderParcel } from './OrderParcel';
 import { OrderStepButton } from './OrderStepButton';
 import { OrderStops } from './OrderStops';
 
 type OrderScreenProps = {
-  order: CourierOrder;
+  order: CurrentCourierOrder;
   step: OrderStep;
   vehicle: CourierVehicle;
   location: LocationSharing;
@@ -65,6 +66,8 @@ export function OrderScreen({
     />
   );
 
+  const help = <OrderHelp order={order} />;
+
   if (chatView.isScreenOpen) {
     return <CourierChat chat={chat} order={order} view={chatView} />;
   }
@@ -103,8 +106,9 @@ export function OrderScreen({
         <div className="lg:hidden">
           <Divider />
         </div>
-        <OrderParcel order={order} step={step} button={button} />
+        <OrderParcel order={order} step={step} button={button} help={help} />
       </div>
+      <div className="flex flex-col lg:hidden">{help}</div>
       <OrderActionBar>{button}</OrderActionBar>
       {chatView.isDrawerOpen ? <CourierChat chat={chat} order={order} view={chatView} /> : null}
     </div>

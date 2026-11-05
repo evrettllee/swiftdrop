@@ -90,6 +90,7 @@ describe('Order details (e2e)', () => {
       cancelledBy: null,
       cancelReason: null,
       payment: null,
+      supportTicket: null,
     });
   });
 

@@ -5,15 +5,11 @@ export const SUPPORT_STAFF_API_PATHS = {
   COUNTS: '/manager/support/counts',
 } as const;
 
-export const SUPPORT_TICKET_STATUS = {
-  OPEN: 'open',
-  CLOSED: 'closed',
-} as const;
-
-export type SupportTicketStatus =
-  (typeof SUPPORT_TICKET_STATUS)[keyof typeof SUPPORT_TICKET_STATUS];
-
-export const supportTicketStatusSchema = z.enum(SUPPORT_TICKET_STATUS);
+export {
+  SUPPORT_TICKET_STATUS,
+  type SupportTicketStatus,
+  supportTicketStatusSchema,
+} from '@/shared/api';
 
 export const supportCountsSchema = z.object({
   awaiting: z.number(),

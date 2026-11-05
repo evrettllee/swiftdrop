@@ -1,3 +1,4 @@
+import type { OrderSupportTicket } from '@/common/database/order-support-ticket';
 import type { ListPage } from '@/common/types/page.types';
 import type { OrderTransitionChanges } from '@/common/database/order-status-transition';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
@@ -51,7 +52,9 @@ export type CourierHistoryOrder = {
 // An order as the courier sees it after accepting.
 export type CourierOrder = Omit<CourierOrderRow, 'sender'> & { sender: Contact };
 
-export type CurrentCourierOrder = { order: CourierOrder | null };
+export type CurrentCourierOrderView = CourierOrder & { supportTicket: OrderSupportTicket | null };
+
+export type CurrentCourierOrder = { order: CurrentCourierOrderView | null };
 
 // One step of the courier through the order.
 export type DeliveryStep = {

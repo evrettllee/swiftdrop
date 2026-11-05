@@ -56,7 +56,7 @@ export class CourierOrdersController {
   async current(@CurrentUser() user: AuthUser): Promise<CurrentCourierOrder> {
     const courierProfileId = await this.profiles.getProfileId(user.userId);
 
-    return { order: await this.views.findActive(courierProfileId) };
+    return { order: await this.views.findCurrent(courierProfileId, user.userId) };
   }
 
   // Before the pickup: to the pickup point and on to the recipient; after it: to the recipient.

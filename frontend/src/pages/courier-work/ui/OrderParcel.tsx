@@ -14,10 +14,11 @@ type OrderParcelProps = {
   step: OrderStep;
   // The main button: at the end of the card on the desktop, in the bar of a phone otherwise.
   button: ReactNode;
+  help: ReactNode;
 };
 
 // The parcel: a section of the page on a phone, a card next to the points on the desktop.
-export function OrderParcel({ order, step, button }: OrderParcelProps) {
+export function OrderParcel({ order, step, button, help }: OrderParcelProps) {
   const { parcel } = order;
 
   return (
@@ -40,6 +41,7 @@ export function OrderParcel({ order, step, button }: OrderParcelProps) {
       <div className="hidden lg:contents">
         <Divider />
         {button}
+        {help}
       </div>
     </div>
   );

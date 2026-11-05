@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PAYMENT_STATUS } from './payment';
+import { supportTicketStatusSchema } from './support-ticket';
 
 export const ORDERS_API_PATHS = {
   ORDERS: '/orders',
@@ -59,6 +60,16 @@ export const orderListItemSchema = z.object({
 
 export type OrderListItem = z.infer<typeof orderListItemSchema>;
 
+export const orderSupportTicketSchema = z.object({
+  ticketId: z.number(),
+  status: supportTicketStatusSchema,
+  awaitingStaff: z.boolean(),
+  unreadCount: z.number(),
+  lastMessageAt: dateSchema,
+});
+
+export type OrderSupportTicket = z.infer<typeof orderSupportTicketSchema>;
+
 // Response of GET /api/orders/:orderId
 export const orderDetailsSchema = z.object({
   orderId: z.number(),
@@ -85,6 +96,7 @@ export const orderDetailsSchema = z.object({
   history: z.array(z.object({ status: orderStatusSchema, changedAt: dateSchema })),
   cancelledBy: z.enum(ORDER_CANCELLED_BY).nullable(),
   payment: z.object({ status: paymentStatusSchema, amountUsd: z.number() }).nullable(),
+  supportTicket: orderSupportTicketSchema.nullable(),
 });
 
 export type OrderDetails = z.infer<typeof orderDetailsSchema>;

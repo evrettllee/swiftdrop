@@ -1,10 +1,17 @@
 import { useEffect, useEffectEvent } from 'react';
 import { useOrderChat } from '@/features/order-chat';
 import { CHAT_SENDER_ROLE, type OrderDetails } from '@/shared/api';
-import { useOrderRoom } from '@/shared/realtime';
+import {
+  SOCKET_EVENTS,
+  type TypedSocketEvent,
+  useOrderRoom,
+  useSocketEventBatch,
+} from '@/shared/realtime';
 import { isValidOrderId } from '../lib/order-answer';
 import { COURIER_VISIBLE_STATUSES } from './order-status-groups';
 import { useOrderTracking } from './useOrderTracking';
+
+const TICKET_EVENTS: readonly TypedSocketEvent[] = [SOCKET_EVENTS.SUPPORT_TICKET];
 
 type OrderLiveSource = {
   order: OrderDetails | null;
@@ -42,6 +49,8 @@ export function useOrderLive(orderId: number, { order, refresh, refreshCourier }
       reloadAfterJoin();
     }
   }, [joins]);
+
+  useSocketEventBatch(TICKET_EVENTS, refresh);
 
   return { tracking, routeReloadToken: joins, chat };
 }
