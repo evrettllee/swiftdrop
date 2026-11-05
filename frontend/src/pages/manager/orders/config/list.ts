@@ -85,20 +85,6 @@ export const DEFAULT_PAGE_SIZE: PageSize = 20;
 
 export const LONG_WAIT_MS = 15 * MS_PER_MINUTE;
 
-export const PERIOD_PRESET = {
-  ALL: 'all',
-  WEEK: 'week',
-  MONTH: 'month',
-  CUSTOM: 'custom',
-} as const;
-
-export type PeriodPreset = (typeof PERIOD_PRESET)[keyof typeof PERIOD_PRESET];
-
-export const PERIOD_PRESET_DAYS = {
-  [PERIOD_PRESET.WEEK]: 7,
-  [PERIOD_PRESET.MONTH]: 30,
-} as const;
-
 export const ORDERS_TABS_ID_PREFIX = 'manager-orders';
 
 export const COUNTS_DRAFT_DELAY_MS = 300;

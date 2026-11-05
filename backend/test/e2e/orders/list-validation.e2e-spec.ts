@@ -1,5 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
@@ -49,19 +50,30 @@ describe('Orders list (e2e)', () => {
     );
   });
 
-  it('should return 400 with a field error when the filter is unknown', async () => {
+  it('should return 400 for the filter of the old list', async () => {
     const { cookies } = await registerUser(app);
 
-    const response = await getOrders(app, cookies, { filter: 'archived' }).expect(
+    const response = await getOrders(app, cookies, { filter: 'active' }).expect(
       HttpStatus.BAD_REQUEST,
     );
 
     expect(response.body.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          field: 'filter',
-          message: ORDERS_VALIDATION_MESSAGES.FILTER_INVALID,
+          message: `${LIST_VALIDATION_MESSAGES.UNKNOWN_PARAMETER}: filter`,
         }),
+      ]),
+    );
+  });
+
+  it.each(['', '   '])('should return 400 for the search %j', async (q) => {
+    const { cookies } = await registerUser(app);
+
+    const response = await getOrders(app, cookies, { q }).expect(HttpStatus.BAD_REQUEST);
+
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: 'q', message: LIST_VALIDATION_MESSAGES.SEARCH_INVALID }),
       ]),
     );
   });

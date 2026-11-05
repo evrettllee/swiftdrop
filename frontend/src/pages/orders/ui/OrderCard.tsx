@@ -60,8 +60,10 @@ export function OrderCard({ order }: OrderCardProps) {
           </span>
         </span>
       </div>
-      <p className="hidden truncate text-small text-fg-secondary [grid-area:cr] lg:block">
-        {ORDERS_TEXTS.COURIER_NOT_ASSIGNED}
+      <p
+        className={`hidden truncate text-small [grid-area:cr] lg:block ${order.courier === null ? 'text-fg-secondary' : ''}`}
+      >
+        {order.courier?.name ?? ORDERS_TEXTS.COURIER_NOT_ASSIGNED}
       </p>
       <p className="font-semibold tabular-nums [grid-area:sum] lg:text-end">
         {formatMoney(order.price, order.currency)}

@@ -14,7 +14,7 @@ import {
   tabSorts,
 } from '../config/list';
 import type { OrdersParams } from '../config/list-params';
-import { isPeriodValid } from '../lib/period';
+import { isPeriodValid } from '@/shared/lib/calendar';
 
 export type OrdersView = {
   tab: OrdersTab;

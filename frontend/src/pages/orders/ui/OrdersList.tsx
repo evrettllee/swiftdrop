@@ -1,90 +1,74 @@
-import { PackageIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { MagnifyingGlassIcon, PackageIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import { LIST_STATUS } from '@/shared/config';
+import type { OrderListItem } from '@/shared/api';
+import { LIST_STATUS, type ListStatus } from '@/shared/config';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { InlineAlert } from '@/shared/ui/inline-alert';
-import { Pagination } from '@/shared/ui/pagination';
-import { ORDERS_PAGE_SIZE } from '../config/list';
-import { ORDERS_EMPTY_TEXTS, ORDERS_TEXTS } from '../config/texts';
-import type { OrderListFilter } from '../model/order-list';
-import type { useOrdersList } from '../model/useOrdersList';
+import { ORDERS_TEXTS } from '../config/texts';
 import { OrderCard } from './OrderCard';
 import { OrdersListSkeleton } from './OrdersListSkeleton';
 
+export type OrdersListEmpty = { title: string; text: string; isSearch: boolean };
+
 type OrdersListProps = {
-  filter: OrderListFilter;
-  list: ReturnType<typeof useOrdersList>;
+  status: ListStatus;
+  items: readonly OrderListItem[];
+  message: string | null;
+  empty: OrdersListEmpty;
+  onRetry: () => void;
+  footer: ReactNode;
 };
 
-// The content of a tab: the skeleton, an empty or failed state, or the cards with the pagination
-// of the desktop and the "show more" button of a phone.
-export function OrdersList({ filter, list }: OrdersListProps) {
-  const isLoading = list.status === LIST_STATUS.LOADING;
-  const isFailed = list.status === LIST_STATUS.ERROR;
-  const hasItems = list.items.length > 0;
-  let content: ReactNode;
+export function OrdersList({ status, items, message, empty, onRetry, footer }: OrdersListProps) {
+  const isFailed = status === LIST_STATUS.ERROR;
+  const retry = (
+    <Button variant="secondary" onClick={onRetry}>
+      {ORDERS_TEXTS.RETRY}
+    </Button>
+  );
 
-  if (!hasItems && isLoading) {
-    content = <OrdersListSkeleton />;
-  } else if (!hasItems && isFailed) {
-    content = (
+  if (items.length === 0 && status === LIST_STATUS.LOADING) {
+    return <OrdersListSkeleton />;
+  }
+
+  if (items.length === 0 && isFailed) {
+    return (
       <EmptyState
         icon={WarningCircleIcon}
         title={ORDERS_TEXTS.LIST_FAILED_TITLE}
-        text={list.message ?? ORDERS_TEXTS.LIST_FAILED}
+        text={message ?? ORDERS_TEXTS.LIST_FAILED}
       >
-        <Button variant="secondary" onClick={() => list.retry()}>
-          {ORDERS_TEXTS.RETRY}
-        </Button>
+        {retry}
       </EmptyState>
-    );
-  } else if (!hasItems) {
-    content = <EmptyState icon={PackageIcon} {...ORDERS_EMPTY_TEXTS[filter]} />;
-  } else {
-    content = (
-      <>
-        <div className="flex flex-col gap-4">
-          {list.items.map((order) => (
-            <OrderCard key={order.orderId} order={order} />
-          ))}
-        </div>
-        {isFailed ? (
-          <InlineAlert variant="error" title={ORDERS_TEXTS.LIST_FAILED_TITLE}>
-            <Button variant="text" onClick={() => list.retry()}>
-              {ORDERS_TEXTS.RETRY}
-            </Button>
-          </InlineAlert>
-        ) : null}
-        {list.totalPages > 1 ? (
-          <div className="hidden lg:block">
-            <Pagination
-              page={list.page}
-              totalPages={list.totalPages}
-              total={list.total}
-              pageSize={ORDERS_PAGE_SIZE}
-              onChange={(page) => list.goToPage(page)}
-            />
-          </div>
-        ) : null}
-        {list.hasMore ? (
-          <div className="flex flex-col items-center gap-2 lg:hidden">
-            <Button
-              variant="secondary"
-              fullWidth
-              loading={isLoading}
-              onClick={() => list.showMore()}
-            >
-              {ORDERS_TEXTS.SHOW_MORE}
-            </Button>
-            <span className="text-caption text-fg-secondary tabular-nums">
-              {ORDERS_TEXTS.shown(list.items.length, list.total)}
-            </span>
-          </div>
-        ) : null}
-      </>
     );
   }
 
-  return <div className="flex flex-col gap-4 lg:gap-6">{content}</div>;
+  if (items.length === 0) {
+    return (
+      <EmptyState
+        icon={empty.isSearch ? MagnifyingGlassIcon : PackageIcon}
+        title={empty.title}
+        text={empty.text}
+      />
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 lg:gap-6">
+      <div className="flex flex-col gap-4">
+        {items.map((order) => (
+          <OrderCard key={order.orderId} order={order} />
+        ))}
+      </div>
+      {isFailed ? (
+        <InlineAlert variant="error" title={ORDERS_TEXTS.LIST_FAILED_TITLE}>
+          <Button variant="text" onClick={onRetry}>
+            {ORDERS_TEXTS.RETRY}
+          </Button>
+        </InlineAlert>
+      ) : null}
+      {footer}
+    </div>
+  );
 }

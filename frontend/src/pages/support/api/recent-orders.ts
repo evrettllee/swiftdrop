@@ -18,7 +18,6 @@ export type RecentOrder = OrderSummary & { orderId: number };
 const ordersPageSchema = z.object({ items: z.array(orderListItemSchema) });
 
 const FIRST_PAGE = '1';
-const ALL_ORDERS = 'all';
 
 function pageQuery(): string {
   return new URLSearchParams({
@@ -28,9 +27,8 @@ function pageQuery(): string {
 }
 
 async function clientOrders(options: HttpOptions): Promise<RecentOrder[]> {
-  const query = `${pageQuery()}&filter=${ALL_ORDERS}`;
   const page = ordersPageSchema.parse(
-    await http.get(`${ORDERS_API_PATHS.ORDERS}?${query}`, options),
+    await http.get(`${ORDERS_API_PATHS.ORDERS}?${pageQuery()}`, options),
   );
 
   return page.items.map((order) => ({

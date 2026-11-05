@@ -1,5 +1,25 @@
-import { calendarToday, shiftCalendarDate } from '@/shared/lib/calendar';
-import { PERIOD_PRESET, PERIOD_PRESET_DAYS, type PeriodPreset } from '../config/list';
+import { calendarToday, shiftCalendarDate } from './calendar';
+
+export const PERIOD_PRESET = {
+  ALL: 'all',
+  WEEK: 'week',
+  MONTH: 'month',
+  CUSTOM: 'custom',
+} as const;
+
+export type PeriodPreset = (typeof PERIOD_PRESET)[keyof typeof PERIOD_PRESET];
+
+export const PERIOD_PRESETS: readonly PeriodPreset[] = [
+  PERIOD_PRESET.ALL,
+  PERIOD_PRESET.WEEK,
+  PERIOD_PRESET.MONTH,
+  PERIOD_PRESET.CUSTOM,
+];
+
+export const PERIOD_PRESET_DAYS = {
+  [PERIOD_PRESET.WEEK]: 7,
+  [PERIOD_PRESET.MONTH]: 30,
+} as const;
 
 const DAY_PART_START = 8;
 const MONTH_PART_START = 5;

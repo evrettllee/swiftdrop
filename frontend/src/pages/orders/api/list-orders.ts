@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { http, type HttpOptions, orderListItemSchema, ORDERS_API_PATHS } from '@/shared/api';
-import { ORDERS_PAGE_SIZE } from '../config/list';
-import type { OrderListFilter } from '../model/order-list';
+import { http, orderListItemSchema, ORDERS_API_PATHS } from '@/shared/api';
+import { serializeListParam } from '@/shared/lib/list-params';
+import { ORDER_COUNT_PROBE_LIMIT, ORDERS_FIRST_PAGE, ORDERS_PAGE_SIZE } from '../config/list';
+import type { OrdersParams } from '../config/list-params';
 
-// Response of GET /api/orders
 const ordersPageSchema = z.object({
   items: z.array(orderListItemSchema),
   total: z.number(),
@@ -11,23 +11,59 @@ const ordersPageSchema = z.object({
   limit: z.number(),
 });
 
-type OrdersPage = z.infer<typeof ordersPageSchema>;
+const ordersCursorPageSchema = z.object({
+  items: z.array(orderListItemSchema),
+  nextCursor: z.string().nullable(),
+  total: z.number().optional(),
+});
 
-type OrdersQuery = {
-  page: number;
-  filter: OrderListFilter;
-  limit?: number;
-};
+export type OrdersPage = z.infer<typeof ordersPageSchema>;
+export type OrdersCursorPage = z.infer<typeof ordersCursorPageSchema>;
+export type OrdersQuery = Omit<OrdersParams, 'page'>;
 
-export async function listOrders(
-  { page, filter, limit = ORDERS_PAGE_SIZE }: OrdersQuery,
-  options: HttpOptions = {},
+function queryOf(query: OrdersQuery, extra: Record<string, string | number>): URLSearchParams {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(query)) {
+    const serialized = serializeListParam(value);
+
+    if (serialized !== null) {
+      params.set(key, serialized);
+    }
+  }
+
+  for (const [key, value] of Object.entries(extra)) {
+    params.set(key, String(value));
+  }
+
+  return params;
+}
+
+export async function getOrdersPage(
+  query: OrdersQuery,
+  page: number,
+  signal: AbortSignal,
+  limit: number = ORDERS_PAGE_SIZE,
 ): Promise<OrdersPage> {
-  const query = new URLSearchParams({
-    page: String(page),
-    limit: String(limit),
-    filter,
-  });
+  const params = queryOf(query, { page, limit });
 
-  return ordersPageSchema.parse(await http.get(`${ORDERS_API_PATHS.ORDERS}?${query}`, options));
+  return ordersPageSchema.parse(await http.get(`${ORDERS_API_PATHS.ORDERS}?${params}`, { signal }));
+}
+
+export async function getOrdersCursorPage(
+  query: OrdersQuery,
+  cursor: string,
+  signal: AbortSignal,
+): Promise<OrdersCursorPage> {
+  const params = queryOf(query, { cursor, limit: ORDERS_PAGE_SIZE });
+
+  return ordersCursorPageSchema.parse(
+    await http.get(`${ORDERS_API_PATHS.ORDERS}?${params}`, { signal }),
+  );
+}
+
+export async function countOrders(query: OrdersQuery, signal: AbortSignal): Promise<number> {
+  const page = await getOrdersPage(query, ORDERS_FIRST_PAGE, signal, ORDER_COUNT_PROBE_LIMIT);
+
+  return page.total;
 }

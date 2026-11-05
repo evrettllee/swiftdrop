@@ -1,9 +1,9 @@
-import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
-import { encodeListCursor } from '@/common/utils/list-cursor';
 import {
-  ORDERS_PAGE_SIZE_DEFAULT,
-  ORDERS_VALIDATION_MESSAGES,
-} from '../constants/orders.constants';
+  LIST_SEARCH_MAX_LENGTH,
+  LIST_VALIDATION_MESSAGES,
+} from '@/common/constants/list.constants';
+import { encodeListCursor } from '@/common/utils/list-cursor';
+import { ORDERS_PAGE_SIZE_DEFAULT } from '../constants/orders.constants';
 import { listOrdersSchema } from './list-orders.dto';
 
 const CREATED_AT_CURSOR = encodeListCursor({
@@ -31,18 +31,15 @@ describe('listOrdersSchema defaults', () => {
       pagination: { mode: 'page', page: 1, limit: ORDERS_PAGE_SIZE_DEFAULT, until: null },
       sort: { key: 'createdAt', direction: 'desc' },
       period: { start: null, end: null },
-      filter: null,
       status: null,
+      search: null,
     });
   });
 
-  it('should keep the filter the frontend sends today', () => {
-    const result = parse({ page: '2', limit: '5', filter: 'finished' });
-
-    expect(result.success && result.data).toMatchObject({
-      pagination: { mode: 'page', page: 2, limit: 5 },
-      filter: 'finished',
-    });
+  it('should refuse the filter of the old list', () => {
+    expect(messagesOf({ filter: 'finished' })).toEqual([
+      `${LIST_VALIDATION_MESSAGES.UNKNOWN_PARAMETER}: filter`,
+    ]);
   });
 });
 
@@ -152,11 +149,21 @@ describe('listOrdersSchema filters', () => {
     expect(messagesOf({ status })).toEqual([LIST_VALIDATION_MESSAGES.FILTER_VALUE_INVALID]);
   });
 
-  it('should refuse the filter and the status together', () => {
-    expect(messagesOf({ filter: 'active', status: 'active' })).toEqual([
-      ORDERS_VALIDATION_MESSAGES.FILTER_AND_STATUS,
-    ]);
+  it.each([
+    ['48232', { kind: 'number', orderId: 48232 }],
+    ['  Свердлова, 13а ', { kind: 'text', pattern: '%Свердлова 13а%' }],
+  ])('should read the search %j', (q, search) => {
+    const result = parse({ q });
+
+    expect(result.success && result.data.search).toEqual(search);
   });
+
+  it.each(['', '   ', 'x'.repeat(LIST_SEARCH_MAX_LENGTH + 1)])(
+    'should refuse the search %j',
+    (q) => {
+      expect(messagesOf({ q })).toEqual([LIST_VALIDATION_MESSAGES.SEARCH_INVALID]);
+    },
+  );
 
   it('should take a period of whole days in Minsk', () => {
     const result = parse({ from: '2026-10-01', to: '2026-10-31' });
@@ -178,8 +185,8 @@ describe('listOrdersSchema filters', () => {
   });
 
   it('should refuse an unknown parameter and name it', () => {
-    expect(messagesOf({ q: 'Ленина' })).toEqual([
-      `${LIST_VALIDATION_MESSAGES.UNKNOWN_PARAMETER}: q`,
+    expect(messagesOf({ search: 'Ленина' })).toEqual([
+      `${LIST_VALIDATION_MESSAGES.UNKNOWN_PARAMETER}: search`,
     ]);
   });
 

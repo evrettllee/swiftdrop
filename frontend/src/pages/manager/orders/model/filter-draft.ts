@@ -1,7 +1,13 @@
 import type { ManagerOrdersFilter, ManagerOrdersSort, PaymentState } from '@/shared/staff-api';
-import { defaultTabSort, PERIOD_PRESET, type OrdersTab, type PeriodPreset } from '../config/list';
+import { defaultTabSort, type OrdersTab } from '../config/list';
 import type { OrdersParams } from '../config/list-params';
-import { detectPreset, isPeriodValid, presetPeriod } from '../lib/period';
+import {
+  detectPreset,
+  isPeriodValid,
+  PERIOD_PRESET,
+  type PeriodPreset,
+  presetPeriod,
+} from '@/shared/lib/calendar';
 import { type OrdersView, sortParamOf } from './orders-view';
 
 export type FilterDraft = {

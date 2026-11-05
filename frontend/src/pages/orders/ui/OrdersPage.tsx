@@ -1,17 +1,25 @@
 import { PackageIcon, PlusIcon } from '@phosphor-icons/react';
-import { useState } from 'react';
-import { ICON_SIZE, ICON_WEIGHT, LIST_STATUS } from '@/shared/config';
+import { useMemo } from 'react';
+import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { useMinuteNow } from '@/shared/lib/clock';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { PageTitle } from '@/shared/ui/page-title';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
-import { ORDER_LIST_FILTER, ORDER_LIST_FILTERS, ORDERS_TABS_ID_PREFIX } from '../config/list';
-import { ORDER_TAB_LABELS, ORDERS_EMPTY_TEXTS, ORDERS_TEXTS } from '../config/texts';
-import type { OrderListFilter } from '../model/order-list';
-import { useOrderCounts } from '../model/useOrderCounts';
-import { useOrdersList } from '../model/useOrdersList';
-import { OrdersList } from './OrdersList';
+import { ORDERS_TAB, ORDERS_TABS, ORDERS_TABS_ID_PREFIX } from '../config/list';
+import {
+  EMPTY_TAB_TEXTS,
+  NO_ORDERS_TEXTS,
+  NOT_FOUND_TEXTS,
+  ORDER_TAB_LABELS,
+  ORDERS_TEXTS,
+} from '../config/texts';
+import { appliedFilters } from '../lib/applied-filters';
+import { useMyOrders } from '../model/useMyOrders';
+import { AppliedFilters } from './AppliedFilters';
+import { OrdersContent } from './OrdersContent';
+import { OrdersToolbar } from './OrdersToolbar';
 
 function NewOrderButton() {
   return (
@@ -25,20 +33,20 @@ function NewOrderButton() {
 }
 
 export function OrdersPage() {
-  const [filter, setFilter] = useState<OrderListFilter>(ORDER_LIST_FILTER.ALL);
-  const list = useOrdersList(filter);
-  const counts = useOrderCounts();
-  // No orders at all: the page shows only the empty state, without the tabs.
-  const hasNoOrders =
-    filter === ORDER_LIST_FILTER.ALL && list.status === LIST_STATUS.READY && list.total === 0;
-  const tabs = ORDER_LIST_FILTERS.map((id) => ({
-    id,
-    label: ORDER_TAB_LABELS[id],
-    count: counts[id],
-  }));
+  const orders = useMyOrders();
+  const { params, query, tab, counts } = orders;
+  const nowMs = useMinuteNow();
+  const now = useMemo(() => new Date(nowMs), [nowMs]);
+  const filters = appliedFilters(params.values, now);
+  const hasFilters = query.q !== null || query.from !== null || query.to !== null;
+  const hasNoOrders = !hasFilters && counts.all === 0;
+  const empty = hasFilters
+    ? { ...NOT_FOUND_TEXTS, isSearch: true }
+    : { ...EMPTY_TAB_TEXTS[tab], isSearch: false };
+  const tabs = ORDERS_TABS.map((id) => ({ id, label: ORDER_TAB_LABELS[id], count: counts[id] }));
 
   return (
-    <div className="flex flex-col gap-4 lg:gap-8">
+    <div className="flex flex-col gap-4 lg:gap-6">
       <header className="flex items-center justify-between gap-6">
         <PageTitle>{ORDERS_TEXTS.PAGE_TITLE}</PageTitle>
         {hasNoOrders ? null : (
@@ -48,25 +56,39 @@ export function OrdersPage() {
         )}
       </header>
       {hasNoOrders ? (
-        <EmptyState icon={PackageIcon} {...ORDERS_EMPTY_TEXTS[ORDER_LIST_FILTER.ALL]}>
+        <EmptyState icon={PackageIcon} {...NO_ORDERS_TEXTS}>
           <NewOrderButton />
         </EmptyState>
       ) : (
-        <div className="flex flex-col gap-4 lg:gap-6">
+        <>
           <Tabs
             layout="fit"
             tabs={tabs}
-            value={filter}
-            onChange={setFilter}
+            value={tab}
+            onChange={(next) => params.update({ status: next === ORDERS_TAB.ALL ? null : next })}
             label={ORDERS_TEXTS.TABS_LABEL}
             idPrefix={ORDERS_TABS_ID_PREFIX}
           />
-          {ORDER_LIST_FILTERS.map((id) => (
-            <TabPanel key={id} idPrefix={ORDERS_TABS_ID_PREFIX} id={id} activeId={filter}>
-              <OrdersList filter={filter} list={list} />
+          <OrdersToolbar
+            query={query}
+            now={now}
+            isDesktop={orders.isDesktop}
+            searchText={params.searchText}
+            onSearchChange={params.setSearchText}
+            onPeriodChange={({ from, to }) => params.update({ from, to })}
+            onSortChange={(sort) => params.update({ sort })}
+          />
+          <AppliedFilters
+            filters={filters}
+            isShown={orders.isDesktop || orders.isEmpty}
+            onChange={params.update}
+          />
+          {ORDERS_TABS.map((id) => (
+            <TabPanel key={id} idPrefix={ORDERS_TABS_ID_PREFIX} id={id} activeId={tab}>
+              <OrdersContent orders={orders} empty={empty} />
             </TabPanel>
           ))}
-        </div>
+        </>
       )}
     </div>
   );

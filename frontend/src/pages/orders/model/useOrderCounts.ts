@@ -1,43 +1,67 @@
-import { useEffect, useState } from 'react';
-import { listOrders } from '../api/list-orders';
-import { ORDER_COUNT_PROBE_LIMIT, ORDER_LIST_FILTERS, ORDERS_FIRST_PAGE } from '../config/list';
-import type { OrderListFilter } from './order-list';
+import { useEffect, useMemo, useState } from 'react';
+import { countOrders, type OrdersQuery } from '../api/list-orders';
+import { ORDERS_TAB, ORDERS_TABS, type OrdersTab } from '../config/list';
 
-type OrderCounts = Record<OrderListFilter, number | null>;
+export type OrderCounts = Record<OrdersTab, number | null>;
 
-const UNKNOWN_COUNTS: OrderCounts = { all: null, active: null, finished: null };
+const UNKNOWN_COUNTS: OrderCounts = { active: null, finished: null, cancelled: null, all: null };
 
-// How many orders each tab holds. The counters are a hint: if they fail to load,
-// the tabs are shown without numbers and the list works as usual.
-export function useOrderCounts(): OrderCounts {
-  const [counts, setCounts] = useState<OrderCounts>(UNKNOWN_COUNTS);
+type CountsAnswer = { base: OrdersQuery; counts: OrderCounts };
+
+export function useOrderCounts({ q, from, to }: OrdersQuery): OrderCounts {
+  const [answer, setAnswer] = useState<CountsAnswer | null>(null);
+  const base = useMemo<OrdersQuery>(
+    () => ({ status: null, q, from, to, sort: null }),
+    [q, from, to],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function load(): Promise<void> {
-      try {
-        const pages = await Promise.all(
-          ORDER_LIST_FILTERS.map((filter) =>
-            listOrders(
-              { page: ORDERS_FIRST_PAGE, filter, limit: ORDER_COUNT_PROBE_LIMIT },
-              { signal: controller.signal },
-            ),
-          ),
-        );
-
+    Promise.all(
+      ORDERS_TABS.map((tab) =>
+        countOrders({ ...base, status: tab === ORDERS_TAB.ALL ? null : tab }, controller.signal),
+      ),
+    ).then(
+      ([active, finished, cancelled, all]) => {
         if (!controller.signal.aborted) {
-          setCounts({ all: pages[0].total, active: pages[1].total, finished: pages[2].total });
+          setAnswer({ base, counts: { active, finished, cancelled, all } });
         }
-      } catch {
-        // The tabs stay without numbers.
-      }
-    }
-
-    void load();
+      },
+      () => undefined,
+    );
 
     return () => controller.abort();
-  }, []);
+  }, [base]);
 
-  return counts;
+  return answer?.base === base ? answer.counts : UNKNOWN_COUNTS;
+}
+
+export function useDraftCount(query: OrdersQuery | null, delayMs: number): number | null {
+  const [answer, setAnswer] = useState<{ query: OrdersQuery; count: number } | null>(null);
+
+  useEffect(() => {
+    if (query === null) {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      countOrders(query, controller.signal).then(
+        (count) => {
+          if (!controller.signal.aborted) {
+            setAnswer({ query, count });
+          }
+        },
+        () => undefined,
+      );
+    }, delayMs);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query, delayMs]);
+
+  return answer !== null && answer.query === query ? answer.count : null;
 }

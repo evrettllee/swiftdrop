@@ -1,15 +1,8 @@
 import { DateField } from '@/shared/ui/date-field';
 import { Select } from '@/shared/ui/select';
-import { PERIOD_PRESET, type PeriodPreset } from '../config/list';
+import { PERIOD_PRESET, PERIOD_PRESETS } from '@/shared/lib/calendar';
 import { FILTER_TEXTS, PERIOD_LABELS } from '../config/texts';
 import type { FilterDraft } from '../model/filter-draft';
-
-const PERIOD_PRESETS: readonly PeriodPreset[] = [
-  PERIOD_PRESET.ALL,
-  PERIOD_PRESET.WEEK,
-  PERIOD_PRESET.MONTH,
-  PERIOD_PRESET.CUSTOM,
-];
 
 const PERIOD_OPTIONS = PERIOD_PRESETS.map((preset) => ({
   value: preset,

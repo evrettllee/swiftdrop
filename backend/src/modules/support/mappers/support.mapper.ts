@@ -1,4 +1,5 @@
 import type { TicketTopic } from '@/common/enums/support-ticket.enum';
+import { firstGraphemes, shortPersonName } from '@/common/utils/person-name';
 import {
   LAST_MESSAGE_PREVIEW_LENGTH,
   STAFF_AUTHOR_SUFFIX,
@@ -17,14 +18,6 @@ import type {
 
 export function ticketTitle(topic: TicketTopic, subject: string | null): string {
   return subject ?? TICKET_TOPIC_LABELS[topic];
-}
-
-const GRAPHEMES = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-
-function firstGraphemes(text: string, count: number): string {
-  return Array.from(GRAPHEMES.segment(text), ({ segment }) => segment)
-    .slice(0, count)
-    .join('');
 }
 
 export function previewText(text: string): string {
@@ -78,7 +71,7 @@ export function toTicketDetails(row: TicketDetailsRow): TicketDetails {
 
 export function staffName(firstName: string, lastName: string, viewer: MessageViewer): string {
   return viewer === 'staff'
-    ? `${firstName} ${firstGraphemes(lastName, 1)}.`
+    ? shortPersonName(firstName, lastName)
     : `${firstName}, ${STAFF_AUTHOR_SUFFIX}`;
 }
 

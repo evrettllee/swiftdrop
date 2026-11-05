@@ -1,8 +1,12 @@
 import type { ManagerOrdersFilter } from '@/shared/staff-api';
-import { PERIOD_PRESET, PERIOD_PRESET_DAYS } from '../config/list';
 import type { OrdersParams } from '../config/list-params';
 import { EMPTY_TEXTS, FILTER_TEXTS, PAYMENT_LABELS, TAB_LABELS } from '../config/texts';
-import { detectPreset, formatCalendarDay } from '../lib/period';
+import {
+  detectPreset,
+  formatCalendarDay,
+  PERIOD_PRESET,
+  PERIOD_PRESET_DAYS,
+} from '@/shared/lib/calendar';
 import type { OrdersView } from './orders-view';
 import { SEARCH_KIND, searchKindOf } from '@/shared/staff-api';
 

@@ -1,33 +1,23 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, gte, inArray, lt, max, type SQL } from 'drizzle-orm';
-import { CURRENCY } from '@/common/constants/money.constants';
 import { mapPageItems, paginate, type ListFetch } from '@/common/database/paginate';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { DateRange } from '@/common/utils/date-range';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
-import { orders } from '@/database/schema';
+import { courierProfiles, orders, users } from '@/database/schema';
 import type { ListOrdersDto } from '../dto/list-orders.dto';
-import {
-  ACTIVE_STATUSES,
-  FINISHED_STATUSES,
-  ORDER_LIST_FILTER,
-  ORDER_STATUS_GROUP_STATUSES,
-} from '../constants/orders.constants';
+import { ORDER_STATUS_GROUP_STATUSES } from '../constants/orders.constants';
+import { toOrderListItem } from '../mappers/order-list-item.mapper';
 import type { OrdersPage } from '../types/orders.types';
 import { addressViewColumns, aliasOrderAddresses } from '../utils/order-address-columns';
+import { clientOrderSearchCondition } from '../utils/order-search';
 import { ORDERS_SORT } from '../utils/orders-sort';
 
 function statusesOf(query: ListOrdersDto): readonly OrderStatus[] | null {
-  if (query.status !== null) {
-    return [...new Set(query.status.flatMap((group) => ORDER_STATUS_GROUP_STATUSES[group]))];
-  }
-
-  if (query.filter === ORDER_LIST_FILTER.ACTIVE) {
-    return ACTIVE_STATUSES;
-  }
-
-  return query.filter === ORDER_LIST_FILTER.FINISHED ? FINISHED_STATUSES : null;
+  return query.status === null
+    ? null
+    : [...new Set(query.status.flatMap((group) => ORDER_STATUS_GROUP_STATUSES[group]))];
 }
 
 function periodCondition({ start, end }: DateRange): SQL | undefined {
@@ -47,6 +37,7 @@ export class OrdersQueryService {
       eq(orders.clientId, clientId),
       statuses === null ? undefined : inArray(orders.status, [...statuses]),
       periodCondition(query.period),
+      clientOrderSearchCondition(this.db, query.search),
     );
     const page = await paginate(query, {
       whitelist: ORDERS_SORT.whitelist,
@@ -58,11 +49,7 @@ export class OrdersQueryService {
       idOf: (row) => row.orderId,
     });
 
-    return mapPageItems(page, ({ sortValue: _sortValue, ...row }) => ({
-      ...row,
-      price: Number(row.price),
-      currency: CURRENCY,
-    }));
+    return mapPageItems(page, ({ sortValue: _sortValue, ...row }) => toOrderListItem(row));
   }
 
   private fetch({ where, orderBy, limit, offset, sortValue }: ListFetch) {
@@ -77,11 +64,15 @@ export class OrdersQueryService {
         estimatedDeliveryAt: orders.estimatedDeliveryAt,
         pickup: addressViewColumns(pickup),
         delivery: addressViewColumns(delivery),
+        courierFirstName: users.firstName,
+        courierLastName: users.lastName,
         sortValue,
       })
       .from(orders)
       .innerJoin(pickup, eq(orders.pickupAddressId, pickup.addressId))
       .innerJoin(delivery, eq(orders.deliveryAddressId, delivery.addressId))
+      .leftJoin(courierProfiles, eq(courierProfiles.courierProfileId, orders.courierId))
+      .leftJoin(users, eq(users.userId, courierProfiles.userId))
       .where(where)
       .orderBy(...orderBy)
       .limit(limit)

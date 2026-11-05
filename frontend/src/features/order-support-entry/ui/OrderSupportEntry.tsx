@@ -46,7 +46,7 @@ export function OrderSupportEntry({
     <Link
       to={getSupportTicketPath(supportPath, ticket.ticketId)}
       aria-label={entryLabel(ticket, now)}
-      className={`flex min-h-14 w-full items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2 text-fg hover:bg-surface-muted ${COLOR_TRANSITION_CLASS}`}
+      className={`flex min-h-14 w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-fg hover:bg-surface-muted ${COLOR_TRANSITION_CLASS}`}
     >
       <span className="relative flex shrink-0 text-accent">
         <LifebuoyIcon size={ICON_SIZE.LARGE} weight={ICON_WEIGHT} aria-hidden="true" />

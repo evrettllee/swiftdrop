@@ -79,9 +79,6 @@ export const DELIVERY_CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.IN_TRANSIT,
 ];
 
-// The courier's last name is cut to its first letter and this mark.
-export const LAST_NAME_INITIAL_MARK = '.';
-
 // History
 // Orders that ended while they were with the courier.
 export const HISTORY_STATUSES: readonly OrderStatus[] = COURIER_HISTORY_STATUSES;

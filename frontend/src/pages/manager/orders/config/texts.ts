@@ -9,7 +9,8 @@ import {
 } from '@/shared/staff-api';
 import { UI_TEXTS } from '@/shared/config';
 import { formatCount, pluralize } from '@/shared/lib/format';
-import { ORDERS_TAB, type OrdersTab, PERIOD_PRESET, type PeriodPreset } from './list';
+import { PERIOD_PRESET, type PeriodPreset } from '@/shared/lib/calendar';
+import { ORDERS_TAB, type OrdersTab } from './list';
 
 const ORDER_FORMS = { one: 'заказ', few: 'заказа', many: 'заказов' };
 

@@ -117,6 +117,7 @@ export function clientOrders() {
     estimatedDeliveryAt: null,
     pickup: address('ул. Богдановича', '12'),
     delivery: address(index === 0 ? 'пр-т Притыцкого' : 'ул. Кирова', index === 0 ? '83' : '120'),
+    courier: null,
   }));
 }
 

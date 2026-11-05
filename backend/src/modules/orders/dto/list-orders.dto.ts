@@ -2,17 +2,14 @@ import { z } from 'zod';
 import {
   csvEnumSchema,
   listPeriodShape,
+  listSearchSchema,
   listSortParamSchema,
   resolveListQuery,
   unknownParameterError,
 } from '@/common/schemas/list-query.schema';
 import { listPaginationShape } from '@/common/schemas/pagination.schema';
-import {
-  ORDER_LIST_FILTER_VALUES,
-  ORDER_STATUS_GROUP_VALUES,
-  ORDERS_PAGE_SIZE_DEFAULT,
-  ORDERS_VALIDATION_MESSAGES,
-} from '../constants/orders.constants';
+import { ORDER_STATUS_GROUP_VALUES, ORDERS_PAGE_SIZE_DEFAULT } from '../constants/orders.constants';
+import { parseClientOrderSearch } from '../utils/order-search';
 import { ORDERS_SORT } from '../utils/orders-sort';
 
 export const listOrdersSchema = z
@@ -21,21 +18,15 @@ export const listOrdersSchema = z
       ...listPaginationShape(ORDERS_PAGE_SIZE_DEFAULT),
       ...listPeriodShape,
       sort: listSortParamSchema,
-      filter: z
-        .enum(ORDER_LIST_FILTER_VALUES, { error: ORDERS_VALIDATION_MESSAGES.FILTER_INVALID })
-        .optional(),
       status: csvEnumSchema(ORDER_STATUS_GROUP_VALUES).optional(),
+      q: listSearchSchema.transform(parseClientOrderSearch).optional(),
     },
     { error: unknownParameterError },
   )
-  .refine((query) => query.filter === undefined || query.status === undefined, {
-    error: ORDERS_VALIDATION_MESSAGES.FILTER_AND_STATUS,
-    path: ['status'],
-  })
   .transform((query, ctx) => {
     const list = resolveListQuery(query, ORDERS_SORT, ctx);
 
-    return list ? { ...list, filter: query.filter ?? null, status: query.status ?? null } : z.NEVER;
+    return list ? { ...list, status: query.status ?? null, search: query.q ?? null } : z.NEVER;
   });
 
 export type ListOrdersDto = z.infer<typeof listOrdersSchema>;

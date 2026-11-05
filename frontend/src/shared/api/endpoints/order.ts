@@ -56,6 +56,7 @@ export const orderListItemSchema = z.object({
   estimatedDeliveryAt: dateSchema.nullable(),
   pickup: addressSchema,
   delivery: addressSchema,
+  courier: z.object({ name: z.string() }).nullable(),
 });
 
 export type OrderListItem = z.infer<typeof orderListItemSchema>;
