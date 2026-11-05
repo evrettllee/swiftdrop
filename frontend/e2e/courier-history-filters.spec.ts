@@ -135,3 +135,16 @@ test('should keep the pages in place when a new delivery comes', async ({ page }
   await expect(historyCards(page).first()).toContainText(`№${NEWEST_ORDER_ID - 5}`);
   await expect.poll(() => lastListRequest(stub)?.get('until')).toBe(String(NEWEST_ORDER_ID));
 });
+
+test('should reset the period panel to this week', async ({ page }) => {
+  await openCourierHistory(page, '?period=all');
+
+  await periodButton(page, 'Всё время').click();
+  await periodDialog(page).getByRole('button', { name: 'Сбросить' }).click();
+
+  await expect(periodDialog(page).getByRole('radio', { name: 'Эта неделя' })).toBeChecked();
+  await periodDialog(page)
+    .getByRole('button', { name: /^Показать/ })
+    .click();
+  await expect(page).toHaveURL(APP_ROUTES.COURIER_HISTORY);
+});

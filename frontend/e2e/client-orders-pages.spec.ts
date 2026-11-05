@@ -43,3 +43,17 @@ test('should keep the pages in place when a new order appears in another tab', a
   await expect(cards(page).first()).toContainText('48050');
   await expect.poll(() => lastListRequest(stub)?.get('until')).toBe('48232');
 });
+
+test('should reset the period panel to all the time', async ({ page }) => {
+  await stubMyOrders(page);
+  await page.goto(`${APP_ROUTES.ORDERS}?from=2026-10-01&to=2026-10-31`);
+
+  await page.getByRole('button', { name: /^Период: / }).click();
+  const panel = page.getByRole('dialog', { name: 'Период' });
+  await expect(panel.getByRole('radio', { name: 'Свой период' })).toBeChecked();
+  await panel.getByRole('button', { name: 'Сбросить' }).click();
+
+  await expect(panel.getByRole('radio', { name: 'Всё время' })).toBeChecked();
+  await panel.getByRole('button', { name: /^Показать/ }).click();
+  await expect(page).toHaveURL(APP_ROUTES.ORDERS);
+});

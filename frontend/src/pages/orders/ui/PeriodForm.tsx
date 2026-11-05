@@ -1,6 +1,7 @@
 import { PERIOD_PRESET, PERIOD_PRESETS, type Period } from '@/shared/lib/calendar';
 import { PeriodForm as SharedPeriodForm, type PeriodFormLayout } from '@/shared/ui/period-picker';
 import type { OrdersQuery } from '../api/list-orders';
+import { DEFAULT_PERIOD_DRAFT } from '../config/list-params';
 import { FILTER_TEXTS, ORDERS_TEXTS, PERIOD_LABELS } from '../config/texts';
 import { usePeriodDraft } from '../model/usePeriodDraft';
 
@@ -22,6 +23,7 @@ export function PeriodForm({ query, now, layout, onApply }: PeriodFormProps) {
       presets={PRESET_OPTIONS}
       customValue={PERIOD_PRESET.CUSTOM}
       draft={form.draft}
+      defaultDraft={DEFAULT_PERIOD_DRAFT}
       isValid={form.isValid}
       texts={{
         legend: FILTER_TEXTS.PERIOD,
@@ -33,7 +35,6 @@ export function PeriodForm({ query, now, layout, onApply }: PeriodFormProps) {
       }}
       onChange={form.change}
       onApply={() => onApply(form.period)}
-      onReset={form.reset}
     />
   );
 }

@@ -7,6 +7,8 @@ export const ORDER_COURIER_RETRIES_WHEN_FINISHED = 1;
 
 // The courier of the order and the code for them.
 export const ORDER_COURIER_TEXTS = {
+  CHANGED: 'Назначен новый курьер',
+  CHANGED_IN_CHAT: 'Курьер сменился',
   SECTION: 'Курьер',
   SEARCHING: 'Ищем курьера рядом с точкой забора',
   VEHICLE_SEPARATOR: ', ',

@@ -40,6 +40,14 @@ function getDeadline(expiresAt: Date, now: number): number {
   return now + Math.min(Math.max(expiresAt.getTime() - now, 0), OFFER_TTL_MS);
 }
 
+// A phone in a pocket: a short series, where the device can vibrate. The browser allows it only
+// after the person has touched the page.
+export function vibrateOffer(): void {
+  if ('vibrate' in navigator && navigator.userActivation.hasBeenActive) {
+    navigator.vibrate(OFFER_VIBRATION_PATTERN);
+  }
+}
+
 export function showOffer(offer: CourierOffer): void {
   if (useOfferStore.getState().offer?.offerId === offer.offerId) {
     return;
@@ -52,11 +60,14 @@ export function showOffer(offer: CourierOffer): void {
     error: null,
   });
   hideToast(OFFER_TOAST_KEY);
+  vibrateOffer();
+}
 
-  // A phone in a pocket: a short series, where the device can vibrate. The browser allows it only
-  // after the person has touched the page.
-  if ('vibrate' in navigator && navigator.userActivation.hasBeenActive) {
-    navigator.vibrate(OFFER_VIBRATION_PATTERN);
+export function dismissOffer(): void {
+  const { offer, response } = useOfferStore.getState();
+
+  if (offer !== null && response === null) {
+    closeOffer(null);
   }
 }
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CALENDAR_PERIOD, type CalendarPeriod, isCalendarDate } from '@/shared/lib/calendar';
 import type { ListParamsConfig } from '@/shared/lib/list-params';
+import type { PeriodDraftOf } from '@/shared/ui/period-picker';
 import {
   HISTORY_FIRST_PAGE,
   HISTORY_PAGE_MAX,
@@ -42,9 +43,15 @@ export const HISTORY_PARAMS_CONFIG: ListParamsConfig<HistoryParams> = {
 };
 
 export const PERIOD_RESET: Partial<HistoryParams> = {
-  period: CALENDAR_PERIOD.THIS_WEEK,
+  period: HISTORY_PARAMS_CONFIG.defaults.period,
   from: null,
   to: null,
+};
+
+export const DEFAULT_PERIOD_DRAFT: PeriodDraftOf<CalendarPeriod> = {
+  preset: HISTORY_PARAMS_CONFIG.defaults.period,
+  from: HISTORY_PARAMS_CONFIG.defaults.from,
+  to: HISTORY_PARAMS_CONFIG.defaults.to,
 };
 
 export const FILTERS_RESET: Partial<HistoryParams> = { ...PERIOD_RESET, q: null };

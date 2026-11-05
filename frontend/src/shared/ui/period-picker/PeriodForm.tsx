@@ -21,11 +21,11 @@ type PeriodFormProps<P extends string> = {
   presets: readonly { value: P; label: string }[];
   customValue: P;
   draft: PeriodDraftOf<P>;
+  defaultDraft: PeriodDraftOf<P>;
   isValid: boolean;
   texts: PeriodFormTexts;
   onChange: (patch: Partial<PeriodDraftOf<P>>) => void;
   onApply: () => void;
-  onReset: () => void;
 };
 
 export function PeriodForm<P extends string>({
@@ -33,11 +33,11 @@ export function PeriodForm<P extends string>({
   presets,
   customValue,
   draft,
+  defaultDraft,
   isValid,
   texts,
   onChange,
   onApply,
-  onReset,
 }: PeriodFormProps<P>) {
   const name = useId();
   const isSheet = layout === 'sheet';
@@ -47,7 +47,11 @@ export function PeriodForm<P extends string>({
     </Button>
   );
   const resetButton = (
-    <Button variant={isSheet ? 'secondary' : 'text'} fullWidth={isSheet} onClick={onReset}>
+    <Button
+      variant={isSheet ? 'secondary' : 'text'}
+      fullWidth={isSheet}
+      onClick={() => onChange(defaultDraft)}
+    >
       {texts.reset}
     </Button>
   );

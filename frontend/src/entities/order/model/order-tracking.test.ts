@@ -112,3 +112,21 @@ test('should forget the arrival at the pickup point and its line after the picku
 
   expect(tracking.getState()).toMatchObject({ pickupEtaAt: null, courierLeg: null });
 });
+
+test('should forget the position and the line of the previous courier', () => {
+  const { tracking } = assigned();
+  tracking.applyRoute(route({ ...POINT, updatedAt: at(0), isStale: false }));
+
+  tracking.applyCourierChange();
+
+  expect(tracking.getState()).toMatchObject({
+    status: ORDER_STATUS.COURIER_ASSIGNED,
+    courierLeg: null,
+    pickupEtaAt: null,
+    courierPosition: null,
+    isPositionStale: false,
+  });
+
+  tracking.applyLocation(POINT, at(-60_000));
+  expect(tracking.getState().courierPosition).toEqual({ ...POINT, updatedAt: at(-60_000) });
+});

@@ -76,6 +76,15 @@ export function setCourierVehicle(vehicle: CourierVehicle): void {
   }));
 }
 
+export function dropActiveOrder(orderId: number): void {
+  useCourierProfileStore.setState(({ profile }) => ({
+    profile:
+      profile === null || profile.activeOrderId !== orderId
+        ? profile
+        : { ...profile, activeOrderId: null },
+  }));
+}
+
 // Loads the profile while the cabinet is open and forgets it (and the position) when the cabinet is
 // left, so the next user of the tab never sees them.
 export function useCourierProfileLoader(): void {

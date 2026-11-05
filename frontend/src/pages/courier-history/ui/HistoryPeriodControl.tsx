@@ -3,6 +3,7 @@ import { CALENDAR_PERIOD, CALENDAR_PERIODS } from '@/shared/lib/calendar';
 import { PeriodControl, PeriodForm, type PeriodFormLayout } from '@/shared/ui/period-picker';
 import type { HistoryQuery } from '../api/get-history';
 import { HISTORY_COUNT_DELAY_MS } from '../config/list';
+import { DEFAULT_PERIOD_DRAFT } from '../config/list-params';
 import { FILTER_TEXTS, HISTORY_TEXTS, PERIOD_LABELS } from '../config/texts';
 import {
   draftOf,
@@ -16,8 +17,6 @@ import {
 import { useHistoryCount } from '../model/useHistoryCount';
 
 const PRESET_OPTIONS = CALENDAR_PERIODS.map((value) => ({ value, label: PERIOD_LABELS[value] }));
-
-const ALL_TIME_DRAFT: HistoryPeriodDraft = { preset: CALENDAR_PERIOD.ALL, from: null, to: null };
 
 type HistoryPeriodProps = {
   value: HistoryPeriodParams;
@@ -48,6 +47,7 @@ function HistoryPeriodForm({
       presets={PRESET_OPTIONS}
       customValue={CALENDAR_PERIOD.CUSTOM}
       draft={draft}
+      defaultDraft={DEFAULT_PERIOD_DRAFT}
       isValid={isValid}
       texts={{
         legend: FILTER_TEXTS.PERIOD,
@@ -59,7 +59,6 @@ function HistoryPeriodForm({
       }}
       onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
       onApply={() => onApply(draftParams(draft))}
-      onReset={() => setDraft(ALL_TIME_DRAFT)}
     />
   );
 }

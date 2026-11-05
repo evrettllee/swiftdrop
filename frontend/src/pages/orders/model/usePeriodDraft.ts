@@ -2,13 +2,7 @@ import { useMemo, useState } from 'react';
 import type { Period } from '@/shared/lib/calendar';
 import type { OrdersQuery } from '../api/list-orders';
 import { COUNTS_DRAFT_DELAY_MS } from '../config/list';
-import {
-  draftOf,
-  draftPeriod,
-  EMPTY_PERIOD_DRAFT,
-  isDraftValid,
-  type PeriodDraft,
-} from '../lib/period-draft';
+import { draftOf, draftPeriod, isDraftValid, type PeriodDraft } from '../lib/period-draft';
 import { useDraftCount } from './useOrderCounts';
 
 export function usePeriodDraft(query: OrdersQuery, now: Date) {
@@ -31,6 +25,5 @@ export function usePeriodDraft(query: OrdersQuery, now: Date) {
     period,
     count,
     change: (patch: Partial<PeriodDraft>) => setDraft((value) => ({ ...value, ...patch })),
-    reset: () => setDraft(EMPTY_PERIOD_DRAFT),
   };
 }

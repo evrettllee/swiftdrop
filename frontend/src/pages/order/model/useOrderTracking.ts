@@ -1,24 +1,14 @@
-import { useEffect, useEffectEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OrderTracking } from '@/entities/order';
-import type { OrderStatus } from '@/shared/api';
 import { onOrderEvent, SOCKET_EVENTS } from '@/shared/realtime';
 
-// The events of the room of the order, while the page shows it. `onStatus` is called with every
-// order:status of the order, so the page loads what the event does not carry (the history, the
-// courier, the code).
-function useTrackingEvents(
-  orderId: number,
-  tracking: OrderTracking,
-  onStatus: (status: OrderStatus) => void,
-): void {
-  const statusChanged = useEffectEvent(onStatus);
-
+// The events of the room of the order, while the page shows it.
+function useTrackingEvents(orderId: number, tracking: OrderTracking): void {
   useEffect(() => {
     const unsubscribers = [
       onOrderEvent(SOCKET_EVENTS.ORDER_STATUS, (event) => {
         if (event.orderId === orderId) {
           tracking.applyStatus(event.status, event.estimatedDeliveryAt);
-          statusChanged(event.status);
         }
       }),
       onOrderEvent(SOCKET_EVENTS.ORDER_ETA, (event) => {
@@ -40,7 +30,7 @@ function useTrackingEvents(
 
 // One store per order: the page gives it the answers of the backend (applyStatus, applyRoute) and
 // the room gives it the events. Leaving the order stops its timer.
-export function useOrderTracking(orderId: number, onStatus: (status: OrderStatus) => void) {
+export function useOrderTracking(orderId: number) {
   const [entry, setEntry] = useState(() => ({ orderId, tracking: new OrderTracking() }));
   let { tracking } = entry;
 
@@ -51,7 +41,7 @@ export function useOrderTracking(orderId: number, onStatus: (status: OrderStatus
   }
 
   useEffect(() => () => tracking.dispose(), [tracking]);
-  useTrackingEvents(orderId, tracking, onStatus);
+  useTrackingEvents(orderId, tracking);
 
   return tracking;
 }

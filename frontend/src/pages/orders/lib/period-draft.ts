@@ -9,8 +9,6 @@ import {
 
 export type PeriodDraft = Period & { preset: PeriodPreset };
 
-export const EMPTY_PERIOD_DRAFT: PeriodDraft = { preset: PERIOD_PRESET.ALL, from: null, to: null };
-
 export function draftOf(period: Period, now: Date): PeriodDraft {
   return { preset: detectPreset(period, now), from: period.from, to: period.to };
 }

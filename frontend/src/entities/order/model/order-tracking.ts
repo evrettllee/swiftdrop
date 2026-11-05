@@ -88,6 +88,22 @@ export class OrderTracking {
     }
   }
 
+  applyCourierChange(): void {
+    if (this.isFinished()) {
+      return;
+    }
+
+    this.stopStaleTimer();
+    this.set({
+      ...this.state,
+      courierLeg: null,
+      pickupEtaAt: null,
+      courierPosition: null,
+      positionReceivedAt: null,
+      isPositionStale: false,
+    });
+  }
+
   // The page left the order: nothing is counted any more.
   dispose(): void {
     this.stopStaleTimer();

@@ -42,6 +42,8 @@ export function OrderContent({
     chatPath: getOrderPath(order.orderId),
   });
 
+  const { chat, isCourierChanging } = live;
+  const chatProps = { chat, view: chatView, isCourierChanging };
   const openCancel = useCallback(() => setIsCancelOpen(true), []);
   const closeCancel = useCallback(() => setIsCancelOpen(false), []);
   const handleCancelled = useCallback(() => {
@@ -50,7 +52,7 @@ export function OrderContent({
   }, [onReload]);
 
   if (courier !== null && chatView.isScreenOpen) {
-    return <OrderChat chat={live.chat} courier={courier} view={chatView} />;
+    return <OrderChat {...chatProps} courier={courier} />;
   }
 
   return (
@@ -99,7 +101,7 @@ export function OrderContent({
         onCancelled={handleCancelled}
       />
       {courier !== null && chatView.isDrawerOpen ? (
-        <OrderChat chat={live.chat} courier={courier} view={chatView} />
+        <OrderChat {...chatProps} courier={courier} />
       ) : null}
     </div>
   );

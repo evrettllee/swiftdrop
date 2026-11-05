@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { isCalendarDate } from '@/shared/lib/calendar';
+import { isCalendarDate, PERIOD_PRESET, type PeriodPreset } from '@/shared/lib/calendar';
 import type { ListParamsConfig } from '@/shared/lib/list-params';
+import type { PeriodDraftOf } from '@/shared/ui/period-picker';
 import {
   ORDER_STATUS_GROUP,
   ORDERS_FIRST_PAGE,
@@ -41,6 +42,12 @@ export const ORDERS_PARAMS_CONFIG: ListParamsConfig<OrdersParams> = {
   },
   pageKey: 'page',
   searchKey: 'q',
+};
+
+export const DEFAULT_PERIOD_DRAFT: PeriodDraftOf<PeriodPreset> = {
+  preset: PERIOD_PRESET.ALL,
+  from: ORDERS_PARAMS_CONFIG.defaults.from,
+  to: ORDERS_PARAMS_CONFIG.defaults.to,
 };
 
 export const FILTERS_RESET: Partial<OrdersParams> = { q: null, from: null, to: null };

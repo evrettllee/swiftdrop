@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { refreshCourierProfile } from '@/entities/courier';
 import { type CourierOrder, type CurrentCourierOrder, getCurrentCourierOrder } from '@/shared/api';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
 import {
-  CONNECTION_STATUS,
   SOCKET_EVENTS,
   type TypedSocketEvent,
-  useConnectionStatus,
   useSocketEventBatch,
+  useSocketReconnect,
 } from '@/shared/realtime';
 
 type CurrentOrderState = {
@@ -20,29 +19,6 @@ const TICKET_EVENTS: readonly TypedSocketEvent[] = [SOCKET_EVENTS.SUPPORT_TICKET
 
 const LOADING: CurrentOrderState = { status: LIST_STATUS.LOADING, order: null };
 const FAILED: CurrentOrderState = { status: LIST_STATUS.ERROR, order: null };
-
-// Asks for the order again each time the socket connects back: the order may have been cancelled
-// while there was no connection. The first connection is not a return, the page loads it anyway.
-function useReconnectReload(reload: () => void): void {
-  const connection = useConnectionStatus();
-  const previous = useRef(connection);
-  const hasBeenConnected = useRef(false);
-
-  useEffect(() => {
-    const isConnected = connection === CONNECTION_STATUS.CONNECTED;
-    const isReturn =
-      isConnected && previous.current !== CONNECTION_STATUS.CONNECTED && hasBeenConnected.current;
-    previous.current = connection;
-
-    if (isReturn) {
-      reload();
-    }
-
-    if (isConnected) {
-      hasBeenConnected.current = true;
-    }
-  }, [connection, reload]);
-}
 
 // The order the courier carries, loaded when the screen opens, when the order of the profile
 // changes and when the socket connects back. No order means the profile is behind: it is loaded
@@ -79,7 +55,7 @@ export function useCurrentOrder(activeOrderId: number) {
     return () => controller.abort();
   }, [activeOrderId, version]);
 
-  useReconnectReload(reload);
+  useSocketReconnect(reload);
   useSocketEventBatch(TICKET_EVENTS, reload);
 
   // The answer of a step is the order after it.

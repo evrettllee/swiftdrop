@@ -12,6 +12,7 @@ export { setCourierPosition, useCourierPosition } from './model/courier-position
 export type { CourierProfileStatus } from './model/courier-profile';
 export {
   COURIER_PROFILE_STATUS,
+  dropActiveOrder,
   refreshCourierProfile,
   setCourierProfile,
   setCourierVehicle,
