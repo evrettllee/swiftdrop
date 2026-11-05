@@ -5,7 +5,7 @@ import { getSupportCounts, isSearchUsable } from '@/shared/staff-api';
 import { getSupportTickets, SUPPORT_VIEW, type SupportTicketsQuery } from '@/shared/support-api';
 import { SUPPORT_PAGE_SIZE, type SupportParams } from '../config/params';
 import { MANAGER_SUPPORT_TEXTS as TEXTS } from '../config/texts';
-import { useLoad } from './useLoad';
+import { useLoad } from '@/shared/lib/async';
 
 const SUPPORT_EVENTS: readonly TypedSocketEvent[] = [SOCKET_EVENTS.SUPPORT_TICKET];
 

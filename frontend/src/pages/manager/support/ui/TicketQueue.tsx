@@ -9,7 +9,7 @@ import { Spinner } from '@/shared/ui/spinner';
 import { SUPPORT_PAGE_SIZE } from '../config/params';
 import { MANAGER_SUPPORT_TEXTS as TEXTS } from '../config/texts';
 import type { QueueEmpty } from '../lib/queue-empty';
-import type { Loaded } from '../model/useLoad';
+import type { Loaded } from '@/shared/lib/async';
 import { TicketRow } from './TicketRow';
 
 type TicketQueueProps = {

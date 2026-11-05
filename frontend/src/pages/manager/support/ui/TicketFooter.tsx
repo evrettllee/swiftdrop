@@ -1,18 +1,12 @@
 import { LockIcon, ProhibitIcon } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react';
+import { supportSendError } from '@/features/support-thread';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
-import { SUPPORT_SEND_FAILURE, type SupportSendFailure } from '@/shared/support-api';
+import { SUPPORT_SEND_FAILURE } from '@/shared/support-api';
 import { ChatComposerField } from '@/shared/ui/chat';
 import { DIALOG_TEXTS, REPLY_PLACEHOLDERS } from '../config/dialog-texts';
 import { closedLine } from '../lib/ticket-lines';
 import type { TicketModel } from '../model/useTicket';
-
-const FAILURE_TEXTS: Record<SupportSendFailure, string> = {
-  [SUPPORT_SEND_FAILURE.CLOSED]: DIALOG_TEXTS.TICKET_CLOSED,
-  [SUPPORT_SEND_FAILURE.TOO_MANY]: DIALOG_TEXTS.TOO_MANY,
-  [SUPPORT_SEND_FAILURE.NETWORK]: DIALOG_TEXTS.NOT_SENT,
-  [SUPPORT_SEND_FAILURE.OTHER]: DIALOG_TEXTS.SEND_FAILED,
-};
 
 function FooterNote({ icon: NoteIcon, text, role }: { icon: Icon; text: string; role?: 'status' }) {
   return (
@@ -57,29 +51,13 @@ export function TicketFooter({ model }: { model: TicketModel }) {
     );
   }
 
-  const error =
-    send.failure === null ? null : (
-      <>
-        {FAILURE_TEXTS[send.failure]}
-        {send.failure === SUPPORT_SEND_FAILURE.NETWORK ? (
-          <button
-            type="button"
-            onClick={send.send}
-            className="ms-1 font-semibold text-accent underline"
-          >
-            {DIALOG_TEXTS.RETRY}
-          </button>
-        ) : null}
-      </>
-    );
-
   return (
     <ChatComposerField
       label={REPLY_PLACEHOLDERS[ticket.author.role]}
       placeholder={REPLY_PLACEHOLDERS[ticket.author.role]}
       value={send.text}
       isSending={send.isSending}
-      error={error}
+      error={supportSendError(send, DIALOG_TEXTS.TICKET_CLOSED)}
       onChange={send.setText}
       onSubmit={send.send}
     />

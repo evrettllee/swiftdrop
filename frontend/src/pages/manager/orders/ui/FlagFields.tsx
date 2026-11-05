@@ -56,7 +56,7 @@ export function SortChoices({ sorts, value, onChange }: SortChoicesProps) {
         <RadioCard
           key={sort}
           name="manager-orders-sort"
-          isCompact
+          density="compact"
           title={SORT_LABELS[sort]}
           checked={value === sort}
           onChange={() => onChange(sort)}

@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, CheckCircleIcon, PhoneIcon } from '@phosphor-icons/react';
 import { useEffect, useRef } from 'react';
+import { SupportLog } from '@/features/support-thread';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { useBodyScrollLock } from '@/shared/lib/dom';
 import { buildTelHref } from '@/shared/lib/format';
@@ -10,7 +11,6 @@ import type { TicketModel } from '../model/useTicket';
 import { CloseTicketDialog } from './CloseTicketDialog';
 import { ClosedMark, TicketLoadState } from './TicketPanel';
 import { TicketFooter } from './TicketFooter';
-import { TicketLog } from './TicketLog';
 import { TicketOrderCard } from './TicketOrderCard';
 
 const ICON = { size: ICON_SIZE.MEDIUM, weight: ICON_WEIGHT, 'aria-hidden': true } as const;
@@ -19,6 +19,8 @@ type TicketScreenProps = {
   model: TicketModel;
   onBack: () => void;
 };
+
+const noAuthor = () => undefined;
 
 export function TicketScreen({ model, onBack }: TicketScreenProps) {
   const screen = useRef<HTMLElement>(null);
@@ -82,7 +84,7 @@ export function TicketScreen({ model, onBack }: TicketScreenProps) {
               <TicketOrderCard order={ticket.order} details={model.order} />
             </div>
           )}
-          <TicketLog thread={model.thread} showAuthors={false} />
+          <SupportLog thread={model.thread} label={DIALOG_TEXTS.MESSAGES} authorOf={noAuthor} />
           <div className="shrink-0 border-t border-border">
             <TicketFooter model={model} />
           </div>

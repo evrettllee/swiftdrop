@@ -38,7 +38,9 @@ export function Toast({ variant, title, text, action, onClose }: ToastProps) {
       />
       <div className="flex min-w-0 grow flex-col gap-1 text-small">
         <p className="font-semibold">{title}</p>
-        <p className="line-clamp-2 text-pretty break-words text-fg-secondary">{text}</p>
+        {text === '' ? null : (
+          <p className="line-clamp-2 text-pretty break-words text-fg-secondary">{text}</p>
+        )}
         {action === undefined ? null : (
           <button
             type="button"

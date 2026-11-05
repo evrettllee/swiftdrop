@@ -1,3 +1,22 @@
+export type {
+  CreateTicketFailure,
+  MyTicket,
+  MyTicketItem,
+  MyTicketsPage,
+  MyTicketsQuery,
+  NewTicket,
+  SupportTopic,
+} from './support-author';
+export {
+  CREATE_TICKET_FAILURE,
+  createMyTicket,
+  createTicketFailureOf,
+  getMyTicket,
+  getMyTickets,
+  MY_TICKETS_LIMIT,
+  SUPPORT_SUBJECT_MAX_LENGTH,
+  SUPPORT_TOPIC,
+} from './support-author';
 export type { SupportMessage, SupportMessagesPage, SupportSendFailure } from './support-messages';
 export {
   getSupportMessages,
@@ -11,6 +30,7 @@ export {
 } from './support-messages';
 export type {
   SupportAuthorRole,
+  SupportSide,
   SupportSort,
   SupportTicket,
   SupportTicketItem,
@@ -24,6 +44,7 @@ export {
   getSupportTicket,
   getSupportTickets,
   SUPPORT_AUTHOR_ROLE,
+  SUPPORT_SIDE,
   SUPPORT_SORT,
   SUPPORT_VIEW,
 } from './support-tickets';

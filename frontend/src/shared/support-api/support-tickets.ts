@@ -2,7 +2,23 @@ import { z } from 'zod';
 import { dateSchema, type HttpOptions, http, orderStatusSchema } from '@/shared/api';
 import { supportTicketStatusSchema } from '@/shared/staff-api';
 
-const BASE = '/manager/support/tickets';
+export const SUPPORT_SIDE = {
+  STAFF: 'staff',
+  AUTHOR: 'author',
+} as const;
+
+export type SupportSide = (typeof SUPPORT_SIDE)[keyof typeof SUPPORT_SIDE];
+
+const BASES: Record<SupportSide, string> = {
+  [SUPPORT_SIDE.STAFF]: '/manager/support/tickets',
+  [SUPPORT_SIDE.AUTHOR]: '/support/tickets',
+};
+
+const BASE = BASES[SUPPORT_SIDE.STAFF];
+
+export function supportTicketsPath(side: SupportSide): string {
+  return BASES[side];
+}
 
 export const SUPPORT_VIEW = {
   AWAITING: 'awaiting',
@@ -84,8 +100,8 @@ export type SupportTicketsQuery = {
   until: number | null;
 };
 
-function ticketPath(ticketId: number): string {
-  return `${BASE}/${ticketId}`;
+export function supportTicketPath(side: SupportSide, ticketId: number): string {
+  return `${BASES[side]}/${ticketId}`;
 }
 
 export async function getSupportTickets(
@@ -116,17 +132,13 @@ export async function getSupportTicket(
   ticketId: number,
   options: HttpOptions = {},
 ): Promise<SupportTicket> {
-  return supportTicketSchema.parse(await http.get(ticketPath(ticketId), options));
+  return supportTicketSchema.parse(
+    await http.get(supportTicketPath(SUPPORT_SIDE.STAFF, ticketId), options),
+  );
 }
 
 export async function closeSupportTicket(ticketId: number): Promise<SupportTicket> {
-  return supportTicketSchema.parse(await http.post(`${ticketPath(ticketId)}/close`));
-}
-
-export function supportMessagesPath(ticketId: number): string {
-  return `${ticketPath(ticketId)}/messages`;
-}
-
-export function supportReadPath(ticketId: number): string {
-  return `${ticketPath(ticketId)}/read`;
+  return supportTicketSchema.parse(
+    await http.post(`${supportTicketPath(SUPPORT_SIDE.STAFF, ticketId)}/close`),
+  );
 }

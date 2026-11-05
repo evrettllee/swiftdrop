@@ -3,17 +3,19 @@ import {
   SUPPORT_SEND_FAILURE,
   type SupportMessage,
   type SupportSendFailure,
+  type SupportSide,
   sendSupportMessage,
   supportSendFailureOf,
 } from '@/shared/support-api';
 
 type SendOptions = {
+  side: SupportSide;
   ticketId: number;
   onSent: (message: SupportMessage) => void;
   onClosed: () => void;
 };
 
-export function useTicketSend({ ticketId, onSent, onClosed }: SendOptions) {
+export function useSupportSend({ side, ticketId, onSent, onClosed }: SendOptions) {
   const [text, setText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [failure, setFailure] = useState<SupportSendFailure | null>(null);
@@ -23,7 +25,7 @@ export function useTicketSend({ ticketId, onSent, onClosed }: SendOptions) {
     setFailure(null);
 
     try {
-      onSent(await sendSupportMessage(ticketId, text.trim()));
+      onSent(await sendSupportMessage(side, ticketId, text.trim()));
       setText('');
     } catch (error) {
       const kind = supportSendFailureOf(error);
@@ -45,3 +47,5 @@ export function useTicketSend({ ticketId, onSent, onClosed }: SendOptions) {
     send: () => void send(),
   };
 }
+
+export type SupportSend = ReturnType<typeof useSupportSend>;

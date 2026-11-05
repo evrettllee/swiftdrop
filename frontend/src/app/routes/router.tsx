@@ -92,6 +92,22 @@ export const router = createBrowserRouter([
                     ),
                   },
                   {
+                    path: APP_ROUTES.SUPPORT,
+                    Component: lazy(() =>
+                      import('@/pages/support').then((module) => ({
+                        default: module.SupportPage,
+                      })),
+                    ),
+                  },
+                  {
+                    path: APP_ROUTES.SUPPORT_TICKET,
+                    Component: lazy(() =>
+                      import('@/pages/support').then((module) => ({
+                        default: module.SupportTicketPage,
+                      })),
+                    ),
+                  },
+                  {
                     path: APP_ROUTES.PROFILE,
                     Component: lazy(() =>
                       import('@/pages/profile').then((module) => ({

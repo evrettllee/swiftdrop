@@ -9,12 +9,20 @@ export type RadioCardProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' 
   description?: string;
   // Shown at the end of the card, for example a limit or a price.
   aside?: ReactNode;
-  isCompact?: boolean;
+  density?: RadioCardDensity;
   isTruncated?: boolean;
 };
 
+export type RadioCardDensity = 'regular' | 'compact' | 'centered';
+
+const DENSITY_CLASSES: Record<RadioCardDensity, { card: string; circle: string; title: string }> = {
+  regular: { card: 'items-start p-4', circle: 'mt-0.5', title: 'font-semibold' },
+  compact: { card: 'items-center px-4 py-3', circle: '', title: '' },
+  centered: { card: 'items-center px-4 py-3', circle: '', title: 'font-semibold' },
+};
+
 const CARD_CLASS = joinClassNames(
-  'group relative flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface text-body',
+  'group relative flex cursor-pointer gap-3 rounded-lg border border-border bg-surface text-body',
   COLOR_TRANSITION_CLASS,
   'has-checked:border-accent has-checked:bg-selected',
   'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent',
@@ -35,19 +43,17 @@ export function RadioCard({
   title,
   description,
   aside,
-  isCompact = false,
+  density = 'regular',
   isTruncated = false,
   ...inputProps
 }: RadioCardProps) {
   const lineClass = isTruncated ? 'truncate' : '';
+  const classes = DENSITY_CLASSES[density];
 
   return (
-    <label className={joinClassNames(CARD_CLASS, isCompact ? 'items-center px-4 py-3' : 'p-4')}>
+    <label className={joinClassNames(CARD_CLASS, classes.card)}>
       <input type="radio" className="peer sr-only" {...inputProps} />
-      <span
-        aria-hidden="true"
-        className={joinClassNames(CIRCLE_CLASS, isCompact ? '' : 'mt-0.5')}
-      />
+      <span aria-hidden="true" className={joinClassNames(CIRCLE_CLASS, classes.circle)} />
       {CardIcon === undefined ? null : (
         <CardIcon
           size={ICON_SIZE.LARGE}
@@ -57,7 +63,7 @@ export function RadioCard({
         />
       )}
       <span className="flex min-w-0 grow flex-col">
-        <span className={joinClassNames(isCompact ? '' : 'font-semibold', lineClass)}>{title}</span>
+        <span className={joinClassNames(classes.title, lineClass)}>{title}</span>
         {description === undefined ? null : (
           <span className={joinClassNames('text-small text-fg-secondary', lineClass)}>
             {description}

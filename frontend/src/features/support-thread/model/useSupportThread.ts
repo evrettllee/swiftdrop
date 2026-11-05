@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { onTypedSocketEvent, SOCKET_EVENTS, SUPPORT_READ_BY } from '@/shared/realtime';
-import { getSupportMessages, type SupportMessage } from '@/shared/support-api';
-import { markStaffMessagesRead, mergeMessages } from '../lib/messages';
+import {
+  getSupportMessages,
+  SUPPORT_SIDE,
+  type SupportMessage,
+  type SupportSide,
+} from '@/shared/support-api';
+import { markOwnMessagesRead, mergeMessages } from '../lib/messages';
 
 type Thread = {
   ticketId: number;
@@ -17,7 +22,12 @@ function emptyThread(ticketId: number): Thread {
 
 type ThreadUpdate = (change: (thread: Thread) => Thread) => void;
 
-function useThreadEvents(ticketId: number, update: ThreadUpdate) {
+const READER_OF_OWN: Record<SupportSide, string> = {
+  [SUPPORT_SIDE.STAFF]: SUPPORT_READ_BY.AUTHOR,
+  [SUPPORT_SIDE.AUTHOR]: SUPPORT_READ_BY.STAFF,
+};
+
+function useThreadEvents(side: SupportSide, ticketId: number, update: ThreadUpdate) {
   useEffect(() => {
     const stopMessages = onTypedSocketEvent(SOCKET_EVENTS.SUPPORT_MESSAGE, (payload) => {
       if (payload.ticketId === ticketId) {
@@ -25,8 +35,8 @@ function useThreadEvents(ticketId: number, update: ThreadUpdate) {
       }
     });
     const stopRead = onTypedSocketEvent(SOCKET_EVENTS.SUPPORT_READ, (payload) => {
-      if (payload.ticketId === ticketId && payload.by === SUPPORT_READ_BY.AUTHOR) {
-        update((thread) => ({ ...thread, items: markStaffMessagesRead(thread.items) }));
+      if (payload.ticketId === ticketId && payload.by === READER_OF_OWN[side]) {
+        update((thread) => ({ ...thread, items: markOwnMessagesRead(thread.items, side) }));
       }
     });
 
@@ -34,14 +44,14 @@ function useThreadEvents(ticketId: number, update: ThreadUpdate) {
       stopMessages();
       stopRead();
     };
-  }, [ticketId, update]);
+  }, [side, ticketId, update]);
 }
 
-function useFirstPage(ticketId: number, rejoins: number, update: ThreadUpdate): void {
+function useFirstPage(side: SupportSide, ticketId: number, rejoins: number, update: ThreadUpdate) {
   useEffect(() => {
     const controller = new AbortController();
 
-    getSupportMessages(ticketId, null, { signal: controller.signal }).then(
+    getSupportMessages(side, ticketId, null, { signal: controller.signal }).then(
       (page) =>
         update((value) => ({
           ...value,
@@ -57,10 +67,10 @@ function useFirstPage(ticketId: number, rejoins: number, update: ThreadUpdate): 
     );
 
     return () => controller.abort();
-  }, [ticketId, rejoins, update]);
+  }, [side, ticketId, rejoins, update]);
 }
 
-export function useTicketMessages(ticketId: number, joins: number) {
+export function useSupportThread(side: SupportSide, ticketId: number, joins: number) {
   const [thread, setThread] = useState<Thread>(() => emptyThread(ticketId));
   const current = thread.ticketId === ticketId ? thread : emptyThread(ticketId);
   const rejoins = Math.max(joins - 1, 0);
@@ -73,8 +83,8 @@ export function useTicketMessages(ticketId: number, joins: number) {
     [ticketId],
   );
 
-  useFirstPage(ticketId, rejoins, update);
-  useThreadEvents(ticketId, update);
+  useFirstPage(side, ticketId, rejoins, update);
+  useThreadEvents(side, ticketId, update);
 
   const loadOlder = useCallback(async () => {
     if (current.nextCursor === null || current.isLoadingOlder) {
@@ -84,7 +94,7 @@ export function useTicketMessages(ticketId: number, joins: number) {
     update((value) => ({ ...value, isLoadingOlder: true }));
 
     try {
-      const page = await getSupportMessages(ticketId, current.nextCursor);
+      const page = await getSupportMessages(side, ticketId, current.nextCursor);
       update((value) => ({
         ...value,
         items: mergeMessages(value.items, page.items),
@@ -94,7 +104,7 @@ export function useTicketMessages(ticketId: number, joins: number) {
     } catch {
       update((value) => ({ ...value, isLoadingOlder: false }));
     }
-  }, [ticketId, current.nextCursor, current.isLoadingOlder, update]);
+  }, [side, ticketId, current.nextCursor, current.isLoadingOlder, update]);
 
   const add = useCallback(
     (message: SupportMessage) =>
@@ -103,6 +113,7 @@ export function useTicketMessages(ticketId: number, joins: number) {
   );
 
   return {
+    side,
     messages: current.items,
     isLoaded: current.isLoaded,
     hasOlder: current.nextCursor !== null,
@@ -111,3 +122,5 @@ export function useTicketMessages(ticketId: number, joins: number) {
     add,
   };
 }
+
+export type SupportThread = ReturnType<typeof useSupportThread>;

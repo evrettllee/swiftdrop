@@ -14,6 +14,7 @@ export const UI_TEXTS = {
   RETRY: 'Повторить',
   ORDERS: 'Заказы',
   NEW_ORDER: 'Новый заказ',
+  SUPPORT: 'Поддержка',
   // The account area of the courier.
   COURIER_WORK: 'Работа',
   COURIER_HISTORY: 'История',

@@ -7,7 +7,11 @@ import {
   http,
   NETWORK_ERROR_STATUS,
 } from '@/shared/api';
-import { supportMessagesPath, supportReadPath } from './support-tickets';
+import { type SupportSide, supportTicketPath } from './support-tickets';
+
+function messagesPath(side: SupportSide, ticketId: number): string {
+  return `${supportTicketPath(side, ticketId)}/messages`;
+}
 
 export const SUPPORT_MESSAGES_LIMIT = 30;
 export const SUPPORT_MESSAGE_MAX_LENGTH = 1000;
@@ -31,6 +35,7 @@ const messagesPageSchema = z.object({
 export type SupportMessagesPage = z.infer<typeof messagesPageSchema>;
 
 export async function getSupportMessages(
+  side: SupportSide,
   ticketId: number,
   cursor: string | null,
   options: HttpOptions = {},
@@ -42,20 +47,24 @@ export async function getSupportMessages(
   }
 
   return messagesPageSchema.parse(
-    await http.get(`${supportMessagesPath(ticketId)}?${search.toString()}`, options),
+    await http.get(`${messagesPath(side, ticketId)}?${search.toString()}`, options),
   );
 }
 
-export async function sendSupportMessage(ticketId: number, text: string): Promise<SupportMessage> {
+export async function sendSupportMessage(
+  side: SupportSide,
+  ticketId: number,
+  text: string,
+): Promise<SupportMessage> {
   const answer = z
     .object({ message: supportMessageSchema })
-    .parse(await http.post(supportMessagesPath(ticketId), { text }));
+    .parse(await http.post(messagesPath(side, ticketId), { text }));
 
   return answer.message;
 }
 
-export async function markSupportRead(ticketId: number): Promise<void> {
-  await http.post(supportReadPath(ticketId));
+export async function markSupportRead(side: SupportSide, ticketId: number): Promise<void> {
+  await http.post(`${supportTicketPath(side, ticketId)}/read`);
 }
 
 export const SUPPORT_SEND_FAILURE = {

@@ -5,6 +5,8 @@ export const APP_ROUTES = {
   ADDRESSES: '/addresses',
   ORDERS: '/orders',
   ORDER_NEW: '/new-order',
+  SUPPORT: '/support',
+  SUPPORT_TICKET: '/support/:ticketId',
   FORGOT_PASSWORD: '/forgot-password',
   TERMS: '/terms',
   PRIVACY: '/privacy',
@@ -14,6 +16,8 @@ export const APP_ROUTES = {
   COURIER_HISTORY_ORDER: '/courier/history/:orderId',
   COURIER_PROFILE: '/courier/profile',
   COURIER_VEHICLE: '/courier/vehicle',
+  COURIER_SUPPORT: '/courier/support',
+  COURIER_SUPPORT_TICKET: '/courier/support/:ticketId',
   MANAGER_ORDERS: '/manager/orders',
   MANAGER_ORDER: '/manager/orders/:orderId',
   MANAGER_MAP: '/manager/map',
@@ -78,6 +82,25 @@ export const MANAGER_TICKET_PARAM = 'ticket';
 
 export function getManagerTicketPath(ticketId: number): string {
   return `${APP_ROUTES.MANAGER_SUPPORT}?${new URLSearchParams({ [MANAGER_TICKET_PARAM]: String(ticketId) })}`;
+}
+
+export const SUPPORT_TICKET_PARAM = 'ticketId';
+export const SUPPORT_NEW_PARAM = 'new';
+export const SUPPORT_NEW_VALUE = '1';
+export const SUPPORT_ORDER_PARAM = 'orderId';
+
+export function getSupportTicketPath(supportPath: string, ticketId: number): string {
+  return `${supportPath}/${ticketId}`;
+}
+
+export function getNewTicketPath(supportPath: string, orderId: number | null): string {
+  const search = new URLSearchParams({ [SUPPORT_NEW_PARAM]: SUPPORT_NEW_VALUE });
+
+  if (orderId !== null) {
+    search.set(SUPPORT_ORDER_PARAM, String(orderId));
+  }
+
+  return `${supportPath}?${search.toString()}`;
 }
 
 // The router pattern for every address that matches no page.

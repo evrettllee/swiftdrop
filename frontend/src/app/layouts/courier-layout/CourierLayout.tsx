@@ -7,8 +7,9 @@ import { useAppSocket } from '@/shared/realtime';
 import { APP_ROUTES } from '@/shared/routes';
 import { ToastViewport } from '@/shared/ui/toast';
 import { AccountShell } from '../account-shell/AccountShell';
+import { useSupportReplyToast } from '../account-shell/useSupportReplyToast';
 import { CourierStatusIndicator } from './CourierStatusIndicator';
-import { COURIER_LAYOUT_TEXTS, COURIER_NAV_ITEMS } from './navigation';
+import { COURIER_BOTTOM_NAV_ITEMS, COURIER_LAYOUT_TEXTS, COURIER_NAV_ITEMS } from './navigation';
 import { useActiveOrderRoom } from './useActiveOrderRoom';
 import { useActiveOrderSender } from './useActiveOrderSender';
 
@@ -18,6 +19,7 @@ import { useActiveOrderSender } from './useActiveOrderSender';
 export function CourierLayout() {
   useAppSocket();
   useCourierProfileLoader();
+  useSupportReplyToast(APP_ROUTES.COURIER_SUPPORT);
   const { activeOrderId, joins } = useActiveOrderRoom();
   const senderName = useActiveOrderSender(activeOrderId);
   useIncomingMessageToast({
@@ -38,6 +40,7 @@ export function CourierLayout() {
           homeTo={APP_ROUTES.COURIER_WORK}
           navLabel={COURIER_LAYOUT_TEXTS.NAV_LABEL}
           navItems={COURIER_NAV_ITEMS}
+          bottomNavItems={COURIER_BOTTOM_NAV_ITEMS}
           headerEnd={<CourierStatusIndicator />}
         />
         <OrderOffer />

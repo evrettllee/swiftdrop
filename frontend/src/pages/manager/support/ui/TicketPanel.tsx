@@ -1,4 +1,5 @@
 import { CheckCircleIcon } from '@phosphor-icons/react';
+import { SupportLog } from '@/features/support-thread';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { useMinuteNow } from '@/shared/lib/clock';
 import { Button } from '@/shared/ui/button';
@@ -9,7 +10,6 @@ import { authorLine } from '../lib/ticket-lines';
 import type { TicketModel } from '../model/useTicket';
 import { CloseTicketDialog } from './CloseTicketDialog';
 import { TicketFooter } from './TicketFooter';
-import { TicketLog } from './TicketLog';
 import { TicketOrderCard } from './TicketOrderCard';
 
 export function ClosedMark() {
@@ -86,7 +86,11 @@ export function TicketPanel({ model }: { model: TicketModel }) {
             )}
           </header>
           <div className="flex min-h-0 flex-1 flex-col border-t border-border">
-            <TicketLog thread={model.thread} showAuthors />
+            <SupportLog
+              thread={model.thread}
+              label={DIALOG_TEXTS.MESSAGES}
+              authorOf={(message) => message.authorName}
+            />
           </div>
           <div className="shrink-0 border-t border-border">
             <TicketFooter model={model} />
