@@ -4,7 +4,11 @@ import { EMPTY_TEXTS, MANAGER_SUPPORT_TEXTS as TEXTS } from '../config/texts';
 
 export type QueueEmpty = { title: string; text: string };
 
-export function queueEmpty(view: SupportView, search: string | null, hasRole: boolean): QueueEmpty {
+export function queueEmpty(
+  view: SupportView,
+  search: string | null,
+  hasFilters: boolean,
+): QueueEmpty {
   if (search !== null) {
     const isNumber = searchKindOf(search) === SEARCH_KIND.NUMBER;
     const subject = isNumber ? EMPTY_TEXTS.byNumber(search) : EMPTY_TEXTS.byText(search);
@@ -13,7 +17,7 @@ export function queueEmpty(view: SupportView, search: string | null, hasRole: bo
     return { title: TEXTS.NOTHING_TITLE, text: `${subject}${EMPTY_TEXTS.NONE}${advice}` };
   }
 
-  if (hasRole) {
+  if (hasFilters) {
     return {
       title: TEXTS.NOTHING_TITLE,
       text: `${EMPTY_TEXTS.BY_FILTERS}${EMPTY_TEXTS.NONE}${EMPTY_TEXTS.CHANGE_FILTERS}`,

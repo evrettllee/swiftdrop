@@ -15,6 +15,7 @@ export const APPLIED_FILTER = {
   COURIER: 'courier',
   PAYMENT: 'payment',
   FRAGILE: 'fragile',
+  OPEN_TICKET: 'openTicket',
 } as const;
 
 export type AppliedFilterId = (typeof APPLIED_FILTER)[keyof typeof APPLIED_FILTER];
@@ -23,6 +24,7 @@ export type AppliedFilter = {
   id: AppliedFilterId;
   name: string;
   value: string;
+  scope?: string;
   reset: Partial<OrdersParams>;
 };
 
@@ -90,6 +92,16 @@ export function appliedFilters(
     });
   }
 
+  if (filter.hasOpenTicket) {
+    result.push({
+      id: APPLIED_FILTER.OPEN_TICKET,
+      name: FILTER_TEXTS.TICKET,
+      value: FILTER_TEXTS.OPEN_TICKET_CHIP,
+      scope: FILTER_TEXTS.OPEN_TICKET_ONLY.toLowerCase(),
+      reset: { hasOpenTicket: false },
+    });
+  }
+
   return result;
 }
 
@@ -116,5 +128,8 @@ export function emptyResultText(view: OrdersView, now: Date): string {
 }
 
 export function exportScope(view: OrdersView, filters: readonly AppliedFilter[]): string[] {
-  return [TAB_LABELS[view.tab].toLowerCase(), ...filters.map((filter) => filter.value)];
+  return [
+    TAB_LABELS[view.tab].toLowerCase(),
+    ...filters.map((filter) => filter.scope ?? filter.value),
+  ];
 }

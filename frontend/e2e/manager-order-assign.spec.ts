@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { lastCandidateQuery, stubOrderActions } from './support/manager-actions';
 import { awaitingOrder, MANAGER_ORDER_ID, stubManagerOrder } from './support/manager-order';
+import { fromFixedNow } from './support/clock';
 
 const ORDER_PATH = `/manager/orders/${MANAGER_ORDER_ID}`;
 const TITLE = 'Назначить курьера на заказ №48231';
@@ -111,7 +112,7 @@ test('should keep the chosen courier when the list is read again after a change 
     orderId: MANAGER_ORDER_ID + 1,
     kind: 'status',
     status: 'confirmed',
-    statusChangedAt: new Date().toISOString(),
+    statusChangedAt: fromFixedNow(0).toISOString(),
     courierId: null,
   });
   await page.waitForTimeout(1000);
@@ -121,7 +122,7 @@ test('should keep the chosen courier when the list is read again after a change 
     orderId: MANAGER_ORDER_ID,
     kind: 'status',
     status: 'awaiting_manual_assignment',
-    statusChangedAt: new Date().toISOString(),
+    statusChangedAt: fromFixedNow(0).toISOString(),
     courierId: null,
   });
   await expect.poll(() => actions.candidateRequests.length).toBe(before + 1);

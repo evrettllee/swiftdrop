@@ -4,4 +4,4 @@ export const SORT_KEY = {
   STATUS_CHANGED_AT: 'statusChangedAt',
 } as const;
 
-export type SortableKey = typeof SORT_KEY.CREATED_AT | typeof SORT_KEY.PRICE;
+export type SortableKey = (typeof SORT_KEY)[keyof typeof SORT_KEY];

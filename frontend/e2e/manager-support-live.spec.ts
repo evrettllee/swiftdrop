@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { SOCKET_EVENTS } from '../src/shared/realtime/socket-events';
 import { stubSupport, SUPPORT_PATH } from './support/manager-support';
+import { fromFixedNow } from './support/clock';
 
 function reply(page: Page) {
   return page.getByRole('textbox', { name: 'Ответ клиенту' });
@@ -12,7 +13,7 @@ function pushMessage(stub: Awaited<ReturnType<typeof stubSupport>>, id: number, 
     message: {
       id,
       text,
-      createdAt: new Date().toISOString(),
+      createdAt: fromFixedNow(0).toISOString(),
       fromStaff: false,
       authorName: 'Анна Кравец',
       isRead: false,
@@ -51,7 +52,7 @@ test('should send a reply by Enter and explain each failure', async ({ page }) =
 
   stub.sendFailure = { status: 409, body: { code: 'TICKET_CLOSED', message: 'Обращение закрыто' } };
   stub.tickets[0].status = 'closed';
-  stub.tickets[0].closedAt = new Date().toISOString();
+  stub.tickets[0].closedAt = fromFixedNow(0).toISOString();
   const asked = stub.detailRequests;
   await reply(page).fill('Последнее');
   await reply(page).press('Enter');
@@ -82,7 +83,7 @@ test('should add live messages once, mark own ones read and reread a closed tick
   await expect(log.getByRole('img', { name: 'Прочитано' })).toHaveCount(1);
 
   stub.tickets[0].status = 'closed';
-  stub.tickets[0].closedAt = new Date().toISOString();
+  stub.tickets[0].closedAt = fromFixedNow(0).toISOString();
   stub.tickets[0].closedBy = { role: 'author', name: 'Анна Кравец' };
   stub.socket.push(SOCKET_EVENTS.SUPPORT_TICKET, {
     ticketId: 91,
@@ -116,7 +117,7 @@ test('should join again after a lost connection and load the missed messages', a
   stub.messages.get(91)?.push({
     id: 77,
     text: 'Пока вас не было',
-    createdAt: new Date().toISOString(),
+    createdAt: fromFixedNow(0).toISOString(),
     fromStaff: false,
     authorName: 'Анна Кравец',
     isRead: false,

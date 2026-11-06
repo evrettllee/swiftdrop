@@ -102,6 +102,7 @@ export const HISTORY_NUMBER_SEARCH = /^\d+$/;
 export const HISTORY_DISTANCE_DECIMALS = 1;
 export const HISTORY_VALIDATION_MESSAGES = {
   SEARCH_NOT_NUMBER: 'Введите номер заказа цифрами',
+  STATUS_INVALID: 'Статус истории: delivered или cancelled',
 } as const;
 
 // Validation

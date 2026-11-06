@@ -1,3 +1,4 @@
+import { TICKET_TOPIC_LABELS } from '@/entities/support-ticket';
 import { STAFF_VEHICLE_LABELS } from '@/entities/courier';
 import type { CourierVehicle } from '@/shared/api';
 import { formatTime } from '@/shared/lib/format';
@@ -10,7 +11,7 @@ import {
   type ManagerOrderTicket,
   SUPPORT_TICKET_STATUS,
 } from '@/shared/staff-api';
-import { ACTOR_LABELS, OFFERS_TEXTS, TICKET_TEXTS, TICKET_TOPIC_LABELS } from '../config/texts';
+import { ACTOR_LABELS, OFFERS_TEXTS, TICKET_TEXTS } from '../config/texts';
 import { minutesSince, secondsToMinutes } from './minutes';
 
 export function toActionTarget(order: ManagerOrderDetails): StaffOrderTarget {

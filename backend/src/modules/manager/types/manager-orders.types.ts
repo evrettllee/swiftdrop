@@ -12,6 +12,7 @@ export type ManagerOrderFilters = {
   courierId: number | null;
   payment: PaymentState[] | null;
   fragile: boolean;
+  hasOpenTicket: boolean;
   search: OrderSearch | null;
 };
 

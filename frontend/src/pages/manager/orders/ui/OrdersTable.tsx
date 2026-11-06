@@ -40,7 +40,7 @@ function OrdersTableHead({ isAttention, sort, sorts, onSort }: OrdersTableHeadPr
         <TableHeaderCell className="w-48">{MANAGER_ORDERS_TEXTS.COLUMN_CLIENT}</TableHeaderCell>
         <TableHeaderCell>{MANAGER_ORDERS_TEXTS.COLUMN_ROUTE}</TableHeaderCell>
         {isAttention ? (
-          <TableHeaderCell sort={headerSortState(sort, SORT_KEY.STATUS_CHANGED_AT)}>
+          <TableHeaderCell {...sortProps(SORT_KEY.STATUS_CHANGED_AT)}>
             {MANAGER_ORDERS_TEXTS.COLUMN_WAITING}
           </TableHeaderCell>
         ) : (

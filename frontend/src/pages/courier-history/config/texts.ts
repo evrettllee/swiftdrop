@@ -1,7 +1,7 @@
 import { UI_TEXTS } from '@/shared/config';
 import { CALENDAR_PERIOD, type CalendarPeriod } from '@/shared/lib/calendar';
 import { formatCount, pluralize } from '@/shared/lib/format';
-import { HISTORY_SORT, type HistorySort } from './list';
+import { HISTORY_SORT, HISTORY_STATUS, type HistorySort, type HistoryStatus } from './list';
 
 const ORDER_FORMS = { one: 'заказ', few: 'заказа', many: 'заказов' };
 
@@ -17,6 +17,7 @@ export const HISTORY_TEXTS = {
   EMPTY_TEXT: 'Здесь появятся заказы, которые вы доставили.',
   EMPTY_PERIOD_TITLE: 'За этот период доставок нет',
   EMPTY_PERIOD_TEXT: 'Выберите другой период.',
+  EMPTY_CANCELLED_TITLE: 'За этот период отменённых заказов нет',
   NOT_FOUND_TITLE: 'Заказ не найден',
   NOT_FOUND_TEXT: 'Проверьте номер заказа или выберите другой период.',
   TO_WORK: 'К работе',
@@ -37,6 +38,9 @@ export const HISTORY_TEXTS = {
 
 export const FILTER_TEXTS = {
   PERIOD: 'Период',
+  PANEL: 'Период и статус',
+  STATUS: 'Статус',
+  ALL_STATUSES: 'Все',
   PERIOD_FROM: 'С',
   PERIOD_TO: 'По',
   PERIOD_INVALID: 'Начало периода позже его конца',
@@ -68,3 +72,8 @@ export const HISTORY_SUMMARY_TEXTS = {
   until: (day: string) => `По ${day}`,
   lead: (period: string) => `${period}: `,
 } as const;
+
+export const STATUS_LABELS: Record<HistoryStatus, string> = {
+  [HISTORY_STATUS.DELIVERED]: 'Доставленные',
+  [HISTORY_STATUS.CANCELLED]: 'Отменённые',
+};

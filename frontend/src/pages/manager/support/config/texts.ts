@@ -6,6 +6,8 @@ import {
   type SupportSort,
   type SupportView,
 } from '@/shared/support-api';
+import { PERIOD_PRESET, type PeriodPreset } from '@/shared/lib/calendar';
+import { formatCount, pluralize } from '@/shared/lib/format';
 import { MANAGER_SEARCH_TEXT_MIN_LENGTH } from '@/shared/staff-api';
 
 export const MANAGER_SUPPORT_TEXTS = {
@@ -70,3 +72,34 @@ export const EMPTY_TEXTS = {
   CHECK_TEXT: ' Проверьте запрос или измените фильтры.',
   CHANGE_FILTERS: ' Измените фильтры.',
 } as const;
+
+export const FILTER_TEXTS = {
+  FILTERS: 'Фильтры',
+  TOPIC: 'Тема',
+  PERIOD: 'Дата создания',
+  PERIOD_CHIP: 'Создано',
+  PERIOD_FROM: 'С',
+  PERIOD_TO: 'По',
+  PERIOD_INVALID: 'Начало периода позже его конца',
+  APPLY: 'Показать обращения',
+  COUNT_DELAY_MS: 300,
+  showTickets: (count: number) =>
+    `Показать ${formatCount(count)} ${pluralize(count, { one: 'обращение', few: 'обращения', many: 'обращений' })}`,
+  RESET: 'Сбросить',
+  APPLIED: 'Применённые фильтры',
+  RESET_ALL: 'Сбросить всё',
+  SEPARATOR: ', ',
+  removeFilter: (name: string, value: string) => `Убрать фильтр ${name} ${value}`,
+  periodDays: (days: number) =>
+    `${formatCount(days)} ${pluralize(days, { one: 'день', few: 'дня', many: 'дней' })}`,
+  periodFrom: (date: string) => `с ${date}`,
+  periodTo: (date: string) => `по ${date}`,
+  periodRange: (from: string, to: string) => `${from}–${to}`,
+} as const;
+
+export const PERIOD_LABELS: Record<PeriodPreset, string> = {
+  [PERIOD_PRESET.ALL]: 'Всё время',
+  [PERIOD_PRESET.WEEK]: 'Последние 7 дней',
+  [PERIOD_PRESET.MONTH]: 'Последние 30 дней',
+  [PERIOD_PRESET.CUSTOM]: 'Свой период',
+};

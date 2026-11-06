@@ -6,12 +6,17 @@ import {
   type Period,
 } from '@/shared/lib/calendar';
 import type { PeriodDraftOf } from '@/shared/ui/period-picker';
+import type { HistoryStatus } from '../config/list';
 import type { HistoryParams } from '../config/list-params';
 import { FILTER_TEXTS, PERIOD_LABELS } from '../config/texts';
 
 export type HistoryPeriodParams = Pick<HistoryParams, 'period' | 'from' | 'to'>;
 
-export type HistoryPeriodDraft = PeriodDraftOf<HistoryParams['period']>;
+export type HistoryFilterParams = Pick<HistoryParams, 'period' | 'from' | 'to' | 'status'>;
+
+export type HistoryPeriodDraft = PeriodDraftOf<HistoryParams['period']> & {
+  status: HistoryStatus | null;
+};
 
 export function historyPeriod({ period, from, to }: HistoryPeriodParams, now: Date): Period {
   return period === CALENDAR_PERIOD.CUSTOM ? { from, to } : calendarPeriod(period, now);
@@ -37,16 +42,16 @@ export function historyPeriodLabel(params: HistoryPeriodParams): string {
     : PERIOD_LABELS[params.period];
 }
 
-export function draftOf({ period, from, to }: HistoryPeriodParams): HistoryPeriodDraft {
-  return { preset: period, from, to };
+export function draftOf({ period, from, to, status }: HistoryFilterParams): HistoryPeriodDraft {
+  return { preset: period, from, to, status };
 }
 
 export function isDraftValid(draft: HistoryPeriodDraft): boolean {
   return draft.preset !== CALENDAR_PERIOD.CUSTOM || isPeriodValid(draft);
 }
 
-export function draftParams({ preset, from, to }: HistoryPeriodDraft): HistoryPeriodParams {
+export function draftParams({ preset, from, to, status }: HistoryPeriodDraft): HistoryFilterParams {
   return preset === CALENDAR_PERIOD.CUSTOM
-    ? { period: preset, from, to }
-    : { period: preset, from: null, to: null };
+    ? { period: preset, from, to, status }
+    : { period: preset, from: null, to: null, status };
 }

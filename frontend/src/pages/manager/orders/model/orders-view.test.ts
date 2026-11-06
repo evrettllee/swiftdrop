@@ -19,11 +19,16 @@ test('should take the date of Minsk for the periods', () => {
   expect(detectPreset({ from: '2026-10-21', to: '2026-10-27' }, NOW)).toBe('custom');
 });
 
-test('should sort the attention tab by the waiting time unless another sort is chosen', () => {
+test('should sort the attention tab by the waiting time and keep to the sorts of the tab', () => {
   expect(toOrdersView(params({ status: 'attention' })).sort).toBe('statusChangedAt:asc');
   expect(toOrdersView(params()).sort).toBe('createdAt:desc');
-  expect(toOrdersView(params({ sort: 'statusChangedAt:asc' })).sort).toBe('createdAt:desc');
-  expect(toOrdersView(params({ status: 'attention', sort: 'price:asc' })).sort).toBe('price:asc');
+  expect(toOrdersView(params({ sort: 'statusChangedAt:asc' })).sort).toBe('statusChangedAt:asc');
+  expect(toOrdersView(params({ status: 'attention', sort: 'statusChangedAt:desc' })).sort).toBe(
+    'statusChangedAt:desc',
+  );
+  expect(toOrdersView(params({ status: 'attention', sort: 'price:asc' })).sort).toBe(
+    'statusChangedAt:asc',
+  );
 });
 
 test('should send a text search from three letters and a number from one digit', () => {
@@ -41,17 +46,27 @@ test('should drop a period that ends before it starts', () => {
 
 test('should name the applied filters for the chips and the export', () => {
   const view = toOrdersView(
-    params({ from: '2026-10-21', courierId: 7, payment: ['paid', 'refunded'], fragile: true }),
+    params({
+      from: '2026-10-21',
+      courierId: 7,
+      payment: ['paid', 'refunded'],
+      fragile: true,
+      hasOpenTicket: true,
+    }),
   );
   const chips = appliedFilters(view.filter, NOW, null);
 
-  expect(view.filtersCount).toBe(4);
+  expect(view.filtersCount).toBe(5);
+  expect(view.query.hasOpenTicket).toBe(true);
   expect(chips.map((chip) => `${chip.name}: ${chip.value}`)).toEqual([
     'Период: 7 дней',
     'Курьер: Курьер №7',
     'Оплата: оплачен, деньги возвращены',
     'Посылка: только хрупкие',
+    'Обращение: открыто',
   ]);
+  expect(chips.at(-1)?.reset).toEqual({ hasOpenTicket: false });
+  expect(exportScope(view, chips.slice(-1))).toEqual(['все', 'есть открытое обращение']);
   expect(exportScope(view, chips.slice(0, 1))).toEqual(['все', '7 дней']);
 });
 

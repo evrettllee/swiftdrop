@@ -1,4 +1,5 @@
 import { ArrowsDownUpIcon } from '@phosphor-icons/react';
+import type { ReactNode } from 'react';
 import { isSearchTooShort, MANAGER_SEARCH_MAX_LENGTH } from '@/shared/staff-api';
 import {
   SUPPORT_AUTHOR_ROLE,
@@ -23,6 +24,7 @@ type SupportToolbarProps = {
   searchText: string;
   role: SupportAuthorRole | null;
   sort: SupportSort;
+  filters: ReactNode;
   onSearchChange: (text: string) => void;
   onRoleChange: (role: SupportAuthorRole | null) => void;
   onSortChange: (sort: SupportSort) => void;
@@ -33,6 +35,7 @@ export function SupportToolbar({
   searchText,
   role,
   sort,
+  filters,
   onSearchChange,
   onRoleChange,
   onSortChange,
@@ -49,20 +52,23 @@ export function SupportToolbar({
         placeholder={isDesktop ? TEXTS.SEARCH_PLACEHOLDER : TEXTS.SEARCH_PLACEHOLDER_SHORT}
         onChange={onSearchChange}
       />
-      <div role="group" aria-label={TEXTS.ROLES} className="flex gap-2 lg:pt-1">
-        <ToggleChip
-          label={TEXTS.ALL}
-          isPressed={role === null}
-          onClick={() => onRoleChange(null)}
-        />
-        {ROLES.map((item) => (
+      <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:flex-nowrap lg:pt-1">
+        <div role="group" aria-label={TEXTS.ROLES} className="flex gap-2">
           <ToggleChip
-            key={item}
-            label={ROLE_CHIPS[item]}
-            isPressed={role === item}
-            onClick={() => onRoleChange(item)}
+            label={TEXTS.ALL}
+            isPressed={role === null}
+            onClick={() => onRoleChange(null)}
           />
-        ))}
+          {ROLES.map((item) => (
+            <ToggleChip
+              key={item}
+              label={ROLE_CHIPS[item]}
+              isPressed={role === item}
+              onClick={() => onRoleChange(item)}
+            />
+          ))}
+        </div>
+        <div className="ms-auto lg:ms-2 lg:-mt-1">{filters}</div>
       </div>
       {isDesktop ? (
         <Select<SupportSort>

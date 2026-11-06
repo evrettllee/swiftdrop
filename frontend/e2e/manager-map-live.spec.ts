@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { MAP_PATH, pushCourierOnline, pushLocation, stubCouriersMap } from './support/manager-map';
+import { runClockFromFixedNow } from './support/clock';
 
 const PHONE = { width: 375, height: 812 };
 const BATCH_WAIT_MS = 1_000;
@@ -63,7 +64,7 @@ test('should jump without a transition when less motion is asked', async ({ page
 test('should lose the signal of a courier when the position grows older than a minute', async ({
   page,
 }) => {
-  await page.clock.install();
+  await runClockFromFixedNow(page);
   const stub = await stubCouriersMap(page);
   stub.items = stub.items.map((item) =>
     item.courierId === 1 ? { ...item, positionAgeSec: 45 } : item,

@@ -1,5 +1,5 @@
 import { ORDER_HEADER_TEXTS } from '@/entities/order';
-import { ORDER_ACTOR, type OrderActor, TICKET_TOPIC, type TicketTopic } from '@/shared/staff-api';
+import { ORDER_ACTOR, type OrderActor } from '@/shared/staff-api';
 import { UI_TEXTS } from '@/shared/config';
 
 export const MANAGER_ORDER_TEXTS = {
@@ -71,15 +71,6 @@ export const OFFERS_TEXTS = {
   TIME: 'Время',
   minutes: (minutes: number) => `${minutes} мин`,
 } as const;
-
-export const TICKET_TOPIC_LABELS: Record<TicketTopic, string> = {
-  [TICKET_TOPIC.ORDER_PROBLEM]: 'Проблема с заказом',
-  [TICKET_TOPIC.PAYMENT]: 'Оплата',
-  [TICKET_TOPIC.ACCOUNT]: 'Аккаунт',
-  [TICKET_TOPIC.CLIENT_UNREACHABLE]: 'Клиент не выходит на связь',
-  [TICKET_TOPIC.APP]: 'Работа приложения',
-  [TICKET_TOPIC.OTHER]: 'Другое',
-};
 
 export const TICKET_TEXTS = {
   SEPARATOR: ', ',

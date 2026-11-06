@@ -9,6 +9,7 @@ import {
   type RawManagerOrder,
 } from './manager-order-fixtures';
 import { PARCEL_SEGMENT } from './routing';
+import { fromFixedNow } from './clock';
 
 export * from './manager-order-fixtures';
 
@@ -64,15 +65,18 @@ export async function stubManagerOrder(
 }
 
 export function freshPosition(): CourierPositionStub {
-  return { ...COURIER_POINT, updatedAt: new Date().toISOString(), isStale: false };
+  return { ...COURIER_POINT, updatedAt: fromFixedNow(0).toISOString(), isStale: false };
 }
 
+let locationSeconds = 0;
+
 export function pushCourierLocation(stub: ManagerOrderStub, lat: number, lng: number): void {
+  locationSeconds += 1;
   stub.socket.push(SOCKET_EVENTS.STAFF_COURIER_LOCATION, {
     courierId: COURIER_ID,
     lat,
     lng,
-    at: new Date().toISOString(),
+    at: fromFixedNow(locationSeconds * 1000).toISOString(),
   });
 }
 
@@ -81,7 +85,7 @@ export function pushOrderEvent(stub: ManagerOrderStub, orderId: number): void {
     orderId,
     kind: 'status',
     status: stub.order.status,
-    statusChangedAt: new Date().toISOString(),
+    statusChangedAt: fromFixedNow(0).toISOString(),
     courierId: null,
   });
 }

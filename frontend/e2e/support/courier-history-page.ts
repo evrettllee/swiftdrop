@@ -51,9 +51,9 @@ export function chips(page: Page) {
 }
 
 export function periodButton(page: Page, label: string) {
-  return page.getByRole('button', { name: `Период: ${label}` });
+  return page.getByRole('button', { name: `Период и статус: ${label}` });
 }
 
 export function periodDialog(page: Page) {
-  return page.getByRole('dialog', { name: 'Период' });
+  return page.getByRole('dialog', { name: 'Период и статус' });
 }

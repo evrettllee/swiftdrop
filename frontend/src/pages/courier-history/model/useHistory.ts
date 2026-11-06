@@ -23,13 +23,13 @@ function messageOf(error: unknown): string {
   return getApiErrorMessage(error, HISTORY_TEXTS.LOAD_ERROR);
 }
 
-function useHistoryQuery({ period, from, to, q, sort }: HistoryParams) {
+function useHistoryQuery({ period, from, to, q, sort, status }: HistoryParams) {
   const today = calendarToday(new Date(useMinuteNow()));
   const now = useMemo(() => calendarDateToUtc(today), [today]);
   const range = useMemo(() => historyPeriod({ period, from, to }, now), [period, from, to, now]);
   const query = useMemo<HistoryQuery>(
-    () => ({ q, from: range.from, to: range.to, sort }),
-    [q, range, sort],
+    () => ({ q, from: range.from, to: range.to, sort, status }),
+    [q, range, sort, status],
   );
 
   return { now, range, query };
@@ -66,6 +66,7 @@ export function useHistory() {
     isDesktop,
     now,
     range,
+    query,
     pages,
     feed,
     summary,

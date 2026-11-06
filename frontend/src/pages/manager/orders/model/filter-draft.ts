@@ -18,6 +18,7 @@ export type FilterDraft = {
   courierName: string | null;
   payment: readonly PaymentState[];
   fragile: boolean;
+  hasOpenTicket: boolean;
   sort: ManagerOrdersSort;
 };
 
@@ -32,6 +33,7 @@ export function draftOf(view: OrdersView, now: Date, courierName: string | null)
     courierName,
     payment: filter.payment,
     fragile: filter.fragile,
+    hasOpenTicket: filter.hasOpenTicket,
     sort: view.sort,
   };
 }
@@ -45,6 +47,7 @@ export function clearedDraft(tab: OrdersTab): FilterDraft {
     courierName: null,
     payment: [],
     fragile: false,
+    hasOpenTicket: false,
     sort: defaultTabSort(tab),
   };
 }
@@ -67,6 +70,7 @@ export function draftFilter(
     courierId: draft.courierId,
     payment: draft.payment,
     fragile: draft.fragile,
+    hasOpenTicket: draft.hasOpenTicket,
     search,
   };
 }
@@ -77,6 +81,7 @@ export function draftPatch(draft: FilterDraft, tab: OrdersTab, now: Date): Parti
     courierId: draft.courierId,
     payment: draft.payment,
     fragile: draft.fragile,
+    hasOpenTicket: draft.hasOpenTicket,
     sort: sortParamOf(tab, draft.sort),
   };
 }

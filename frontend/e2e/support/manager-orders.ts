@@ -3,6 +3,7 @@ import { ORDER_STATUS, type OrderStatus } from '../../src/shared/api/endpoints/o
 import type { ManagerOrderListItem } from '../../src/shared/staff-api/manager-orders';
 import { type AppSocketStub } from './app-socket';
 import { openAsManager, type CountsStub } from './manager';
+import { fromFixedNow } from './clock';
 
 const LIST_URL = /\/api\/manager\/orders(\?.*)?$/;
 const COUNTS_URL = /\/api\/manager\/orders\/counts(\?.*)?$/;
@@ -23,9 +24,9 @@ export function buildOrder(index: number, status: OrderStatus = ORDER_STATUS.CON
 
   return {
     id,
-    createdAt: new Date(Date.now() - (index + 1) * 60_000).toISOString(),
+    createdAt: fromFixedNow(-(index + 1) * 60_000).toISOString(),
     status,
-    statusChangedAt: new Date(Date.now() - 35 * 60_000).toISOString(),
+    statusChangedAt: fromFixedNow(-35 * 60_000).toISOString(),
     price: 14.6 + index,
     client: { name: `Ирина Лис ${index}`, phone: '+375334021788' },
     route: {
@@ -146,7 +147,7 @@ export function pushStaffOrder(
     orderId,
     kind,
     status: ORDER_STATUS.CONFIRMED,
-    statusChangedAt: new Date().toISOString(),
+    statusChangedAt: fromFixedNow(0).toISOString(),
     courierId: null,
   });
 }

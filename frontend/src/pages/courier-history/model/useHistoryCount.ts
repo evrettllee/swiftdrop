@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { countHistory, type HistoryQuery } from '../api/get-history';
 
-const ALL_HISTORY: HistoryQuery = { q: null, from: null, to: null, sort: null };
+const ALL_HISTORY: HistoryQuery = { q: null, from: null, to: null, sort: null, status: null };
 
 export function useHistoryCount(query: HistoryQuery | null, delayMs = 0): number | null {
   const [answer, setAnswer] = useState<{ query: HistoryQuery; count: number } | null>(null);

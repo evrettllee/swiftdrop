@@ -127,7 +127,7 @@ export function Popover({
           style={style}
           onKeyDown={handleKeyDown}
           className={joinClassNames(
-            'fixed z-30 overflow-hidden rounded-md border border-border-elevated bg-surface-elevated text-fg shadow-lg outline-none',
+            'fixed z-30 overflow-x-hidden overflow-y-auto overscroll-contain rounded-md border border-border-elevated bg-surface-elevated text-fg shadow-lg outline-none',
             panelClassName,
           )}
         >

@@ -27,6 +27,7 @@ export type OrdersParams = {
   courierId: number | null;
   payment: readonly PaymentState[];
   fragile: boolean;
+  hasOpenTicket: boolean;
   sort: ManagerOrdersSort | null;
   page: number;
   limit: PageSize;
@@ -44,6 +45,7 @@ export const ORDERS_PARAMS_CONFIG: ListParamsConfig<OrdersParams> = {
       .transform((raw) => [...new Set(raw.split(LIST_VALUES_SEPARATOR))])
       .pipe(z.array(z.enum(PAYMENT_STATE)).min(1)),
     fragile: z.literal(MANAGER_FLAG_TRUE).transform(() => true),
+    hasOpenTicket: z.literal(MANAGER_FLAG_TRUE).transform(() => true),
     sort: z.enum(MANAGER_ORDERS_SORT),
     page: z.coerce.number().int().min(1).max(PAGE_MAX),
     limit: z.coerce
@@ -58,6 +60,7 @@ export const ORDERS_PARAMS_CONFIG: ListParamsConfig<OrdersParams> = {
     courierId: null,
     payment: [],
     fragile: false,
+    hasOpenTicket: false,
     sort: null,
     page: 1,
     limit: DEFAULT_PAGE_SIZE,

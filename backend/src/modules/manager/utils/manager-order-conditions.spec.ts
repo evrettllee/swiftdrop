@@ -10,6 +10,7 @@ import {
   searchCondition,
   statusGroupsCondition,
 } from './manager-order-conditions';
+import { openTicketCondition } from './order-flag-conditions';
 
 const db = drizzle.mock({ schema, casing: 'snake_case' }) as unknown as Database;
 const dialect = new PgDialect({ casing: 'snake_case' });
@@ -18,6 +19,7 @@ const NO_FILTERS = {
   courierId: null,
   payment: null,
   fragile: false,
+  hasOpenTicket: false,
   search: null,
 };
 
@@ -161,5 +163,15 @@ describe('managerOrderConditions', () => {
     expect(query?.sql).toContain('"orders"."courier_id" = $3');
     expect(query?.sql).toContain('"packages"."is_fragile" = $4');
     expect(query?.params).toEqual([start.toISOString(), end.toISOString(), 3, true]);
+  });
+
+  it('should keep only orders with an open ticket through a correlated EXISTS', () => {
+    const query = render(managerOrderConditions(db, { ...NO_FILTERS, hasOpenTicket: true }));
+
+    expect(query?.sql).toBe(render(openTicketCondition(db))?.sql);
+    expect(query?.sql).toContain(
+      'exists (select 1 from "support_tickets" where ("support_tickets"."order_id" = "orders"."order_id" and "support_tickets"."status" = $1))',
+    );
+    expect(query?.params).toEqual(['open']);
   });
 });

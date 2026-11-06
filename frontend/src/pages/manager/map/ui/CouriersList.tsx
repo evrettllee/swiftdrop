@@ -1,6 +1,5 @@
 import { MagnifyingGlassIcon, UsersIcon } from '@phosphor-icons/react';
 import { EmptyState } from '@/shared/ui/empty-state';
-import type { MapFilter } from '../config/map';
 import { MANAGER_MAP_TEXTS as TEXTS } from '../config/texts';
 import type { LiveCourier } from '../lib/courier-state';
 import { CourierRow } from './CourierRow';
@@ -10,17 +9,17 @@ type CouriersListProps = {
   now: number;
   selectedId: number | null;
   search: string | null;
-  filter: MapFilter | null;
+  isFiltered: boolean;
   isLoading: boolean;
   onSelect: (courierId: number) => void;
 };
 
-function emptyText(search: string | null, filter: MapFilter | null): string | null {
+function emptyText(search: string | null, isFiltered: boolean): string | null {
   if (search !== null) {
     return TEXTS.bySearch(search);
   }
 
-  return filter === null ? null : TEXTS.BY_FILTER;
+  return isFiltered ? TEXTS.BY_FILTER : null;
 }
 
 export function CouriersList({
@@ -28,12 +27,12 @@ export function CouriersList({
   now,
   selectedId,
   search,
-  filter,
+  isFiltered,
   isLoading,
   onSelect,
 }: CouriersListProps) {
   if (couriers.length === 0) {
-    const text = emptyText(search, filter);
+    const text = emptyText(search, isFiltered);
 
     return text === null ? (
       <EmptyState icon={UsersIcon} title={TEXTS.NOBODY_TITLE} text={TEXTS.NOBODY_TEXT} />

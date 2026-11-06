@@ -38,8 +38,10 @@ export function ManagerMapPage() {
             searchText={params.searchText}
             chips={page.chips}
             filter={params.values.state}
+            vehicleTypes={params.values.vehicleType}
             onSearchChange={params.setSearchText}
             onFilterChange={(state) => params.update({ state })}
+            onVehicleTypesChange={(vehicleType) => params.update({ vehicleType })}
           />
         }
         failure={page.isFailed ? <MapLoadFailed onRetry={page.reload} /> : null}
@@ -70,7 +72,7 @@ export function ManagerMapPage() {
               now={page.now}
               selectedId={page.selectedId}
               search={page.query.search}
-              filter={params.values.state}
+              isFiltered={params.values.state !== null || params.values.vehicleType.length > 0}
               isLoading={page.isLoading}
               onSelect={select}
             />

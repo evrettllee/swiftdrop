@@ -80,6 +80,9 @@ export const FILTER_TEXTS = {
   PARCEL: 'Посылка',
   FRAGILE_ONLY: 'Только хрупкие',
   FRAGILE_CHIP: 'только хрупкие',
+  TICKET: 'Обращение',
+  OPEN_TICKET_ONLY: 'Есть открытое обращение',
+  OPEN_TICKET_CHIP: 'открыто',
   periodDays: (days: number) =>
     `${formatCount(days)} ${pluralize(days, { one: 'день', few: 'дня', many: 'дней' })}`,
   periodFrom: (date: string) => `с ${date}`,

@@ -100,8 +100,10 @@ export type HistoryStub = { items: HistoryItemBody[]; requests: URLSearchParams[
 function answer(stub: HistoryStub, route: Route) {
   const params = new URL(route.request().url()).searchParams;
   stub.requests.push(params);
+  const status = params.get('status');
+  const inPeriod = stub.items.filter((item) => matches(item, params));
   const found = sorted(
-    stub.items.filter((item) => matches(item, params)),
+    inPeriod.filter((item) => status === null || item.status === status),
     params.get('sort'),
   );
   const limit = Number(params.get('limit') ?? '10');
@@ -118,7 +120,7 @@ function answer(stub: HistoryStub, route: Route) {
         limit,
         total: found.length,
         until: params.has('until') ? Number(params.get('until')) : top,
-        summary: summaryOf(found),
+        summary: summaryOf(inPeriod),
       },
     });
   }
@@ -130,7 +132,7 @@ function answer(stub: HistoryStub, route: Route) {
     json: {
       items: found.slice(offset, end),
       nextCursor: end < found.length ? String(end) : null,
-      ...(cursor === '' ? { total: found.length, summary: summaryOf(found) } : {}),
+      ...(cursor === '' ? { total: found.length, summary: summaryOf(inPeriod) } : {}),
     },
   });
 }

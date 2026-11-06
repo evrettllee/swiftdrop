@@ -10,6 +10,7 @@ export const MANAGER_ORDERS_PARAM = {
   COURIER_ID: 'courierId',
   PAYMENT: 'payment',
   FRAGILE: 'fragile',
+  HAS_OPEN_TICKET: 'hasOpenTicket',
   SEARCH: 'q',
   FORMAT: 'format',
   WITH_PHONES: 'withPhones',

@@ -38,6 +38,14 @@ export function FlagFields({ draft, onToggle, onChange }: FlagFieldsProps) {
           onChange={(event) => onChange({ fragile: event.target.checked })}
         />
       </fieldset>
+      <fieldset className="flex flex-col gap-3">
+        <legend className={LEGEND_CLASS}>{FILTER_TEXTS.TICKET}</legend>
+        <Checkbox
+          label={FILTER_TEXTS.OPEN_TICKET_ONLY}
+          checked={draft.hasOpenTicket}
+          onChange={(event) => onChange({ hasOpenTicket: event.target.checked })}
+        />
+      </fieldset>
     </>
   );
 }

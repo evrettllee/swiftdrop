@@ -19,6 +19,14 @@ describe('historyCondition', () => {
     expect(params).toEqual(expect.arrayContaining([7, 'delivered', 'cancelled']));
   });
 
+  it('should keep to one finished status when it is chosen', () => {
+    const { sql, params } = render(historyCondition(7, NO_PERIOD, null, 'cancelled'));
+
+    expect(sql).toContain('"orders"."status" = $');
+    expect(sql).not.toContain('"status" in (');
+    expect(params).toEqual(expect.arrayContaining([7, 'cancelled']));
+  });
+
   it('should match the number of the order exactly', () => {
     const { sql, params } = render(historyCondition(7, NO_PERIOD, { orderId: 48232 }));
 

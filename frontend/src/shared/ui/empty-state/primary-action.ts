@@ -14,13 +14,12 @@ export type PrimaryActionList = {
   hasEmptyAction?: boolean;
 };
 
-export function primaryActionPlace({
-  isLoading,
-  isEmpty,
-  hasEmptyAction = true,
-}: PrimaryActionList): PrimaryActionPlace {
+export function primaryActionPlace(
+  { isLoading, isEmpty, hasEmptyAction = true }: PrimaryActionList,
+  settled: PrimaryActionPlace | null = null,
+): PrimaryActionPlace {
   if (isLoading) {
-    return PRIMARY_ACTION_PLACE.NONE;
+    return settled ?? PRIMARY_ACTION_PLACE.NONE;
   }
 
   return isEmpty && hasEmptyAction ? PRIMARY_ACTION_PLACE.EMPTY : PRIMARY_ACTION_PLACE.HEADER;
@@ -30,10 +29,8 @@ export type PlacedPrimaryAction = { header: ReactNode; empty: ReactNode };
 
 export function placePrimaryAction(
   action: ReactNode,
-  list: PrimaryActionList,
+  place: PrimaryActionPlace,
 ): PlacedPrimaryAction {
-  const place = primaryActionPlace(list);
-
   return {
     header: place === PRIMARY_ACTION_PLACE.HEADER ? action : null,
     empty: place === PRIMARY_ACTION_PLACE.EMPTY ? action : null,

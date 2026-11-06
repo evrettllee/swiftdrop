@@ -7,18 +7,27 @@ import type { PeriodFormLayout } from './PeriodForm';
 
 const TRIGGER_CLASS = `inline-flex min-h-11 min-w-0 items-center gap-2 rounded-md border border-border bg-surface px-3 text-body hover:bg-surface-muted aria-expanded:border-accent lg:px-4 ${COLOR_TRANSITION_CLASS}`;
 
+export type PeriodTriggerProps = Partial<PopoverTriggerProps>;
+
 type PeriodControlProps = {
   isDesktop: boolean;
   title: string;
   label: string;
+  renderTrigger?: (props: PeriodTriggerProps) => ReactNode;
   children: (layout: PeriodFormLayout, close: () => void) => ReactNode;
 };
 
-export function PeriodControl({ isDesktop, title, label, children }: PeriodControlProps) {
+export function PeriodControl({
+  isDesktop,
+  title,
+  label,
+  renderTrigger,
+  children,
+}: PeriodControlProps) {
   const [isOpen, setIsOpen] = useState(false);
   const close = () => setIsOpen(false);
 
-  const trigger = (props: Partial<PopoverTriggerProps>) => (
+  const periodTrigger = (props: PeriodTriggerProps) => (
     <button
       type="button"
       aria-label={`${title}: ${label}`}
@@ -42,6 +51,8 @@ export function PeriodControl({ isDesktop, title, label, children }: PeriodContr
       />
     </button>
   );
+
+  const trigger = renderTrigger ?? periodTrigger;
 
   if (isDesktop) {
     return (

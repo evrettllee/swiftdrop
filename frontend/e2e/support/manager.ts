@@ -8,6 +8,7 @@ import { SOCKET_EVENTS } from '../../src/shared/realtime/socket-events';
 import { ROLE } from '../../src/shared/session/auth-user';
 import { type AppSocketStub, stubAppSocket } from './app-socket';
 import { stubSession } from './stub-session';
+import { fixClock } from './clock';
 
 export type CountsStub = {
   attention: number;
@@ -54,6 +55,7 @@ async function stubCounts(page: Page): Promise<CountsStub> {
 export async function openAsManager(
   page: Page,
 ): Promise<{ counts: CountsStub; socket: AppSocketStub }> {
+  await fixClock(page);
   await stubSession(page, ROLE.MANAGER);
   const counts = await stubCounts(page);
   const socket = await stubAppSocket(page);

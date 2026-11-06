@@ -10,6 +10,7 @@ import {
 } from './manager-order-fixtures';
 import { stubMapbox } from './mapbox';
 import { COURIER_SEGMENT, PARCEL_SEGMENT } from './routing';
+import { fromFixedNow } from './clock';
 
 const MAP_URL = /\/api\/manager\/couriers\/map(\?.*)?$/;
 const ORDER_URL = /\/api\/manager\/orders\/(\d+)$/;
@@ -49,7 +50,7 @@ function courier(
     vehicleType: 'car',
     lat: point[0],
     lng: point[1],
-    positionAt: new Date(Date.now() - ageSec * 1000).toISOString(),
+    positionAt: fromFixedNow(-ageSec * 1000).toISOString(),
     positionAgeSec: ageSec,
     state: 'free',
     activeOrder: null,
@@ -150,7 +151,7 @@ export function pushLocation(stub: CouriersMapStub, courierId: number, lat: numb
     courierId,
     lat,
     lng,
-    at: new Date().toISOString(),
+    at: fromFixedNow(0).toISOString(),
   });
 }
 

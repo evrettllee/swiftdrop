@@ -65,3 +65,24 @@ test('should sort by the headers through the same sort in the address', async ({
   await expect(page).toHaveURL(APP_ROUTES.MANAGER_ORDERS);
   await expect(order).toHaveAttribute('aria-sort', 'descending');
 });
+
+test('should flip the waiting time by its header on the tab of the orders that need attention', async ({
+  page,
+}) => {
+  const stub = await stubManagerOrders(page);
+  const route = `${APP_ROUTES.MANAGER_ORDERS}?status=attention`;
+  await page.goto(route);
+  const waiting = header(page, MANAGER_ORDERS_TEXTS.COLUMN_WAITING);
+
+  await expect(waiting).toHaveAttribute('aria-sort', 'ascending');
+
+  await waiting.getByRole('button').click();
+  await expect(page).toHaveURL(`${route}&sort=statusChangedAt%3Adesc`);
+  await expect(waiting).toHaveAttribute('aria-sort', 'descending');
+  await expect(sortSelect(page)).toHaveValue('statusChangedAt:desc');
+  await expect.poll(() => lastList(stub).get('sort')).toBe('statusChangedAt:desc');
+
+  await waiting.getByRole('button').click();
+  await expect(page).toHaveURL(route);
+  await expect(waiting).toHaveAttribute('aria-sort', 'ascending');
+});

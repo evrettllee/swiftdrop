@@ -1,5 +1,5 @@
 import { and, count, eq, gte, inArray, lt, sql, type SQL } from 'drizzle-orm';
-import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 import type { DateRange } from '@/common/utils/date-range';
 import type { Database } from '@/database/database.module';
 import { orders } from '@/database/schema';
@@ -25,10 +25,11 @@ export function historyCondition(
   courierProfileId: number,
   period: DateRange,
   search: HistorySearch | null,
+  status: OrderStatus | null = null,
 ): SQL | undefined {
   return and(
     eq(orders.courierId, courierProfileId),
-    inArray(orders.status, [...HISTORY_STATUSES]),
+    status === null ? inArray(orders.status, [...HISTORY_STATUSES]) : eq(orders.status, status),
     periodCondition(period),
     searchCondition(search),
   );

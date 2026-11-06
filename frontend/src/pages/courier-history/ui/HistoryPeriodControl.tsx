@@ -1,29 +1,64 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { CALENDAR_PERIOD, CALENDAR_PERIODS } from '@/shared/lib/calendar';
 import { PeriodControl, PeriodForm, type PeriodFormLayout } from '@/shared/ui/period-picker';
+import { RadioCard } from '@/shared/ui/radio-card';
 import type { HistoryQuery } from '../api/get-history';
-import { HISTORY_COUNT_DELAY_MS } from '../config/list';
+import { HISTORY_COUNT_DELAY_MS, HISTORY_STATUSES, type HistoryStatus } from '../config/list';
 import { DEFAULT_PERIOD_DRAFT } from '../config/list-params';
-import { FILTER_TEXTS, HISTORY_TEXTS, PERIOD_LABELS } from '../config/texts';
+import { FILTER_TEXTS, HISTORY_TEXTS, PERIOD_LABELS, STATUS_LABELS } from '../config/texts';
 import {
   draftOf,
   draftParams,
+  type HistoryFilterParams,
   historyPeriod,
   historyPeriodLabel,
   type HistoryPeriodDraft,
-  type HistoryPeriodParams,
   isDraftValid,
 } from '../lib/history-period';
 import { useHistoryCount } from '../model/useHistoryCount';
 
 const PRESET_OPTIONS = CALENDAR_PERIODS.map((value) => ({ value, label: PERIOD_LABELS[value] }));
 
+const STATUS_OPTIONS: readonly { value: HistoryStatus | null; label: string }[] = [
+  { value: null, label: FILTER_TEXTS.ALL_STATUSES },
+  ...HISTORY_STATUSES.map((value) => ({ value, label: STATUS_LABELS[value] })),
+];
+
 type HistoryPeriodProps = {
-  value: HistoryPeriodParams;
+  value: HistoryFilterParams;
   query: HistoryQuery;
   now: Date;
-  onApply: (period: HistoryPeriodParams) => void;
+  onApply: (filters: HistoryFilterParams) => void;
 };
+
+function StatusFields({
+  value,
+  onChange,
+}: {
+  value: HistoryStatus | null;
+  onChange: (status: HistoryStatus | null) => void;
+}) {
+  const name = useId();
+
+  return (
+    <fieldset className="flex flex-col gap-2">
+      <legend className="mb-2 text-caption font-semibold text-fg-secondary uppercase">
+        {FILTER_TEXTS.STATUS}
+      </legend>
+      {STATUS_OPTIONS.map((option) => (
+        <RadioCard
+          key={option.value ?? 'all'}
+          name={name}
+          value={option.value ?? ''}
+          density="compact"
+          title={option.label}
+          checked={value === option.value}
+          onChange={() => onChange(option.value)}
+        />
+      ))}
+    </fieldset>
+  );
+}
 
 function HistoryPeriodForm({
   value,
@@ -37,7 +72,7 @@ function HistoryPeriodForm({
   const countQuery = useMemo<HistoryQuery | null>(() => {
     const range = historyPeriod(draftParams(draft), now);
 
-    return isValid ? { ...query, from: range.from, to: range.to } : null;
+    return isValid ? { ...query, from: range.from, to: range.to, status: draft.status } : null;
   }, [draft, isValid, now, query]);
   const count = useHistoryCount(countQuery, HISTORY_COUNT_DELAY_MS);
 
@@ -58,8 +93,14 @@ function HistoryPeriodForm({
         reset: HISTORY_TEXTS.RESET,
       }}
       onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
+      onReset={() => setDraft(DEFAULT_PERIOD_DRAFT)}
       onApply={() => onApply(draftParams(draft))}
-    />
+    >
+      <StatusFields
+        value={draft.status}
+        onChange={(status) => setDraft((current) => ({ ...current, status }))}
+      />
+    </PeriodForm>
   );
 }
 
@@ -71,15 +112,15 @@ export function HistoryPeriodControl({
   return (
     <PeriodControl
       isDesktop={isDesktop}
-      title={FILTER_TEXTS.PERIOD}
+      title={FILTER_TEXTS.PANEL}
       label={historyPeriodLabel(props.value)}
     >
       {(layout, close) => (
         <HistoryPeriodForm
           {...props}
           layout={layout}
-          onApply={(period) => {
-            onApply(period);
+          onApply={(filters) => {
+            onApply(filters);
             close();
           }}
         />

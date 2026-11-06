@@ -10,7 +10,7 @@ import { LIST_PAGE_SIZE, serializeListParam } from '@/shared/lib/list-params';
 import { HISTORY_COUNT_PROBE_LIMIT, HISTORY_FIRST_PAGE } from '../config/list';
 import type { HistoryParams } from '../config/list-params';
 
-export type HistoryQuery = Pick<HistoryParams, 'q' | 'from' | 'to' | 'sort'>;
+export type HistoryQuery = Pick<HistoryParams, 'q' | 'from' | 'to' | 'sort' | 'status'>;
 
 function pathOf(query: HistoryQuery, extra: Record<string, string | number | null>): string {
   const params = new URLSearchParams();

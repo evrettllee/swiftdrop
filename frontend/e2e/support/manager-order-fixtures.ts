@@ -1,5 +1,6 @@
 import { ORDER_STATUS, type OrderStatus } from '../../src/shared/api/endpoints/order';
 import type { ManagerOrderActions } from '../../src/shared/staff-api/manager-order';
+import { fromFixedNow } from './clock';
 
 export const MANAGER_ORDER_ID = 48231;
 export const COURIER_ID = 12;
@@ -8,11 +9,11 @@ export const COURIER_POINT = { latitude: 53.905, longitude: 27.54 };
 const MINUTE = 60_000;
 
 function minutesAgo(minutes: number): string {
-  return new Date(Date.now() - minutes * MINUTE).toISOString();
+  return fromFixedNow(-minutes * MINUTE).toISOString();
 }
 
 export function minutesAhead(minutes: number): string {
-  return new Date(Date.now() + minutes * MINUTE).toISOString();
+  return fromFixedNow(minutes * MINUTE).toISOString();
 }
 
 const POINT = { city: 'Минск', house: '120', apartment: null };

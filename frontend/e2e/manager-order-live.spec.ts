@@ -11,6 +11,7 @@ import {
   pushOrderEvent,
   stubManagerOrder,
 } from './support/manager-order';
+import { fromFixedNow } from './support/clock';
 
 const ORDER_PATH = `/manager/orders/${MANAGER_ORDER_ID}`;
 const PHONE = { width: 375, height: 812 };
@@ -63,7 +64,7 @@ test('should move the marker of the assigned courier and ignore other couriers',
     courierId: 999,
     lat: 53.95,
     lng: 27.6,
-    at: new Date().toISOString(),
+    at: fromFixedNow(0).toISOString(),
   });
   await page.waitForTimeout(BATCH_WAIT_MS);
   expect(await markerTransform(marker)).toBe(start);

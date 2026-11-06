@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { dateSchema, type HttpOptions, http, orderStatusSchema } from '@/shared/api';
-import { supportTicketStatusSchema } from '@/shared/staff-api';
+import {
+  LIST_VALUES_SEPARATOR,
+  supportTicketStatusSchema,
+  type TicketTopic,
+} from '@/shared/staff-api';
 
 export const SUPPORT_SIDE = {
   STAFF: 'staff',
@@ -95,6 +99,9 @@ export type SupportTicket = z.infer<typeof supportTicketSchema>;
 export type SupportTicketsQuery = {
   view: SupportView;
   authorRole: SupportAuthorRole | null;
+  topics?: readonly TicketTopic[];
+  from?: string | null;
+  to?: string | null;
   q: string | null;
   sort: SupportSort | null;
   page: number;
@@ -118,6 +125,9 @@ export async function getSupportTickets(
 
   for (const [name, value] of [
     ['authorRole', query.authorRole],
+    ['topic', query.topics?.length ? query.topics.join(LIST_VALUES_SEPARATOR) : null],
+    ['from', query.from ?? null],
+    ['to', query.to ?? null],
     ['q', query.q],
     ['sort', query.sort],
     ['until', query.until === null ? null : String(query.until)],

@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { type ReactNode, useId } from 'react';
 import { Button } from '@/shared/ui/button';
 import { DateField } from '@/shared/ui/date-field';
 import { RadioCard } from '@/shared/ui/radio-card';
@@ -26,20 +26,76 @@ type PeriodFormProps<P extends string> = {
   texts: PeriodFormTexts;
   onChange: (patch: Partial<PeriodDraftOf<P>>) => void;
   onApply: () => void;
+  onReset?: () => void;
+  children?: ReactNode;
 };
 
-export function PeriodForm<P extends string>({
-  layout,
+type PeriodFieldsProps<P extends string> = Pick<
+  PeriodFormProps<P>,
+  'presets' | 'customValue' | 'draft' | 'isValid' | 'texts' | 'onChange'
+> & { isLegendHidden: boolean };
+
+function PeriodFields<P extends string>({
   presets,
   customValue,
   draft,
+  isValid,
+  texts,
+  onChange,
+  isLegendHidden,
+}: PeriodFieldsProps<P>) {
+  const name = useId();
+
+  return (
+    <>
+      <fieldset className="flex flex-col gap-2">
+        <legend
+          className={
+            isLegendHidden
+              ? 'sr-only'
+              : 'mb-2 text-caption font-semibold text-fg-secondary uppercase'
+          }
+        >
+          {texts.legend}
+        </legend>
+        {presets.map((preset) => (
+          <RadioCard
+            key={preset.value}
+            name={name}
+            value={preset.value}
+            density="compact"
+            title={preset.label}
+            checked={draft.preset === preset.value}
+            onChange={() => onChange({ preset: preset.value })}
+          />
+        ))}
+      </fieldset>
+      {draft.preset === customValue ? (
+        <div className="grid grid-cols-2 gap-3">
+          <DateField
+            label={texts.from}
+            value={draft.from}
+            onChange={(from) => onChange({ from })}
+            error={isValid ? undefined : texts.invalid}
+          />
+          <DateField label={texts.to} value={draft.to} onChange={(to) => onChange({ to })} />
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+export function PeriodForm<P extends string>({
+  layout,
   defaultDraft,
   isValid,
   texts,
   onChange,
   onApply,
+  onReset,
+  children,
+  ...fields
 }: PeriodFormProps<P>) {
-  const name = useId();
   const isSheet = layout === 'sheet';
   const applyButton = (
     <Button fullWidth={isSheet} disabled={!isValid} onClick={onApply}>
@@ -50,7 +106,7 @@ export function PeriodForm<P extends string>({
     <Button
       variant={isSheet ? 'secondary' : 'text'}
       fullWidth={isSheet}
-      onClick={() => onChange(defaultDraft)}
+      onClick={onReset ?? (() => onChange(defaultDraft))}
     >
       {texts.reset}
     </Button>
@@ -59,37 +115,14 @@ export function PeriodForm<P extends string>({
   return (
     <div className="flex flex-col">
       <div className={`flex flex-col gap-4 ${isSheet ? 'pb-4' : 'p-4'}`}>
-        <fieldset className="flex flex-col gap-2">
-          <legend
-            className={
-              isSheet ? 'sr-only' : 'mb-2 text-caption font-semibold text-fg-secondary uppercase'
-            }
-          >
-            {texts.legend}
-          </legend>
-          {presets.map((preset) => (
-            <RadioCard
-              key={preset.value}
-              name={name}
-              value={preset.value}
-              density="compact"
-              title={preset.label}
-              checked={draft.preset === preset.value}
-              onChange={() => onChange({ preset: preset.value })}
-            />
-          ))}
-        </fieldset>
-        {draft.preset === customValue ? (
-          <div className="grid grid-cols-2 gap-3">
-            <DateField
-              label={texts.from}
-              value={draft.from}
-              onChange={(from) => onChange({ from })}
-              error={isValid ? undefined : texts.invalid}
-            />
-            <DateField label={texts.to} value={draft.to} onChange={(to) => onChange({ to })} />
-          </div>
-        ) : null}
+        {children}
+        <PeriodFields
+          {...fields}
+          isValid={isValid}
+          texts={texts}
+          onChange={onChange}
+          isLegendHidden={isSheet && children === undefined}
+        />
       </div>
       {isSheet ? (
         <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-border bg-surface px-4 pt-3">

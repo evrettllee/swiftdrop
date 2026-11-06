@@ -68,6 +68,7 @@ export type ManagerOrdersFilter = {
   courierId: number | null;
   payment: readonly PaymentState[];
   fragile: boolean;
+  hasOpenTicket: boolean;
   search: string | null;
 };
 
@@ -93,6 +94,11 @@ function filterQuery(filter: ManagerOrdersFilter): URLSearchParams {
   setIf(query, MANAGER_ORDERS_PARAM.COURIER_ID, filter.courierId);
   setIf(query, MANAGER_ORDERS_PARAM.PAYMENT, filter.payment.join(LIST_VALUES_SEPARATOR));
   setIf(query, MANAGER_ORDERS_PARAM.FRAGILE, filter.fragile ? MANAGER_FLAG_TRUE : null);
+  setIf(
+    query,
+    MANAGER_ORDERS_PARAM.HAS_OPEN_TICKET,
+    filter.hasOpenTicket ? MANAGER_FLAG_TRUE : null,
+  );
   setIf(query, MANAGER_ORDERS_PARAM.SEARCH, filter.search);
 
   return query;

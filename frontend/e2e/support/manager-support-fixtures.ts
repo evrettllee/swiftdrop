@@ -1,3 +1,5 @@
+import { fromFixedNow } from './clock';
+
 export const ORDER_ID = 48232;
 const MESSAGES_PAGE = 30;
 
@@ -13,7 +15,7 @@ export type RawMessage = {
 export type RawTicket = ReturnType<typeof ticket>;
 
 export function minutesAgo(minutes: number): string {
-  return new Date(Date.now() - minutes * 60_000).toISOString();
+  return fromFixedNow(-minutes * 60_000).toISOString();
 }
 
 function ticket(
@@ -83,6 +85,9 @@ export function listOf(tickets: RawTicket[], search: URLSearchParams) {
   const view = search.get('view') ?? 'awaiting';
   const role = search.get('authorRole');
   const q = search.get('q');
+  const topics = search.get('topic')?.split(',') ?? null;
+  const from = search.get('from');
+  const to = search.get('to');
   const items = tickets
     .filter((item) =>
       view === 'closed'
@@ -90,6 +95,9 @@ export function listOf(tickets: RawTicket[], search: URLSearchParams) {
         : item.status === 'open' && (view === 'open' || item.awaitingStaff),
     )
     .filter((item) => role === null || item.author.role === role)
+    .filter((item) => topics === null || topics.includes(item.topic))
+    .filter((item) => from === null || item.createdAt.slice(0, 10) >= from)
+    .filter((item) => to === null || item.createdAt.slice(0, 10) <= to)
     .filter((item) => q === null || item.author.name.includes(q) || String(item.id) === q)
     .map(({ closedAt: _closedAt, closedBy: _closedBy, ...item }) => ({
       ...item,

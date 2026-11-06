@@ -11,6 +11,7 @@ export const MANAGER_MAP_TEXTS = {
   SEARCH_CLEAR: 'Очистить поиск',
   SEARCH_TOO_SHORT: `Введите не меньше ${MANAGER_SEARCH_TEXT_MIN_LENGTH} символов`,
   FILTERS_LABEL: 'Состояние',
+  VEHICLE_FILTERS_LABEL: 'Транспорт',
   ALL: 'Все',
   LOAD_FAILED_TITLE: 'Не удалось загрузить курьеров',
   LOAD_FAILED: 'Проверьте соединение и попробуйте ещё раз.',

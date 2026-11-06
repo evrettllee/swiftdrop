@@ -23,6 +23,7 @@ describe('managerOrdersSchema', () => {
         courierId: null,
         payment: null,
         fragile: false,
+        hasOpenTicket: false,
         search: null,
       },
     });
@@ -34,6 +35,7 @@ describe('managerOrdersSchema', () => {
       payment: 'paid,refunded',
       courierId: '3',
       fragile: 'true',
+      hasOpenTicket: 'true',
       q: '  +375 29 123-45-67 ',
       sort: 'statusChangedAt:asc',
     });
@@ -45,6 +47,7 @@ describe('managerOrdersSchema', () => {
         courierId: 3,
         payment: ['paid', 'refunded'],
         fragile: true,
+        hasOpenTicket: true,
         search: { kind: 'number', orderId: null, phone: '+375291234567' },
       },
     });
@@ -61,6 +64,11 @@ describe('managerOrdersSchema', () => {
       'fragile other than true',
       { fragile: 'false' },
       MANAGER_ORDERS_VALIDATION_MESSAGES.FRAGILE_INVALID,
+    ],
+    [
+      'an open ticket flag other than true',
+      { hasOpenTicket: '1' },
+      MANAGER_ORDERS_VALIDATION_MESSAGES.OPEN_TICKET_INVALID,
     ],
     [
       'a courier id of zero',
@@ -119,7 +127,12 @@ describe('managerOrdersSchema', () => {
 
 describe('managerOrderCountsSchema', () => {
   it('should take the same filters and the bound of the list', () => {
-    const result = managerOrderCountsSchema.safeParse({ q: 'Анна', fragile: 'true', until: '90' });
+    const result = managerOrderCountsSchema.safeParse({
+      q: 'Анна',
+      fragile: 'true',
+      hasOpenTicket: 'true',
+      until: '90',
+    });
 
     expect(result.success && result.data).toEqual({
       until: 90,
@@ -128,6 +141,7 @@ describe('managerOrderCountsSchema', () => {
         courierId: null,
         payment: null,
         fragile: true,
+        hasOpenTicket: true,
         search: { kind: 'text', pattern: '%Анна%' },
       },
     });

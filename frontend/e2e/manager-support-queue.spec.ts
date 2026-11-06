@@ -10,7 +10,7 @@ test('should count the tabs and keep them with the menu badge after a ticket eve
   await page.goto(SUPPORT_PATH);
 
   const tabs = page.getByRole('tablist', { name: 'Обращения' });
-  await expect(tabs.getByRole('tab')).toHaveText(['Без ответа2', 'Открытые5', 'Закрытые1']);
+  await expect(tabs.getByRole('tab')).toHaveText(['Без ответа2', 'Открытые2', 'Закрытые1']);
   const list = page.getByRole('list', { name: 'Очередь обращений' });
   await expect(list.getByRole('listitem')).toHaveCount(2);
   await expect(list.getByRole('listitem').first()).toContainText('Анна Кравец');

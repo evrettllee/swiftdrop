@@ -46,7 +46,7 @@ export function OrdersToolbar({
         }
         onChange={onSearchChange}
       />
-      <div className="flex gap-3 lg:contents">
+      <div className="grid grid-cols-2 gap-3 lg:contents">
         <PeriodControl query={query} now={now} isDesktop={isDesktop} onApply={onPeriodChange} />
         <Select<OrdersSort>
           label={ORDERS_TEXTS.SORT}
@@ -55,8 +55,8 @@ export function OrdersToolbar({
           options={SORT_OPTIONS}
           value={query.sort ?? ORDERS_SORT.NEWEST}
           onChange={(sort) => onSortChange(sort === ORDERS_SORT.NEWEST ? null : sort)}
-          className="shrink-0 lg:ms-auto"
-          selectClassName="w-auto field-sizing-content"
+          className="min-w-0 lg:ms-auto lg:shrink-0"
+          selectClassName="truncate lg:w-auto lg:field-sizing-content"
         />
       </div>
     </div>

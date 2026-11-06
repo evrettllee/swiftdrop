@@ -1,33 +1,15 @@
 import { useCallback, useMemo } from 'react';
+import { useLoad } from '@/shared/lib/async';
 import { LIST_PAGE_SIZE, type ListParams } from '@/shared/lib/list-params';
 import { SOCKET_EVENTS, type TypedSocketEvent, useSocketEventBatch } from '@/shared/realtime';
-import { getSupportCounts, isSearchUsable } from '@/shared/staff-api';
-import { getSupportTickets, SUPPORT_VIEW, type SupportTicketsQuery } from '@/shared/support-api';
+import { isSearchUsable } from '@/shared/staff-api';
+import { getSupportTickets } from '@/shared/support-api';
 import type { SupportParams } from '../config/params';
 import { MANAGER_SUPPORT_TEXTS as TEXTS } from '../config/texts';
-import { useLoad } from '@/shared/lib/async';
+import { filtersPeriod } from './support-filters';
+import { loadQueueCounts, type QueueFilters } from './ticket-counts';
 
 const SUPPORT_EVENTS: readonly TypedSocketEvent[] = [SOCKET_EVENTS.SUPPORT_TICKET];
-
-export type QueueCounts = { awaiting: number; open: number; closed: number };
-
-async function loadCounts(signal: AbortSignal): Promise<QueueCounts> {
-  const closedQuery: SupportTicketsQuery = {
-    view: SUPPORT_VIEW.CLOSED,
-    authorRole: null,
-    q: null,
-    sort: null,
-    page: 1,
-    limit: 1,
-    until: null,
-  };
-  const [counts, closed] = await Promise.all([
-    getSupportCounts(signal),
-    getSupportTickets(closedQuery, { signal }),
-  ]);
-
-  return { awaiting: counts.awaiting, open: counts.open, closed: closed.total };
-}
 
 export function searchOf(q: string | null): string | null {
   return q !== null && isSearchUsable(q) ? q : null;
@@ -36,18 +18,23 @@ export function searchOf(q: string | null): string | null {
 export function useSupportQueue(params: ListParams<SupportParams>) {
   const { values, until, setUntil, resetUntil } = params;
   const search = searchOf(values.q);
-  const listKey = JSON.stringify([values.view, values.role, search, values.sort, values.page]);
+  const { from, to } = filtersPeriod(values);
+  const filters = useMemo<QueueFilters>(
+    () => ({ authorRole: values.role, topics: values.topic, from, to, q: search }),
+    [values.role, values.topic, from, to, search],
+  );
+  const filtersKey = JSON.stringify(filters);
+  const listKey = JSON.stringify([filtersKey, values.view, values.sort, values.page]);
 
   const query = useMemo(
     () => ({
+      ...filters,
       view: values.view,
-      authorRole: values.role,
-      q: search,
       sort: values.sort,
       page: values.page,
       limit: LIST_PAGE_SIZE,
     }),
-    [values.view, values.role, search, values.sort, values.page],
+    [filters, values.view, values.sort, values.page],
   );
 
   const list = useLoad(
@@ -63,7 +50,11 @@ export function useSupportQueue(params: ListParams<SupportParams>) {
     },
     TEXTS.LOAD_FAILED,
   );
-  const counts = useLoad('counts', loadCounts, TEXTS.LOAD_FAILED);
+  const counts = useLoad(
+    filtersKey,
+    (signal) => loadQueueCounts(filters, signal),
+    TEXTS.LOAD_FAILED,
+  );
   const reloadList = list.reload;
   const reloadCounts = counts.reload;
 
@@ -75,5 +66,5 @@ export function useSupportQueue(params: ListParams<SupportParams>) {
 
   useSocketEventBatch(SUPPORT_EVENTS, reload);
 
-  return { list, counts: counts.data, search, reload };
+  return { list, counts: counts.data, filters, search, reload };
 }

@@ -10,19 +10,19 @@ import {
   type HistorySort,
 } from '../config/list';
 import { HISTORY_TEXTS, SORT_LABELS } from '../config/texts';
-import type { HistoryPeriodParams } from '../lib/history-period';
+import type { HistoryFilterParams } from '../lib/history-period';
 import { HistoryPeriodControl } from './HistoryPeriodControl';
 
 const SORT_OPTIONS = HISTORY_SORTS.map((sort) => ({ value: sort, label: SORT_LABELS[sort] }));
 
 type HistoryToolbarProps = {
-  period: HistoryPeriodParams;
+  period: HistoryFilterParams;
   query: HistoryQuery;
   now: Date;
   isDesktop: boolean;
   searchText: string;
   onSearchChange: (text: string) => void;
-  onPeriodChange: (period: HistoryPeriodParams) => void;
+  onPeriodChange: (filters: HistoryFilterParams) => void;
   onSortChange: (sort: HistorySort | null) => void;
 };
 
@@ -51,7 +51,7 @@ export function HistoryToolbar({
         placeholder={HISTORY_TEXTS.SEARCH_PLACEHOLDER}
         onChange={onSearchChange}
       />
-      <div className="flex gap-3 lg:contents">
+      <div className="grid grid-cols-2 gap-3 lg:contents">
         <HistoryPeriodControl
           value={period}
           query={query}
@@ -66,8 +66,8 @@ export function HistoryToolbar({
           options={SORT_OPTIONS}
           value={query.sort ?? HISTORY_SORT.NEWEST}
           onChange={(sort) => onSortChange(sort === HISTORY_SORT.NEWEST ? null : sort)}
-          className="shrink-0 lg:ms-auto"
-          selectClassName="w-auto field-sizing-content"
+          className="min-w-0 lg:ms-auto lg:shrink-0"
+          selectClassName="truncate lg:w-auto lg:field-sizing-content"
         />
       </div>
     </div>

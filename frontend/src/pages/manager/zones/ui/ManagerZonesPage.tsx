@@ -3,7 +3,7 @@ import { DESKTOP_MEDIA_QUERY, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { APP_ROUTES } from '@/shared/routes';
 import { LinkButton } from '@/shared/ui/button';
-import { placePrimaryAction } from '@/shared/ui/empty-state';
+import { placePrimaryAction, usePrimaryActionPlace } from '@/shared/ui/empty-state';
 import { PageTitle } from '@/shared/ui/page-title';
 import { MANAGER_ZONES_TEXTS as TEXTS } from '../config/texts';
 import { useZonesPage } from '../model/useZonesPage';
@@ -18,6 +18,10 @@ export function ManagerZonesPage() {
   const page = useZonesPage();
   const { toggle } = page;
   const zones = page.list.zones;
+  const newZonePlace = usePrimaryActionPlace({
+    isLoading: zones === null && !page.list.isFailed,
+    isEmpty: zones?.length === 0,
+  });
   const newZone = placePrimaryAction(
     <LinkButton
       to={APP_ROUTES.MANAGER_ZONE_NEW}
@@ -25,7 +29,7 @@ export function ManagerZonesPage() {
     >
       {TEXTS.NEW_ZONE}
     </LinkButton>,
-    { isLoading: zones === null && !page.list.isFailed, isEmpty: zones?.length === 0 },
+    newZonePlace,
   );
 
   return (

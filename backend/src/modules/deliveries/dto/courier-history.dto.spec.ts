@@ -18,6 +18,7 @@ describe('courierHistorySchema', () => {
       sort: { key: 'finishedAt', direction: 'desc' },
       period: { start: null, end: null },
       search: null,
+      status: null,
     });
   });
 
@@ -29,6 +30,16 @@ describe('courierHistorySchema', () => {
       mode: 'cursor',
       position: { value: '12', id: 12 },
     });
+  });
+
+  it.each(['delivered', 'cancelled'])('should keep to the %s orders', (status) => {
+    const result = courierHistorySchema.safeParse({ status });
+
+    expect(result.success && result.data.status).toBe(status);
+  });
+
+  it.each(['pending', 'delivered,cancelled', ''])('should refuse the status %j', (status) => {
+    expect(messagesOf({ status })).toEqual([HISTORY_VALIDATION_MESSAGES.STATUS_INVALID]);
   });
 
   it('should refuse a sort by a key it does not have', () => {

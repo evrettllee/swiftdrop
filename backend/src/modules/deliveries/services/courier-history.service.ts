@@ -19,11 +19,20 @@ export class CourierHistoryService {
     const page = await paginate(query, {
       whitelist: HISTORY_SORT.whitelist,
       idColumn: orders.orderId,
-      where: historyCondition(courierProfileId, query.period, query.search),
+      where: historyCondition(courierProfileId, query.period, query.search, query.status),
       fetch: (options) => this.fetch(options),
       count: async (where) => {
-        const [row] = await historyTotalsQuery(this.db, where);
-        totals.summary = { count: row?.delivered ?? 0, distanceKm: row?.distanceKm ?? 0 };
+        const [[row], [summaryRow]] = await Promise.all([
+          historyTotalsQuery(this.db, where),
+          query.status === null
+            ? Promise.resolve([undefined])
+            : historyTotalsQuery(
+                this.db,
+                historyCondition(courierProfileId, query.period, query.search),
+              ),
+        ]);
+        const summary = summaryRow ?? row;
+        totals.summary = { count: summary?.delivered ?? 0, distanceKm: summary?.distanceKm ?? 0 };
 
         return row?.total ?? 0;
       },

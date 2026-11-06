@@ -2,8 +2,28 @@ import { type CSSProperties, type RefObject, useLayoutEffect, useState } from 'r
 import { POPOVER_ALIGN, type PopoverAlign } from './popover-align';
 
 const PANEL_GAP_PX = 4;
+const VIEWPORT_MARGIN_PX = 8;
 const RESIZE_EVENT = 'resize';
 const SCROLL_EVENT = 'scroll';
+
+function verticalPlacement(
+  trigger: Pick<DOMRect, 'top' | 'bottom'>,
+  panelHeight: number,
+  viewportHeight: number,
+): { top: number; maxHeight: number } {
+  const below = trigger.bottom + PANEL_GAP_PX;
+  const spaceBelow = viewportHeight - below - VIEWPORT_MARGIN_PX;
+  const spaceAbove = trigger.top - PANEL_GAP_PX - VIEWPORT_MARGIN_PX;
+
+  if (panelHeight <= spaceBelow || spaceBelow >= spaceAbove) {
+    return { top: below, maxHeight: spaceBelow };
+  }
+
+  return {
+    top: trigger.top - PANEL_GAP_PX - Math.min(panelHeight, spaceAbove),
+    maxHeight: spaceAbove,
+  };
+}
 
 export function popoverPlacement(
   trigger: Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right'>,
@@ -11,13 +31,11 @@ export function popoverPlacement(
   viewport: { width: number; height: number },
   align: PopoverAlign,
 ): CSSProperties {
-  const below = trigger.bottom + PANEL_GAP_PX;
-  const above = trigger.top - PANEL_GAP_PX - panelHeight;
-  const top = below + panelHeight > viewport.height && above >= 0 ? above : below;
+  const vertical = verticalPlacement(trigger, panelHeight, viewport.height);
 
   return align === POPOVER_ALIGN.END
-    ? { top, right: viewport.width - trigger.right }
-    : { top, left: trigger.left };
+    ? { ...vertical, right: viewport.width - trigger.right }
+    : { ...vertical, left: trigger.left };
 }
 
 export function usePopoverPosition(
@@ -43,7 +61,12 @@ export function usePopoverPosition(
           height: window.innerHeight,
         };
         setPosition(
-          popoverPlacement(trigger.getBoundingClientRect(), panel.offsetHeight, viewport, align),
+          popoverPlacement(
+            trigger.getBoundingClientRect(),
+            panel.offsetHeight - panel.clientHeight + panel.scrollHeight,
+            viewport,
+            align,
+          ),
         );
       }
     }

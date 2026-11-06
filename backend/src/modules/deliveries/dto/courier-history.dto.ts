@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
+import { COURIER_HISTORY_STATUSES } from '@/common/constants/orders.constants';
 import {
   listPeriodShape,
   listSearchSchema,
@@ -38,13 +39,16 @@ export const courierHistorySchema = z
       ...listPeriodShape,
       sort: listSortParamSchema,
       q: historySearchSchema.optional(),
+      status: z
+        .enum(COURIER_HISTORY_STATUSES, { error: HISTORY_VALIDATION_MESSAGES.STATUS_INVALID })
+        .optional(),
     },
     { error: unknownParameterError },
   )
   .transform((query, ctx) => {
     const list = resolveListQuery(query, HISTORY_SORT, ctx);
 
-    return list ? { ...list, search: query.q ?? null } : z.NEVER;
+    return list ? { ...list, search: query.q ?? null, status: query.status ?? null } : z.NEVER;
   });
 
 export type CourierHistoryDto = z.infer<typeof courierHistorySchema>;

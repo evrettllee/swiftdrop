@@ -9,10 +9,12 @@ const TRIGGER = { top: 100, bottom: 144, left: 1300, right: 1344 };
 test('should put the panel under the trigger, at its end edge when asked', () => {
   expect(popoverPlacement(TRIGGER, 200, VIEWPORT, POPOVER_ALIGN.END)).toEqual({
     top: 148,
+    maxHeight: 744,
     right: 96,
   });
   expect(popoverPlacement(TRIGGER, 200, VIEWPORT, POPOVER_ALIGN.START)).toEqual({
     top: 148,
+    maxHeight: 744,
     left: 1300,
   });
 });
@@ -22,7 +24,25 @@ test('should put the panel above the trigger when it does not fit under it', () 
 
   expect(popoverPlacement(low, 200, VIEWPORT, POPOVER_ALIGN.END)).toEqual({
     top: 596,
+    maxHeight: 788,
     right: 96,
+  });
+});
+
+test('should fit a tall panel into the larger space and let it scroll there', () => {
+  const middle = { ...TRIGGER, top: 300, bottom: 344 };
+
+  expect(popoverPlacement(middle, 1200, VIEWPORT, POPOVER_ALIGN.START)).toEqual({
+    top: 348,
+    maxHeight: 544,
+    left: 1300,
+  });
+  expect(
+    popoverPlacement({ ...TRIGGER, top: 700, bottom: 744 }, 1200, VIEWPORT, POPOVER_ALIGN.START),
+  ).toEqual({
+    top: 8,
+    maxHeight: 688,
+    left: 1300,
   });
 });
 

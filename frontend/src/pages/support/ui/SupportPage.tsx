@@ -5,7 +5,7 @@ import { useAppSocket } from '@/shared/realtime';
 import { getSupportTicketPath } from '@/shared/routes';
 import { SUPPORT_TICKET_STATUS } from '@/shared/staff-api';
 import { Button } from '@/shared/ui/button';
-import { placePrimaryAction } from '@/shared/ui/empty-state';
+import { placePrimaryAction, usePrimaryActionPlace } from '@/shared/ui/empty-state';
 import { PageTitle } from '@/shared/ui/page-title';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
 import { showToast } from '@/shared/ui/toast';
@@ -37,8 +37,9 @@ export function SupportPage() {
     isEmpty: tickets.items.length === 0,
     hasEmptyAction: params.status === SUPPORT_TICKET_STATUS.OPEN,
   };
-  const desktopNew = placePrimaryAction(newButton(false), list);
-  const phoneNew = placePrimaryAction(newButton(true), list);
+  const newPlace = usePrimaryActionPlace(list);
+  const desktopNew = placePrimaryAction(newButton(false), newPlace);
+  const phoneNew = placePrimaryAction(newButton(true), newPlace);
   const tabs = STATUSES.map((id) => ({ id, label: TAB_LABELS[id], count: tickets.counts[id] }));
   const goToTicket = (ticketId: number) =>
     void navigate(getSupportTicketPath(role.supportPath, ticketId), { replace: true });

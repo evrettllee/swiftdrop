@@ -39,6 +39,7 @@ export function filterOf(params: OrdersParams): ManagerOrdersFilter {
     courierId: params.courierId,
     payment: params.payment,
     fragile: params.fragile,
+    hasOpenTicket: params.hasOpenTicket,
     search: params.q !== null && isSearchUsable(params.q) ? params.q : null,
   };
 }
@@ -49,6 +50,7 @@ export function countFilters(filter: ManagerOrdersFilter): number {
     filter.courierId !== null,
     filter.payment.length > 0,
     filter.fragile,
+    filter.hasOpenTicket,
   ].filter(Boolean).length;
 }
 
@@ -83,5 +85,12 @@ export function isInTab(tab: OrdersTab, status: OrderStatus): boolean {
 
 export const FILTERS_RESET: Pick<
   OrdersParams,
-  'from' | 'to' | 'courierId' | 'payment' | 'fragile'
-> = { from: null, to: null, courierId: null, payment: [], fragile: false };
+  'from' | 'to' | 'courierId' | 'payment' | 'fragile' | 'hasOpenTicket'
+> = {
+  from: null,
+  to: null,
+  courierId: null,
+  payment: [],
+  fragile: false,
+  hasOpenTicket: false,
+};

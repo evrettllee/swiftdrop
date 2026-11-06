@@ -14,6 +14,7 @@ import {
 import { buildOrderStubState, buildTestOrder, stubCourierOnOrder } from './courier-order';
 import { messagesPage, type RawMessage } from './manager-support-fixtures';
 import { stubSession } from './stub-session';
+import { fixClock } from './clock';
 
 const TICKETS_URL = /\/api\/support\/tickets(\?.*)?$/;
 const TICKET_URL = /\/api\/support\/tickets\/(\d+)(\/(messages|read|close))?(\?.*)?$/;
@@ -128,6 +129,7 @@ export async function stubAuthorSupport(
   page: Page,
   role: typeof ROLE.CLIENT | typeof ROLE.COURIER = ROLE.CLIENT,
 ): Promise<AuthorSupportStub> {
+  await fixClock(page);
   await stubRole(page, role);
   const stub: AuthorSupportStub = {
     tickets: rawMyTickets(),

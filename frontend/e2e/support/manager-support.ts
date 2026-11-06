@@ -11,6 +11,7 @@ import {
   type RawTicket,
   rawTickets,
 } from './manager-support-fixtures';
+import { fromFixedNow } from './clock';
 
 export const SUPPORT_PATH = '/manager/support';
 export { messagesOf, minutesAgo, ORDER_ID } from './manager-support-fixtures';
@@ -49,7 +50,7 @@ function sendMessage(stub: SupportStub, route: Route, ticketId: number) {
   const message = {
     id: 1000 + stub.sent.length,
     text,
-    createdAt: new Date().toISOString(),
+    createdAt: fromFixedNow(0).toISOString(),
     fromStaff: true,
     authorName: 'Ольга М.',
     isRead: false,
@@ -68,7 +69,7 @@ function closeTicket(stub: SupportStub, ticketId: number) {
       status: 'closed',
       awaitingStaff: false,
       waitingSec: null,
-      closedAt: new Date().toISOString(),
+      closedAt: fromFixedNow(0).toISOString(),
       closedBy: { role: 'staff', name: 'Ольга М.' },
     });
   }
