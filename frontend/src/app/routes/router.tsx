@@ -6,7 +6,6 @@ import { PLACEHOLDER_TEXTS, PlaceholderPage } from '@/pages/placeholder';
 import { APP_ROUTES, CATCH_ALL_ROUTE, ORDER_DETAILS_PATTERN } from '@/shared/routes';
 import { ROLE } from '@/shared/session';
 import { PageLoader } from '@/shared/ui/page-loader';
-import { ClientLayout } from '../layouts/client-layout/ClientLayout';
 import { courierRoutes } from './courier-routes';
 import { GuestRoute } from './GuestRoute';
 import { managerRoutes } from './manager-routes';
@@ -57,7 +56,11 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute roles={[ROLE.CLIENT]} />,
             children: [
               {
-                element: <ClientLayout />,
+                Component: lazy(() =>
+                  import('../layouts/client-layout/ClientLayout').then((module) => ({
+                    default: module.ClientLayout,
+                  })),
+                ),
                 children: [
                   {
                     path: APP_ROUTES.ORDERS,

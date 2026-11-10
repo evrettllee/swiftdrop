@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { LIST_STATUS } from '@/shared/config';
-import { createFeedCache, FEED_CACHE_TTL_MS } from './feed-cache';
+import { clearFeedCaches, createFeedCache, FEED_CACHE_TTL_MS } from './feed-cache';
 import type { CursorPage, ListFeed } from './list-feed';
 
 type Page = CursorPage<number>;
@@ -49,4 +49,16 @@ test('should keep only the last saved list', () => {
 
   expect(cache.take('first', SAVED_AT)).toBeNull();
   expect(cache.take('second', SAVED_AT)?.feed.items).toEqual([2]);
+});
+
+test('should forget every saved feed when the user of the session changes', () => {
+  const orders = createFeedCache<number, Page>();
+  const history = createFeedCache<number, Page>();
+  orders.save('orders', { feed: feedOf([1]), scrollY: 0, savedAt: SAVED_AT });
+  history.save('history', { feed: feedOf([2]), scrollY: 0, savedAt: SAVED_AT });
+
+  clearFeedCaches();
+
+  expect(orders.take('orders', SAVED_AT)).toBeNull();
+  expect(history.take('history', SAVED_AT)).toBeNull();
 });

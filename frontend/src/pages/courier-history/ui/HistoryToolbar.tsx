@@ -9,11 +9,17 @@ import {
   HISTORY_SORTS,
   type HistorySort,
 } from '../config/list';
-import { HISTORY_TEXTS, SORT_LABELS } from '../config/texts';
+import { HISTORY_TEXTS, SHORT_SORT_LABELS, SORT_LABELS } from '../config/texts';
 import type { HistoryFilterParams } from '../lib/history-period';
 import { HistoryPeriodControl } from './HistoryPeriodControl';
 
 const SORT_OPTIONS = HISTORY_SORTS.map((sort) => ({ value: sort, label: SORT_LABELS[sort] }));
+
+const SHORT_SORT_OPTIONS = HISTORY_SORTS.map((sort) => ({
+  value: sort,
+  label: SHORT_SORT_LABELS[sort],
+  fullLabel: SORT_LABELS[sort],
+}));
 
 type HistoryToolbarProps = {
   period: HistoryFilterParams;
@@ -63,7 +69,7 @@ export function HistoryToolbar({
           label={HISTORY_TEXTS.SORT}
           labelMode={SELECT_LABEL.HIDDEN}
           icon={isDesktop ? ArrowsDownUpIcon : undefined}
-          options={SORT_OPTIONS}
+          options={isDesktop ? SORT_OPTIONS : SHORT_SORT_OPTIONS}
           value={query.sort ?? HISTORY_SORT.NEWEST}
           onChange={(sort) => onSortChange(sort === HISTORY_SORT.NEWEST ? null : sort)}
           className="min-w-0 lg:ms-auto lg:shrink-0"

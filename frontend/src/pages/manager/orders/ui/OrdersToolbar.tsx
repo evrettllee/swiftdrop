@@ -6,7 +6,7 @@ import {
 } from '@/shared/staff-api';
 import { Select, SELECT_LABEL } from '@/shared/ui/select';
 import type { OrdersParams } from '../config/list-params';
-import { sortLabel } from '../config/sort-labels';
+import { shortSortLabel, sortLabel } from '../config/sort-labels';
 import { MANAGER_ORDERS_TEXTS } from '../config/texts';
 import { type OrdersView, sortParamOf } from '../model/orders-view';
 import { FiltersControl } from './FiltersControl';
@@ -31,7 +31,15 @@ export function OrdersToolbar({
   onChange,
   onCourierChosen,
 }: OrdersToolbarProps) {
-  const sortOptions = view.sorts.map((sort) => ({ value: sort, label: sortLabel(view.tab, sort) }));
+  const sortOptions = view.sorts.map((sort) =>
+    isDesktop
+      ? { value: sort, label: sortLabel(view.tab, sort) }
+      : {
+          value: sort,
+          label: shortSortLabel(view.tab, sort),
+          fullLabel: sortLabel(view.tab, sort),
+        },
+  );
 
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-3">

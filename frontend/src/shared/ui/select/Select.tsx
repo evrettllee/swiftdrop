@@ -8,6 +8,7 @@ import { SELECT_LABEL, type SelectLabel } from './select-label';
 export type SelectOption<TValue extends string> = {
   value: TValue;
   label: string;
+  fullLabel?: string;
 };
 
 const WRAPPER_CLASSES: Record<SelectLabel, string> = {
@@ -88,7 +89,7 @@ export function Select<TValue extends string>({
           )}
         >
           {options.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} aria-label={option.fullLabel}>
               {option.label}
             </option>
           ))}

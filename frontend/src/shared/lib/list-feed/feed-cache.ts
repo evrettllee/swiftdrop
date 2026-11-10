@@ -14,10 +14,17 @@ export type FeedCache<T, P extends CursorPage<T>> = {
   take: (key: string, now: number) => CachedFeed<T, P> | null;
 };
 
+const caches = new Set<{ clear: () => void }>();
+
+export function clearFeedCaches(): void {
+  caches.forEach((cache) => cache.clear());
+}
+
 export function createFeedCache<T, P extends CursorPage<T>>(
   ttlMs: number = FEED_CACHE_TTL_MS,
 ): FeedCache<T, P> {
   const entries = new Map<string, CachedFeed<T, P>>();
+  caches.add(entries);
 
   return {
     save: (key, entry) => {

@@ -2,6 +2,7 @@ const ENCODED_FILENAME = /filename\*\s*=\s*UTF-8''([^;]+)/i;
 const QUOTED_FILENAME = /filename\s*=\s*"([^"]*)"/i;
 const PLAIN_FILENAME = /filename\s*=\s*([^;"\s]+)/i;
 const UNSAFE_FILENAME_CHARACTERS = /[\\/:*?"<>|\p{Cc}]/gu;
+const LEADING_DOTS = /^\.+/;
 
 function decode(value: string): string | null {
   try {
@@ -12,7 +13,7 @@ function decode(value: string): string | null {
 }
 
 function clean(name: string | null | undefined): string | null {
-  const safe = name?.replace(UNSAFE_FILENAME_CHARACTERS, '').trim() ?? '';
+  const safe = name?.replace(UNSAFE_FILENAME_CHARACTERS, '').trim().replace(LEADING_DOTS, '') ?? '';
 
   return safe === '' ? null : safe;
 }

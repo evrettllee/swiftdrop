@@ -1,41 +1,53 @@
-import { getNameInitials } from '@/shared/lib/format';
+import { memo } from 'react';
+import type { VehicleType } from '@/shared/api';
 import { COLOR_TRANSITION_CLASS } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
+import { getNameInitials } from '@/shared/lib/format';
+import type { CourierMapState } from '@/shared/staff-api';
 import { Avatar } from '@/shared/ui/avatar';
-import type { LiveCourier } from '../lib/courier-state';
-import { stateText } from '../lib/courier-view';
 import { vehicleLabel } from '../lib/vehicle';
 import { StateMark } from './StateMark';
 
 type CourierRowProps = {
-  courier: LiveCourier;
-  now: number;
+  courierId: number;
+  name: string;
+  vehicleType: VehicleType | null;
+  state: CourierMapState;
+  stateText: string;
   isSelected: boolean;
   onSelect: (courierId: number) => void;
 };
 
-export function CourierRow({ courier, now, isSelected, onSelect }: CourierRowProps) {
+export const CourierRow = memo(function CourierRow({
+  courierId,
+  name,
+  vehicleType,
+  state,
+  stateText,
+  isSelected,
+  onSelect,
+}: CourierRowProps) {
   return (
     <li>
       <button
         type="button"
         aria-pressed={isSelected}
-        onClick={() => onSelect(courier.courierId)}
+        onClick={() => onSelect(courierId)}
         className={joinClassNames(
           'flex min-h-14 w-full items-center gap-3 rounded-md p-2 text-start',
           COLOR_TRANSITION_CLASS,
           isSelected ? 'bg-selected' : 'hover:bg-surface-muted',
         )}
       >
-        <Avatar initials={getNameInitials(courier.name)} size="small" />
+        <Avatar initials={getNameInitials(name)} size="small" />
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate leading-5">{courier.name}</span>
+          <span className="truncate leading-5">{name}</span>
           <span className="truncate text-small leading-5 text-fg-secondary">
-            {vehicleLabel(courier.vehicleType)}
+            {vehicleLabel(vehicleType)}
           </span>
         </span>
-        <StateMark state={courier.state} text={stateText(courier, now)} />
+        <StateMark state={state} text={stateText} />
       </button>
     </li>
   );
-}
+});

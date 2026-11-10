@@ -2,6 +2,7 @@ import { MagnifyingGlassIcon, UsersIcon } from '@phosphor-icons/react';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { MANAGER_MAP_TEXTS as TEXTS } from '../config/texts';
 import type { LiveCourier } from '../lib/courier-state';
+import { stateText } from '../lib/courier-view';
 import { CourierRow } from './CourierRow';
 
 type CouriersListProps = {
@@ -46,8 +47,11 @@ export function CouriersList({
       {couriers.map((courier) => (
         <CourierRow
           key={courier.courierId}
-          courier={courier}
-          now={now}
+          courierId={courier.courierId}
+          name={courier.name}
+          vehicleType={courier.vehicleType}
+          state={courier.state}
+          stateText={stateText(courier, now)}
           isSelected={courier.courierId === selectedId}
           onSelect={onSelect}
         />

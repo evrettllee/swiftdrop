@@ -65,6 +65,13 @@ export const SORT_LABELS: Record<HistorySort, string> = {
   [HISTORY_SORT.NEAREST]: 'Сначала ближние',
 };
 
+export const SHORT_SORT_LABELS: Record<HistorySort, string> = {
+  [HISTORY_SORT.NEWEST]: 'Новые',
+  [HISTORY_SORT.OLDEST]: 'Старые',
+  [HISTORY_SORT.FARTHEST]: 'Дальние',
+  [HISTORY_SORT.NEAREST]: 'Ближние',
+};
+
 export const HISTORY_SUMMARY_TEXTS = {
   ALL_TIME: 'Всего',
   DELIVERY_FORMS: { one: 'доставка', few: 'доставки', many: 'доставок' },

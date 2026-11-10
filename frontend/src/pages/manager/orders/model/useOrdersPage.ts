@@ -6,6 +6,7 @@ import {
   type ManagerOrdersPage,
 } from '@/shared/staff-api';
 import { LIST_STATUS, type ListStatus } from '@/shared/config';
+import { keepUnchangedItems } from '@/shared/lib/list-feed';
 import { fetchOutcome, type FetchOutcome } from './orders-fetch';
 
 type PageAnswer = {
@@ -34,7 +35,7 @@ function toAnswer(
     : {
         key,
         status: LIST_STATUS.READY,
-        items: outcome.data.items,
+        items: keepUnchangedItems(previous.items, outcome.data.items, (item) => item.id),
         total: outcome.data.total,
         message: null,
       };

@@ -9,10 +9,16 @@ import {
   ORDERS_SORTS,
   type OrdersSort,
 } from '../config/list';
-import { ORDERS_TEXTS, SORT_LABELS } from '../config/texts';
+import { ORDERS_TEXTS, SHORT_SORT_LABELS, SORT_LABELS } from '../config/texts';
 import { PeriodControl } from './PeriodControl';
 
 const SORT_OPTIONS = ORDERS_SORTS.map((sort) => ({ value: sort, label: SORT_LABELS[sort] }));
+
+const SHORT_SORT_OPTIONS = ORDERS_SORTS.map((sort) => ({
+  value: sort,
+  label: SHORT_SORT_LABELS[sort],
+  fullLabel: SORT_LABELS[sort],
+}));
 
 type OrdersToolbarProps = {
   query: OrdersQuery;
@@ -52,7 +58,7 @@ export function OrdersToolbar({
           label={ORDERS_TEXTS.SORT}
           labelMode={SELECT_LABEL.HIDDEN}
           icon={isDesktop ? ArrowsDownUpIcon : undefined}
-          options={SORT_OPTIONS}
+          options={isDesktop ? SORT_OPTIONS : SHORT_SORT_OPTIONS}
           value={query.sort ?? ORDERS_SORT.NEWEST}
           onChange={(sort) => onSortChange(sort === ORDERS_SORT.NEWEST ? null : sort)}
           className="min-w-0 lg:ms-auto lg:shrink-0"

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   type OrderAction,
   OrderActionDialog,
@@ -16,7 +16,7 @@ import {
   TAB_STATUS_GROUP,
 } from '../config/list';
 import { MANAGER_ORDERS_TEXTS, TAB_LABELS } from '../config/texts';
-import { rowActionTarget } from '../lib/row-actions';
+import { type RowAction, rowActionTarget } from '../lib/row-actions';
 import { appliedFilters, emptyResultText, exportScope } from '../model/applied-filters';
 import { useManagerOrders } from '../model/useManagerOrders';
 import { AppliedFilters } from './AppliedFilters';
@@ -35,6 +35,10 @@ export function ManagerOrdersPage() {
     target: StaffOrderTarget;
     action: OrderAction;
   } | null>(null);
+  const openRowAction = useCallback<RowAction>(
+    (order, action) => setRowAction({ target: rowActionTarget(order), action }),
+    [],
+  );
   const chips = appliedFilters(view.filter, nowDate, orders.courierName);
   const tabs = ORDERS_TABS.map((id) => ({
     id,
@@ -86,9 +90,7 @@ export function ManagerOrdersPage() {
                 now={now}
                 emptyText={emptyResultText(view, nowDate)}
                 onChange={changeParams}
-                onAction={(order, action) =>
-                  setRowAction({ target: rowActionTarget(order), action })
-                }
+                onAction={openRowAction}
               />
             </div>
           </TabPanel>

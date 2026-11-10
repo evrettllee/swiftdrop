@@ -17,7 +17,9 @@ test('should take the quoted or the plain name without an encoded one', () => {
 });
 
 test('should drop the parts of a path and give nothing without a name', () => {
-  expect(readAttachmentFilename('attachment; filename="../../etc/passwd"')).toBe('....etcpasswd');
+  expect(readAttachmentFilename('attachment; filename="../../etc/passwd"')).toBe('etcpasswd');
+  expect(readAttachmentFilename('attachment; filename=".."')).toBeNull();
+  expect(readAttachmentFilename('attachment; filename=".bashrc"')).toBe('bashrc');
   expect(readAttachmentFilename("attachment; filename*=UTF-8''%E0%A4%A")).toBeNull();
   expect(readAttachmentFilename('attachment')).toBeNull();
   expect(readAttachmentFilename(null)).toBeNull();

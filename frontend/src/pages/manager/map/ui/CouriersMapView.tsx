@@ -1,4 +1,6 @@
-import { createElement, type ReactNode, useCallback } from 'react';
+import { createElement, memo, type ReactNode, useCallback, useMemo } from 'react';
+import type { VehicleType } from '@/shared/api';
+import type { CourierMapState } from '@/shared/staff-api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { MapAnchoredPanel, MarkersMap, PinMarker } from '@/shared/ui/route-map';
 import type { GeoPoint } from '@/shared/lib/geo';
@@ -12,30 +14,43 @@ const PANEL_CLASS =
   'w-80 rounded-lg border border-transparent bg-surface p-4 text-fg shadow-lg dark:border-border';
 
 type CourierPinProps = {
-  courier: LiveCourier;
-  point: GeoPoint;
+  courierId: number;
+  name: string;
+  vehicleType: VehicleType | null;
+  state: CourierMapState;
+  latitude: number;
+  longitude: number;
   isSelected: boolean;
   onSelect: (courierId: number) => void;
 };
 
-function CourierPin({ courier, point, isSelected, onSelect }: CourierPinProps) {
-  const { courierId } = courier;
+const CourierPin = memo(function CourierPin({
+  courierId,
+  name,
+  vehicleType,
+  state,
+  latitude,
+  longitude,
+  isSelected,
+  onSelect,
+}: CourierPinProps) {
   const select = useCallback(() => onSelect(courierId), [onSelect, courierId]);
+  const point = useMemo<GeoPoint>(() => ({ latitude, longitude }), [latitude, longitude]);
 
   return (
     <PinMarker
       point={point}
-      tone={pinTone(courier.state)}
+      tone={pinTone(state)}
       isSelected={isSelected}
-      label={markerLabel(courier.name, stateLabel(courier.state))}
-      icon={createElement(vehicleIcon(courier.vehicleType), {
+      label={markerLabel(name, stateLabel(state))}
+      icon={createElement(vehicleIcon(vehicleType), {
         size: ICON_SIZE.MEDIUM,
         weight: ICON_WEIGHT,
       })}
       onSelect={select}
     />
   );
-}
+});
 
 type CouriersMapViewProps = {
   couriers: readonly LiveCourier[];
@@ -72,8 +87,12 @@ export function CouriersMapView({
         return point === null ? null : (
           <CourierPin
             key={courier.courierId}
-            courier={courier}
-            point={point}
+            courierId={courier.courierId}
+            name={courier.name}
+            vehicleType={courier.vehicleType}
+            state={courier.state}
+            latitude={point.latitude}
+            longitude={point.longitude}
             isSelected={courier.courierId === selected?.courierId}
             onSelect={onSelect}
           />

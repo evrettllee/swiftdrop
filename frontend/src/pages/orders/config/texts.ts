@@ -56,6 +56,13 @@ export const SORT_LABELS: Record<OrdersSort, string> = {
   [ORDERS_SORT.PRICE_LOW]: 'Сначала дешевле',
 };
 
+export const SHORT_SORT_LABELS: Record<OrdersSort, string> = {
+  [ORDERS_SORT.NEWEST]: 'Новые',
+  [ORDERS_SORT.OLDEST]: 'Старые',
+  [ORDERS_SORT.PRICE_HIGH]: 'Дороже',
+  [ORDERS_SORT.PRICE_LOW]: 'Дешевле',
+};
+
 export const ORDER_TAB_LABELS: Record<OrdersTab, string> = {
   [ORDERS_TAB.ACTIVE]: 'Активные',
   [ORDERS_TAB.FINISHED]: 'Завершённые',

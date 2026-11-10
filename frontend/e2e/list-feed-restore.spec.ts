@@ -1,7 +1,10 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { AUTH_TEXTS } from '../src/pages/auth/config/texts';
+import { AUTH_API_PATHS } from '../src/shared/api/endpoints/auth';
 import { ORDER_STATUS } from '../src/shared/api/endpoints/order';
 import { API_BASE_PATH } from '../src/shared/api/request-config';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
+import { ROLE } from '../src/shared/session/auth-user';
 import { historyCards, PHONE_VIEWPORT } from './support/courier-history';
 import { answerAs, stubHistoryOrder } from './support/courier-history-order';
 import { openCourierHistory } from './support/courier-history-page';
@@ -74,6 +77,46 @@ test('should bring back the shown deliveries of the courier and load anew after 
   await expectScroll(page, scrollY);
   expect(stub.requests).toHaveLength(asked);
 
-  await page.getByRole('combobox', { name: 'Сортировка' }).selectOption('Сначала старые');
+  await page.getByRole('combobox', { name: 'Сортировка' }).selectOption('finishedAt:asc');
   await expect(historyCards(page)).toHaveCount(20);
+});
+
+test('should not bring back the feed of the previous user after another one signs in', async ({
+  page,
+}) => {
+  await answerTheRestWithNotFound(page);
+  const stub = await stubMyOrders(page, [...myOrders(), ...olderOrders(17)]);
+  await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.LOGOUT}`, (route) =>
+    route.fulfill({ status: 204 }),
+  );
+  await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.LOGIN}`, (route) =>
+    route.fulfill({
+      json: {
+        user: {
+          userId: 990008,
+          firstName: 'Олег',
+          lastName: 'Ким',
+          email: 'other@example.com',
+          phone: null,
+          role: ROLE.CLIENT,
+        },
+      },
+    }),
+  );
+  await page.goto(APP_ROUTES.ORDERS);
+  const cards = page.getByRole('tabpanel').getByRole('link', { name: /^№/ });
+  await page.getByRole('button', { name: 'Показать ещё' }).click();
+  await expect(cards).toHaveCount(25);
+
+  await page.getByRole('link', { name: 'Профиль' }).click();
+  await page.getByRole('button', { name: 'Выйти' }).click();
+  await expect(page).toHaveURL(new RegExp(`${APP_ROUTES.AUTH}`));
+  stub.orders = myOrders().slice(0, 3);
+  await page.getByLabel(AUTH_TEXTS.LABEL_EMAIL, { exact: true }).fill('other@example.com');
+  await page.getByLabel(AUTH_TEXTS.LABEL_PASSWORD, { exact: true }).fill('Password123');
+  await page.getByRole('button', { name: AUTH_TEXTS.SUBMIT_LOGIN, exact: true }).click();
+  await page.getByRole('link', { name: 'Заказы' }).first().click();
+
+  await expect(page).toHaveURL(APP_ROUTES.ORDERS);
+  await expect(cards).toHaveCount(3);
 });

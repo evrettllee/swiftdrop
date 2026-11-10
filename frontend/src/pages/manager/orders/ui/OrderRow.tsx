@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router';
 import { formatOrderNumber, OrderStatusBadge, STATUS_AUDIENCE } from '@/entities/order';
 import type { ManagerOrderListItem } from '@/shared/staff-api';
@@ -38,7 +39,12 @@ function CourierAndStatus({ order, now }: Pick<OrderRowProps, 'order' | 'now'>) 
   );
 }
 
-export function OrderRow({ order, now, isAttention, onAction }: OrderRowProps) {
+export const OrderRow = memo(function OrderRow({
+  order,
+  now,
+  isAttention,
+  onAction,
+}: OrderRowProps) {
   const number = formatOrderNumber(order.id);
 
   return (
@@ -80,4 +86,4 @@ export function OrderRow({ order, now, isAttention, onAction }: OrderRowProps) {
       </TableCell>
     </TableRow>
   );
-}
+});
