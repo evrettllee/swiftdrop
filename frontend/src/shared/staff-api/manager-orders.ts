@@ -9,6 +9,7 @@ import {
   type ManagerStatusGroup,
   type PaymentState,
 } from './manager-orders-params';
+import { shareOrderCounts } from './order-counts-store';
 
 export const MANAGER_ORDERS_API_PATHS = {
   ORDERS: '/manager/orders',
@@ -161,6 +162,12 @@ export async function getManagerOrderCounts(
   const query = filter === undefined ? new URLSearchParams() : filterQuery(filter);
   setIf(query, MANAGER_ORDERS_PARAM.UNTIL, until);
   const suffix = query.size === 0 ? '' : `?${query.toString()}`;
+
+  if (suffix === '') {
+    return shareOrderCounts(async () =>
+      managerOrderCountsSchema.parse(await http.get(MANAGER_ORDERS_API_PATHS.COUNTS)),
+    );
+  }
 
   return managerOrderCountsSchema.parse(
     await http.get(`${MANAGER_ORDERS_API_PATHS.COUNTS}${suffix}`, { signal }),

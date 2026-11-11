@@ -28,26 +28,25 @@ import {
   STRIPE_CHECKOUT_MODE,
   STRIPE_METADATA_ORDER_ID_KEY,
   STRIPE_REFUND_IDEMPOTENCY_PREFIX,
-  STRIPE_REQUEST_TIMEOUT_MS,
 } from '../constants/stripe.constants';
+import { StripeCheckoutApi } from '../contracts/stripe-checkout.contract';
 
 @Injectable()
 export class StripePaymentAdapter extends PaymentGateway {
   private readonly logger = new Logger(StripePaymentAdapter.name);
-  private readonly stripe: Stripe;
   private readonly webhookSecret: string;
 
-  constructor(config: ConfigService) {
+  constructor(
+    private readonly client: StripeCheckoutApi,
+    config: ConfigService,
+  ) {
     super();
-    this.stripe = new Stripe(config.getOrThrow<string>(ENV_KEYS.STRIPE_SECRET_KEY), {
-      timeout: STRIPE_REQUEST_TIMEOUT_MS,
-    });
     this.webhookSecret = config.getOrThrow<string>(ENV_KEYS.STRIPE_WEBHOOK_SECRET);
   }
 
   async createCheckoutSession(input: CheckoutSessionInput): Promise<CheckoutSession> {
     const session = await this.call(() =>
-      this.stripe.checkout.sessions.create({
+      this.client.createSession({
         mode: STRIPE_CHECKOUT_MODE,
         line_items: [
           {
@@ -79,7 +78,7 @@ export class StripePaymentAdapter extends PaymentGateway {
     let result: SessionExpireResult = SESSION_EXPIRE_RESULT.EXPIRED;
 
     try {
-      await this.stripe.checkout.sessions.expire(sessionId);
+      await this.client.expireSession(sessionId);
     } catch (error) {
       if (!isNotOpenSessionError(error)) {
         throw this.unavailable(error);
@@ -92,17 +91,14 @@ export class StripePaymentAdapter extends PaymentGateway {
   }
 
   async getCheckoutSession(sessionId: string): Promise<CheckoutSessionState> {
-    const session = await this.call(() => this.stripe.checkout.sessions.retrieve(sessionId));
+    const session = await this.call(() => this.client.retrieveSession(sessionId));
 
     return mapStripeSession(session);
   }
 
   async refund(paymentRef: string): Promise<void> {
     await this.call(() =>
-      this.stripe.refunds.create(
-        { payment_intent: paymentRef },
-        { idempotencyKey: `${STRIPE_REFUND_IDEMPOTENCY_PREFIX}${paymentRef}` },
-      ),
+      this.client.createRefund(paymentRef, `${STRIPE_REFUND_IDEMPOTENCY_PREFIX}${paymentRef}`),
     );
   }
 
@@ -110,7 +106,7 @@ export class StripePaymentAdapter extends PaymentGateway {
     let event: Stripe.Event;
 
     try {
-      event = this.stripe.webhooks.constructEvent(rawBody, signature, this.webhookSecret);
+      event = Stripe.webhooks.constructEvent(rawBody, signature, this.webhookSecret);
     } catch {
       this.logger.warn('Stripe webhook signature check failed');
       throw new BadRequestException(PAYMENTS_ERROR_MESSAGES.INVALID_SIGNATURE);

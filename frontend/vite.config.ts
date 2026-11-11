@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
+const DEFAULT_API_TARGET = 'http://localhost:8080';
+
 export default defineConfig(({ command }) => {
   if (command === 'build') {
     process.env.VITE_USER_NODE_ENV ??= '';
@@ -25,7 +27,7 @@ export default defineConfig(({ command }) => {
     server: {
       proxy: {
         '/api': {
-          target: 'http://localhost:8080',
+          target: process.env.API_PROXY_TARGET ?? DEFAULT_API_TARGET,
           changeOrigin: true,
           // The socket of the courier cabinet (/api/socket.io) goes through the same proxy.
           ws: true,

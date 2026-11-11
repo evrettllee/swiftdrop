@@ -116,14 +116,14 @@ test('should end the stages of a cancelled order with the cancellation', async (
 
 test('should lead back to the same page of the history', async () => {
   await page.goto(getCourierHistoryPath('page=2'));
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
 
   await page.getByRole('link', { name: new RegExp(`№${NEWEST_ORDER_ID - PAGE_SIZE}`) }).click();
   await expect(page).toHaveURL(getCourierHistoryOrderPath(NEWEST_ORDER_ID - PAGE_SIZE, 'page=2'));
   await backLink().click();
 
   await expect(page).toHaveURL(getCourierHistoryPath('page=2'));
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
 });
 
 test('should keep the history item of the menu active on the order', async () => {

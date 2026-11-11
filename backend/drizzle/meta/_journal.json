@@ -176,6 +176,13 @@
       "when": 1793478577793,
       "tag": "0024_support_tickets_closed_index",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794403037847,
+      "tag": "0025_exchange_rates",
+      "breakpoints": true
     }
   ]
 }

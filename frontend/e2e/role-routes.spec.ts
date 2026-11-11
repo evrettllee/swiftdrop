@@ -48,17 +48,16 @@ const FOREIGN_PAGES: Record<
 };
 
 for (const role of [ROLE.CLIENT, ROLE.COURIER, ROLE.MANAGER] satisfies Role[]) {
-  test(`should close every page of another role to a ${role} by the 403 page`, async ({ page }) => {
-    await stubSession(page, role);
-    await stubAppSocket(page);
+  for (const path of FOREIGN_PAGES[role]) {
+    test(`should close ${path} to a ${role} by the 403 page`, async ({ page }) => {
+      await stubSession(page, role);
+      await stubAppSocket(page);
 
-    for (const path of FOREIGN_PAGES[role]) {
       await page.goto(path);
 
       await expect(
         page.getByRole('heading', { name: FORBIDDEN_TEXTS.FORBIDDEN_TITLE }),
-        path,
       ).toBeVisible();
-    }
-  });
+    });
+  }
 }

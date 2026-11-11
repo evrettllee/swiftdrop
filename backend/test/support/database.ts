@@ -38,7 +38,9 @@ async function assertTestDatabase(db: Database): Promise<void> {
 
 export async function resetTestData(db: Database): Promise<void> {
   await assertTestDatabase(db);
-  await db.execute(sql`TRUNCATE TABLE users, tariffs, service_zones RESTART IDENTITY CASCADE`);
+  await db.execute(
+    sql`TRUNCATE TABLE users, tariffs, service_zones, exchange_rates RESTART IDENTITY CASCADE`,
+  );
 }
 
 // One active tariff and one active zone that covers the central Minsk test points.

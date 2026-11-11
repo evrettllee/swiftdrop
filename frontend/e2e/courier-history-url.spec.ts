@@ -43,21 +43,21 @@ test.beforeEach(async () => {
   await stubHistory(page);
 });
 
-test('should open the page of the address and step back to it after the next one', async () => {
+test('should open the page of the address and step back to it after another one', async () => {
   await openHistory(page, getCourierHistoryPath('page=2'));
 
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
   await expect(historyCards(page).first().getByRole('link')).toHaveAttribute(
     'href',
     getCourierHistoryOrderPath(NEWEST_ORDER_ID - PAGE_SIZE, 'page=2'),
   );
 
-  await page.getByRole('button', { name: PAGINATION_TEXTS.NEXT }).click();
-  await expect(page).toHaveURL(getCourierHistoryPath('page=3'));
+  await page.getByRole('button', { name: PAGINATION_TEXTS.PREVIOUS }).click();
+  await expect(page.getByText(PAGINATION_TEXTS.range(1, PAGE_SIZE, TOTAL))).toBeVisible();
 
   await page.goBack();
   await expect(page).toHaveURL(getCourierHistoryPath('page=2'));
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
 });
 
 test('should open the first page when the page of the address is not one of the history', async () => {
@@ -87,6 +87,6 @@ test('should start a phone at the top of the history by the cursor', async () =>
 
   await page.getByRole('button', { name: HISTORY_TEXTS.SHOW_MORE }).click();
 
-  await expect(historyCards(page)).toHaveCount(2 * PAGE_SIZE);
+  await expect(historyCards(page)).toHaveCount(TOTAL);
   expect(cursors.at(-1)).toBe(String(PAGE_SIZE));
 });

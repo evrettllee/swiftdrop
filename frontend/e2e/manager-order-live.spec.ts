@@ -86,7 +86,7 @@ test('should grey the marker out when the position is older than a minute', asyn
   const stub = await stubManagerOrder(page, assignedOrder());
   stub.courierPosition = {
     ...COURIER_POINT,
-    updatedAt: new Date(Date.now() - 2 * 60_000).toISOString(),
+    updatedAt: fromFixedNow(-2 * 60_000).toISOString(),
     isStale: false,
   };
   await page.goto(ORDER_PATH);

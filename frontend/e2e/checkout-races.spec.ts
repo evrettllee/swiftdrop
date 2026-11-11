@@ -88,11 +88,15 @@ test('should place one order when the client presses the button again after the 
       new URL(response.url()).pathname === `${API_BASE_PATH}${PAYMENTS_API_PATHS.PAYMENTS}`,
   );
 
+  const box = await submitButton(page).boundingBox();
+
+  if (box === null) {
+    throw new Error('The pay button is not on the page');
+  }
+
   await submitButton(page).click();
   await paymentStarted;
-  // A click from inside the page: Playwright would wait for the stalled navigation first, while a
-  // person can press the button right away.
-  await submitButton(page).evaluate((button: HTMLElement) => button.click());
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 
   // A second order would be asked for right on the click; this is time enough to see it.
   await delay(SECOND_ORDER_WAIT_MS);

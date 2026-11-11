@@ -144,3 +144,4 @@ export {
   ZONE_NAME_MAX_LENGTH,
   ZONE_PRIORITY,
 } from './manager-zones';
+export * as orderCountsStore from './order-counts-store';

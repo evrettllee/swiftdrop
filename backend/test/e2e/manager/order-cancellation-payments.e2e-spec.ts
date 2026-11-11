@@ -9,6 +9,7 @@ import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.con
 import { SESSION_EXPIRE_RESULT } from '@/modules/payments/constants/payments.constants';
 import { createTestApp } from '@test/support/app';
 import { registerUser } from '@test/support/auth';
+import { APP_HOOK_TIMEOUT_MS } from '@test/support/constants';
 import { createManager } from '@test/support/manager';
 import { postManagerCancel } from '@test/support/manager-assignment';
 import { placeOrders, readOrderStatus, setOrderStatus } from '@test/support/orders';
@@ -38,7 +39,7 @@ describe('Payments of an order cancelled by a manager (e2e)', () => {
       { token: PaymentGateway, useValue: gateway },
     ]);
     db = app.get<Database>(DRIZZLE);
-  });
+  }, APP_HOOK_TIMEOUT_MS);
 
   beforeEach(async () => {
     await resetServiceArea(db, getRoute);
@@ -46,7 +47,7 @@ describe('Payments of an order cancelled by a manager (e2e)', () => {
     const { cookies } = await registerUser(app);
     [orderId] = await placeOrders(app, cookies, 1);
     manager = await createManager(app, db);
-  });
+  }, APP_HOOK_TIMEOUT_MS);
 
   afterAll(async () => {
     await app.close();

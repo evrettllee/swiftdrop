@@ -4,6 +4,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import Stripe from 'stripe';
 import { ENV_KEYS } from '@/config/env.constants';
 import { StripePaymentAdapter } from '@/integrations/stripe/adapters/stripe-payment.adapter';
+import { StripeCheckoutClient } from '@/integrations/stripe/clients/stripe-checkout.client';
 import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
 import {
   PAYMENTS_ROUTES,
@@ -37,7 +38,10 @@ describe('Payment webhook signature over the raw body (e2e)', () => {
     const config = { getOrThrow: (key: string) => TEST_SETTINGS[key] } as unknown as ConfigService;
 
     app = await createTestApp([
-      { token: PaymentGateway, useValue: new StripePaymentAdapter(config) },
+      {
+        token: PaymentGateway,
+        useValue: new StripePaymentAdapter(new StripeCheckoutClient(config), config),
+      },
     ]);
   });
 

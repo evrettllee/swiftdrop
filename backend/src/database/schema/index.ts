@@ -19,3 +19,4 @@ export * from './support-tickets';
 export * from './messages';
 export * from './notifications';
 export * from './reviews';
+export * from './exchange-rates';

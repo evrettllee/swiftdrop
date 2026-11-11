@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { listParamsKey, useListParams } from '@/shared/lib/list-params';
+import { orderCountsStore } from '@/shared/staff-api';
 import { ORDERS_PARAMS_CONFIG } from '../config/list-params';
 import { toOrdersView } from './orders-view';
 import { useCourierName } from './useCourierName';
@@ -12,7 +13,9 @@ export function useManagerOrders(isDesktop: boolean) {
   const { values, update, resetUntil } = params;
   const view = useMemo(() => toOrdersView(values), [values]);
   const lists = useOrdersLists(params, view, isDesktop);
-  const counts = useTabCounts(view.filter);
+  const isUnfiltered = !view.hasFilters && view.filter.search === null;
+  const counts = useTabCounts(view.filter, 0, isUnfiltered);
+  orderCountsStore.useOrderCountsOwner(isUnfiltered);
   const courier = useCourierName(view.filter.courierId, lists.items);
   const { reloadList } = lists;
 

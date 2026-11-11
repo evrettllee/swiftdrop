@@ -20,12 +20,17 @@ test('should load the list and the counts again by events when nothing narrows t
   await settleRequests(page);
   const lists = stub.lists.length;
   const counts = stub.counts.length;
+  const countsWithoutFilters = stub.counts.filter((url) => url.search === '').length;
 
   pushStaffOrder(stub, 'created', 48300);
   pushStaffOrder(stub, 'status', 48236);
 
   await expect.poll(() => stub.lists.length).toBe(lists + 1);
-  await expect.poll(() => stub.counts.length).toBe(counts + 2);
+  await expect.poll(() => stub.counts.length).toBe(counts + 1);
+  await page.waitForTimeout(EVENT_WAIT_MS);
+  expect(stub.counts.filter((url) => url.search === '')).toHaveLength(
+    stub.counts.length - counts + countsWithoutFilters,
+  );
   expect(lastList(stub).get('until')).toBeNull();
   await expect(page.getByText(/новы(й|х) заказ/)).toHaveCount(0);
 });

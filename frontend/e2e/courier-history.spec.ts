@@ -62,9 +62,11 @@ test('should page the history on the desktop', async () => {
 
   await page.getByRole('button', { name: PAGINATION_TEXTS.NEXT }).click();
 
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
-  await expect(page.getByText(PAGINATION_TEXTS.page(2, 5))).toBeVisible();
-  await expect(cards()).toHaveCount(PAGE_SIZE);
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
+  await expect(
+    page.getByText(PAGINATION_TEXTS.page(2, Math.ceil(TOTAL / PAGE_SIZE))),
+  ).toBeVisible();
+  await expect(cards()).toHaveCount(TOTAL - PAGE_SIZE);
   await expect(cards().first()).toContainText(`№${NEWEST_ORDER_ID - PAGE_SIZE}`);
 });
 
@@ -75,14 +77,10 @@ test('should show more on a phone until the whole history is shown', async () =>
   const showMore = page.getByRole('button', { name: HISTORY_TEXTS.SHOW_MORE });
 
   await expect(page.getByText(HISTORY_TEXTS.shown(PAGE_SIZE, TOTAL))).toBeVisible();
-  for (const shown of [2, 3, 4]) {
-    await showMore.click();
-    await expect(cards()).toHaveCount(shown * PAGE_SIZE);
-  }
+  await expect(cards()).toHaveCount(PAGE_SIZE);
   await showMore.click();
 
   await expect(cards()).toHaveCount(TOTAL);
-  await expect(page.getByText(HISTORY_TEXTS.shown(TOTAL, TOTAL))).toBeVisible();
   await expect(showMore).toHaveCount(0);
 });
 

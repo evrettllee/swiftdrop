@@ -9,8 +9,7 @@ import { stubMyOrders } from './support/my-orders';
 
 const SETTLE_MS = 1_500;
 const CHAT_RESYNC_AFTER_ROOM_JOIN = /\/messages\?/;
-const MENU_BADGE_COUNTS = /^GET \/api\/manager\/orders\/counts$/;
-const KNOWN_REPEATS = [CHAT_RESYNC_AFTER_ROOM_JOIN, MENU_BADGE_COUNTS];
+const KNOWN_REPEATS = [CHAT_RESYNC_AFTER_ROOM_JOIN];
 const SLOW_ANSWER_MS = 1_500;
 
 test.use({ viewport: { width: 1440, height: 1000 } });
