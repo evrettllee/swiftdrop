@@ -10,13 +10,12 @@ import { HISTORY_ORDER_TEXTS } from '../config/texts';
 
 type HistoryOrderHeaderProps = {
   order: CourierHistoryOrder;
-  // The page of the history the order was opened from: the way back leads to it.
-  historyPage: number;
+  historySearch: string;
 };
 
 // The way back, the number with the status, the end of the order. The desktop puts the status next
 // to the title and the full date under it; a phone puts the status and the short date in a row.
-export function HistoryOrderHeader({ order, historyPage }: HistoryOrderHeaderProps) {
+export function HistoryOrderHeader({ order, historySearch }: HistoryOrderHeaderProps) {
   const finishedAt = order.finishedAt;
 
   return (
@@ -24,7 +23,7 @@ export function HistoryOrderHeader({ order, historyPage }: HistoryOrderHeaderPro
       <div className="-ms-4 self-start">
         <LinkButton
           variant="text"
-          to={getCourierHistoryPath(historyPage)}
+          to={getCourierHistoryPath(historySearch)}
           icon={<ArrowLeftIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />}
         >
           {HISTORY_ORDER_TEXTS.BACK}

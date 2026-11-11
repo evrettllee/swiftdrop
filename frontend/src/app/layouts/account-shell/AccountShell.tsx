@@ -14,6 +14,9 @@ type AccountShellProps = {
   homeTo: string;
   navLabel: string;
   navItems: readonly NavItem[];
+  bottomNavItems?: readonly NavItem[];
+  bottomNavEnd?: ReactNode;
+  userCaption?: string;
   // Shown at the end of the top bar of the phone.
   headerEnd?: ReactNode;
 };
@@ -21,14 +24,27 @@ type AccountShellProps = {
 // The frame of every page of an account area: the sidebar on the desktop, the top bar and the
 // bottom navigation on a phone. A page loads inside the frame, so the menu never disappears.
 // The page fills the width next to the menu, with the same 48px margin on the desktop.
-export function AccountShell({ homeTo, navLabel, navItems, headerEnd }: AccountShellProps) {
+export function AccountShell({
+  homeTo,
+  navLabel,
+  navItems,
+  bottomNavItems = navItems,
+  bottomNavEnd,
+  userCaption,
+  headerEnd,
+}: AccountShellProps) {
   const [searchParams] = useSearchParams();
   const isChatOpen = isChatOpenIn(searchParams);
 
   return (
     <div className="flex min-h-dvh">
       <SkipLink />
-      <AccountSidebar homeTo={homeTo} navLabel={navLabel} items={navItems} />
+      <AccountSidebar
+        homeTo={homeTo}
+        navLabel={navLabel}
+        items={navItems}
+        userCaption={userCaption}
+      />
       <div className="flex min-w-0 flex-1 flex-col">
         <AccountMobileHeader homeTo={homeTo} end={isChatOpen ? undefined : headerEnd} />
         {/* A column, so that a loader of a page can fill the space between the header and the
@@ -39,7 +55,9 @@ export function AccountShell({ homeTo, navLabel, navItems, headerEnd }: AccountS
           </Suspense>
         </main>
       </div>
-      {isChatOpen ? null : <AccountBottomNav label={navLabel} items={navItems} />}
+      {isChatOpen ? null : (
+        <AccountBottomNav label={navLabel} items={bottomNavItems} end={bottomNavEnd} />
+      )}
     </div>
   );
 }

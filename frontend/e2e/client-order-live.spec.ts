@@ -14,6 +14,7 @@ import {
 } from './support/live-order';
 import { TEST_ADDRESSES } from './support/mapbox';
 import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
+import { fixClock, fromFixedNow, runClockFromFixedNow } from './support/clock';
 
 const MINUTE = 60_000;
 const STALE_MS = MINUTE;
@@ -77,10 +78,11 @@ async function openAssigned(page: Page): Promise<LiveOrder> {
 test('should count the minutes to the pickup from order:eta on the status line and the marker', async ({
   page,
 }) => {
+  await fixClock(page);
   const order = await openAssigned(page);
   pushLocation(order, EAST_OF_PICKUP);
 
-  pushEta(order, new Date(Date.now() + 6 * MINUTE + 30_000));
+  pushEta(order, fromFixedNow(6 * MINUTE + 30_000));
 
   await expect(statusLine(page, 'Курьер приедет за посылкой через 7 мин')).toBeVisible();
   await expect(courierMarker(page).locator(`.${MAP_CLASS.COURIER_ETA_TEXT}`)).toHaveText('7 мин');
@@ -97,7 +99,7 @@ test('should move the marker of the courier with courier:location', async ({ pag
 });
 
 test('should say the connection is lost a minute after the last position', async ({ page }) => {
-  await page.clock.install();
+  await runClockFromFixedNow(page);
   const order = await openAssigned(page);
   pushLocation(order, EAST_OF_PICKUP);
   await expect(courierMarker(page)).toBeVisible();

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { CHAT_TEXTS } from '../src/features/order-chat/config/texts';
 import { ORDER_COURIER_TEXTS } from '../src/pages/order/config/tracking';
 import { HTTP_STATUS } from '../src/shared/api/request-config';
+import { CHAT_UI_TEXTS } from '../src/shared/config/chat';
 import {
   clientChat,
   courierMessages,
@@ -40,13 +40,13 @@ test('should mark an own message read with two checks after message:read', async
   const { order, chat } = await openClientChatOrder(page, courierMessages(1));
   await clientChat.button(page).click();
   await clientChat.input(page).fill(TEXT);
-  await clientChat.panel(page).getByRole('button', { name: CHAT_TEXTS.SEND }).click();
+  await clientChat.panel(page).getByRole('button', { name: CHAT_UI_TEXTS.SEND }).click();
   const own = clientChat.log(page).getByText(TEXT).locator('..');
-  await expect(own.getByRole('img', { name: CHAT_TEXTS.SENT })).toBeVisible();
+  await expect(own.getByRole('img', { name: CHAT_UI_TEXTS.SENT })).toBeVisible();
 
   pushChatRead(order, chat.messages.at(-1)?.messageId ?? 0);
 
-  await expect(own.getByRole('img', { name: CHAT_TEXTS.READ })).toBeVisible();
+  await expect(own.getByRole('img', { name: CHAT_UI_TEXTS.READ })).toBeVisible();
 });
 
 test('should send a quick reply at once', async ({ page }) => {

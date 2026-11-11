@@ -15,6 +15,7 @@ import {
   STRIPE_METADATA_ORDER_ID_KEY,
   STRIPE_PAYMENT_STATUS_PAID,
 } from '../constants/stripe.constants';
+import type { StripeSessionState } from '../types/stripe.types';
 
 function readOrderId(session: Stripe.Checkout.Session): number | null {
   const orderId = Number(session.metadata?.[STRIPE_METADATA_ORDER_ID_KEY]);
@@ -22,7 +23,7 @@ function readOrderId(session: Stripe.Checkout.Session): number | null {
   return Number.isInteger(orderId) && orderId > 0 ? orderId : null;
 }
 
-function readPaymentRef(session: Stripe.Checkout.Session): string | null {
+function readPaymentRef(session: Pick<StripeSessionState, 'payment_intent'>): string | null {
   const paymentIntent = session.payment_intent;
 
   return typeof paymentIntent === 'string' ? paymentIntent : (paymentIntent?.id ?? null);
@@ -65,7 +66,7 @@ function toSessionStatus(status: Stripe.Checkout.Session.Status | null): Checkou
   return result;
 }
 
-export function mapStripeSession(session: Stripe.Checkout.Session): CheckoutSessionState {
+export function mapStripeSession(session: StripeSessionState): CheckoutSessionState {
   return {
     status: toSessionStatus(session.status),
     isPaid: session.payment_status === STRIPE_PAYMENT_STATUS_PAID,

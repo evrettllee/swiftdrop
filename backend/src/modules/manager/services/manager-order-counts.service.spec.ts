@@ -10,6 +10,7 @@ const NO_FILTERS = {
   courierId: null,
   payment: null,
   fragile: false,
+  hasOpenTicket: false,
   search: null,
 };
 

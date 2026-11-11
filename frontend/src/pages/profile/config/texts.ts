@@ -5,4 +5,5 @@ export const PROFILE_TEXTS = {
   PROFILE_EMAIL: UI_TEXTS.EMAIL,
   PROFILE_THEME: 'Тема оформления',
   SIGN_OUT: 'Выйти',
+  SUPPORT: UI_TEXTS.SUPPORT,
 } as const;

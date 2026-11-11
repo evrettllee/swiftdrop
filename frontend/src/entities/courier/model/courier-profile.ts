@@ -36,6 +36,10 @@ export function useCourierProfileStatus(): CourierProfileStatus {
   return useCourierProfileStore((state) => state.status);
 }
 
+export function getCourierProfile(): CourierMe | null {
+  return useCourierProfileStore.getState().profile;
+}
+
 export async function loadCourierProfile(signal?: AbortSignal): Promise<void> {
   useCourierProfileStore.setState({ status: COURIER_PROFILE_STATUS.LOADING });
 
@@ -73,6 +77,15 @@ export function setCourierProfile(profile: CourierMe): void {
 export function setCourierVehicle(vehicle: CourierVehicle): void {
   useCourierProfileStore.setState(({ profile }) => ({
     profile: profile === null ? null : { ...profile, vehicle },
+  }));
+}
+
+export function dropActiveOrder(orderId: number): void {
+  useCourierProfileStore.setState(({ profile }) => ({
+    profile:
+      profile === null || profile.activeOrderId !== orderId
+        ? profile
+        : { ...profile, activeOrderId: null },
   }));
 }
 

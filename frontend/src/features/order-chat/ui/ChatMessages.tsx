@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import type { ChatMessage } from '@/shared/api';
+import { ChatBubble, ChatDaySection, groupByDay, useChatScroll } from '@/shared/ui/chat';
 import { Spinner } from '@/shared/ui/spinner';
 import { CHAT_TEXTS } from '../config/texts';
-import { groupMessagesByDay } from '../lib/day-groups';
 import { useChat } from './chat-context';
-import { ChatBubble } from './ChatBubble';
-import { useChatScroll } from './useChatScroll';
+
+const sentAtOf = (message: ChatMessage) => message.sentAt;
 
 function useIncomingAnnouncement() {
   const { messages, ownRole, isLoaded } = useChat();
@@ -22,10 +23,19 @@ function useIncomingAnnouncement() {
 
 export function ChatMessages() {
   const chat = useChat();
-  const { scroller, handleScroll, requestOlder } = useChatScroll(chat);
+  const last = chat.messages.at(-1) ?? null;
+  const { scroller, handleScroll, requestOlder } = useChatScroll({
+    firstKey: chat.messages[0]?.messageId ?? null,
+    lastKey: last?.messageId ?? null,
+    isLastOwn: last?.senderRole === chat.ownRole,
+    isLoaded: chat.isLoaded,
+    hasOlder: chat.hasOlder,
+    isLoadingOlder: chat.isLoadingOlder,
+    loadOlder: chat.loadOlder,
+  });
   const [nowMs] = useState(() => Date.now());
   const announcement = useIncomingAnnouncement();
-  const days = groupMessagesByDay(chat.messages, nowMs);
+  const days = groupByDay(chat.messages, sentAtOf, nowMs);
 
   useEffect(() => {
     const element = scroller.current;
@@ -63,16 +73,17 @@ export function ChatMessages() {
           </p>
         ) : null}
         {days.map((day) => (
-          <section key={day.key} aria-label={day.label} className="flex flex-col gap-2">
-            <h3 className="self-center text-caption text-fg-secondary">{day.label}</h3>
-            {day.messages.map((message) => (
+          <ChatDaySection key={day.key} label={day.label}>
+            {day.items.map((message) => (
               <ChatBubble
                 key={message.messageId}
-                message={message}
+                text={message.content}
+                sentAt={message.sentAt}
+                isRead={message.isRead}
                 isOwn={message.senderRole === chat.ownRole}
               />
             ))}
-          </section>
+          </ChatDaySection>
         ))}
       </div>
       <p aria-live="polite" className="sr-only">

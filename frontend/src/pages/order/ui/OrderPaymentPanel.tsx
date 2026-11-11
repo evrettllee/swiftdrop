@@ -1,13 +1,15 @@
 import { memo, useId } from 'react';
+import { PaymentStatusRow } from '@/entities/order';
+import { OrderSupportEntry } from '@/features/order-support-entry';
 import { DeliveryPriceRows, formatDistanceKm, PRICE_TEXTS, PriceTotal } from '@/entities/price';
 import type { OrderDetails } from '@/shared/api';
 import { formatMoney } from '@/shared/lib/format';
+import { APP_ROUTES } from '@/shared/routes';
 import { Divider } from '@/shared/ui/divider';
 import { PriceRow } from '@/shared/ui/price-row';
 import { PAYMENT_TEXTS } from '../config/texts';
-import { getTravelMinutes } from '../lib/payment';
+import { getPaymentTime, getPaymentView, getTravelMinutes } from '../lib/payment';
 import { OrderPaymentActions } from './OrderPaymentActions';
-import { PaymentStatusRow } from './PaymentStatusRow';
 import { RepeatOrderAction } from './RepeatOrderAction';
 
 type OrderPaymentPanelProps = {
@@ -26,6 +28,7 @@ export const OrderPaymentPanel = memo(function OrderPaymentPanel({
   const headingId = useId();
   const minutes = getTravelMinutes(order);
   const total = formatMoney(order.price, order.currency);
+  const paymentView = getPaymentView(order);
 
   return (
     <aside
@@ -35,7 +38,7 @@ export const OrderPaymentPanel = memo(function OrderPaymentPanel({
       <h2 id={headingId} className="text-heading-sm font-semibold text-balance">
         {PAYMENT_TEXTS.SECTION}
       </h2>
-      <PaymentStatusRow order={order} />
+      <PaymentStatusRow view={paymentView} time={getPaymentTime(order, paymentView)} />
       <Divider />
       <dl className="flex flex-col gap-2 text-small">
         <PriceRow label={PRICE_TEXTS.DISTANCE} value={formatDistanceKm(order.distanceKm)} />
@@ -57,6 +60,13 @@ export const OrderPaymentPanel = memo(function OrderPaymentPanel({
         onCancel={onCancel}
       />
       <RepeatOrderAction order={order} />
+      <Divider />
+      <OrderSupportEntry
+        orderId={order.orderId}
+        ticket={order.supportTicket}
+        supportPath={APP_ROUTES.SUPPORT}
+        placement="start"
+      />
     </aside>
   );
 });

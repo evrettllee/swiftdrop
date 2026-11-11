@@ -27,6 +27,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "nest build && node dist/database/seed.js",
     "perf:seed": "node -r tsconfig-paths/register -r ts-node/register test/support/perf-seed.ts",
+    "start:e2e": "node -r tsconfig-paths/register -r ts-node/register/transpile-only test/support/e2e-stand-start.ts",
+    "e2e:seed": "node -r tsconfig-paths/register -r ts-node/register/transpile-only test/support/e2e-stand-seed.ts",
     "payments:reconcile": "nest build && node dist/modules/payments/scripts/reconcile-payments.js"
   },
   "dependencies": {

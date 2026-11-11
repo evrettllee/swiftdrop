@@ -42,6 +42,7 @@ export function order(
     })),
     cancelledBy: null,
     payment: null,
+    supportTicket: null,
     ...changes,
   };
 }

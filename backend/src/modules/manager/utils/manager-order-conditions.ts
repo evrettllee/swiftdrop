@@ -3,7 +3,7 @@ import { alias, union } from 'drizzle-orm/pg-core';
 import { PAYMENT_STATUS, type PaymentStatus } from '@/common/enums/payment-status.enum';
 import type { DateRange } from '@/common/utils/date-range';
 import type { Database } from '@/database/database.module';
-import { orders, packages, payments, users } from '@/database/schema';
+import { orders, payments, users } from '@/database/schema';
 import { fullNameSql } from '@/database/sql-expressions';
 import {
   MANAGER_STATUS_GROUP_STATUSES,
@@ -12,6 +12,7 @@ import {
   type PaymentState,
 } from '../constants/manager-orders.constants';
 import type { ManagerOrderFilters, OrderSearch } from '../types/manager-orders.types';
+import { fragileCondition, openTicketCondition } from './order-flag-conditions';
 
 const SEARCH_ORDERS_ALIAS = 'search_orders';
 
@@ -47,15 +48,6 @@ export function paymentStateSql(): SQL<PaymentState> {
     order by ${isPaid} desc
     limit 1
   ), ${PAYMENT_STATE.UNPAID})`;
-}
-
-function fragileCondition(db: Database): SQL {
-  return exists(
-    db
-      .select({ one: sql`1` })
-      .from(packages)
-      .where(and(eq(packages.orderId, orders.orderId), eq(packages.isFragile, true))),
-  );
 }
 
 function paymentStateCondition(db: Database, state: PaymentState): SQL | undefined {
@@ -157,6 +149,7 @@ export function managerOrderConditions(
     filters.courierId === null ? undefined : eq(orders.courierId, filters.courierId),
     paymentCondition(db, filters.payment),
     filters.fragile ? fragileCondition(db) : undefined,
+    filters.hasOpenTicket ? openTicketCondition(db) : undefined,
     searchCondition(db, filters.search),
   );
 }

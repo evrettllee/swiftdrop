@@ -39,6 +39,7 @@ const historyEntrySchema = z.strictObject({
   status: z.enum(ORDER_STATUS_VALUES),
   changedAt: z.date(),
   actor: z.enum(ORDER_ACTOR_VALUES),
+  actorName: z.string().nullable(),
   comment: z.string().nullable(),
 });
 
@@ -84,6 +85,7 @@ export const managerOrderDetailsSchema = z.strictObject({
   createdAt: z.date(),
   statusChangedAt: z.date(),
   finishedAt: z.date().nullable(),
+  estimatedDeliveryAt: z.date().nullable(),
   client: z.strictObject({
     id: z.number().int(),
     name: z.string(),

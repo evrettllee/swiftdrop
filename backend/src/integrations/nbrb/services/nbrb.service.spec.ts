@@ -1,77 +1,133 @@
-import { ServiceUnavailableException } from '@nestjs/common';
-import { NBRB_CACHE_TTL_MS } from '../constants/nbrb.constants';
+import { Logger, ServiceUnavailableException } from '@nestjs/common';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import {
+  NBRB_CACHE_TTL_MS,
+  NBRB_RATE_CURRENCY,
+  NBRB_RETRY_DELAY_MS,
+} from '../constants/nbrb.constants';
+import type { NbrbClient } from './nbrb-client.service';
 import { NbrbService } from './nbrb.service';
+import type { SavedRateService } from './saved-rate.service';
 
-const RATE_BODY = { Cur_Scale: 1, Cur_OfficialRate: 3.0371 };
-
-function buildResponse(body: unknown, status = 200): Response {
-  return { ok: status === 200, status, json: () => Promise.resolve(body) } as unknown as Response;
-}
+const FRESH_RATE = 3.0371;
+const SAVED_RATE = 2.9876;
+const MS_PER_HOUR = 60 * MS_PER_MINUTE;
+const START = Date.UTC(2026, 10, 11, 9);
 
 describe('NbrbService', () => {
   let service: NbrbService;
-  let fetchMock: jest.SpiedFunction<typeof globalThis.fetch>;
   let now: number;
+  let warn: jest.SpiedFunction<Logger['warn']>;
+  const fetchUsdRate = jest.fn<Promise<number>, []>();
+  const find = jest.fn<
+    ReturnType<SavedRateService['find']>,
+    Parameters<SavedRateService['find']>
+  >();
+  const save = jest.fn<
+    ReturnType<SavedRateService['save']>,
+    Parameters<SavedRateService['save']>
+  >();
+
+  function saveRateHoursAgo(hours: number): void {
+    find.mockResolvedValue({ rate: SAVED_RATE, fetchedAt: new Date(now - hours * MS_PER_HOUR) });
+  }
+
+  function failNbrb(): void {
+    fetchUsdRate.mockRejectedValue(new Error('NBRB is down'));
+  }
 
   beforeEach(() => {
-    service = new NbrbService();
-    now = 1_000_000;
+    now = START;
     jest.spyOn(Date, 'now').mockImplementation(() => now);
-    fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(buildResponse(RATE_BODY));
+    warn = jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
+    fetchUsdRate.mockReset().mockResolvedValue(FRESH_RATE);
+    find.mockReset().mockResolvedValue(null);
+    save.mockReset().mockResolvedValue(undefined);
+    service = new NbrbService(
+      { fetchUsdRate } as unknown as NbrbClient,
+      { find, save } as unknown as SavedRateService,
+    );
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('should return the official rate when NBRB answers', async () => {
-    expect(await service.getUsdRate()).toBe(3.0371);
+  it('should return the fresh NBRB rate and save it', async () => {
+    expect(await service.getUsdRate()).toBe(FRESH_RATE);
+    expect(save).toHaveBeenCalledWith(NBRB_RATE_CURRENCY, {
+      rate: FRESH_RATE,
+      fetchedAt: new Date(START),
+    });
+    expect(find).not.toHaveBeenCalled();
   });
 
-  it('should divide the rate by the scale when the rate is given for several units', async () => {
-    fetchMock.mockResolvedValue(buildResponse({ Cur_Scale: 100, Cur_OfficialRate: 303.71 }));
-
-    expect(await service.getUsdRate()).toBeCloseTo(3.0371, 4);
-  });
-
-  it('should ask NBRB once when the rate is requested twice within the cache time', async () => {
+  it('should ask NBRB once within the cache time and again after it', async () => {
     await service.getUsdRate();
-    await service.getUsdRate();
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('should ask NBRB again when the cache time has passed', async () => {
     await service.getUsdRate();
     now += NBRB_CACHE_TTL_MS + 1;
     await service.getUsdRate();
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchUsdRate).toHaveBeenCalledTimes(2);
   });
 
-  it('should return the last known rate when NBRB fails after a successful request', async () => {
+  it('should use the saved rate of 71 hours with a warning when NBRB fails', async () => {
+    failNbrb();
+    saveRateHoursAgo(71);
+
+    expect(await service.getUsdRate()).toBe(SAVED_RATE);
+    expect(find).toHaveBeenCalledWith(NBRB_RATE_CURRENCY);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Using the saved NBRB rate'));
+  });
+
+  it('should throw 503 when NBRB fails and the saved rate is 73 hours old', async () => {
+    failNbrb();
+    saveRateHoursAgo(73);
+
+    await expect(service.getUsdRate()).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('should throw 503 on the first start when NBRB fails and no rate is saved', async () => {
+    failNbrb();
+
+    await expect(service.getUsdRate()).rejects.toThrow(ServiceUnavailableException);
+  });
+
+  it('should keep the saved rate until the retry delay and then ask NBRB again', async () => {
+    failNbrb();
+    saveRateHoursAgo(1);
+    await service.getUsdRate();
+    await service.getUsdRate();
+
+    expect(fetchUsdRate).toHaveBeenCalledTimes(1);
+
+    now += NBRB_RETRY_DELAY_MS + 1;
+    fetchUsdRate.mockResolvedValue(FRESH_RATE);
+
+    expect(await service.getUsdRate()).toBe(FRESH_RATE);
+    expect(fetchUsdRate).toHaveBeenCalledTimes(2);
+  });
+
+  it('should ask NBRB again on the next call after a failure with no rate', async () => {
+    failNbrb();
+    await expect(service.getUsdRate()).rejects.toThrow(ServiceUnavailableException);
+    fetchUsdRate.mockResolvedValue(FRESH_RATE);
+
+    expect(await service.getUsdRate()).toBe(FRESH_RATE);
+  });
+
+  it('should use the rate in memory when NBRB fails and the saved rate cannot be read', async () => {
     await service.getUsdRate();
     now += NBRB_CACHE_TTL_MS + 1;
-    fetchMock.mockRejectedValue(new Error('NBRB is down'));
+    failNbrb();
+    find.mockRejectedValue(new Error('database is down'));
 
-    expect(await service.getUsdRate()).toBe(3.0371);
+    expect(await service.getUsdRate()).toBe(FRESH_RATE);
   });
 
-  it('should throw 503 when NBRB fails and no rate is known yet', async () => {
-    fetchMock.mockRejectedValue(new Error('NBRB is down'));
+  it('should return the fresh rate when it cannot be saved', async () => {
+    save.mockRejectedValue(new Error('database is down'));
 
-    await expect(service.getUsdRate()).rejects.toThrow(ServiceUnavailableException);
-  });
-
-  it('should throw 503 when NBRB answers with an error status and no rate is known', async () => {
-    fetchMock.mockResolvedValue(buildResponse({}, 500));
-
-    await expect(service.getUsdRate()).rejects.toThrow(ServiceUnavailableException);
-  });
-
-  it('should throw 503 when the NBRB answer has no usable rate', async () => {
-    fetchMock.mockResolvedValue(buildResponse({ Cur_Scale: 1 }));
-
-    await expect(service.getUsdRate()).rejects.toThrow(ServiceUnavailableException);
+    expect(await service.getUsdRate()).toBe(FRESH_RATE);
   });
 });

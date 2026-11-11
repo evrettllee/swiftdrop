@@ -14,6 +14,7 @@ import { listPaginationShape } from '@/common/schemas/pagination.schema';
 import { toDateRange } from '@/common/utils/date-range';
 import {
   FRAGILE_ONLY,
+  OPEN_TICKET_ONLY,
   MANAGER_ORDERS_PAGE_SIZE_DEFAULT,
   MANAGER_ORDERS_VALIDATION_MESSAGES,
   MANAGER_STATUS_GROUP_VALUES,
@@ -53,6 +54,9 @@ export const managerOrderFilterShape = {
   fragile: z
     .literal(FRAGILE_ONLY, { error: MANAGER_ORDERS_VALIDATION_MESSAGES.FRAGILE_INVALID })
     .optional(),
+  hasOpenTicket: z
+    .literal(OPEN_TICKET_ONLY, { error: MANAGER_ORDERS_VALIDATION_MESSAGES.OPEN_TICKET_INVALID })
+    .optional(),
   q: managerSearchSchema.optional(),
 };
 
@@ -64,6 +68,7 @@ export function toManagerOrderFilters(raw: RawFilters): ManagerOrderFilters {
     courierId: raw.courierId ?? null,
     payment: raw.payment ?? null,
     fragile: raw.fragile === FRAGILE_ONLY,
+    hasOpenTicket: raw.hasOpenTicket === OPEN_TICKET_ONLY,
     search: raw.q ?? null,
   };
 }

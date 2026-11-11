@@ -8,6 +8,7 @@ import { requireCourier, signInAsCourierByForm } from './support/courier';
 const COURIER_NAV_LABELS = [
   COURIER_LAYOUT_TEXTS.NAV_WORK,
   COURIER_LAYOUT_TEXTS.NAV_HISTORY,
+  COURIER_LAYOUT_TEXTS.NAV_SUPPORT,
   COURIER_LAYOUT_TEXTS.NAV_PROFILE,
 ];
 

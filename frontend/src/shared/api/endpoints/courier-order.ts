@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { http } from '../http';
-import { orderStatusSchema } from './order';
+import { orderStatusSchema, orderSupportTicketSchema } from './order';
 
 const COURIER_ORDERS_PATH = '/couriers/me/orders';
 
@@ -45,9 +45,17 @@ export const courierOrderSchema = z.object({
 export type CourierOrder = z.infer<typeof courierOrderSchema>;
 
 // Response of GET /api/couriers/me/orders/current
-export const currentCourierOrderSchema = z.object({ order: courierOrderSchema.nullable() });
+export const currentCourierOrderSchema = z.object({
+  order: courierOrderSchema
+    .extend({ supportTicket: orderSupportTicketSchema.nullable() })
+    .nullable(),
+});
 
-export async function getCurrentCourierOrder(signal?: AbortSignal): Promise<CourierOrder | null> {
+export type CurrentCourierOrder = NonNullable<z.infer<typeof currentCourierOrderSchema>['order']>;
+
+export async function getCurrentCourierOrder(
+  signal?: AbortSignal,
+): Promise<CurrentCourierOrder | null> {
   const { order } = currentCourierOrderSchema.parse(
     await http.get(COURIER_ORDERS_API_PATHS.CURRENT, { signal }),
   );

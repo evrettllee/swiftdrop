@@ -81,6 +81,7 @@ export const MANAGER_SORT_KEY = {
 } as const;
 
 export const FRAGILE_ONLY = 'true';
+export const OPEN_TICKET_ONLY = 'true';
 
 export const NUMERIC_SEARCH = /^[\d\s+\-()]+$/;
 export const NON_DIGITS = /\D/g;
@@ -95,4 +96,5 @@ export const MANAGER_ORDERS_VALIDATION_MESSAGES = {
   TEXT_SEARCH_TOO_SHORT: `Введите не меньше ${TEXT_SEARCH_MIN_LENGTH} символов`,
   COURIER_ID_INVALID: 'Некорректный номер курьера',
   FRAGILE_INVALID: 'Фильтр хрупких посылок принимает только true',
+  OPEN_TICKET_INVALID: 'Фильтр открытых обращений принимает только true',
 } as const;

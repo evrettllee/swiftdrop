@@ -3,12 +3,7 @@ import type { ReactNode } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { buildOrderProgress, OrderProgressSteps } from '@/entities/order';
 import { LIST_STATUS, MAIN_COLUMN_CLASS, SIDE_COLUMN_LAYOUT_CLASS } from '@/shared/config';
-import {
-  getCourierHistoryPath,
-  HISTORY_PAGE_PARAM,
-  ORDER_ID_PARAM,
-  parseHistoryPage,
-} from '@/shared/routes';
+import { getCourierHistoryPath, ORDER_ID_PARAM } from '@/shared/routes';
 import { Button, LinkButton } from '@/shared/ui/button';
 import { Divider } from '@/shared/ui/divider';
 import { EmptyState } from '@/shared/ui/empty-state';
@@ -26,14 +21,14 @@ import { HistoryOrderSkeleton } from './HistoryOrderSkeleton';
 export function HistoryOrderPage() {
   const params = useParams();
   const [searchParams] = useSearchParams();
-  const historyPage = parseHistoryPage(searchParams.get(HISTORY_PAGE_PARAM));
+  const historySearch = searchParams.toString();
   const { order, status, isNotFound, retry } = useHistoryOrder(Number(params[ORDER_ID_PARAM]));
   let content: ReactNode;
 
   if (order !== null) {
     content = (
       <div className="flex flex-col gap-6 lg:gap-8">
-        <HistoryOrderHeader order={order} historyPage={historyPage} />
+        <HistoryOrderHeader order={order} historySearch={historySearch} />
         <div className={SIDE_COLUMN_LAYOUT_CLASS}>
           <div className={`${MAIN_COLUMN_CLASS} flex flex-col gap-6 lg:gap-8`}>
             <HistoryOrderRoute order={order} />
@@ -62,7 +57,7 @@ export function HistoryOrderPage() {
         title={HISTORY_ORDER_TEXTS.NOT_FOUND_TITLE}
         text={HISTORY_ORDER_TEXTS.NOT_FOUND_TEXT}
       >
-        <LinkButton variant="secondary" to={getCourierHistoryPath(historyPage)}>
+        <LinkButton variant="secondary" to={getCourierHistoryPath(historySearch)}>
           {HISTORY_ORDER_TEXTS.BACK}
         </LinkButton>
       </EmptyState>

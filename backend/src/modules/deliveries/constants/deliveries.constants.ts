@@ -79,9 +79,6 @@ export const DELIVERY_CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.IN_TRANSIT,
 ];
 
-// The courier's last name is cut to its first letter and this mark.
-export const LAST_NAME_INITIAL_MARK = '.';
-
 // History
 // Orders that ended while they were with the courier.
 export const HISTORY_STATUSES: readonly OrderStatus[] = COURIER_HISTORY_STATUSES;
@@ -93,11 +90,19 @@ export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,
   ORDER_STATUS.CANCELLED,
 ];
-export const HISTORY_PAGE_SIZE_DEFAULT = 10;
+export const HISTORY_PAGE_SIZE_DEFAULT = 20;
 
 export const HISTORY_SORT_KEY = {
   ID: 'id',
   FINISHED_AT: 'finishedAt',
+  DISTANCE_KM: 'distanceKm',
+} as const;
+
+export const HISTORY_NUMBER_SEARCH = /^\d+$/;
+export const HISTORY_DISTANCE_DECIMALS = 1;
+export const HISTORY_VALIDATION_MESSAGES = {
+  SEARCH_NOT_NUMBER: 'Введите номер заказа цифрами',
+  STATUS_INVALID: 'Статус истории: delivered или cancelled',
 } as const;
 
 // Validation

@@ -31,6 +31,7 @@ export type LiveOrder = {
   socket: AppSocketStub;
   status: OrderStatus;
   cancelledBy: OrderDetails['cancelledBy'];
+  supportTicket: OrderDetails['supportTicket'];
   requests: number;
   // When each request of the order came, by the clock of the test.
   requestedAt: number[];
@@ -47,6 +48,7 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
     ),
     status: ORDER_STATUS.CONFIRMED,
     cancelledBy: null,
+    supportTicket: null,
     requests: 0,
     requestedAt: [],
     isFailing: false,
@@ -67,6 +69,7 @@ export async function stubLiveOrder(page: Page, joinAnswer?: OrderJoinAnswer): P
           json: {
             ...buildTestOrderDetails(LIVE_ORDER_ID, order.status),
             cancelledBy: order.cancelledBy,
+            supportTicket: order.supportTicket,
           },
         });
   });

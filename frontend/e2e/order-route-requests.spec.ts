@@ -15,7 +15,7 @@ import {
   routeUnavailableBadge,
   stubClientOrderRoute,
 } from './support/routing';
-import { stubOrderLive } from './support/app-socket';
+import { type AppSocketStub, stubOrderLive } from './support/app-socket';
 
 // How often the map of an order asks for its route. The session, the order and its route all come
 // from the stubbed API: nothing here needs the backend, and no client is registered, as the
@@ -23,6 +23,7 @@ import { stubOrderLive } from './support/app-socket';
 const ORDER_ID = 990004;
 // Longer than both the retry and the refresh, so a repeated request would have come.
 const QUIET_WAIT_MS = Math.max(ROUTE_RETRY_MS, ROUTE_REFRESH_INTERVAL_MS) + 3_000;
+const JOIN_SETTLE_MS = 1_000;
 const TEST_CLIENT = {
   userId: 990004,
   firstName: 'Анна',
@@ -32,10 +33,12 @@ const TEST_CLIENT = {
   role: ROLE.CLIENT,
 };
 
+let socket: AppSocketStub;
+
 test.beforeEach(async ({ page }) => {
   test.setTimeout(QUIET_WAIT_MS * 3);
   await stubMapbox(page);
-  await stubOrderLive(page);
+  socket = await stubOrderLive(page);
   await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.ME}`, (route) =>
     route.fulfill({ json: TEST_CLIENT }),
   );
@@ -60,9 +63,7 @@ test('should ask for the route of an order without a courier once, without polli
   expect(requests).toHaveLength(answered);
 });
 
-test('should show the points alone and not ask again when the route is not found', async ({
-  page,
-}) => {
+async function openOrderWithMissingRoute(page: Page): Promise<{ count: () => number }> {
   await stubOrderDetails(page, ORDER_ID);
   let requests = 0;
   await page.route(`**${API_BASE_PATH}${ROUTING_API_PATHS.clientOrder(ORDER_ID)}`, (route) => {
@@ -73,11 +74,34 @@ test('should show the points alone and not ask again when the route is not found
 
   await page.goto(getOrderPath(ORDER_ID));
   await expect(orderMap(page).locator(`.${MAP_CLASS.MARKER}`)).toHaveCount(2);
+  await expect.poll(() => socket.joins.length).toBeGreaterThan(0);
   await expect.poll(() => requests).toBeGreaterThan(0);
-  const answered = requests;
+  await page.waitForTimeout(JOIN_SETTLE_MS);
+
+  return { count: () => requests };
+}
+
+test('should show the points alone and not ask again when the route is not found', async ({
+  page,
+}) => {
+  const requests = await openOrderWithMissingRoute(page);
+  const answered = requests.count();
   await page.waitForTimeout(QUIET_WAIT_MS);
 
   await expect(routeUnavailableBadge(orderMap(page))).toHaveCount(0);
   await expectRoadLines(orderMap(page), 0);
-  expect(requests).toBe(answered);
+  expect(requests.count()).toBe(answered);
+});
+
+test('should not ask again for a route that is not found when the room is joined again', async ({
+  page,
+}) => {
+  const requests = await openOrderWithMissingRoute(page);
+  const answered = requests.count();
+
+  await socket.drop();
+  await expect.poll(() => socket.joins.length).toBeGreaterThan(1);
+  await page.waitForTimeout(JOIN_SETTLE_MS);
+
+  expect(requests.count()).toBe(answered);
 });

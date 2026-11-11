@@ -1,6 +1,5 @@
+import { PAYMENT_VIEW, type PaymentView } from '@/entities/order';
 import { ORDER_STATUS, type OrderDetails, PAYMENT_STATUS } from '@/shared/api';
-import { PAYMENT_VIEW } from '../config/payment';
-import type { PaymentView } from '../model/payment-view';
 
 export function getPaymentView(order: OrderDetails): PaymentView {
   let view: PaymentView = PAYMENT_VIEW.UNPAID;

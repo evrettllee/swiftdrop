@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { http } from '../http';
+import { COURIER_ORDERS_API_PATHS } from './courier-order';
 import { dateSchema, orderStatusSchema } from './order';
 
 // A finished order of the courier (the CourierHistoryItem of the backend). `finishedAt` is null
@@ -16,12 +18,32 @@ export const courierHistoryItemSchema = z.object({
 export type CourierHistoryItem = z.infer<typeof courierHistoryItemSchema>;
 
 // Response of GET /api/couriers/me/orders/history
+export const courierHistorySummarySchema = z.object({
+  count: z.number(),
+  distanceKm: z.number(),
+});
+
+export type CourierHistorySummary = z.infer<typeof courierHistorySummarySchema>;
+
 export const courierHistoryPageSchema = z.object({
   items: z.array(courierHistoryItemSchema),
   page: z.number(),
   limit: z.number(),
   total: z.number(),
+  until: z.number().nullable(),
+  summary: courierHistorySummarySchema.optional(),
 });
+
+export type CourierHistoryPage = z.infer<typeof courierHistoryPageSchema>;
+
+export const courierHistoryCursorPageSchema = z.object({
+  items: z.array(courierHistoryItemSchema),
+  nextCursor: z.string().nullable(),
+  total: z.number().optional(),
+  summary: courierHistorySummarySchema.optional(),
+});
+
+export type CourierHistoryCursorPage = z.infer<typeof courierHistoryCursorPageSchema>;
 
 const pointSchema = z.object({
   city: z.string(),
@@ -51,3 +73,12 @@ export const courierHistoryOrderSchema = z.object({
 });
 
 export type CourierHistoryOrder = z.infer<typeof courierHistoryOrderSchema>;
+
+export async function getCourierHistoryOrder(
+  orderId: number,
+  signal?: AbortSignal,
+): Promise<CourierHistoryOrder> {
+  return courierHistoryOrderSchema.parse(
+    await http.get(COURIER_ORDERS_API_PATHS.historyOrder(orderId), { signal }),
+  );
+}

@@ -28,6 +28,7 @@ describe('managerOrdersExportSchema', () => {
         courierId: null,
         payment: ['unpaid'],
         fragile: false,
+        hasOpenTicket: false,
         search: { kind: 'text', pattern: '%Петров%' },
       },
     });
@@ -41,6 +42,12 @@ describe('managerOrdersExportSchema', () => {
       withPhones: true,
       sort: { key: 'createdAt', direction: 'desc' },
     });
+  });
+
+  it('should take the open ticket filter of the list', () => {
+    const result = managerOrdersExportSchema.safeParse({ format: 'csv', hasOpenTicket: 'true' });
+
+    expect(result.success && result.data).toMatchObject({ filters: { hasOpenTicket: true } });
   });
 
   it('should require the format', () => {

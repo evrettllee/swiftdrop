@@ -11,6 +11,7 @@ import {
 import { MANAGER_EXPORT_THROTTLE } from '@/modules/manager/constants/manager-export.constants';
 import { getAnalytics } from '@test/support/analytics';
 import { createTestApp } from '@test/support/app';
+import { APP_HOOK_TIMEOUT_MS } from '@test/support/constants';
 import { createManager, getManagerExport } from '@test/support/manager';
 import { resetServiceArea } from '@test/support/pricing';
 import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
@@ -30,7 +31,7 @@ describe('Manager export and analytics limits per user (e2e)', () => {
     await resetServiceArea(db, getRoute);
     manager = await createManager(app, db);
     admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
-  });
+  }, APP_HOOK_TIMEOUT_MS);
 
   afterAll(async () => {
     await app.close();

@@ -128,6 +128,6 @@ describe('Database queries per request (e2e)', () => {
     };
 
     // Each HTTP request also reads its user in the session guard: one query of every count.
-    expect(perStep).toEqual({ details: 4, courier: 2, route: 2, messages: 4, join: 1 });
+    expect(perStep).toEqual({ details: 5, courier: 2, route: 2, messages: 4, join: 1 });
   });
 });

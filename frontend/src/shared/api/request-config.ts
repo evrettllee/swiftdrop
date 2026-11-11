@@ -1,6 +1,7 @@
 export const API_BASE_PATH = '/api';
 export const JSON_CONTENT_TYPE = 'application/json';
 export const CONTENT_TYPE_HEADER = 'Content-Type';
+export const CONTENT_DISPOSITION_HEADER = 'Content-Disposition';
 // The session cookies go only to the backend of the same origin (the /api proxy).
 export const REQUEST_CREDENTIALS: RequestCredentials = 'same-origin';
 
@@ -22,6 +23,7 @@ export const HTTP_METHOD = {
 
 export const HTTP_STATUS = {
   NO_CONTENT: 204,
+  BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,

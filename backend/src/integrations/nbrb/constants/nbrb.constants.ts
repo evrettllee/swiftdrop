@@ -11,6 +11,10 @@ export const NBRB_CACHE_TTL_MS = 60 * MS_PER_MINUTE;
 // After a failed request the last known rate is used, and a new request waits this long.
 export const NBRB_RETRY_DELAY_MS = 5 * MS_PER_MINUTE;
 
+export const NBRB_SAVED_RATE_MAX_AGE_MS = 72 * 60 * MS_PER_MINUTE;
+
+export const NBRB_RATE_CURRENCY = 'USD';
+
 export const NBRB_ERROR_MESSAGES = {
   RATE_UNAVAILABLE: 'Не удалось получить курс валюты, попробуйте позже',
 } as const;

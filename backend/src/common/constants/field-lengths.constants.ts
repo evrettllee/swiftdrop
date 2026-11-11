@@ -78,3 +78,5 @@ export const MESSAGE_FIELD_LENGTH = {
   // The content is text: a check of the table keeps it to this many characters.
   CONTENT: 1000,
 } as const;
+
+export const CURRENCY_CODE_LENGTH = 3;

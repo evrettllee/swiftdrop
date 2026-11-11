@@ -1,11 +1,10 @@
 import { memo } from 'react';
-import { formatOrderNumber } from '@/entities/order';
+import { formatOrderNumber, PAYMENT_VIEW } from '@/entities/order';
 import type { OrderDetails } from '@/shared/api';
 import { formatMoney } from '@/shared/lib/format';
 import { Button } from '@/shared/ui/button';
 import { Dialog } from '@/shared/ui/dialog';
 import { InlineAlert } from '@/shared/ui/inline-alert';
-import { PAYMENT_VIEW } from '../config/payment';
 import { CANCEL_TEXTS } from '../config/texts';
 import { getPaymentView } from '../lib/payment';
 import { useCancelOrder } from '../model/useCancelOrder';

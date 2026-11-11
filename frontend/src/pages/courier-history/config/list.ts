@@ -1,18 +1,36 @@
+import { ORDER_STATUS } from '@/shared/api';
+
 export const HISTORY_FIRST_PAGE = 1;
-// The same size as the page of "My orders" of the client (ORDERS_PAGE_SIZE in pages/orders), so
-// the desktop shows "1–5 из 23" as the mockup does.
-export const HISTORY_PAGE_SIZE = 5;
-// The biggest `limit` the backend takes (HISTORY_PAGE_SIZE_MAX of the deliveries module).
-export const HISTORY_PAGE_SIZE_MAX = 50;
+export const HISTORY_PAGE_MAX = 10_000;
+export const HISTORY_COUNT_PROBE_LIMIT = 1;
+export const HISTORY_COUNT_DELAY_MS = 300;
+export const HISTORY_SEARCH_MAX_LENGTH = 10;
+export const HISTORY_SEARCH_PATTERN = /^\d{1,10}$/;
 
-// The desktop of the layout: the width where Tailwind's `lg` starts.
-export const HISTORY_DESKTOP_QUERY = '(min-width: 64rem)';
-
-// How a loaded page joins the list: the pagination of the desktop replaces the page, the button
-// "show more" of a phone adds it to the end, and a phone that opens a page from the address asks
-// for all the pages up to it at once.
-export const LOAD_MODE = {
-  REPLACE: 'replace',
-  APPEND: 'append',
-  RESTORE: 'restore',
+export const HISTORY_SORT = {
+  NEWEST: 'finishedAt:desc',
+  OLDEST: 'finishedAt:asc',
+  FARTHEST: 'distanceKm:desc',
+  NEAREST: 'distanceKm:asc',
 } as const;
+
+export type HistorySort = (typeof HISTORY_SORT)[keyof typeof HISTORY_SORT];
+
+export const HISTORY_SORTS: readonly HistorySort[] = [
+  HISTORY_SORT.NEWEST,
+  HISTORY_SORT.OLDEST,
+  HISTORY_SORT.FARTHEST,
+  HISTORY_SORT.NEAREST,
+];
+
+export const HISTORY_STATUS = {
+  DELIVERED: ORDER_STATUS.DELIVERED,
+  CANCELLED: ORDER_STATUS.CANCELLED,
+} as const;
+
+export type HistoryStatus = (typeof HISTORY_STATUS)[keyof typeof HISTORY_STATUS];
+
+export const HISTORY_STATUSES: readonly HistoryStatus[] = [
+  HISTORY_STATUS.DELIVERED,
+  HISTORY_STATUS.CANCELLED,
+];

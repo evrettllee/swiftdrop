@@ -91,6 +91,17 @@ export const MAP_CLASS = {
   POSITION_PULSE: 'position-marker__pulse',
   POSITION_PULSE_LATE: 'position-marker__pulse--late',
   AREA: 'delivery-area',
+  PANEL: 'map-panel',
+  ZONE: 'map-zone',
+  ZONE_SELECTED: 'map-zone--selected',
+  ZONE_OFF: 'map-zone--off',
+  ZONE_LABEL: 'map-zone-label',
+  ZONE_GHOST: 'map-zone--ghost',
+  PIN: 'map-pin',
+  PIN_BODY: 'map-pin__body',
+  PIN_HALO: 'map-pin__halo',
+  PIN_CIRCLE: 'map-pin__circle',
+  PIN_SELECTED: 'map-pin__body--selected',
 } as const;
 
 // The dot of the position of the courier, 16px across (position-marker in route-map.css).

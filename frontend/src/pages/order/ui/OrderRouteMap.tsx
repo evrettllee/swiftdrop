@@ -1,17 +1,15 @@
 import { PackageIcon } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { VEHICLE_TYPE_META } from '@/entities/courier';
+import { type OrderTracking, useTrackingState, withCourierLine } from '@/entities/order';
 import { getClientOrderRoute, type OrderDetails, type VehicleType } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT, MAP_FRAME_CLASS } from '@/shared/config';
 import { useRouteLines } from '@/shared/lib/route-lines';
 import { CourierEtaMarker, RouteMapView, SearchPulse } from '@/shared/ui/route-map';
 import { getCourierMarkerLabel } from '../lib/courier-marker';
-import { withCourierLine } from '../lib/courier-line';
 import { getStatusLineAnchorMs } from '../lib/status-line-anchor';
 import { COURIER_ACTIVE_STATUSES, SEARCHING_STATUSES } from '../model/order-status-groups';
-import type { OrderTracking } from '../model/order-tracking';
 import { useMinuteNow } from '../model/useMinuteNow';
-import { useTrackingState } from '../model/useOrderTracking';
 
 type OrderRouteMapProps = {
   order: OrderDetails;

@@ -14,6 +14,7 @@ export type ProgressStep = {
   label: string;
   time: Date | null;
   state: ProgressState;
+  notes?: readonly string[];
 };
 
 // The steps of "Ход заказа" a page shows: each page names its own, as its person sees the order.

@@ -31,3 +31,5 @@ export const TEST_ZONE_POLYGON = [
     [27.4, 53.85],
   ],
 ];
+
+export const APP_HOOK_TIMEOUT_MS = 30_000;

@@ -15,6 +15,7 @@ const ROWS: ManagerOrderDetailsRows = {
     createdAt: AT,
     statusChangedAt: LATER,
     finishedAt: null,
+    estimatedDeliveryAt: LATER,
     client: {
       id: 7,
       firstName: 'Иван',
@@ -37,9 +38,42 @@ const ROWS: ManagerOrderDetailsRows = {
   },
   payments: [{ status: 'paid', paidAt: AT, refundedAt: null }],
   history: [
-    { status: 'pending', changedAt: AT, changedBy: 7, role: 'client', comment: null },
-    { status: 'confirmed', changedAt: AT, changedBy: null, role: null, comment: null },
-    { status: 'courier_assigned', changedAt: LATER, changedBy: 9, role: 'courier', comment: 'ok' },
+    {
+      status: 'pending',
+      changedAt: AT,
+      changedBy: 7,
+      role: 'client',
+      firstName: 'Иван',
+      lastName: 'Петров',
+      comment: null,
+    },
+    {
+      status: 'confirmed',
+      changedAt: AT,
+      changedBy: null,
+      role: null,
+      firstName: null,
+      lastName: null,
+      comment: null,
+    },
+    {
+      status: 'courier_assigned',
+      changedAt: LATER,
+      changedBy: 9,
+      role: 'courier',
+      firstName: 'Дмитрий',
+      lastName: 'Соколов',
+      comment: 'ok',
+    },
+    {
+      status: 'courier_assigned',
+      changedAt: LATER,
+      changedBy: 2,
+      role: 'manager',
+      firstName: 'Ольга',
+      lastName: 'Мельник',
+      comment: 'Курьер заболел',
+    },
   ],
   offers: [
     {
@@ -93,8 +127,19 @@ describe('toManagerOrderDetails', () => {
   it('should name who changed the status and keep the user ids out', () => {
     const { history } = toManagerOrderDetails(ROWS);
 
-    expect(history.map((entry) => entry.actor)).toEqual(['client', 'system', 'courier']);
+    expect(history.map((entry) => entry.actor)).toEqual(['client', 'system', 'courier', 'staff']);
     expect(JSON.stringify(history)).not.toContain('changedBy');
+  });
+
+  it('should name only the staff member who changed the status', () => {
+    const { history } = toManagerOrderDetails(ROWS);
+
+    expect(history.map((entry) => entry.actorName)).toEqual([null, null, null, 'Ольга М.']);
+    expect(JSON.stringify(history)).not.toContain('Петров');
+  });
+
+  it('should give the delivery estimate of the order', () => {
+    expect(toManagerOrderDetails(ROWS).estimatedDeliveryAt).toEqual(LATER);
   });
 
   it('should tell the tickets of the client from the tickets of the courier', () => {

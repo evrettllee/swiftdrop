@@ -56,18 +56,6 @@ export const ORDER_CANCELLED_BY = {
 } as const;
 
 // List
-export const ORDER_LIST_FILTER = {
-  ALL: 'all',
-  ACTIVE: 'active',
-  FINISHED: 'finished',
-} as const;
-
-export const ORDER_LIST_FILTER_VALUES = [
-  ORDER_LIST_FILTER.ALL,
-  ORDER_LIST_FILTER.ACTIVE,
-  ORDER_LIST_FILTER.FINISHED,
-] as const;
-
 export const ORDER_STATUS_GROUP = {
   ACTIVE: 'active',
   FINISHED: 'finished',
@@ -90,13 +78,18 @@ export const ORDER_STATUS_GROUP_STATUSES: Record<
 };
 
 export const ORDERS_FIRST_PAGE = LIST_FIRST_PAGE;
-export const ORDERS_PAGE_SIZE_DEFAULT = 10;
+export const ORDERS_PAGE_SIZE_DEFAULT = 20;
 export const ORDERS_PAGE_SIZE_MAX = LIST_LIMIT_MAX;
 
 export const ORDERS_SORT_KEY = {
   CREATED_AT: 'createdAt',
   PRICE: 'price',
 } as const;
+
+export const ORDER_NUMBER_SEARCH = /^\d+$/;
+export const ORDER_ADDRESS_SEARCH_SEPARATORS = /[\s,]+/g;
+export const ORDER_ADDRESS_SEARCH_JOINER = ' ';
+export const ORDER_SEARCH_ADDRESS_ALIAS = 'search_address';
 
 // Payment
 // An unpaid order is cancelled after this time (a Stripe Checkout Session lives 30 minutes at least).
@@ -128,8 +121,6 @@ export const ORDERS_VALIDATION_MESSAGES = {
   RECIPIENT_NAME_INVALID: `Имя получателя может содержать ${NAME_ALLOWED_CHARACTERS}`,
   PAGE_INVALID: LIST_VALIDATION_MESSAGES.PAGE_INVALID,
   LIMIT_INVALID: LIST_VALIDATION_MESSAGES.LIMIT_INVALID,
-  FILTER_INVALID: 'Неизвестный фильтр заказов',
-  FILTER_AND_STATUS: 'Укажите либо filter, либо status',
   ORDER_ID_INVALID: ORDER_ID_INVALID_MESSAGE,
 } as const;
 

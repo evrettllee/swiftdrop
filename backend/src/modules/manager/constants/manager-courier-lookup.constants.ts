@@ -1,0 +1,7 @@
+export const COURIER_LOOKUP_LIMIT_MIN = 1;
+export const COURIER_LOOKUP_LIMIT_MAX = 20;
+export const COURIER_LOOKUP_LIMIT_DEFAULT = 10;
+
+export const COURIER_LOOKUP_MESSAGES = {
+  LIMIT_INVALID: `Количество подсказок: от ${COURIER_LOOKUP_LIMIT_MIN} до ${COURIER_LOOKUP_LIMIT_MAX}`,
+} as const;

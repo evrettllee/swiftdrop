@@ -4,7 +4,7 @@ import { createToastTimer } from './toast-timer';
 
 export const TOAST_DURATION_MS = 6 * MS_PER_SECOND;
 
-export type ToastVariant = 'info' | 'warning' | 'chat';
+export type ToastVariant = 'info' | 'success' | 'warning' | 'chat';
 
 export type ToastAction = {
   label: string;
