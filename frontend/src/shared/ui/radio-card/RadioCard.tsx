@@ -9,10 +9,20 @@ export type RadioCardProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' 
   description?: string;
   // Shown at the end of the card, for example a limit or a price.
   aside?: ReactNode;
+  density?: RadioCardDensity;
+  isTruncated?: boolean;
+};
+
+export type RadioCardDensity = 'regular' | 'compact' | 'centered';
+
+const DENSITY_CLASSES: Record<RadioCardDensity, { card: string; circle: string; title: string }> = {
+  regular: { card: 'items-start p-4', circle: 'mt-0.5', title: 'font-semibold' },
+  compact: { card: 'items-center px-4 py-3', circle: '', title: '' },
+  centered: { card: 'items-center px-4 py-3', circle: '', title: 'font-semibold' },
 };
 
 const CARD_CLASS = joinClassNames(
-  'group flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-surface p-4 text-body',
+  'group relative flex cursor-pointer gap-3 rounded-lg border border-border bg-surface text-body',
   COLOR_TRANSITION_CLASS,
   'has-checked:border-accent has-checked:bg-selected',
   'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent',
@@ -21,7 +31,7 @@ const CARD_CLASS = joinClassNames(
 
 // The dot of the chosen card is drawn by ::after of the circle.
 const CIRCLE_CLASS = joinClassNames(
-  'mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-fg-muted',
+  'grid size-5 shrink-0 place-items-center rounded-full border border-fg-muted',
   'after:hidden after:size-2.5 after:rounded-full after:bg-accent',
   'peer-checked:border-accent peer-checked:after:block',
 );
@@ -33,12 +43,17 @@ export function RadioCard({
   title,
   description,
   aside,
+  density = 'regular',
+  isTruncated = false,
   ...inputProps
 }: RadioCardProps) {
+  const lineClass = isTruncated ? 'truncate' : '';
+  const classes = DENSITY_CLASSES[density];
+
   return (
-    <label className={CARD_CLASS}>
+    <label className={joinClassNames(CARD_CLASS, classes.card)}>
       <input type="radio" className="peer sr-only" {...inputProps} />
-      <span aria-hidden="true" className={CIRCLE_CLASS} />
+      <span aria-hidden="true" className={joinClassNames(CIRCLE_CLASS, classes.circle)} />
       {CardIcon === undefined ? null : (
         <CardIcon
           size={ICON_SIZE.LARGE}
@@ -48,9 +63,11 @@ export function RadioCard({
         />
       )}
       <span className="flex min-w-0 grow flex-col">
-        <span className="font-semibold">{title}</span>
+        <span className={joinClassNames(classes.title, lineClass)}>{title}</span>
         {description === undefined ? null : (
-          <span className="text-small text-fg-secondary">{description}</span>
+          <span className={joinClassNames('text-small text-fg-secondary', lineClass)}>
+            {description}
+          </span>
         )}
       </span>
       {aside === undefined ? null : (

@@ -1,6 +1,6 @@
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import { buildThrottleOverride } from '../../../common/utils/throttle';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import { buildThrottleOverride } from '@/common/utils/throttle';
 
 // Routes
 export const PRICING_ROUTES = {

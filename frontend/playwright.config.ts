@@ -1,9 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import { STAND, STAND_BACKEND_URL, STAND_ENV, STAND_FRONTEND_URL } from './e2e/support/stand';
 
-const FRONTEND_URL = 'http://localhost:5173';
-// Any public endpoint: an anonymous /api/auth/me answers 401, which means the backend is up.
-const BACKEND_READY_URL = 'http://localhost:8080/api/auth/me';
-// The backend compiles before it listens.
+Object.assign(process.env, STAND_ENV);
+
+const BACKEND_READY_URL = `${STAND_BACKEND_URL}/api/auth/me`;
 const SERVER_START_TIMEOUT_MS = 180_000;
 
 // The specs that use the one seeded courier (the line, the vehicle, the orders it carries): they
@@ -12,9 +12,6 @@ const SERVER_START_TIMEOUT_MS = 180_000;
 const SEEDED_COURIER_SPECS =
   /(courier-(cabinet|delivery-code|history-order|history-url|history|offer-route|offer|order-map|order|shift|vehicle)|delivery-flow)\.spec\.ts$/;
 
-// The end-to-end tests of the frontend: the real dev servers of the frontend and the backend,
-// with Mapbox and Stripe replaced in the browser (e2e/support). The database must be up, migrated
-// and seeded.
 export default defineConfig({
   testDir: './e2e',
   tsconfig: './e2e/tsconfig.json',
@@ -23,11 +20,10 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: 'list',
   use: {
-    baseURL: FRONTEND_URL,
+    baseURL: STAND_FRONTEND_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
-  // Signs the seeded courier in once for the run (e2e/global-setup.ts).
   globalSetup: './e2e/global-setup.ts',
   projects: [
     {
@@ -45,23 +41,24 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'npm run dev',
-      url: FRONTEND_URL,
-      reuseExistingServer: true,
+      command: `npx vite --port ${STAND.FRONTEND_PORT} --strictPort`,
+      url: STAND_FRONTEND_URL,
+      reuseExistingServer: false,
       timeout: SERVER_START_TIMEOUT_MS,
-      // The address search and the map send requests only with a token. Its value does not
-      // matter: every Mapbox request is answered by the tests. A variable of the process wins
-      // over the .env file in Vite.
-      env: { VITE_MAPBOX_TOKEN: 'pk.e2e-placeholder' },
+      env: { VITE_MAPBOX_TOKEN: 'pk.e2e-placeholder', API_PROXY_TARGET: STAND_BACKEND_URL },
     },
     {
-      command: 'npm run start:dev',
+      command: 'npm run start:e2e',
       cwd: '../backend',
       url: BACKEND_READY_URL,
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       timeout: SERVER_START_TIMEOUT_MS,
-      // The backend requires it; a .env made before it became required may lack it.
-      env: { NODE_ENV: 'development' },
+      env: {
+        NODE_ENV: 'development',
+        PORT: String(STAND.BACKEND_PORT),
+        APP_URL: STAND_FRONTEND_URL,
+        STRIPE_WEBHOOK_SECRET: STAND.WEBHOOK_SECRET,
+      },
     },
   ],
 });

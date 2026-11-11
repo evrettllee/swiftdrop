@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, type SQL } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { parcelColumns } from '../../../common/database/parcel-columns';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orderOffers, orders, packages } from '../../../database/schema';
-import { addressPointColumns, aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { parcelColumns } from '@/common/database/parcel-columns';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers, orders, packages } from '@/database/schema';
+import {
+  addressPointColumns,
+  aliasOrderAddresses,
+} from '@/modules/orders/utils/order-address-columns';
 import { toCourierOffer } from '../mappers/courier-offer.mapper';
 import type { CourierOffer } from '../types/assignment.types';
 import { openOfferOf } from '../utils/open-offer';

@@ -1,0 +1,1 @@
+CREATE INDEX "support_tickets_closed_last_message_idx" ON "support_tickets" USING btree ("last_message_at","ticket_id") WHERE "support_tickets"."status" = 'closed';

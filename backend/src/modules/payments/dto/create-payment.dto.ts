@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ORDER_ID_INVALID_MESSAGE } from '../../../common/constants/orders.constants';
+import { ORDER_ID_INVALID_MESSAGE } from '@/common/constants/orders.constants';
 
 export const createPaymentSchema = z.object({
   orderId: z

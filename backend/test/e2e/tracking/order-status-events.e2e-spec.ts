@@ -1,27 +1,27 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { MAX_OFFERS_PER_ORDER } from '../../../src/modules/assignment/constants/assignment.constants';
-import { OrderDispatchService } from '../../../src/modules/assignment/services/order-dispatch.service';
-import { UNPAID_ORDER_TTL_MS } from '../../../src/modules/orders/constants/orders.constants';
-import { UnpaidOrdersService } from '../../../src/modules/orders/services/unpaid-orders.service';
-import { PAYMENT_EVENT } from '../../../src/modules/payments/constants/payments.constants';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { createTestApp } from '../../support/app';
-import { insertBareCouriers, insertOffer } from '../../support/assignment';
-import { registerUser } from '../../support/auth';
-import { OpenSockets } from '../../support/chat';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { MAX_OFFERS_PER_ORDER } from '@/modules/assignment/constants/assignment.constants';
+import { OrderDispatchService } from '@/modules/assignment/services/order-dispatch.service';
+import { UNPAID_ORDER_TTL_MS } from '@/modules/orders/constants/orders.constants';
+import { UnpaidOrdersService } from '@/modules/orders/services/unpaid-orders.service';
+import { PAYMENT_EVENT } from '@/modules/payments/constants/payments.constants';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { createTestApp } from '@test/support/app';
+import { insertBareCouriers, insertOffer } from '@test/support/assignment';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets } from '@test/support/chat';
 import {
   type Cookies,
   cancelOrder,
   placeOrders,
   SECOND_CLIENT,
   setOrderStatus,
-} from '../../support/orders';
+} from '@test/support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
@@ -30,10 +30,10 @@ import {
   postWebhook,
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
-import { listenTestApp } from '../../support/sockets';
-import { settle, watchOrderStatus } from '../../support/tracking';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
+import { listenTestApp } from '@test/support/sockets';
+import { settle, watchOrderStatus } from '@test/support/tracking';
 
 // Moments after the unpaid order expired, so the job cancels it.
 const AFTER_UNPAID_TTL_MS = UNPAID_ORDER_TTL_MS + 1000;

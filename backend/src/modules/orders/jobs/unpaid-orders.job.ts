@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { describeError } from '../../../common/utils/describe-error';
+import { describeError } from '@/common/utils/describe-error';
 import { UNPAID_ORDERS_CRON } from '../constants/orders.constants';
 import { UnpaidOrdersService } from '../services/unpaid-orders.service';
 

@@ -1,6 +1,6 @@
+import type { OrderTrackingState } from '@/entities/order';
 import { ORDER_STATUS, type OrderDetails } from '@/shared/api';
 import { ORDER_COURIER_TEXTS } from '../config/tracking';
-import type { OrderTrackingState } from '../model/tracking-state';
 import { minutesUntil } from './minutes';
 
 export function getCourierMarkerLabel(

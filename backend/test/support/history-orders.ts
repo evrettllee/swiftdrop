@@ -1,9 +1,11 @@
-import { ORDER_STATUS, type OrderStatus } from '../../src/common/enums/order-status.enum';
-import type { Database } from '../../src/database/database.module';
-import { orderStatusHistory } from '../../src/database/schema';
-import { COURIER_ORDERS_ROUTES } from '../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../src/modules/orders/constants/orders.constants';
+import { eq } from 'drizzle-orm';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import type { Database } from '@/database/database.module';
+import { orders, orderStatusHistory } from '@/database/schema';
+import { COURIER_ORDERS_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { assignOrder } from './couriers';
+import { statusChange } from './order-status';
 
 // The stages a courier went through before the end of an order, oldest first.
 export const COURIER_STAGES: readonly OrderStatus[] = [
@@ -44,4 +46,8 @@ export async function finishOrder(
   }));
 
   await db.insert(orderStatusHistory).values(stages);
+  await db
+    .update(orders)
+    .set(statusChange(status, stages[stages.length - 1].changedAt))
+    .where(eq(orders.orderId, orderId));
 }

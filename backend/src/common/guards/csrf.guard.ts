@@ -6,14 +6,14 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
-import { HTTP_CONTEXT_TYPE } from '../constants/http.constants';
+import { HTTP_CONTEXT_TYPE } from '@/common/constants/http.constants';
 import {
   CSRF_ERROR_MESSAGE,
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
   CSRF_SKIP_KEY,
   SAFE_HTTP_METHODS,
-} from '../constants/csrf.constants';
+} from '@/common/constants/csrf.constants';
 
 // Browsers cannot add a custom header to a cross-site request without CORS approval,
 // and CORS is not enabled, so a forged request from another site never carries it.

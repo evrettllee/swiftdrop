@@ -1,5 +1,5 @@
-import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
+import type { PackageSpec } from '@/common/schemas/package-spec.schema';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 
 export type TariffRates = {
   pricePerKm: number;

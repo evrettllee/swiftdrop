@@ -13,6 +13,7 @@ import {
   historyCards,
   historyItem,
   isHistoryUrl,
+  isNextCursorUrl,
   NEWEST_ORDER_ID,
   openHistory,
   PHONE_VIEWPORT,
@@ -61,9 +62,11 @@ test('should page the history on the desktop', async () => {
 
   await page.getByRole('button', { name: PAGINATION_TEXTS.NEXT }).click();
 
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
-  await expect(page.getByText(PAGINATION_TEXTS.page(2, 5))).toBeVisible();
-  await expect(cards()).toHaveCount(PAGE_SIZE);
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
+  await expect(
+    page.getByText(PAGINATION_TEXTS.page(2, Math.ceil(TOTAL / PAGE_SIZE))),
+  ).toBeVisible();
+  await expect(cards()).toHaveCount(TOTAL - PAGE_SIZE);
   await expect(cards().first()).toContainText(`№${NEWEST_ORDER_ID - PAGE_SIZE}`);
 });
 
@@ -74,14 +77,10 @@ test('should show more on a phone until the whole history is shown', async () =>
   const showMore = page.getByRole('button', { name: HISTORY_TEXTS.SHOW_MORE });
 
   await expect(page.getByText(HISTORY_TEXTS.shown(PAGE_SIZE, TOTAL))).toBeVisible();
-  for (const shown of [2, 3, 4]) {
-    await showMore.click();
-    await expect(cards()).toHaveCount(shown * PAGE_SIZE);
-  }
+  await expect(cards()).toHaveCount(PAGE_SIZE);
   await showMore.click();
 
   await expect(cards()).toHaveCount(TOTAL);
-  await expect(page.getByText(HISTORY_TEXTS.shown(TOTAL, TOTAL))).toBeVisible();
   await expect(showMore).toHaveCount(0);
 });
 
@@ -92,11 +91,11 @@ test('should mark a cancelled order and link every card to its order', async () 
   await expect(cards().first()).toContainText(ORDER_STATUS_LABELS[ORDER_STATUS.CANCELLED]);
   await expect(cards().first().getByRole('link')).toHaveAttribute(
     'href',
-    getCourierHistoryOrderPath(NEWEST_ORDER_ID, 1),
+    getCourierHistoryOrderPath(NEWEST_ORDER_ID),
   );
   await expect(cards().nth(1).getByRole('link')).toHaveAttribute(
     'href',
-    getCourierHistoryOrderPath(NEWEST_ORDER_ID - 1, 1),
+    getCourierHistoryOrderPath(NEWEST_ORDER_ID - 1),
   );
 });
 
@@ -133,7 +132,7 @@ test('should keep the shown cards when the next page fails', async () => {
   await openHistory(page);
   await expect(cards()).toHaveCount(PAGE_SIZE);
 
-  await page.route(isHistoryUrl(2), (route) =>
+  await page.route(isNextCursorUrl(), (route) =>
     route.fulfill({ status: HTTP_STATUS.SERVICE_UNAVAILABLE, json: { message: 'Unavailable' } }),
   );
   await page.getByRole('button', { name: HISTORY_TEXTS.SHOW_MORE }).click();

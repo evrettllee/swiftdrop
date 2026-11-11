@@ -9,7 +9,7 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { COURIER_PROFILE_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { COURIER_PROFILE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { users } from './users';
 
 export const courierProfiles = pgTable(

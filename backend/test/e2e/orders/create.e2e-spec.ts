@@ -1,32 +1,25 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import {
-  addresses,
-  orders,
-  orderStatusHistory,
-  packages,
-  roles,
-  users,
-} from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { ORDERS_ROUTES } from '../../../src/modules/orders/constants/orders.constants';
-import { PRICING_ERROR_MESSAGES } from '../../../src/modules/pricing/constants/pricing.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { addresses, orders, orderStatusHistory, packages, roles, users } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ORDERS_ROUTES } from '@/modules/orders/constants/orders.constants';
+import { PRICING_ERROR_MESSAGES } from '@/modules/pricing/constants/pricing.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   MOSCOW,
   VALID_ORDER,
   VALID_ORDER_PRICE,
   VALID_ORDER_PRICE_TEXT,
-} from '../../support/fixtures';
-import { postApi } from '../../support/http';
-import { postOrder } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/fixtures';
+import { postApi } from '@test/support/http';
+import { postOrder } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Orders (e2e)', () => {
   let app: NestExpressApplication;

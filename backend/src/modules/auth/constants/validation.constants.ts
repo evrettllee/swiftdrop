@@ -1,8 +1,8 @@
-import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import {
   NAME_ALLOWED_CHARACTERS,
   NAME_MIN_LENGTH,
-} from '../../../common/constants/person-validation.constants';
+} from '@/common/constants/person-validation.constants';
 
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 72;

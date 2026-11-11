@@ -1,14 +1,14 @@
 import { BadRequestException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { placeOrders, readOrderStatus } from '../../support/orders';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { placeOrders, readOrderStatus } from '@test/support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
@@ -17,8 +17,8 @@ import {
   readPaymentStatus,
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 describe('Payment webhook (e2e)', () => {
   let app: NestExpressApplication;

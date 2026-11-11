@@ -1,13 +1,17 @@
 import type { OrderStatus } from '@/shared/api';
 import { TONE_DOT_CLASS, TONE_RING_CLASS } from '../config/status-tone';
-import { ORDER_STATUS_META } from '../model/order-status';
+import { getOrderStatusMeta, STATUS_AUDIENCE, type StatusAudience } from '../model/order-status';
 
 type OrderStatusBadgeProps = {
   status: OrderStatus;
+  audience?: StatusAudience;
 };
 
-export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
-  const { label, tone, isRing } = ORDER_STATUS_META[status];
+export function OrderStatusBadge({
+  status,
+  audience = STATUS_AUDIENCE.CLIENT,
+}: OrderStatusBadgeProps) {
+  const { label, tone, isRing } = getOrderStatusMeta(status, audience);
   const dotClass = isRing ? TONE_RING_CLASS[tone] : TONE_DOT_CLASS[tone];
 
   return (

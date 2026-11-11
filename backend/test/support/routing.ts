@@ -1,14 +1,14 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { MS_PER_MINUTE } from '../../src/common/constants/time.constants';
-import type { GeoPoint } from '../../src/common/schemas/geo-point.schema';
-import { COURIER_LOCATION_FRESH_MS } from '../../src/modules/assignment/constants/assignment.constants';
-import type { Database } from '../../src/database/database.module';
-import { OsrmGeometryService } from '../../src/integrations/osrm/services/osrm-geometry.service';
-import { OsrmTripService } from '../../src/integrations/osrm/services/osrm-trip.service';
-import { OsrmService } from '../../src/integrations/osrm/services/osrm.service';
-import { ETA_SHUTDOWN_WAIT_MS } from '../../src/modules/tracking/constants/tracking.constants';
-import { OrderEtaStore } from '../../src/modules/tracking/services/order-eta-store.service';
-import { OrderEtaService } from '../../src/modules/tracking/services/order-eta.service';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { COURIER_LOCATION_FRESH_MS } from '@/modules/assignment/constants/assignment.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmGeometryService } from '@/integrations/osrm/services/osrm-geometry.service';
+import { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ETA_SHUTDOWN_WAIT_MS } from '@/modules/tracking/constants/tracking.constants';
+import { OrderEtaStore } from '@/modules/tracking/services/order-eta-store.service';
+import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
 import { createTestApp } from './app';
 import { resetServiceArea } from './pricing';
 

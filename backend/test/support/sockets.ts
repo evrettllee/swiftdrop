@@ -1,12 +1,10 @@
 import type { AddressInfo } from 'node:net';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { io, type Socket } from 'socket.io-client';
-import {
-  COURIER_SOCKET_EVENTS,
-  COURIERS_SOCKET_NAMESPACE,
-} from '../../src/modules/couriers/constants/couriers-socket.constants';
-import type { OrderJoinAck } from '../../src/modules/couriers/types/couriers-socket.types';
-import { SOCKET_PATH } from '../../src/modules/realtime/constants/realtime.constants';
+import { APP_SOCKET_NAMESPACE } from '@/modules/realtime/constants/realtime.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import type { OrderJoinAck } from '@/modules/realtime/types/realtime.types';
+import { SOCKET_PATH } from '@/modules/realtime/constants/realtime.constants';
 import { COOKIE_HEADER } from './auth';
 
 const LOOPBACK_URL = 'http://127.0.0.1';
@@ -45,7 +43,7 @@ export function connectAppSocket(
   origin = appOrigin(),
 ): Promise<Socket> {
   return new Promise((resolve, reject) => {
-    const socket = io(`${baseUrl}${COURIERS_SOCKET_NAMESPACE}`, {
+    const socket = io(`${baseUrl}${APP_SOCKET_NAMESPACE}`, {
       path: SOCKET_PATH,
       transports: [WEBSOCKET_TRANSPORT],
       reconnection: false,
@@ -78,7 +76,7 @@ export function waitForEvent<TPayload>(socket: Socket, event: string): Promise<T
 }
 
 export function joinOrderRoom(socket: Socket, body: unknown): Promise<OrderJoinAck> {
-  return emitWithAck<OrderJoinAck>(socket, COURIER_SOCKET_EVENTS.ORDER_JOIN, body);
+  return emitWithAck<OrderJoinAck>(socket, SOCKET_EVENTS.ORDER_JOIN, body);
 }
 
 // Every payload of this event the socket gets from now on.
@@ -94,7 +92,7 @@ export function collectEvents<TPayload>(socket: Socket, event: string): TPayload
 // in order, so an event the server sent before it has already arrived. An empty position is
 // refused without changing anything, for a client and a courier alike.
 export async function roundTrip(socket: Socket): Promise<void> {
-  await emitWithAck(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, null);
+  await emitWithAck(socket, SOCKET_EVENTS.LOCATION_UPDATE, null);
 }
 
 const DISCONNECT_EVENT = 'disconnect';

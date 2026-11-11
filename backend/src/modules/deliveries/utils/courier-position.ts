@@ -1,4 +1,4 @@
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
 import {
   COURIER_CONTACT_STATUSES,
   COURIER_LOCATION_STALE_MS,

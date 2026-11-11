@@ -1,13 +1,15 @@
+import type { ReactNode } from 'react';
 import { NAV_VARIANT, type NavItem } from './nav-item';
 import { NavItemLink } from './NavItemLink';
 
 type AccountBottomNavProps = {
   label: string;
   items: readonly NavItem[];
+  end?: ReactNode;
 };
 
 // The menu of the phone: on the desktop the sidebar takes its place.
-export function AccountBottomNav({ label, items }: AccountBottomNavProps) {
+export function AccountBottomNav({ label, items, end }: AccountBottomNavProps) {
   return (
     <nav
       aria-label={label}
@@ -17,6 +19,7 @@ export function AccountBottomNav({ label, items }: AccountBottomNavProps) {
       {items.map((item) => (
         <NavItemLink key={item.to} {...item} variant={NAV_VARIANT.BOTTOM} />
       ))}
+      {end}
     </nav>
   );
 }

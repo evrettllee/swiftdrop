@@ -1,27 +1,27 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orderOffers } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ASSIGNMENT_ERROR_MESSAGES,
   COURIER_OFFERS_ROUTES,
   OFFER_ID_ROUTE_PARAM,
-} from '../../../src/modules/assignment/constants/assignment.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierSession, insertOffer } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
-import { CAR, COURIER_ACCOUNT, putAvailability } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { postApi } from '../../support/http';
-import { holdOffer, holdOrder, whileRowsAreHeld } from '../../support/locks';
-import { type Cookies, placeOrders, readOrderStatus, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/assignment/constants/assignment.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierSession, insertOffer } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { LOCK_TEST_MARGIN_MS } from '@test/support/constants';
+import { CAR, COURIER_ACCOUNT, putAvailability } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { postApi } from '@test/support/http';
+import { holdOffer, holdOrder, whileRowsAreHeld } from '@test/support/locks';
+import { type Cookies, placeOrders, readOrderStatus, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 type OfferAction = typeof COURIER_OFFERS_ROUTES.ACCEPT | typeof COURIER_OFFERS_ROUTES.DECLINE;
 

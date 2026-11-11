@@ -1,11 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, asc, eq, inArray } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { parcelColumns } from '../../../common/database/parcel-columns';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orders, orderStatusHistory, packages } from '../../../database/schema';
-import { addressPointColumns, aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { parcelColumns } from '@/common/database/parcel-columns';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, orderStatusHistory, packages } from '@/database/schema';
+import {
+  addressPointColumns,
+  aliasOrderAddresses,
+} from '@/modules/orders/utils/order-address-columns';
 import {
   COURIER_STAGE_STATUSES,
   DELIVERIES_ERROR_MESSAGES,
@@ -48,7 +51,7 @@ export class CourierHistoryOrderService {
       .select({
         orderId: orders.orderId,
         status: orders.status,
-        finishedAt: orderStatusHistory.changedAt,
+        finishedAt: orders.finishedAt,
         pickup: addressPointColumns(pickup),
         delivery: addressPointColumns(delivery),
         parcel: parcelColumns(),
@@ -58,14 +61,6 @@ export class CourierHistoryOrderService {
       .innerJoin(pickup, eq(pickup.addressId, orders.pickupAddressId))
       .innerJoin(delivery, eq(delivery.addressId, orders.deliveryAddressId))
       .innerJoin(packages, eq(packages.orderId, orders.orderId))
-      // The final status is written to the history once, so this row is the moment it ended.
-      .leftJoin(
-        orderStatusHistory,
-        and(
-          eq(orderStatusHistory.orderId, orders.orderId),
-          eq(orderStatusHistory.status, orders.status),
-        ),
-      )
       .where(
         and(
           eq(orders.orderId, orderId),

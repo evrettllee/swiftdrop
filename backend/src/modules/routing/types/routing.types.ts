@@ -1,7 +1,7 @@
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { OsrmProfile } from '@/integrations/osrm/types/osrm.types';
 import type { ROUTE_SEGMENT_KIND } from '../constants/routing.constants';
 
 export type RouteSegmentKind = (typeof ROUTE_SEGMENT_KIND)[keyof typeof ROUTE_SEGMENT_KIND];

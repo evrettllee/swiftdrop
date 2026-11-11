@@ -1,15 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, inArray } from 'drizzle-orm';
-import {
-  ROW_LOCK_NO_KEY_UPDATE,
-  SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import { positionAgeMsSql } from '../../../common/database/position-age';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orders, vehicles } from '../../../database/schema';
-import { aliasOrderAddresses } from '../../orders/utils/order-address-columns';
+import { ROW_LOCK_NO_KEY_UPDATE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import { positionAgeMsSql } from '@/common/database/position-age';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orders, vehicles } from '@/database/schema';
+import { aliasOrderAddresses } from '@/modules/orders/utils/order-address-columns';
 import type { EtaSource } from '../types/tracking.types';
 
 // The database side of the arrival estimate.

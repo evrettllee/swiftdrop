@@ -1,20 +1,17 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
-import { MS_PER_SECOND } from '../../src/common/constants/time.constants';
-import { ORDER_STATUS } from '../../src/common/enums/order-status.enum';
-import { ROLE } from '../../src/common/enums/role.enum';
-import type { Database } from '../../src/database/database.module';
-import { courierProfiles, messages, orders } from '../../src/database/schema';
-import { CHAT_ROUTES } from '../../src/modules/chat/constants/chat.constants';
-import type { ChatSenderRole } from '../../src/modules/chat/types/chat.types';
-import { ORDER_ID_ROUTE_PARAM } from '../../src/modules/orders/constants/orders.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, messages, orders } from '@/database/schema';
+import type { OrderJoinAck, OrderJoinRejection } from '@/modules/realtime/types/realtime.types';
+import { CHAT_ROUTES } from '@/modules/chat/constants/chat.constants';
+import type { ChatSenderRole } from '@/modules/chat/types/chat.types';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
 import { COOKIE_HEADER } from './auth';
 import { getApi, postApi } from './http';
-import type {
-  OrderJoinAck,
-  OrderJoinRejection,
-} from '../../src/modules/couriers/types/couriers-socket.types';
 import { addCourierSession } from './assignment';
 import { assignOrder, CAR, COURIER_ACCOUNT } from './couriers';
 import { MINSK_PICKUP } from './fixtures';

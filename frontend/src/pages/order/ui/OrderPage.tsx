@@ -23,6 +23,7 @@ export function OrderPage() {
   // The events of the room of the order keep the page in step: no polling.
   const live = useOrderLive(orderId, {
     order: details.order,
+    courier,
     refresh: details.refresh,
     refreshCourier,
   });

@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { COURIER_SOCKET_EVENTS } from '../../couriers/constants/couriers-socket.constants';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
+import type {
+  OrderAssignedEvent,
+  OrderUnassignedEvent,
+} from '@/modules/realtime/types/realtime.types';
 import { OfferViewsService } from './offer-views.service';
 
 @Injectable()
 export class OfferNotifierService {
   constructor(
     private readonly views: OfferViewsService,
-    private readonly gateway: CouriersGateway,
+    private readonly events: RealtimeEventsService,
   ) {}
 
   // Sends a new offer to every open tab of its courier. A courier with no tab open sees it on
@@ -16,12 +20,25 @@ export class OfferNotifierService {
     const offer = await this.views.findById(offerId);
 
     if (offer) {
-      this.gateway.emitToCourier(courierProfileId, COURIER_SOCKET_EVENTS.OFFER_NEW, offer);
+      this.events.toCourier(courierProfileId, SOCKET_EVENTS.OFFER_NEW, offer);
     }
+  }
+
+  assigned(orderId: number, courierProfileId: number): void {
+    const event: OrderAssignedEvent = { orderId };
+
+    this.events.toCourier(courierProfileId, SOCKET_EVENTS.ORDER_ASSIGNED, event);
+  }
+
+  unassigned(orderId: number, courierProfileId: number): void {
+    const event: OrderUnassignedEvent = { orderId };
+
+    this.events.toCourier(courierProfileId, SOCKET_EVENTS.ORDER_UNASSIGNED, event);
+    this.events.removeCourierFromOrder(orderId, courierProfileId);
   }
 
   // Tells the courier to close the offer window.
   withdraw(offerId: number, courierProfileId: number): void {
-    this.gateway.emitToCourier(courierProfileId, COURIER_SOCKET_EVENTS.OFFER_CLOSED, { offerId });
+    this.events.toCourier(courierProfileId, SOCKET_EVENTS.OFFER_CLOSED, { offerId });
   }
 }

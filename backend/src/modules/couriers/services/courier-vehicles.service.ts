@@ -1,8 +1,8 @@
 import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
-import { withLockConflict } from '../../../common/database/lock-conflict';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { vehicles } from '../../../database/schema';
+import { withLockConflict } from '@/common/database/lock-conflict';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { vehicles } from '@/database/schema';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import type { UpdateVehicleDto } from '../dto/update-vehicle.dto';
 import { toCourierVehicle } from '../mappers/courier-profile.mapper';

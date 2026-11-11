@@ -1,10 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/access.constants';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { createTestApp } from '../../support/app';
+import { AUTH_ERROR_MESSAGES } from '@/modules/auth/constants/access.constants';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { createTestApp } from '@test/support/app';
 import {
   accessCookie,
   AUTHORIZATION_HEADER,
@@ -12,9 +12,9 @@ import {
   getAuth,
   registerUser,
   validRegistration,
-} from '../../support/auth';
-import { resetTestData } from '../../support/database';
-import { blockUser } from '../../support/users';
+} from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
+import { blockUser } from '@test/support/users';
 
 describe('Auth (e2e)', () => {
   let app: NestExpressApplication;

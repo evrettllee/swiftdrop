@@ -1,13 +1,15 @@
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { ORDER_CANCELLED_BY } from '../constants/orders.constants';
 import type { OrderCancelledBy, OrderHistoryRow, OrderHistoryView } from '../types/orders.types';
 
+function findCancellation(rows: readonly OrderHistoryRow[]): OrderHistoryRow | undefined {
+  return rows.findLast((row) => row.status === ORDER_STATUS.CANCELLED);
+}
+
 function toCancelledBy(
-  rows: readonly OrderHistoryRow[],
+  cancellation: OrderHistoryRow | undefined,
   clientId: number,
 ): OrderCancelledBy | null {
-  const cancellation = rows.findLast((row) => row.status === ORDER_STATUS.CANCELLED);
-
   if (!cancellation) {
     return null;
   }
@@ -23,8 +25,12 @@ export function toOrderHistory(
   rows: readonly OrderHistoryRow[],
   clientId: number,
 ): OrderHistoryView {
+  const cancellation = findCancellation(rows);
+  const cancelledBy = toCancelledBy(cancellation, clientId);
+
   return {
     history: rows.map(({ status, changedAt }) => ({ status, changedAt })),
-    cancelledBy: toCancelledBy(rows, clientId),
+    cancelledBy,
+    cancelReason: cancelledBy === ORDER_CANCELLED_BY.STAFF ? (cancellation?.comment ?? null) : null,
   };
 }

@@ -1,18 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { COURIER_LOCATION_FRESH_MS } from '../../../src/modules/assignment/constants/assignment.constants';
-import { CourierCandidatesService } from '../../../src/modules/assignment/services/courier-candidates.service';
-import { DispatchOrdersService } from '../../../src/modules/assignment/services/dispatch-orders.service';
-import { createTestApp } from '../../support/app';
-import { addCourierOnShift, insertOffer } from '../../support/assignment';
-import { registerUser } from '../../support/auth';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { users } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { COURIER_LOCATION_FRESH_MS } from '@/modules/assignment/constants/assignment.constants';
+import { CourierCandidatesService } from '@/modules/assignment/services/courier-candidates.service';
+import { DispatchOrdersService } from '@/modules/assignment/services/dispatch-orders.service';
+import { createTestApp } from '@test/support/app';
+import { addCourierOnShift, insertOffer } from '@test/support/assignment';
+import { registerUser } from '@test/support/auth';
 import {
   assignOrder,
   CAR,
@@ -20,16 +20,16 @@ import {
   ON_FOOT,
   placeCourierAt,
   SECOND_COURIER_ACCOUNT,
-} from '../../support/couriers';
+} from '@test/support/couriers';
 import {
   MINSK_DELIVERY,
   MINSK_PICKUP,
   MOSCOW,
   SMALL_PACKAGE,
   VALID_ORDER,
-} from '../../support/fixtures';
-import { type Cookies, placeOrders, postOrder } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/fixtures';
+import { type Cookies, placeOrders, postOrder } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 // Only a car or a truck takes it.
 const HEAVY_PACKAGE_KG = 20;
@@ -79,6 +79,7 @@ describe('Courier candidates (e2e)', () => {
       pickup: MINSK_PICKUP,
       delivery: MINSK_DELIVERY,
       parcel: SMALL_PACKAGE,
+      round: 1,
     });
   });
 

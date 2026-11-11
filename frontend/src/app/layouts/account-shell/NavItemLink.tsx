@@ -1,21 +1,11 @@
 import { Link, matchPath, useLocation } from 'react-router';
-import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
-import type { NavItem, NavVariant } from './nav-item';
-
-const VARIANT_CLASSES: Record<NavVariant, string> = {
-  sidebar: 'h-11 flex-row justify-start gap-3 rounded-md px-3 text-body',
-  bottom: 'h-16 flex-col justify-center text-caption',
-};
-
-const ACTIVE_CLASS = 'bg-selected text-accent';
-
-const IDLE_CLASSES: Record<NavVariant, string> = {
-  sidebar: 'text-fg hover:bg-surface-muted',
-  bottom: 'text-fg-secondary',
-};
+import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
+import { COUNT_BADGE_PLACEMENT, CountBadge } from '@/shared/ui/badge';
+import { getNavItemClass, NAV_VARIANT, type NavItem, type NavVariant } from './nav-item';
 
 type NavItemLinkProps = NavItem & {
   variant: NavVariant;
+  onClick?: () => void;
 };
 
 export function NavItemLink({
@@ -24,7 +14,9 @@ export function NavItemLink({
   icon: ItemIcon,
   isExact,
   alsoActiveOn = [],
+  badge,
   variant,
+  onClick,
 }: NavItemLinkProps) {
   const { pathname } = useLocation();
   // One answer for the highlight and for assistive technology: the item stands for its own page
@@ -32,15 +24,27 @@ export function NavItemLink({
   const isCurrent =
     matchPath({ path: to, end: isExact }, pathname) !== null ||
     alsoActiveOn.some((path) => matchPath(path, pathname) !== null);
+  const hasBadge = badge !== undefined && badge.count > 0;
+  const isSidebar = variant === NAV_VARIANT.SIDEBAR;
 
   return (
     <Link
       to={to}
       aria-current={isCurrent ? 'page' : undefined}
-      className={`flex items-center ${COLOR_TRANSITION_CLASS} ${VARIANT_CLASSES[variant]} ${isCurrent ? ACTIVE_CLASS : IDLE_CLASSES[variant]}`}
+      aria-label={hasBadge ? `${label}, ${badge.label}` : undefined}
+      onClick={onClick}
+      className={getNavItemClass(variant, isCurrent)}
     >
-      <ItemIcon size={ICON_SIZE.LARGE} weight={ICON_WEIGHT} aria-hidden="true" />
+      <span className="relative flex shrink-0">
+        <ItemIcon size={ICON_SIZE.LARGE} weight={ICON_WEIGHT} aria-hidden="true" />
+        {hasBadge && !isSidebar ? (
+          <CountBadge count={badge.count} placement={COUNT_BADGE_PLACEMENT.ICON} />
+        ) : null}
+      </span>
       {label}
+      {hasBadge && isSidebar ? (
+        <CountBadge count={badge.count} placement={COUNT_BADGE_PLACEMENT.INLINE} />
+      ) : null}
     </Link>
   );
 }

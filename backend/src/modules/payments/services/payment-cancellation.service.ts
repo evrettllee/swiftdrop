@@ -1,16 +1,21 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { PAYMENT_STATUS } from '../../../common/enums/payment-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { payments } from '../../../database/schema';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { payments } from '@/database/schema';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
 import {
   CHECKOUT_SESSION_STATUS,
+  ORDER_REFUND,
   PENDING_PAYMENT_OUTCOME,
   SESSION_EXPIRE_RESULT,
 } from '../constants/payments.constants';
-import type { CheckoutSessionState, PendingPaymentOutcome } from '../types/payments.types';
+import type {
+  CheckoutSessionState,
+  OrderRefund,
+  PendingPaymentOutcome,
+} from '../types/payments.types';
 import { PaymentRefundService } from './payment-refund.service';
 import { PaymentSettlementService } from './payment-settlement.service';
 
@@ -31,9 +36,18 @@ export class PaymentCancellationService {
   ) {}
 
   // Called when an order is cancelled: the unpaid sessions are closed and the paid money goes back.
-  async releaseOrderPayments(orderId: number): Promise<void> {
-    await this.releasePendingPayments(orderId);
-    await this.refunds.refundOrderPayments(orderId);
+  async releaseOrderPayments(orderId: number): Promise<OrderRefund> {
+    const outcomes = await this.releasePendingPayments(orderId);
+    const refundedCount = await this.refunds.refundOrderPayments(orderId);
+    let refund: OrderRefund = ORDER_REFUND.NONE;
+
+    if (outcomes.includes(PENDING_PAYMENT_OUTCOME.LEFT_PENDING)) {
+      refund = ORDER_REFUND.PENDING;
+    } else if (refundedCount > 0 || outcomes.includes(PENDING_PAYMENT_OUTCOME.REFUNDED)) {
+      refund = ORDER_REFUND.REFUNDED;
+    }
+
+    return refund;
   }
 
   // Closes the sessions of the pending payments of a cancelled order and settles each payment by

@@ -1,23 +1,20 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Pool } from 'pg';
-import { DRIZZLE, PG_POOL } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { CLIENT_ORDER_COURIER_ROUTES } from '../../../src/modules/deliveries/constants/deliveries.constants';
-import {
-  ORDER_ID_ROUTE_PARAM,
-  ORDERS_ROUTES,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { ETA_SHUTDOWN_WAIT_MS } from '../../../src/modules/tracking/constants/tracking.constants';
-import { OrderEtaStore } from '../../../src/modules/tracking/services/order-eta-store.service';
-import { OrderEtaService } from '../../../src/modules/tracking/services/order-eta.service';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { getChatHistory, OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { getApi } from '../../support/http';
-import { createRoutingMocks, createRoutingTestApp, resetRouting } from '../../support/routing';
-import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '../../support/sockets';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { assignTrackedCourier, sendLocation } from '../../support/tracking';
+import { DRIZZLE, PG_POOL } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { CLIENT_ORDER_COURIER_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM, ORDERS_ROUTES } from '@/modules/orders/constants/orders.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { ETA_SHUTDOWN_WAIT_MS } from '@/modules/tracking/constants/tracking.constants';
+import { OrderEtaStore } from '@/modules/tracking/services/order-eta-store.service';
+import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { getChatHistory, OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { getApi } from '@test/support/http';
+import { createRoutingMocks, createRoutingTestApp, resetRouting } from '@test/support/routing';
+import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '@test/support/sockets';
+import { assignTrackedCourier, sendLocation } from '@test/support/tracking';
 
 // Open tabs of one client, all in the room of the order.
 const CLIENT_TABS = 5;
@@ -90,7 +87,7 @@ describe('Database queries per request (e2e)', () => {
       Array.from({ length: CLIENT_TABS }, () => sockets.connect(baseUrl, cookies)),
     );
     await Promise.all(tabs.map((tab) => joinOrderRoom(tab, { orderId })));
-    const received = tabs.map((tab) => collectEvents(tab, COURIER_SOCKET_EVENTS.COURIER_LOCATION));
+    const received = tabs.map((tab) => collectEvents(tab, SOCKET_EVENTS.COURIER_LOCATION));
     const socket = await sockets.connect(baseUrl, courier.cookies);
 
     expect(await countQueries(() => sendLocation(socket))).toBe(1);
@@ -131,6 +128,6 @@ describe('Database queries per request (e2e)', () => {
     };
 
     // Each HTTP request also reads its user in the session guard: one query of every count.
-    expect(perStep).toEqual({ details: 4, courier: 2, route: 2, messages: 4, join: 1 });
+    expect(perStep).toEqual({ details: 5, courier: 2, route: 2, messages: 4, join: 1 });
   });
 });

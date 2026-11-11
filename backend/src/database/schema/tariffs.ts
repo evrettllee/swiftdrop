@@ -1,5 +1,5 @@
 import { boolean, integer, numeric, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { TARIFF_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { TARIFF_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const tariffs = pgTable('tariffs', {
   tariffId: integer().primaryKey().generatedAlwaysAsIdentity(),

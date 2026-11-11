@@ -5,7 +5,6 @@ import {
   APP_ROUTES,
   getCourierHistoryOrderPath,
   getCourierHistoryPath,
-  HISTORY_PAGE_PARAM,
 } from '../src/shared/routes/app-routes';
 import { requireCourier, signInAsCourier } from './support/courier';
 import {
@@ -21,7 +20,6 @@ import {
 } from './support/courier-history';
 import { waitForPath } from './support/courier-pages';
 
-// The page of the history lives in the address (?page=N). The history comes from the stubbed API.
 test.describe.configure({ mode: 'serial' });
 
 let page: Page;
@@ -45,52 +43,50 @@ test.beforeEach(async () => {
   await stubHistory(page);
 });
 
-test('should open the page of the address and write the next one without piling up entries', async () => {
-  await openHistory(page, getCourierHistoryPath(2));
+test('should open the page of the address and step back to it after another one', async () => {
+  await openHistory(page, getCourierHistoryPath('page=2'));
 
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
   await expect(historyCards(page).first().getByRole('link')).toHaveAttribute(
     'href',
-    getCourierHistoryOrderPath(NEWEST_ORDER_ID - PAGE_SIZE, 2),
+    getCourierHistoryOrderPath(NEWEST_ORDER_ID - PAGE_SIZE, 'page=2'),
   );
 
-  const entries = await page.evaluate(() => history.length);
-  await page.getByRole('button', { name: PAGINATION_TEXTS.NEXT }).click();
+  await page.getByRole('button', { name: PAGINATION_TEXTS.PREVIOUS }).click();
+  await expect(page.getByText(PAGINATION_TEXTS.range(1, PAGE_SIZE, TOTAL))).toBeVisible();
 
-  await expect(page).toHaveURL(getCourierHistoryPath(3));
-  expect(await page.evaluate(() => history.length)).toBe(entries);
+  await page.goBack();
+  await expect(page).toHaveURL(getCourierHistoryPath('page=2'));
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
 });
 
 test('should open the first page when the page of the address is not one of the history', async () => {
-  for (const wrong of ['abc', '0', '-2', '99']) {
-    await openHistory(page, `${APP_ROUTES.COURIER_HISTORY}?${HISTORY_PAGE_PARAM}=${wrong}`);
+  for (const wrong of ['abc', '0', '-2']) {
+    await openHistory(page, `${APP_ROUTES.COURIER_HISTORY}?page=${wrong}`);
 
     await expect(page.getByText(PAGINATION_TEXTS.range(1, PAGE_SIZE, TOTAL))).toBeVisible();
-    await expect(page).toHaveURL(getCourierHistoryPath(1));
   }
 });
 
-test('should ask a phone for all the pages up to the one of the address at once', async () => {
+test('should start a phone at the top of the history by the cursor', async () => {
   await page.setViewportSize(PHONE_VIEWPORT);
-  const searches: string[] = [];
+  const cursors: (string | null)[] = [];
   page.on('request', (request) => {
     const url = new URL(request.url());
 
-    if (isHistoryUrl()(url)) {
-      searches.push(url.search);
+    if (isHistoryUrl()(url) && url.searchParams.get('limit') !== '1') {
+      cursors.push(url.searchParams.get('cursor'));
     }
   });
 
-  await openHistory(page, getCourierHistoryPath(2));
+  await openHistory(page, getCourierHistoryPath('page=2'));
 
-  await expect(historyCards(page)).toHaveCount(2 * PAGE_SIZE);
-  await expect(page.getByText(HISTORY_TEXTS.shown(2 * PAGE_SIZE, TOTAL))).toBeVisible();
-  // The dev server runs an effect twice (StrictMode) and cancels the first request, so the same
-  // request may be seen twice; what matters is that no other one was made.
-  expect([...new Set(searches)]).toEqual([`?page=1&limit=${2 * PAGE_SIZE}`]);
+  await expect(historyCards(page)).toHaveCount(PAGE_SIZE);
+  await expect(page.getByText(HISTORY_TEXTS.shown(PAGE_SIZE, TOTAL))).toBeVisible();
+  expect([...new Set(cursors)]).toEqual(['']);
 
   await page.getByRole('button', { name: HISTORY_TEXTS.SHOW_MORE }).click();
 
-  await expect(historyCards(page)).toHaveCount(3 * PAGE_SIZE);
-  await expect(page).toHaveURL(getCourierHistoryPath(3));
+  await expect(historyCards(page)).toHaveCount(TOTAL);
+  expect(cursors.at(-1)).toBe(String(PAGE_SIZE));
 });

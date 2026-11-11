@@ -1,11 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, count, eq, max } from 'drizzle-orm';
-import { transitionOrderStatus } from '../../../common/database/order-status-transition';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { orderOffers, orderStatusHistory } from '../../../database/schema';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+import { and, count, eq, max, ne } from 'drizzle-orm';
+import { transitionOrderStatus } from '@/common/database/order-status-transition';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orderOffers, orderStatusHistory } from '@/database/schema';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import {
   CANDIDATE_SEARCH_TIMEOUT_MS,
   MAX_OFFERS_PER_ORDER,
@@ -38,7 +39,7 @@ export class OrderDispatchService {
 
     if (!order) {
       this.logger.warn(`Order ${orderId} to dispatch is missing`);
-    } else if ((await this.countOffers(orderId)) >= MAX_OFFERS_PER_ORDER) {
+    } else if ((await this.countOffers(order)) >= MAX_OFFERS_PER_ORDER) {
       await this.moveToManual(orderId, `${MAX_OFFERS_PER_ORDER} offers were not accepted`);
     } else {
       await this.offerOrWait(order, now);
@@ -70,11 +71,17 @@ export class OrderDispatchService {
     }
   }
 
-  private async countOffers(orderId: number): Promise<number> {
+  private async countOffers({ orderId, round }: DispatchOrder): Promise<number> {
     const [row] = await this.db
       .select({ total: count() })
       .from(orderOffers)
-      .where(eq(orderOffers.orderId, orderId));
+      .where(
+        and(
+          eq(orderOffers.orderId, orderId),
+          eq(orderOffers.round, round),
+          ne(orderOffers.status, ORDER_OFFER_STATUS.REVOKED),
+        ),
+      );
 
     return row?.total ?? 0;
   }

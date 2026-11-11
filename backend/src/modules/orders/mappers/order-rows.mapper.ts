@@ -1,4 +1,4 @@
-import type { addresses, packages } from '../../../database/schema';
+import type { addresses, packages } from '@/database/schema';
 import type { CreateOrderDto } from '../dto/create-order.dto';
 
 type AddressRow = typeof addresses.$inferInsert;

@@ -1,4 +1,4 @@
-import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { AUTH_VALIDATION_MESSAGES } from '../constants/validation.constants';
 import { registerSchema } from './register.dto';
 

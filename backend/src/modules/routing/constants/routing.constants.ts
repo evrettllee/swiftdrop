@@ -1,6 +1,7 @@
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { buildThrottleOverride } from '../../../common/utils/throttle';
-import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
+import { THROTTLE_ERROR_MESSAGE } from '@/common/constants/http.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import type { UserThrottleOptions } from '@/common/guards/user-throttle.guard';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
 
 // Routes
 // The route of an offer or of an order lives under it, for example /orders/:orderId/route.
@@ -36,7 +37,9 @@ export const ROUTING_THROTTLE_TTL_MS = MS_PER_MINUTE;
 export const ROUTE_PREVIEW_GUEST_THROTTLE_LIMIT = 10;
 export const ROUTE_PREVIEW_THROTTLE_KEY = 'route-preview';
 
-export const ROUTING_THROTTLE = buildThrottleOverride(
-  ROUTING_THROTTLE_LIMIT,
-  ROUTING_THROTTLE_TTL_MS,
-);
+export const ROUTING_THROTTLE: UserThrottleOptions = {
+  key: 'routing',
+  limit: ROUTING_THROTTLE_LIMIT,
+  ttlMs: ROUTING_THROTTLE_TTL_MS,
+  message: THROTTLE_ERROR_MESSAGE,
+};

@@ -6,9 +6,9 @@ import { PLACEHOLDER_TEXTS, PlaceholderPage } from '@/pages/placeholder';
 import { APP_ROUTES, CATCH_ALL_ROUTE, ORDER_DETAILS_PATTERN } from '@/shared/routes';
 import { ROLE } from '@/shared/session';
 import { PageLoader } from '@/shared/ui/page-loader';
-import { ClientLayout } from '../layouts/client-layout/ClientLayout';
 import { courierRoutes } from './courier-routes';
 import { GuestRoute } from './GuestRoute';
+import { managerRoutes } from './manager-routes';
 import { PendingCheckoutRoute } from './PendingCheckoutRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 
@@ -56,7 +56,11 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute roles={[ROLE.CLIENT]} />,
             children: [
               {
-                element: <ClientLayout />,
+                Component: lazy(() =>
+                  import('../layouts/client-layout/ClientLayout').then((module) => ({
+                    default: module.ClientLayout,
+                  })),
+                ),
                 children: [
                   {
                     path: APP_ROUTES.ORDERS,
@@ -91,6 +95,22 @@ export const router = createBrowserRouter([
                     ),
                   },
                   {
+                    path: APP_ROUTES.SUPPORT,
+                    Component: lazy(() =>
+                      import('@/pages/support').then((module) => ({
+                        default: module.SupportPage,
+                      })),
+                    ),
+                  },
+                  {
+                    path: APP_ROUTES.SUPPORT_TICKET,
+                    Component: lazy(() =>
+                      import('@/pages/support').then((module) => ({
+                        default: module.SupportTicketPage,
+                      })),
+                    ),
+                  },
+                  {
                     path: APP_ROUTES.PROFILE,
                     Component: lazy(() =>
                       import('@/pages/profile').then((module) => ({
@@ -103,6 +123,7 @@ export const router = createBrowserRouter([
             ],
           },
           courierRoutes,
+          managerRoutes,
           {
             path: APP_ROUTES.FORGOT_PASSWORD,
             element: <PlaceholderPage title={PLACEHOLDER_TEXTS.FORGOT_PASSWORD_TITLE} />,

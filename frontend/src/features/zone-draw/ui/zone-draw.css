@@ -1,0 +1,63 @@
+.zone-draw .map-zone--draft {
+  fill: var(--accent);
+  fill-opacity: 0.18;
+  stroke: var(--accent);
+  stroke-width: 2px;
+}
+
+.zone-draw .zone-draw__line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2px;
+}
+
+.zone-draw .zone-draw__line--hint {
+  stroke-dasharray: 4 4;
+}
+
+.zone-draw .marker-icon {
+  box-sizing: border-box;
+  width: 12px !important;
+  height: 12px !important;
+  margin: -6px 0 0 -6px !important;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 9999px;
+}
+
+.zone-draw .marker-icon.marker-icon-middle {
+  width: 8px !important;
+  height: 8px !important;
+  margin: -4px 0 0 -4px !important;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  border: none;
+  opacity: 1;
+}
+
+.zone-draw .zone-draw__snapped {
+  box-sizing: border-box;
+  background: none;
+  border: 1.5px dashed var(--accent);
+  border-radius: 9999px;
+}
+
+.zone-draw .zone-draw__radius-label {
+  width: auto !important;
+  height: auto !important;
+  background: none;
+  border: none;
+}
+
+.zone-draw .zone-draw__radius-label span {
+  display: inline-block;
+  padding: 2px 12px;
+  color: var(--fg);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transform: translate(-50%, -130%);
+}

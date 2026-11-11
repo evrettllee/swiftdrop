@@ -1,14 +1,15 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ROLE } from '../../src/common/enums/role.enum';
-import { VEHICLE_TYPE } from '../../src/common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../src/common/schemas/geo-point.schema';
-import type { Database } from '../../src/database/database.module';
-import { courierProfiles, orders, users } from '../../src/database/schema';
-import { COURIERS_ROUTES } from '../../src/modules/couriers/constants/couriers.constants';
+import { ROLE } from '@/common/enums/role.enum';
+import { VEHICLE_TYPE } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orders, users } from '@/database/schema';
+import { COURIERS_ROUTES } from '@/modules/couriers/constants/couriers.constants';
 import { COOKIE_HEADER, validRegistration } from './auth';
 import { getApi, putApi } from './http';
 import { createUserWithRole } from './users';
+import { statusChange } from './order-status';
 
 export const COURIER_ACCOUNT = {
   firstName: 'Дмитрий',
@@ -63,7 +64,7 @@ export async function assignOrder(
 ): Promise<void> {
   await db
     .update(orders)
-    .set({ courierId: courierProfileId, status })
+    .set({ courierId: courierProfileId, ...statusChange(status) })
     .where(eq(orders.orderId, orderId));
 }
 

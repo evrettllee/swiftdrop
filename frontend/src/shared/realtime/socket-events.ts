@@ -18,6 +18,18 @@ export const SOCKET_EVENTS = {
   ORDER_ETA: 'order:eta',
   MESSAGE_NEW: 'message:new',
   MESSAGE_READ: 'message:read',
+  ORDER_ASSIGNED: 'order:assigned',
+  ORDER_UNASSIGNED: 'order:unassigned',
+  ORDER_COURIER: 'order:courier',
+  STAFF_ORDER: 'staff:order',
+  STAFF_COURIER: 'staff:courier',
+  STAFF_COURIER_LOCATION: 'staff:courier-location',
+  STAFF_ZONE: 'staff:zone',
+  TICKET_JOIN: 'ticket:join',
+  TICKET_LEAVE: 'ticket:leave',
+  SUPPORT_MESSAGE: 'support:message',
+  SUPPORT_READ: 'support:read',
+  SUPPORT_TICKET: 'support:ticket',
 } as const;
 
 export type SocketEvent = (typeof SOCKET_EVENTS)[keyof typeof SOCKET_EVENTS];

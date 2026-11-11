@@ -1,21 +1,18 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import {
-  ORDER_LIST_FILTER,
-  ORDERS_FIRST_PAGE,
-  ORDERS_PAGE_SIZE_DEFAULT,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { VALID_ORDER_PRICE } from '../../support/fixtures';
-import { getOrders, placeOrders, SECOND_CLIENT } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ORDER_STATUS_GROUP, ORDERS_FIRST_PAGE } from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { VALID_ORDER_PRICE } from '@test/support/fixtures';
+import { getOrders, placeOrders, SECOND_CLIENT } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { statusChange } from '@test/support/order-status';
 
 type ListBody = { items: { orderId: number }[] };
 
@@ -50,7 +47,8 @@ describe('Orders list (e2e)', () => {
       items: [],
       total: 0,
       page: ORDERS_FIRST_PAGE,
-      limit: ORDERS_PAGE_SIZE_DEFAULT,
+      limit: 20,
+      until: null,
     });
   });
 
@@ -85,18 +83,18 @@ describe('Orders list (e2e)', () => {
     expect(idsOf(response.body)).toEqual([ids[0]]);
   });
 
-  it('should split orders into active and finished when a filter is given', async () => {
+  it('should split orders into active and finished when a group of statuses is given', async () => {
     const { cookies } = await registerUser(app);
     const [finishedId, activeId] = await placeOrders(app, cookies, 2);
     await db
       .update(orders)
-      .set({ status: ORDER_STATUS.DELIVERED })
+      .set(statusChange(ORDER_STATUS.DELIVERED))
       .where(eq(orders.orderId, finishedId));
 
-    const finished = await getOrders(app, cookies, { filter: ORDER_LIST_FILTER.FINISHED }).expect(
+    const finished = await getOrders(app, cookies, { status: ORDER_STATUS_GROUP.FINISHED }).expect(
       HttpStatus.OK,
     );
-    const active = await getOrders(app, cookies, { filter: ORDER_LIST_FILTER.ACTIVE }).expect(
+    const active = await getOrders(app, cookies, { status: ORDER_STATUS_GROUP.ACTIVE }).expect(
       HttpStatus.OK,
     );
 
@@ -116,6 +114,7 @@ describe('Orders list (e2e)', () => {
       currency: 'BYN',
       pickup: { city: 'Минск', street: 'ул. Свердлова', house: '13а', apartment: null },
       delivery: { city: 'Минск', street: 'пр-т Притыцкого', house: '83', apartment: '47' },
+      courier: null,
     });
   });
 });

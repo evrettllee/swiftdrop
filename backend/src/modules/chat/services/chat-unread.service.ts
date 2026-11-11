@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, eq, lte, sql } from 'drizzle-orm';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { messages } from '../../../database/schema';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { messages } from '@/database/schema';
 
 // Written as in the predicate of messages_unread_idx, so the counter and the marking can use that
 // index. A literal, not a parameter: the planner proves that a query fits a partial index from the

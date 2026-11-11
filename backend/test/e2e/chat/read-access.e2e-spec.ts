@@ -1,29 +1,26 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import {
-  CHAT_ERROR_MESSAGES,
-  CHAT_ROUTES,
-} from '../../../src/modules/chat/constants/chat.constants';
-import { ChatReadService } from '../../../src/modules/chat/services/chat-read.service';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
+import { ROLE } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CHAT_ERROR_MESSAGES, CHAT_ROUTES } from '@/modules/chat/constants/chat.constants';
+import { ChatReadService } from '@/modules/chat/services/chat-read.service';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
 import {
   assignCourier,
   getChatHistory,
   insertOrderMessages,
   markChatRead,
   placeConfirmedOrder,
-} from '../../support/chat';
-import { MISSING_ORDER_ID } from '../../support/constants';
-import { rawPostApi } from '../../support/http';
-import { type Cookies, SECOND_CLIENT } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { createUserWithRole, MANAGER_ACCOUNT } from '../../support/users';
+} from '@test/support/chat';
+import { MISSING_ORDER_ID } from '@test/support/constants';
+import { rawPostApi } from '@test/support/http';
+import { type Cookies, SECOND_CLIENT } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { createUserWithRole, MANAGER_ACCOUNT } from '@test/support/users';
 
 describe('Marking chat messages read: access and validation (e2e)', () => {
   let app: NestExpressApplication;

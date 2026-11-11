@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import { ASSIGNMENT_VALIDATION_MESSAGES } from '../constants/assignment.constants';
 
 const error = ASSIGNMENT_VALIDATION_MESSAGES.OFFER_ID_INVALID;

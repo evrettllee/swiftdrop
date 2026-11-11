@@ -2,7 +2,7 @@ import { DatabaseError } from 'pg';
 import {
   PG_LOCK_NOT_AVAILABLE_CODE,
   PG_UNIQUE_VIOLATION_CODE,
-} from '../constants/database.constants';
+} from '@/common/constants/database.constants';
 import { getUniqueViolationConstraint, isLockTimeout } from './pg-errors';
 
 const CONSTRAINT = 'payments_one_pending_per_order_uidx';

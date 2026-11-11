@@ -1,0 +1,1 @@
+ALTER TYPE "public"."order_offer_status" ADD VALUE 'revoked';

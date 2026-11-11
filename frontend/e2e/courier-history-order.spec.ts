@@ -48,8 +48,8 @@ function backLink() {
   return page.getByRole('link', { name: HISTORY_ORDER_TEXTS.BACK });
 }
 
-function openOrder(orderId = NEWEST_ORDER_ID, historyPage = 1): Promise<unknown> {
-  return page.goto(getCourierHistoryOrderPath(orderId, historyPage));
+function openOrder(orderId = NEWEST_ORDER_ID, listSearch = ''): Promise<unknown> {
+  return page.goto(getCourierHistoryOrderPath(orderId, listSearch));
 }
 
 test.beforeAll(async ({ browser }) => {
@@ -115,15 +115,15 @@ test('should end the stages of a cancelled order with the cancellation', async (
 });
 
 test('should lead back to the same page of the history', async () => {
-  await page.goto(getCourierHistoryPath(2));
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await page.goto(getCourierHistoryPath('page=2'));
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
 
   await page.getByRole('link', { name: new RegExp(`№${NEWEST_ORDER_ID - PAGE_SIZE}`) }).click();
-  await expect(page).toHaveURL(getCourierHistoryOrderPath(NEWEST_ORDER_ID - PAGE_SIZE, 2));
+  await expect(page).toHaveURL(getCourierHistoryOrderPath(NEWEST_ORDER_ID - PAGE_SIZE, 'page=2'));
   await backLink().click();
 
-  await expect(page).toHaveURL(getCourierHistoryPath(2));
-  await expect(page.getByText(PAGINATION_TEXTS.range(6, 10, TOTAL))).toBeVisible();
+  await expect(page).toHaveURL(getCourierHistoryPath('page=2'));
+  await expect(page.getByText(PAGINATION_TEXTS.range(PAGE_SIZE + 1, TOTAL, TOTAL))).toBeVisible();
 });
 
 test('should keep the history item of the menu active on the order', async () => {
@@ -142,12 +142,12 @@ test('should keep the history item of the menu active on the order', async () =>
 
 test('should say the order is not found when it is not a finished one of the courier', async () => {
   answerOrder = () => ({ status: HTTP_STATUS.NOT_FOUND, json: { message: 'Заказ не найден' } });
-  await openOrder(NEWEST_ORDER_ID, 2);
+  await openOrder(NEWEST_ORDER_ID, 'page=2');
 
   await expect(
     page.getByRole('heading', { name: HISTORY_ORDER_TEXTS.NOT_FOUND_TITLE }),
   ).toBeVisible();
-  await expect(backLink()).toHaveAttribute('href', getCourierHistoryPath(2));
+  await expect(backLink()).toHaveAttribute('href', getCourierHistoryPath('page=2'));
 });
 
 test('should say the order is not found when the address is not an order number', async () => {

@@ -1,7 +1,7 @@
 import { integer, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { VEHICLE_TYPE_VALUES } from '../../common/enums/vehicle-type.enum';
+import { VEHICLE_TYPE_VALUES } from '@/common/enums/vehicle-type.enum';
 import { courierProfiles } from './courier-profiles';
-import { VEHICLE_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { VEHICLE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 
 export const vehicleTypeEnum = pgEnum('vehicle_type', VEHICLE_TYPE_VALUES);
 

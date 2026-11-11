@@ -9,6 +9,7 @@ import {
 } from './config';
 import { type MapRoute, NO_ROUTE } from './map-route';
 import { fetchRouteOutcome, type RouteLinesLoader, type RouteOutcome } from './route-outcome';
+import { settledRouteKey, shouldAskRoute } from './route-request';
 
 type RouteLinesOptions = {
   // The courier on the map: a move farther than the threshold asks for the line again.
@@ -71,6 +72,7 @@ export function useRouteLines(
   const [attempt, setAttempt] = useState(0);
   const [stored, setStored] = useState<StoredRoute | null>(null);
   const lastRequest = useRef<LastRequest | null>(null);
+  const settledKey = useRef<string | null>(null);
   const loadRoute = useEffectEvent((signal: AbortSignal) =>
     load === null ? Promise.resolve(NOTHING_TO_ASK) : fetchRouteOutcome(load, signal),
   );
@@ -78,7 +80,7 @@ export function useRouteLines(
   const askAgain = () => setAttempt((current) => current + 1);
 
   useEffect(() => {
-    if (!isEnabled) {
+    if (!isEnabled || !shouldAskRoute(settledKey.current, requestKey)) {
       return undefined;
     }
 
@@ -90,6 +92,7 @@ export function useRouteLines(
         return;
       }
 
+      settledKey.current = settledRouteKey({ isFinal }, requestKey);
       setStored({ ...route, key: requestKey });
       // A final answer leaves no last request, so a move of the courier asks for nothing either.
       lastRequest.current = isFinal ? null : { atMs: Date.now(), point: getMovingPoint() };

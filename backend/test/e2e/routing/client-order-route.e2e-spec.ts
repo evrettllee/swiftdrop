@@ -1,19 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OSRM_PROFILE } from '../../../src/integrations/osrm/constants/osrm.constants';
-import { CLIENT_ORDER_COURIER_ROUTES } from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { ROUTE_SEGMENT_KIND } from '../../../src/modules/routing/constants/routing.constants';
-import { OrderEtaService } from '../../../src/modules/tracking/services/order-eta.service';
-import { addCourierSession } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, COURIER_ACCOUNT, ON_FOOT, placeCourierAt } from '../../support/couriers';
-import { MINSK_DELIVERY, MINSK_PICKUP } from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { type Cookies, placeOrders, SECOND_CLIENT } from '../../support/orders';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import { CLIENT_ORDER_COURIER_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { ROUTE_SEGMENT_KIND } from '@/modules/routing/constants/routing.constants';
+import { OrderEtaService } from '@/modules/tracking/services/order-eta.service';
+import { addCourierSession } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, COURIER_ACCOUNT, ON_FOOT, placeCourierAt } from '@test/support/couriers';
+import { MINSK_DELIVERY, MINSK_PICKUP } from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { type Cookies, placeOrders, SECOND_CLIENT } from '@test/support/orders';
 import {
   COURIER_POINT,
   createRoutingMocks,
@@ -22,7 +22,7 @@ import {
   lineThrough,
   resetRouting,
   staleTime,
-} from '../../support/routing';
+} from '@test/support/routing';
 
 const PARCEL_LINE = lineThrough([MINSK_PICKUP, MINSK_DELIVERY]);
 

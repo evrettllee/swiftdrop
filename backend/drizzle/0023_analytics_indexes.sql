@@ -1,0 +1,2 @@
+CREATE INDEX "order_offers_offered_at_idx" ON "order_offers" USING btree ("offered_at");--> statement-breakpoint
+CREATE INDEX "payments_paid_at_idx" ON "payments" USING btree ("paid_at") WHERE "payments"."status" = 'paid';

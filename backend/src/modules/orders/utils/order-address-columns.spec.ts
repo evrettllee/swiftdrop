@@ -1,5 +1,5 @@
 import { QueryBuilder } from 'drizzle-orm/pg-core';
-import { DB_CASING } from '../../../database/database.constants';
+import { DB_CASING } from '@/database/database.constants';
 import {
   addressPointColumns,
   addressViewColumns,

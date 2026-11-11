@@ -1,6 +1,6 @@
 import { Logger, ServiceUnavailableException, UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MS_PER_SECOND } from '../../../common/constants/time.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
 import {
   OSRM_COOLDOWN_MS,
   OSRM_FAILURE_THRESHOLD,

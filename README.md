@@ -192,3 +192,5 @@ docker-compose.dev.yml   PostgreSQL и S3-хранилище для разраб
 .env.example             шаблон единого .env
 .nvmrc                   версия Node.js
 ```
+
+Импорты в backend: внутри своего модуля (`src/modules/<feature>`, `src/integrations/<name>`, `src/common/<area>`) пути относительные (`./`, `../`), за его пределами — через алиасы `@/` (`backend/src`) и `@test/` (`backend/test`). Импорты `../../` и глубже запрещены правилом `no-restricted-imports` в `backend/.oxlintrc.json`.

@@ -1,28 +1,54 @@
 import { z } from 'zod';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
+import { COURIER_HISTORY_STATUSES } from '@/common/constants/orders.constants';
 import {
-  DELIVERIES_VALIDATION_MESSAGES,
-  HISTORY_FIRST_PAGE,
+  listPeriodShape,
+  listSearchSchema,
+  listSortParamSchema,
+  resolveListQuery,
+  unknownParameterError,
+} from '@/common/schemas/list-query.schema';
+import { listPaginationShape } from '@/common/schemas/pagination.schema';
+import {
+  HISTORY_NUMBER_SEARCH,
   HISTORY_PAGE_SIZE_DEFAULT,
-  HISTORY_PAGE_SIZE_MAX,
-  HISTORY_PAGE_SIZE_MIN,
+  HISTORY_VALIDATION_MESSAGES,
 } from '../constants/deliveries.constants';
+import { HISTORY_SORT } from '../utils/history-sort';
 
-const pageError = DELIVERIES_VALIDATION_MESSAGES.PAGE_INVALID;
-const limitError = DELIVERIES_VALIDATION_MESSAGES.LIMIT_INVALID;
+export type HistorySearch = { orderId: number | null };
 
-// Query values arrive as strings, so numbers are coerced.
-export const courierHistorySchema = z.object({
-  page: z.coerce
-    .number({ error: pageError })
-    .int({ error: pageError })
-    .min(HISTORY_FIRST_PAGE, { error: pageError })
-    .default(HISTORY_FIRST_PAGE),
-  limit: z.coerce
-    .number({ error: limitError })
-    .int({ error: limitError })
-    .min(HISTORY_PAGE_SIZE_MIN, { error: limitError })
-    .max(HISTORY_PAGE_SIZE_MAX, { error: limitError })
-    .default(HISTORY_PAGE_SIZE_DEFAULT),
-});
+function toSearch(digits: string): HistorySearch {
+  const value = Number(digits);
+
+  return { orderId: value > 0 && value <= DB_INTEGER_MAX ? value : null };
+}
+
+const historySearchSchema = listSearchSchema
+  .pipe(
+    z.string().regex(HISTORY_NUMBER_SEARCH, {
+      error: HISTORY_VALIDATION_MESSAGES.SEARCH_NOT_NUMBER,
+    }),
+  )
+  .transform(toSearch);
+
+export const courierHistorySchema = z
+  .strictObject(
+    {
+      ...listPaginationShape(HISTORY_PAGE_SIZE_DEFAULT),
+      ...listPeriodShape,
+      sort: listSortParamSchema,
+      q: historySearchSchema.optional(),
+      status: z
+        .enum(COURIER_HISTORY_STATUSES, { error: HISTORY_VALIDATION_MESSAGES.STATUS_INVALID })
+        .optional(),
+    },
+    { error: unknownParameterError },
+  )
+  .transform((query, ctx) => {
+    const list = resolveListQuery(query, HISTORY_SORT, ctx);
+
+    return list ? { ...list, search: query.q ?? null, status: query.status ?? null } : z.NEVER;
+  });
 
 export type CourierHistoryDto = z.infer<typeof courierHistorySchema>;

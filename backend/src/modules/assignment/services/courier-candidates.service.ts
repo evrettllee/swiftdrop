@@ -1,18 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gte, inArray, lte, notExists, sql } from 'drizzle-orm';
-import { courierActiveOrder } from '../../../common/database/courier-active-order';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orderOffers, orders, users, vehicles } from '../../../database/schema';
-import {
-  ASSIGNMENT_RADIUS_KM,
-  COURIER_LOCATION_FRESH_MS,
-  ROUTED_CANDIDATES_LIMIT,
-} from '../constants/assignment.constants';
+import { and, eq, lte, notExists, sql } from 'drizzle-orm';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orderOffers, users, vehicles } from '@/database/schema';
+import { ASSIGNMENT_RADIUS_KM, ROUTED_CANDIDATES_LIMIT } from '../constants/assignment.constants';
 import type { CourierCandidate, DispatchOrder } from '../types/assignment.types';
 import { approxDistanceKm } from '../utils/approx-distance';
-import { vehiclesThatCarry } from '../utils/vehicle-routing';
+import {
+  courierAccountActive,
+  courierEligibility,
+  eligibleCourier,
+} from '../utils/courier-eligibility';
 
 @Injectable()
 export class CourierCandidatesService {
@@ -25,7 +24,6 @@ export class CourierCandidatesService {
       courierProfiles.currentLng,
       order.pickup,
     );
-    const freshSince = new Date(now.getTime() - COURIER_LOCATION_FRESH_MS);
 
     return this.db
       .select({
@@ -43,15 +41,12 @@ export class CourierCandidatesService {
       .innerJoin(users, eq(users.userId, courierProfiles.userId))
       .where(
         and(
-          eq(courierProfiles.isAvailable, true),
+          eligibleCourier(courierEligibility(this.db, order.parcel, now)),
           // A blocked courier cannot answer an offer, so it would only expire.
-          eq(users.isBlocked, false),
-          gte(courierProfiles.locationUpdatedAt, freshSince),
-          inArray(vehicles.type, vehiclesThatCarry(order.parcel)),
+          courierAccountActive,
           lte(distanceKm, ASSIGNMENT_RADIUS_KM),
-          notExists(this.activeOrders()),
           notExists(this.pendingOffers()),
-          notExists(this.offersOfOrder(order.orderId)),
+          notExists(this.offersOfOrder(order)),
         ),
       )
       .orderBy(distanceKm)
@@ -59,13 +54,6 @@ export class CourierCandidatesService {
   }
 
   // The subqueries below refer to the courier of the outer query.
-
-  private activeOrders() {
-    return this.db
-      .select({ orderId: orders.orderId })
-      .from(orders)
-      .where(courierActiveOrder(courierProfiles.courierProfileId));
-  }
 
   private pendingOffers() {
     return this.db
@@ -79,8 +67,9 @@ export class CourierCandidatesService {
       );
   }
 
-  // An order is offered to a courier once: a decline or a missed offer is final for that order.
-  private offersOfOrder(orderId: number) {
+  // An order is offered to a courier once a round: a decline or a missed offer is final until a
+  // manager restarts the search.
+  private offersOfOrder({ orderId, round }: DispatchOrder) {
     return this.db
       .select({ offerId: orderOffers.offerId })
       .from(orderOffers)
@@ -88,6 +77,7 @@ export class CourierCandidatesService {
         and(
           eq(orderOffers.courierId, courierProfiles.courierProfileId),
           eq(orderOffers.orderId, orderId),
+          eq(orderOffers.round, round),
         ),
       );
   }

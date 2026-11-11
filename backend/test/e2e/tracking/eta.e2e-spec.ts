@@ -1,37 +1,36 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { MS_PER_SECOND } from '../../../src/common/constants/time.constants';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import {
   DROPOFF_HANDOVER_MS,
-  ORDER_ROOM_EVENTS,
   PICKUP_HANDOVER_MS,
-} from '../../../src/modules/tracking/constants/tracking.constants';
-import type { OrderEtaEvent } from '../../../src/modules/tracking/types/tracking.types';
-import { registerUser } from '../../support/auth';
-import { OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { placeCourierAt } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
+} from '@/modules/tracking/constants/tracking.constants';
+import type { OrderEtaEvent } from '@/modules/tracking/types/tracking.types';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { placeCourierAt } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
 import {
   createRoutingMocks,
   createRoutingTestApp,
   FIRST_LEG_DURATION_S,
   resetRouting,
   TRIP_DURATION_S,
-} from '../../support/routing';
+} from '@test/support/routing';
 import {
   collectEvents,
   joinOrderRoom,
   listenTestApp,
   roundTrip,
   waitForEvent,
-} from '../../support/sockets';
-import { assignTrackedCourier, sendLocation, trackEstimates } from '../../support/tracking';
+} from '@test/support/sockets';
+import { assignTrackedCourier, sendLocation, trackEstimates } from '@test/support/tracking';
 
 // Older than the limit of positions per courier, so the next one is stored.
 const PAST_POSITION_MS = 10_000;
@@ -71,7 +70,7 @@ describe('Arrival estimate of an order (e2e)', () => {
   });
 
   it('should send order:eta after a position and keep the same time in the order', async () => {
-    const received = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const received = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
 
     await sendLocation(await sockets.connect(baseUrl, courier.cookies));
 
@@ -90,7 +89,7 @@ describe('Arrival estimate of an order (e2e)', () => {
 
   // The pickup is the first leg alone: the rest of the trip and the two handovers come after it.
   it('should send the arrival at the pickup point before the delivery estimate', async () => {
-    const received = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const received = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
     const sentAtMs = Date.now();
 
     await sendLocation(await sockets.connect(baseUrl, courier.cookies));
@@ -112,7 +111,7 @@ describe('Arrival estimate of an order (e2e)', () => {
       .update(orders)
       .set({ status: ORDER_STATUS.PICKED_UP })
       .where(eq(orders.orderId, orderId));
-    const received = waitForEvent<OrderEtaEvent>(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const received = waitForEvent<OrderEtaEvent>(client, SOCKET_EVENTS.ORDER_ETA);
 
     await sendLocation(await sockets.connect(baseUrl, courier.cookies));
 
@@ -123,7 +122,7 @@ describe('Arrival estimate of an order (e2e)', () => {
   });
 
   it('should not ask the routing service again for a position within 30 seconds', async () => {
-    const firstEstimate = waitForEvent(client, ORDER_ROOM_EVENTS.ORDER_ETA);
+    const firstEstimate = waitForEvent(client, SOCKET_EVENTS.ORDER_ETA);
     await sendLocation(await sockets.connect(baseUrl, courier.cookies));
     await firstEstimate;
     await placeCourierAt(
@@ -132,7 +131,7 @@ describe('Arrival estimate of an order (e2e)', () => {
       MINSK_PICKUP,
       new Date(Date.now() - PAST_POSITION_MS),
     );
-    const secondPosition = waitForEvent(client, COURIER_SOCKET_EVENTS.COURIER_LOCATION);
+    const secondPosition = waitForEvent(client, SOCKET_EVENTS.COURIER_LOCATION);
 
     await expect(sendLocation(await sockets.connect(baseUrl, courier.cookies))).resolves.toEqual({
       ok: true,
@@ -145,8 +144,8 @@ describe('Arrival estimate of an order (e2e)', () => {
   it('should send no estimate while routing is unavailable, the position still works', async () => {
     mocks.isTripAvailable.mockReturnValue(false);
     const estimatesDone = trackEstimates(app);
-    const estimates = collectEvents(client, ORDER_ROOM_EVENTS.ORDER_ETA);
-    const position = waitForEvent(client, COURIER_SOCKET_EVENTS.COURIER_LOCATION);
+    const estimates = collectEvents(client, SOCKET_EVENTS.ORDER_ETA);
+    const position = waitForEvent(client, SOCKET_EVENTS.COURIER_LOCATION);
 
     await expect(sendLocation(await sockets.connect(baseUrl, courier.cookies))).resolves.toEqual({
       ok: true,

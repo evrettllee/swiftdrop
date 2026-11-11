@@ -1,21 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import {
-  CHAT_ERROR_MESSAGES,
-  CHAT_SOCKET_EVENTS,
-} from '../../../src/modules/chat/constants/chat.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { CHAT_ERROR_MESSAGES } from '@/modules/chat/constants/chat.constants';
 import type {
   ChatHistory,
   MessageNewEvent,
   SentChatMessage,
-} from '../../../src/modules/chat/types/chat.types';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+} from '@/modules/chat/types/chat.types';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   assignCourier,
   countOrderMessages,
@@ -23,10 +21,10 @@ import {
   OpenSockets,
   placeConfirmedOrder,
   sendChatMessage,
-} from '../../support/chat';
-import { type Cookies, SECOND_CLIENT, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '../../support/sockets';
+} from '@test/support/chat';
+import { type Cookies, SECOND_CLIENT, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { collectEvents, joinOrderRoom, listenTestApp, roundTrip } from '@test/support/sockets';
 
 describe('Sending a chat message (e2e)', () => {
   let app: NestExpressApplication;
@@ -102,7 +100,7 @@ describe('Sending a chat message (e2e)', () => {
       [client, courier, outsider].map((socket) => joinOrderRoom(socket, { orderId })),
     );
     const received = [client, courier, outsider].map((socket) =>
-      collectEvents<MessageNewEvent>(socket, CHAT_SOCKET_EVENTS.MESSAGE_NEW),
+      collectEvents<MessageNewEvent>(socket, SOCKET_EVENTS.MESSAGE_NEW),
     );
 
     const response = await sendChatMessage(app, clientCookies, orderId).expect(HttpStatus.CREATED);

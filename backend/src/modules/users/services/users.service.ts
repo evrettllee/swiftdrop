@@ -5,12 +5,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { and, eq, isNull, type SQL } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { getUniqueViolationConstraint } from '../../../common/database/pg-errors';
-import type { RoleName } from '../../../common/enums/role.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { roles, users } from '../../../database/schema';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { getUniqueViolationConstraint } from '@/common/database/pg-errors';
+import type { RoleName } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { roles, users } from '@/database/schema';
 import { USERS_CONFLICT_MESSAGES, USERS_ERROR_MESSAGES } from '../constants/users.constants';
 import type { CreateUserInput, User, UserWithRole } from '../types/users.types';
 

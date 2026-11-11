@@ -57,6 +57,132 @@
       "when": 1792702465740,
       "tag": "0007_add_order_estimated_minutes",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793254378692,
+      "tag": "0008_orders_finished_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793254429072,
+      "tag": "0009_orders_list_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793254444671,
+      "tag": "0010_pg_trgm",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793254493976,
+      "tag": "0011_support_tickets_v070",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793254513611,
+      "tag": "0012_messages_ticket_receiver",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793254542344,
+      "tag": "0013_order_offers_round",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1793254559840,
+      "tag": "0014_order_offer_status_revoked",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1793254596504,
+      "tag": "0015_order_status_history_comment_length",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793254619965,
+      "tag": "0016_service_zones_updated_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793258479296,
+      "tag": "0017_orders_status_changed_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793258517859,
+      "tag": "0018_orders_search_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793259838963,
+      "tag": "0019_payments_paid_refunded_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793373651575,
+      "tag": "0020_orders_assignment_round",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793383698245,
+      "tag": "0021_service_zones_name_lower",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793384679551,
+      "tag": "0022_courier_shifts",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793385323866,
+      "tag": "0023_analytics_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793478577793,
+      "tag": "0024_support_tickets_closed_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794403037847,
+      "tag": "0025_exchange_rates",
+      "breakpoints": true
     }
   ]
 }

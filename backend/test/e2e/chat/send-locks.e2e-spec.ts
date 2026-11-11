@@ -1,27 +1,28 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { orderParticipant } from '../../../src/common/database/order-participant';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { messages, orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { CHAT_ERROR_MESSAGES } from '../../../src/modules/chat/constants/chat.constants';
-import { COURIER_ORDERS_ROUTES } from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { ORDER_ID_ROUTE_PARAM } from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierSession } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { countOrderMessages, placeConfirmedOrder, sendChatMessage } from '../../support/chat';
-import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
-import { assignOrder, CAR, COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { postApi } from '../../support/http';
-import { commitOnceBlocked, holdOrder, whileRowsAreHeld } from '../../support/locks';
-import { readOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+import { orderParticipant } from '@/common/database/order-participant';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
+import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { messages, orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CHAT_ERROR_MESSAGES } from '@/modules/chat/constants/chat.constants';
+import { COURIER_ORDERS_ROUTES } from '@/modules/deliveries/constants/deliveries.constants';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierSession } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { countOrderMessages, placeConfirmedOrder, sendChatMessage } from '@test/support/chat';
+import { LOCK_TEST_MARGIN_MS } from '@test/support/constants';
+import { assignOrder, CAR, COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { postApi } from '@test/support/http';
+import { commitOnceBlocked, holdOrder, whileRowsAreHeld } from '@test/support/locks';
+import { readOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { statusChange } from '@test/support/order-status';
 
 const RIGHT_CODE = '4821';
 
@@ -67,7 +68,7 @@ describe('Chat messages and the order row lock (e2e)', () => {
       (tx) =>
         tx
           .update(orders)
-          .set({ status: ORDER_STATUS.DELIVERED })
+          .set(statusChange(ORDER_STATUS.DELIVERED))
           .where(eq(orders.orderId, orderId)),
       () => sendChatMessage(app, courierCookies, orderId),
     );

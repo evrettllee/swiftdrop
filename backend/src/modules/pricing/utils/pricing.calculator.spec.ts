@@ -1,4 +1,4 @@
-import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
+import type { PackageSpec } from '@/common/schemas/package-spec.schema';
 import { calculatePrice } from './pricing.calculator';
 import type { PriceInput, TariffRates } from '../types/pricing.types';
 

@@ -1,10 +1,12 @@
-import type { OrderTransitionChanges } from '../../../common/database/order-status-transition';
-import type { OrderStatus } from '../../../common/enums/order-status.enum';
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import type { PackageSpec } from '../../../common/schemas/package-spec.schema';
-import type { CourierVehicle } from '../../couriers/types/couriers.types';
-import type { RouteLines } from '../../routing/types/routing.types';
+import type { OrderSupportTicket } from '@/common/database/order-support-ticket';
+import type { ListPage } from '@/common/types/page.types';
+import type { OrderTransitionChanges } from '@/common/database/order-status-transition';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { PackageSpec } from '@/common/schemas/package-spec.schema';
+import type { CourierVehicle } from '@/modules/couriers/types/couriers.types';
+import type { RouteLines } from '@/modules/routing/types/routing.types';
 import type { HANDOVER_OUTCOME } from '../constants/deliveries.constants';
 
 // The courier making a request: the user writes the history, the profile owns the order.
@@ -50,7 +52,9 @@ export type CourierHistoryOrder = {
 // An order as the courier sees it after accepting.
 export type CourierOrder = Omit<CourierOrderRow, 'sender'> & { sender: Contact };
 
-export type CurrentCourierOrder = { order: CourierOrder | null };
+export type CurrentCourierOrderView = CourierOrder & { supportTicket: OrderSupportTicket | null };
+
+export type CurrentCourierOrder = { order: CurrentCourierOrderView | null };
 
 // One step of the courier through the order.
 export type DeliveryStep = {
@@ -123,11 +127,10 @@ export type CourierHistoryItem = Omit<CourierHistoryRow, 'finishedAt'> & {
   finishedAt: string | null;
 };
 
-export type CourierHistoryPage = {
-  items: CourierHistoryItem[];
-  page: number;
-  limit: number;
-  total: number;
+export type CourierHistorySummary = { count: number; distanceKm: number };
+
+export type CourierHistoryPage = ListPage<CourierHistoryItem> & {
+  summary?: CourierHistorySummary;
 };
 
 export type CourierTodayStats = {

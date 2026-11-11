@@ -1,5 +1,5 @@
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
-import { ROLE } from '../../../common/enums/role.enum';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import type { ChatMessageRow } from '../types/chat.types';
 import { canSendInOrder, toChatHistoryPage, toChatMessage } from './chat-message.mapper';
 

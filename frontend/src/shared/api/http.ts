@@ -21,12 +21,19 @@ export type FieldError = z.infer<typeof fieldErrorSchema>;
 export class ApiError extends Error {
   readonly status: number;
   readonly fieldErrors: FieldError[];
+  readonly body: unknown;
 
-  constructor(status: number, message: string, fieldErrors: FieldError[] = []) {
+  constructor(
+    status: number,
+    message: string,
+    fieldErrors: FieldError[] = [],
+    body: unknown = null,
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.fieldErrors = fieldErrors;
+    this.body = body;
   }
 }
 
@@ -39,7 +46,7 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
 // request replaced it).
 export type HttpOptions = { signal?: AbortSignal };
 
-type RequestOptions = HttpOptions & { method: string; body?: unknown };
+export type RequestOptions = HttpOptions & { method: string; body?: unknown };
 
 const errorBodySchema = z.object({
   message: z.string().optional(),
@@ -87,10 +94,16 @@ async function readJson(response: Response): Promise<unknown> {
 }
 
 async function toApiError(response: Response): Promise<ApiError> {
-  const parsed = errorBodySchema.safeParse(await readJson(response));
+  const raw = await readJson(response);
+  const parsed = errorBodySchema.safeParse(raw);
   const body = parsed.success ? parsed.data : undefined;
 
-  return new ApiError(response.status, body?.message ?? API_ERROR_MESSAGES.GENERIC, body?.errors);
+  return new ApiError(
+    response.status,
+    body?.message ?? API_ERROR_MESSAGES.GENERIC,
+    body?.errors,
+    raw,
+  );
 }
 
 // The tabs of one browser share the session cookies, so they refresh one at a time: a tab that waited
@@ -144,7 +157,7 @@ async function retryAfterRefresh(
   return isRefreshed ? send(path, options) : failed;
 }
 
-async function request(path: string, options: RequestOptions): Promise<unknown> {
+export async function sendOk(path: string, options: RequestOptions): Promise<Response> {
   let response = await send(path, options);
 
   if (response.status === HTTP_STATUS.UNAUTHORIZED && !NO_RETRY_PATHS.includes(path)) {
@@ -154,6 +167,12 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
   if (!response.ok) {
     throw await toApiError(response);
   }
+
+  return response;
+}
+
+async function request(path: string, options: RequestOptions): Promise<unknown> {
+  const response = await sendOk(path, options);
 
   return response.status === HTTP_STATUS.NO_CONTENT ? undefined : readJson(response);
 }

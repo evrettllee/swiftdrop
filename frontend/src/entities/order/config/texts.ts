@@ -1,4 +1,13 @@
 import { ORDER_STATUS, type OrderStatus } from '@/shared/api';
+import { UI_TEXTS } from '@/shared/config';
+
+export const ORDER_HEADER_TEXTS = {
+  BREADCRUMBS_LABEL: 'Хлебные крошки',
+  ORDERS: UI_TEXTS.ORDERS,
+  BACK_TO_ORDERS: 'Все заказы',
+  title: (orderNumber: string) => `Заказ ${orderNumber}`,
+  createdAt: (date: string) => `Оформлен ${date}`,
+} as const;
 
 export const ORDER_TEXTS = {
   ORDER_NUMBER_PREFIX: '№',
@@ -28,4 +37,9 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [ORDER_STATUS.DELIVERED]: 'Доставлен',
   [ORDER_STATUS.CANCELLED]: 'Отменён',
   [ORDER_STATUS.REJECTED]: 'Отклонён',
+};
+
+export const STAFF_ORDER_STATUS_LABELS: Partial<Record<OrderStatus, string>> = {
+  [ORDER_STATUS.PENDING]: 'Ждёт оплаты',
+  [ORDER_STATUS.AWAITING_MANUAL_ASSIGNMENT]: 'Ждёт назначения',
 };

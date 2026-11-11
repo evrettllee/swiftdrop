@@ -1,30 +1,30 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { COURIER_SOCKET_EVENTS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import type { CourierLocationEvent } from '../../../src/modules/couriers/types/couriers-socket.types';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { OpenSockets, placeConfirmedOrder } from '../../support/chat';
-import { type Cookies, SECOND_CLIENT, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import type { CourierLocationEvent } from '@/modules/couriers/types/courier-location.types';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { OpenSockets, placeConfirmedOrder } from '@test/support/chat';
+import { type Cookies, SECOND_CLIENT, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 import {
   collectEvents,
   joinOrderRoom,
   listenTestApp,
   roundTrip,
   waitForEvent,
-} from '../../support/sockets';
+} from '@test/support/sockets';
 import {
   assignTrackedCourier,
   readCourierProfile,
   REPORTED_POINT,
   sendLocation,
-} from '../../support/tracking';
+} from '@test/support/tracking';
 
-const LOCATION_EVENT = COURIER_SOCKET_EVENTS.COURIER_LOCATION;
+const LOCATION_EVENT = SOCKET_EVENTS.COURIER_LOCATION;
 
 // Negative checks wait for a round trip of the socket that must stay silent: the room gets the
 // position right after the acknowledgement of the courier, before the server reads the next packet.

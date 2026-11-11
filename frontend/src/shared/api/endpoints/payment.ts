@@ -12,10 +12,12 @@ export const PAYMENT_STATUS = {
   REFUNDED: 'refunded',
 } as const;
 
+const CHECKOUT_PROTOCOL = /^https$/;
+
 // Response of POST /api/payments
 export const startedPaymentSchema = z.object({
   paymentId: z.number(),
-  checkoutUrl: z.string(),
+  checkoutUrl: z.url({ protocol: CHECKOUT_PROTOCOL }),
 });
 
 export type StartedPayment = z.infer<typeof startedPaymentSchema>;

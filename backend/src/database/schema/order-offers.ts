@@ -5,13 +5,14 @@ import {
   integer,
   pgEnum,
   pgTable,
+  smallint,
   timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import {
   ORDER_OFFER_STATUS,
   ORDER_OFFER_STATUS_VALUES,
-} from '../../common/enums/order-offer-status.enum';
+} from '@/common/enums/order-offer-status.enum';
 import { sqlLiteral } from '../sql-literal';
 import { courierProfiles } from './courier-profiles';
 import { orders } from './orders';
@@ -34,11 +35,18 @@ export const orderOffers = pgTable(
     respondedAt: timestamp({ withTimezone: true }),
     pickupEtaSec: integer().notNull(),
     totalEtaSec: integer().notNull(),
+    round: smallint().notNull().default(1),
   },
   (table) => [
     index('order_offers_courier_id_idx').on(table.courierId),
-    // An order is offered to the same courier at most once; also serves lookups by order.
-    uniqueIndex('order_offers_order_courier_uidx').on(table.orderId, table.courierId),
+    index('order_offers_offered_at_idx').on(table.offeredAt),
+    // An order is offered to the same courier at most once a round; also serves lookups by order.
+    uniqueIndex('order_offers_order_courier_round_uidx').on(
+      table.orderId,
+      table.courierId,
+      table.round,
+    ),
+    check('order_offers_round_check', sql`${table.round} >= 1`),
     // One open offer per order and per courier, one courier who accepted an order.
     uniqueIndex('order_offers_one_pending_per_order_uidx')
       .on(table.orderId)

@@ -1,15 +1,14 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
-import { MS_PER_MINUTE } from '../../src/common/constants/time.constants';
-import type { GeoPoint } from '../../src/common/schemas/geo-point.schema';
-import type { Database } from '../../src/database/database.module';
-import { courierProfiles } from '../../src/database/schema';
-import { COURIER_SOCKET_EVENTS } from '../../src/modules/couriers/constants/couriers-socket.constants';
-import type { LocationAck } from '../../src/modules/couriers/types/couriers-socket.types';
-import { ORDER_ROOM_EVENTS } from '../../src/modules/tracking/constants/tracking.constants';
-import { OrderEtaDataService } from '../../src/modules/tracking/services/order-eta-data.service';
-import type { OrderStatusEvent } from '../../src/modules/tracking/types/tracking.types';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { Database } from '@/database/database.module';
+import { courierProfiles } from '@/database/schema';
+import type { LocationAck } from '@/modules/couriers/types/courier-location.types';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { OrderEtaDataService } from '@/modules/tracking/services/order-eta-data.service';
+import type { OrderStatusEvent } from '@/modules/tracking/types/tracking.types';
 import { assignCourier, type OpenSockets } from './chat';
 import { placeCourierAt } from './couriers';
 import { MINSK_DELIVERY, MINSK_PICKUP } from './fixtures';
@@ -22,7 +21,7 @@ export function sendLocation(
   socket: Socket,
   point: GeoPoint = REPORTED_POINT,
 ): Promise<LocationAck> {
-  return emitWithAck<LocationAck>(socket, COURIER_SOCKET_EVENTS.LOCATION_UPDATE, point);
+  return emitWithAck<LocationAck>(socket, SOCKET_EVENTS.LOCATION_UPDATE, point);
 }
 
 // The courier of the order, whose last position is old enough for the next one to be taken.
@@ -54,7 +53,7 @@ export async function watchOrderStatus(
 
   return {
     socket,
-    events: collectEvents<OrderStatusEvent>(socket, ORDER_ROOM_EVENTS.ORDER_STATUS),
+    events: collectEvents<OrderStatusEvent>(socket, SOCKET_EVENTS.ORDER_STATUS),
   };
 }
 

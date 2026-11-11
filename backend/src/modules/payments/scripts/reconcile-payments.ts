@@ -1,9 +1,9 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { ENV_FILE_PATH } from '../../../config/env.constants';
-import { validateEnv } from '../../../config/env.validation';
-import { DatabaseModule } from '../../../database/database.module';
+import { ENV_FILE_PATH } from '@/config/env.constants';
+import { validateEnv } from '@/config/env.validation';
+import { DatabaseModule } from '@/database/database.module';
 import { PaymentsModule } from '../payments.module';
 import { PaymentReconciliationService } from '../services/payment-reconciliation.service';
 

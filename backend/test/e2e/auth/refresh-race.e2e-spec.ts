@@ -1,9 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { createTestApp } from '../../support/app';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { createTestApp } from '@test/support/app';
 import {
   COOKIE_HEADER,
   endRefreshGraceWindow,
@@ -12,9 +12,9 @@ import {
   refreshCookie,
   registerUser,
   validRegistration,
-} from '../../support/auth';
-import { resetTestData } from '../../support/database';
-import { sortedStatuses } from '../../support/http';
+} from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
+import { sortedStatuses } from '@test/support/http';
 
 const PARALLEL_TABS = 2;
 

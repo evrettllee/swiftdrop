@@ -1,19 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OSRM_PROFILE } from '../../../src/integrations/osrm/constants/osrm.constants';
-import { PRICING_ERROR_MESSAGES } from '../../../src/modules/pricing/constants/pricing.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import { PRICING_ERROR_MESSAGES } from '@/modules/pricing/constants/pricing.constants';
 import {
   ROUTE_PREVIEW_ROUTES,
   ROUTE_SEGMENT_KIND,
-} from '../../../src/modules/routing/constants/routing.constants';
-import { accessCookie, COOKIE_HEADER, registerUser } from '../../support/auth';
-import { CAR, COURIER_ACCOUNT } from '../../support/couriers';
-import { addCourierSession } from '../../support/assignment';
-import { MINSK_DELIVERY, MINSK_PICKUP, MOSCOW } from '../../support/fixtures';
-import { postApi } from '../../support/http';
-import type { Cookies } from '../../support/orders';
+} from '@/modules/routing/constants/routing.constants';
+import { accessCookie, COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { CAR, COURIER_ACCOUNT } from '@test/support/couriers';
+import { addCourierSession } from '@test/support/assignment';
+import { MINSK_DELIVERY, MINSK_PICKUP, MOSCOW } from '@test/support/fixtures';
+import { postApi } from '@test/support/http';
+import type { Cookies } from '@test/support/orders';
 import {
   COURIER_POINT,
   createRoutingMocks,
@@ -21,7 +21,7 @@ import {
   failRouting,
   lineThrough,
   resetRouting,
-} from '../../support/routing';
+} from '@test/support/routing';
 
 const PREVIEW_PATH = `${ROUTE_PREVIEW_ROUTES.BASE}/${ROUTE_PREVIEW_ROUTES.PREVIEW}`;
 const VALID_POINTS = { pickup: MINSK_PICKUP, delivery: MINSK_DELIVERY };

@@ -2,21 +2,22 @@ import { ConflictException, Inject, Injectable, Logger, NotFoundException } from
 import { and, eq } from 'drizzle-orm';
 import {
   ORDERS_ONE_ACTIVE_PER_COURIER_INDEX,
+  ROW_LOCK_NO_KEY_UPDATE,
   SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { withLockConflict } from '../../../common/database/lock-conflict';
+} from '@/common/constants/database.constants';
+import { withLockConflict } from '@/common/database/lock-conflict';
 import {
   type OrderTransaction,
   transitionOrderStatus,
-} from '../../../common/database/order-status-transition';
-import { getUniqueViolationConstraint } from '../../../common/database/pg-errors';
-import { ORDER_OFFER_STATUS } from '../../../common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { orderOffers } from '../../../database/schema';
-import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
-import { OrderTransactionsService } from '../../tracking/services/order-transactions.service';
+} from '@/common/database/order-status-transition';
+import { getUniqueViolationConstraint } from '@/common/database/pg-errors';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { orderOffers, orders } from '@/database/schema';
+import { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
+import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import { ASSIGNMENT_ERROR_MESSAGES } from '../constants/assignment.constants';
 import { openOfferOf } from '../utils/open-offer';
 import { OfferNotifierService } from './offer-notifier.service';
@@ -92,6 +93,15 @@ export class OfferResponsesService {
     now: Date,
   ): Promise<{ orderId: number }> {
     const { tx } = orderTx;
+    const offerOrderId = await this.findOfferOrder(tx, courierProfileId, offerId);
+
+    await tx
+      .select({ orderId: orders.orderId })
+      .from(orders)
+      .where(eq(orders.orderId, offerOrderId))
+      .limit(SINGLE_ROW_LIMIT)
+      .for(ROW_LOCK_NO_KEY_UPDATE);
+
     const [offer] = await tx
       .update(orderOffers)
       .set({ status: ORDER_OFFER_STATUS.ACCEPTED, respondedAt: now })
@@ -121,6 +131,24 @@ export class OfferResponsesService {
     }
 
     return { orderId: offer.orderId };
+  }
+
+  private async findOfferOrder(
+    tx: Transaction,
+    courierProfileId: number,
+    offerId: number,
+  ): Promise<number> {
+    const [offer] = await tx
+      .select({ orderId: orderOffers.orderId })
+      .from(orderOffers)
+      .where(and(eq(orderOffers.offerId, offerId), eq(orderOffers.courierId, courierProfileId)))
+      .limit(SINGLE_ROW_LIMIT);
+
+    if (!offer) {
+      throw new NotFoundException(ASSIGNMENT_ERROR_MESSAGES.OFFER_NOT_FOUND);
+    }
+
+    return offer.orderId;
   }
 
   // An offer of this courier that is still open; a second answer waits for the first one and then

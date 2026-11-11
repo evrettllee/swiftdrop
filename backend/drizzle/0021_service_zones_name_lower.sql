@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "service_zones_name_lower_uidx" ON "service_zones" USING btree (lower("name"));

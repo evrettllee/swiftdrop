@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/button';
 import { PageTitle } from '@/shared/ui/page-title';
 import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { PROFILE_TEXTS } from '../config/texts';
+import { SupportRow } from './SupportRow';
 
 // A temporary profile: the full page comes with the addresses. The theme is chosen here,
 // as the design system says, and the user signs out here.
@@ -18,6 +19,7 @@ export function ProfilePage() {
       <p className="text-small text-fg-secondary">
         {PROFILE_TEXTS.PROFILE_EMAIL}: {user?.email}
       </p>
+      <SupportRow role={user?.role} />
       <div className="flex items-center justify-between gap-4">
         <span>{PROFILE_TEXTS.PROFILE_THEME}</span>
         <ThemeToggle />

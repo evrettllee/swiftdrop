@@ -1,21 +1,19 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { sql } from 'drizzle-orm';
 import { Socket as ServerSocket } from 'socket.io';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import {
-  COURIER_SOCKET_EVENTS,
-  orderRoom,
-} from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { OrderRoomsService } from '../../../src/modules/couriers/services/order-rooms.service';
-import { SocketSessionTimersService } from '../../../src/modules/realtime/services/socket-session-timers.service';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { placeConfirmedOrder } from '../../support/chat';
-import { commitOnceBlocked } from '../../support/locks';
-import { resetServiceArea } from '../../support/pricing';
-import { connectAppSocket, listenTestApp } from '../../support/sockets';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { orderRoom } from '@/modules/realtime/constants/realtime.constants';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { OrderRoomsService } from '@/modules/realtime/services/order-rooms.service';
+import { SocketSessionTimersService } from '@/modules/realtime/services/socket-session-timers.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { placeConfirmedOrder } from '@test/support/chat';
+import { commitOnceBlocked } from '@test/support/locks';
+import { resetServiceArea } from '@test/support/pricing';
+import { connectAppSocket, listenTestApp } from '@test/support/sockets';
 
 describe('Joining an order room while the socket closes (e2e)', () => {
   let app: NestExpressApplication;
@@ -55,7 +53,7 @@ describe('Joining an order room while the socket closes (e2e)', () => {
       db,
       (tx) => tx.execute(sql`lock table orders in access exclusive mode`),
       async () => {
-        socket.emit(COURIER_SOCKET_EVENTS.ORDER_JOIN, { orderId });
+        socket.emit(SOCKET_EVENTS.ORDER_JOIN, { orderId });
       },
       async () => {
         socket.close();

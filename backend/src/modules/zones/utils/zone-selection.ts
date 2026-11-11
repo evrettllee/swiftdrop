@@ -1,5 +1,5 @@
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { GEOJSON_POLYGON_TYPE } from '../constants/zones.constants';
 import type { ServiceZoneMatch, ZoneCandidate } from '../types/zones.types';
 

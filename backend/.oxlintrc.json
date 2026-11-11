@@ -5,6 +5,17 @@
     "typescript/no-floating-promises": "error",
     "typescript/await-thenable": "error",
     "typescript/no-misused-promises": "error",
+    "eslint/no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["../../*", "../../**"],
+            "message": "Use the @/ or @test/ alias for imports outside the current module."
+          }
+        ]
+      }
+    ],
     "eslint/max-lines": ["error", { "max": 150, "skipBlankLines": true, "skipComments": true }],
     "eslint/max-lines-per-function": [
       "error",

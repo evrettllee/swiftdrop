@@ -1,8 +1,9 @@
 import { DatabaseError } from 'pg';
 import {
+  PG_DEADLOCK_DETECTED_CODE,
   PG_LOCK_NOT_AVAILABLE_CODE,
   PG_UNIQUE_VIOLATION_CODE,
-} from '../constants/database.constants';
+} from '@/common/constants/database.constants';
 
 // The Postgres error somewhere in the chain of causes (the query builder wraps the driver error).
 function findDatabaseError(error: unknown, code: string): DatabaseError | null {
@@ -26,4 +27,8 @@ export function getUniqueViolationConstraint(error: unknown): string | null {
 // A statement waited for a row lock longer than lock_timeout (DB_LOCK_TIMEOUT_MS) allows.
 export function isLockTimeout(error: unknown): boolean {
   return findDatabaseError(error, PG_LOCK_NOT_AVAILABLE_CODE) !== null;
+}
+
+export function isDeadlock(error: unknown): boolean {
+  return findDatabaseError(error, PG_DEADLOCK_DETECTED_CODE) !== null;
 }

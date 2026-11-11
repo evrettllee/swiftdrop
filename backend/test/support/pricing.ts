@@ -1,6 +1,6 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import type { Database } from '../../src/database/database.module';
-import { PRICING_ROUTES } from '../../src/modules/pricing/constants/pricing.constants';
+import type { Database } from '@/database/database.module';
+import { PRICING_ROUTES } from '@/modules/pricing/constants/pricing.constants';
 import { resetTestData, seedServiceArea } from './database';
 import { MINSK_DELIVERY, MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from './fixtures';
 import { postApi } from './http';

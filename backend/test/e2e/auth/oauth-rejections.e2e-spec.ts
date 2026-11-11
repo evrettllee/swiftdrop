@@ -1,13 +1,13 @@
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { OAUTH_ERROR_MESSAGES } from '../../../src/modules/auth/constants/oauth.constants';
-import { AuthService } from '../../../src/modules/auth/services/auth.service';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { registerUser, validRegistration, buildOAuthProfile } from '../../support/auth';
-import { createTestApp } from '../../support/app';
-import { resetTestData } from '../../support/database';
-import { blockUser, findLinks, findUsers } from '../../support/users';
+import { OAUTH_ERROR_MESSAGES } from '@/modules/auth/constants/oauth.constants';
+import { AuthService } from '@/modules/auth/services/auth.service';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { registerUser, validRegistration, buildOAuthProfile } from '@test/support/auth';
+import { createTestApp } from '@test/support/app';
+import { resetTestData } from '@test/support/database';
+import { blockUser, findLinks, findUsers } from '@test/support/users';
 
 describe('OAuth login (e2e)', () => {
   let app: NestExpressApplication;

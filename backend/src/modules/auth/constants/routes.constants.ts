@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDER } from '../../../common/enums/oauth-provider.enum';
+import { OAUTH_PROVIDER } from '@/common/enums/oauth-provider.enum';
 
 const CALLBACK_SEGMENT = 'callback';
 

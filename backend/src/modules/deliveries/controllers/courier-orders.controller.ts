@@ -9,17 +9,17 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
-import { ROLE } from '../../../common/enums/role.enum';
-import { ZodValidationPipe } from '../../../common/pipes/zod-validation.pipe';
-import { CurrentUser } from '../../auth/decorators/current-user.decorator';
-import { Roles } from '../../auth/decorators/roles.decorator';
-import type { AuthUser } from '../../auth/types/auth.types';
-import { CourierProfilesService } from '../../couriers/services/courier-profiles.service';
-import { type OrderIdParamDto, orderIdParamSchema } from '../../orders/dto/order-id-param.dto';
-import { ROUTING_THROTTLE } from '../../routing/constants/routing.constants';
-import { RouteLinesService } from '../../routing/services/route-lines.service';
-import type { RouteLines } from '../../routing/types/routing.types';
+import { ROLE } from '@/common/enums/role.enum';
+import { UserThrottle } from '@/common/guards/user-throttle.guard';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
+import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+import { Roles } from '@/modules/auth/decorators/roles.decorator';
+import type { AuthUser } from '@/modules/auth/types/auth.types';
+import { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
+import { type OrderIdParamDto, orderIdParamSchema } from '@/modules/orders/dto/order-id-param.dto';
+import { ROUTING_THROTTLE } from '@/modules/routing/constants/routing.constants';
+import { RouteLinesService } from '@/modules/routing/services/route-lines.service';
+import type { RouteLines } from '@/modules/routing/types/routing.types';
 import {
   COURIER_ORDERS_ROUTES,
   DELIVERIES_ERROR_MESSAGES,
@@ -56,12 +56,12 @@ export class CourierOrdersController {
   async current(@CurrentUser() user: AuthUser): Promise<CurrentCourierOrder> {
     const courierProfileId = await this.profiles.getProfileId(user.userId);
 
-    return { order: await this.views.findActive(courierProfileId) };
+    return { order: await this.views.findCurrent(courierProfileId, user.userId) };
   }
 
   // Before the pickup: to the pickup point and on to the recipient; after it: to the recipient.
   @Get(COURIER_ORDERS_ROUTES.CURRENT_ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   async currentRoute(@CurrentUser() user: AuthUser): Promise<RouteLines> {
     const courierProfileId = await this.profiles.getProfileId(user.userId);
     const order = await this.views.findActive(courierProfileId);
@@ -123,7 +123,7 @@ export class CourierOrdersController {
 
   // The trip of the parcel of a finished order, by the vehicle of the courier.
   @Get(COURIER_ORDERS_ROUTES.ORDER_ROUTE)
-  @Throttle(ROUTING_THROTTLE)
+  @UserThrottle(ROUTING_THROTTLE)
   async finishedRoute(
     @CurrentUser() user: AuthUser,
     @Param(new ZodValidationPipe(orderIdParamSchema)) params: OrderIdParamDto,

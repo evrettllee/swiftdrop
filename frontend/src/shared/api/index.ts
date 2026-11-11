@@ -29,13 +29,21 @@ export {
 } from './endpoints/courier-offer';
 export type { ClientOrderCourier } from './endpoints/client-order-courier';
 export { clientOrderCourierSchema } from './endpoints/client-order-courier';
-export type { CourierHistoryItem, CourierHistoryOrder } from './endpoints/courier-history';
+export type {
+  CourierHistoryCursorPage,
+  CourierHistoryItem,
+  CourierHistoryOrder,
+  CourierHistoryPage,
+  CourierHistorySummary,
+} from './endpoints/courier-history';
 export {
+  courierHistoryCursorPageSchema,
   courierHistoryItemSchema,
   courierHistoryOrderSchema,
+  getCourierHistoryOrder,
   courierHistoryPageSchema,
 } from './endpoints/courier-history';
-export type { CourierOrder } from './endpoints/courier-order';
+export type { CourierOrder, CurrentCourierOrder } from './endpoints/courier-order';
 export {
   COURIER_ORDERS_API_PATHS,
   courierOrderSchema,
@@ -61,7 +69,14 @@ export {
   GEOCODING_MIN_QUERY_LENGTH,
 } from './endpoints/geocoding/geocoding-params';
 export { findAddressByPoint, searchAddresses } from './endpoints/geocoding/search-addresses';
-export type { OrderDetails, OrderListItem, OrderStatus } from './endpoints/order';
+export type {
+  OrderDetails,
+  OrderListItem,
+  OrderStatus,
+  OrderSupportTicket,
+} from './endpoints/order';
+export type { SupportTicketStatus } from './endpoints/support-ticket';
+export { SUPPORT_TICKET_STATUS, supportTicketStatusSchema } from './endpoints/support-ticket';
 export {
   dateSchema,
   ORDER_CANCEL_SEGMENT,
@@ -71,6 +86,7 @@ export {
   orderListItemSchema,
   ORDERS_API_PATHS,
   orderStatusSchema,
+  orderSupportTicketSchema,
 } from './endpoints/order';
 export { PAYMENT_STATUS, startPayment } from './endpoints/payment';
 export type { PackageParams, PriceEstimate } from './endpoints/pricing';
@@ -87,6 +103,8 @@ export {
   ROUTING_API_PATHS,
   routeLinesSchema,
 } from './endpoints/routing';
+export type { DownloadedFile } from './download';
+export { downloadFile } from './download';
 export type { HttpOptions } from './http';
 export {
   ApiError,

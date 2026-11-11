@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
 import {
   DELIVERIES_ERROR_MESSAGES,
   DELIVERY_CODE_LOCK_MINUTES,

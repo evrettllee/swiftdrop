@@ -2,10 +2,10 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
-import { DB_CASING } from '../../src/database/database.constants';
-import type { Database } from '../../src/database/database.module';
-import * as schema from '../../src/database/schema';
-import { seedRoles } from '../../src/database/seed-steps';
+import { DB_CASING } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import * as schema from '@/database/schema';
+import { seedRoles } from '@/database/seed-steps';
 import {
   MIGRATIONS_FOLDER,
   TEST_DB_NAME_SUFFIX,
@@ -38,7 +38,9 @@ async function assertTestDatabase(db: Database): Promise<void> {
 
 export async function resetTestData(db: Database): Promise<void> {
   await assertTestDatabase(db);
-  await db.execute(sql`TRUNCATE TABLE users, tariffs, service_zones RESTART IDENTITY CASCADE`);
+  await db.execute(
+    sql`TRUNCATE TABLE users, tariffs, service_zones, exchange_rates RESTART IDENTITY CASCADE`,
+  );
 }
 
 // One active tariff and one active zone that covers the central Minsk test points.

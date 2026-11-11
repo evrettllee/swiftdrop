@@ -7,6 +7,7 @@ import { chatMessage, createChatBackend, stubChatBackend } from './support/chat-
 import { LIVE_ORDER_ID, openLiveOrder, stubLiveOrder } from './support/live-order';
 import { COURIER_PHONE } from './support/order-details';
 import { PARCEL_SEGMENT, stubClientOrderRoute } from './support/routing';
+import { fixClock, fromFixedNow } from './support/clock';
 
 const MINUTE = 60_000;
 const PHONE = { width: 375, height: 812 };
@@ -20,9 +21,14 @@ function orderMap(page: Page) {
   return page.getByRole('region', { name: MAP_TEXTS.VIEW_LABEL });
 }
 
-async function stubCourierOnMap(page: Page, isStale: boolean, pickupEtaAt: Date | null) {
+async function stubCourierOnMap(
+  page: Page,
+  isStale: boolean,
+  pickupEtaAt: Date | null,
+  updatedAt = new Date(),
+) {
   await stubClientOrderRoute(page, LIVE_ORDER_ID, () => [PARCEL_SEGMENT], {
-    courierPosition: { ...COURIER_POINT, updatedAt: new Date(), isStale },
+    courierPosition: { ...COURIER_POINT, updatedAt, isStale },
     pickupEtaAt,
   });
 }
@@ -43,9 +49,10 @@ test('should tell that the order waits for the payment above the route, without 
 test('should count the minutes to the pickup on the status line and on the marker', async ({
   page,
 }) => {
+  await fixClock(page);
   const order = await stubLiveOrder(page);
   order.status = ORDER_STATUS.COURIER_ASSIGNED;
-  await stubCourierOnMap(page, false, new Date(Date.now() + 6 * MINUTE + 30_000));
+  await stubCourierOnMap(page, false, fromFixedNow(6 * MINUTE + 30_000), fromFixedNow(0));
   await openLiveOrder(page, order);
 
   await expect(statusLine(page, 'Курьер приедет за посылкой через 7 мин')).toBeVisible();

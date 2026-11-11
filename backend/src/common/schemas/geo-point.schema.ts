@@ -5,7 +5,7 @@ import {
   LATITUDE_MIN,
   LONGITUDE_MAX,
   LONGITUDE_MIN,
-} from '../constants/geo.constants';
+} from '@/common/constants/geo.constants';
 
 export const geoPointSchema = z.object({
   latitude: z

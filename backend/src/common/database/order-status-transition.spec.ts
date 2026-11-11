@@ -1,5 +1,5 @@
-import type { Database, Transaction } from '../../database/database.module';
-import { ORDER_STATUS, type OrderStatus } from '../enums/order-status.enum';
+import type { Database, Transaction } from '@/database/database.module';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 import {
   type OrderStatusChange,
   runOrderTransaction,
@@ -54,9 +54,10 @@ describe('runOrderTransaction', () => {
     );
 
     expect(calls).toEqual(['update confirmed', 'commit', 'publish 1']);
-    expect(publish).toHaveBeenCalledWith([
-      { orderId: 1, status: ORDER_STATUS.CONFIRMED, estimatedDeliveryAt: ETA },
-    ]);
+    expect(publish).toHaveBeenCalledWith(
+      [{ orderId: 1, status: ORDER_STATUS.CONFIRMED, estimatedDeliveryAt: ETA }],
+      [],
+    );
   });
 
   it('should publish nothing when the transaction rolls back', async () => {
@@ -108,6 +109,61 @@ describe('runOrderTransaction', () => {
 
     await runOrderTransaction(fakeDatabase([]), () => Promise.resolve(), publish);
 
-    expect(publish).toHaveBeenCalledWith([]);
+    expect(publish).toHaveBeenCalledWith([], []);
   });
+});
+
+describe('transitionOrderStatus finish time', () => {
+  function recordingTransaction(sets: Record<string, unknown>[]) {
+    const tx = {
+      update: () => ({
+        set: (values: Record<string, unknown>) => {
+          sets.push(values);
+
+          return {
+            where: () => ({
+              returning: () =>
+                Promise.resolve([{ orderId: 1, status: values.status, estimatedDeliveryAt: null }]),
+            }),
+          };
+        },
+      }),
+      insert: () => ({ values: () => Promise.resolve() }),
+    } as unknown as Transaction;
+
+    return { tx, statusChanges: [], courierChanges: [] };
+  }
+
+  it.each([ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED])(
+    'should stamp the finish time when the order becomes %s',
+    async (to) => {
+      const sets: Record<string, unknown>[] = [];
+
+      await transitionOrderStatus(recordingTransaction(sets), {
+        orderId: 1,
+        from: [],
+        to,
+        changedBy: null,
+      });
+
+      expect(sets[0]).toHaveProperty('finishedAt');
+      expect(sets[0].status).toBe(to);
+    },
+  );
+
+  it.each([ORDER_STATUS.CONFIRMED, ORDER_STATUS.COURIER_ASSIGNED, ORDER_STATUS.IN_TRANSIT])(
+    'should leave the finish time alone when the order becomes %s',
+    async (to) => {
+      const sets: Record<string, unknown>[] = [];
+
+      await transitionOrderStatus(recordingTransaction(sets), {
+        orderId: 1,
+        from: [],
+        to,
+        changedBy: null,
+      });
+
+      expect(sets[0]).not.toHaveProperty('finishedAt');
+    },
+  );
 });

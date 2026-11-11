@@ -1,4 +1,4 @@
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 
 export type CourierVehicle = {
   type: VehicleType;
@@ -28,4 +28,9 @@ export type CourierProfileRow = {
   brand: string | null;
   model: string | null;
   licensePlate: string | null;
+};
+
+export type CourierShiftEvent = {
+  courierProfileId: number;
+  isAvailable: boolean;
 };

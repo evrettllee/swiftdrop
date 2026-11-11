@@ -1,7 +1,7 @@
 import { hash } from '@node-rs/argon2';
 import { and, asc, eq, isNull } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../common/constants/database.constants';
-import { ROLE, ROLE_NAMES } from '../common/enums/role.enum';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { ROLE, ROLE_NAMES } from '@/common/enums/role.enum';
 import type { Database } from './database.module';
 import * as schema from './schema';
 import {

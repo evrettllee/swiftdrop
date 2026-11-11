@@ -1,23 +1,23 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS, type OrderStatus } from '../../../src/common/enums/order-status.enum';
-import { ROLE } from '../../../src/common/enums/role.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { CHAT_PAGE_SIZE_DEFAULT } from '../../../src/modules/chat/constants/chat.constants';
-import type { ChatHistory } from '../../../src/modules/chat/types/chat.types';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { ROLE } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { CHAT_PAGE_SIZE_DEFAULT } from '@/modules/chat/constants/chat.constants';
+import type { ChatHistory } from '@/modules/chat/types/chat.types';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
 import {
   assignCourier,
   getChatHistory,
   insertOrderMessages,
   placeConfirmedOrder,
   type TestMessage,
-} from '../../support/chat';
-import { type Cookies, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/chat';
+import { type Cookies, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 const FROM_CLIENT: TestMessage = { from: ROLE.CLIENT };
 const FROM_COURIER: TestMessage = { from: ROLE.COURIER };

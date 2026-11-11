@@ -1,10 +1,10 @@
-import type { VehicleType } from '../../../common/enums/vehicle-type.enum';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import type { OsrmProfile } from '../../../integrations/osrm/types/osrm.types';
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import type { OsrmProfile } from '@/integrations/osrm/types/osrm.types';
 import {
   COURIER_LOCATION_FRESH_MS,
   VEHICLE_ROUTING_PROFILE,
-} from '../../assignment/constants/assignment.constants';
+} from '@/modules/assignment/constants/assignment.constants';
 import { DEFAULT_ROUTING_PROFILE } from '../constants/routing.constants';
 import type { RoutingCourier, RoutingCourierRow } from '../types/routing.types';
 

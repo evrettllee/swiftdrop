@@ -12,7 +12,7 @@ import {
 import { orders } from './orders';
 import { supportTickets } from './support-tickets';
 import { users } from './users';
-import { MESSAGE_FIELD_LENGTH } from '../../common/constants/field-lengths.constants';
+import { MESSAGE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { sqlIntegerLiteral } from '../sql-literal';
 
 export const messages = pgTable(
@@ -24,9 +24,7 @@ export const messages = pgTable(
     senderId: integer()
       .notNull()
       .references(() => users.userId),
-    receiverId: integer()
-      .notNull()
-      .references(() => users.userId),
+    receiverId: integer().references(() => users.userId),
     orderId: integer().references(() => orders.orderId),
     ticketId: integer().references(() => supportTickets.ticketId),
     content: text(),
@@ -55,6 +53,10 @@ export const messages = pgTable(
     index('messages_unread_idx')
       .on(table.receiverId, table.orderId)
       .where(sql`${table.isRead} = false AND ${table.orderId} IS NOT NULL`),
-    index('messages_ticket_id_idx').on(table.ticketId),
+    check(
+      'messages_order_receiver_check',
+      sql`${table.orderId} IS NULL OR ${table.receiverId} IS NOT NULL`,
+    ),
+    index('messages_ticket_id_message_id_idx').on(table.ticketId, table.messageId),
   ],
 );

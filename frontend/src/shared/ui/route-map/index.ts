@@ -1,7 +1,16 @@
 export { AreaMap } from './AreaMap';
 export { CourierEtaMarker } from './CourierEtaMarker';
 export { CourierRouteMap } from './CourierRouteMap';
+export { MapAnchoredPanel } from './MapAnchoredPanel';
+export { PIN_TONE, type PinTone } from './map-pin';
+export { MarkersMap } from './MarkersMap';
+export { MovableMapFrame } from './MovableMapFrame';
+export { AREAS_FIT_PADDING } from './useFitOnce';
+export { PinMarker } from './PinMarker';
 export { PositionMap } from './PositionMap';
 export { RouteMap } from './RouteMap';
 export { RouteMapView } from './RouteMapView';
+export { RouteOverlay } from './RouteOverlay';
 export { SearchPulse } from './SearchPulse';
+export { useMovableMap } from './useMovableMap';
+export { ZonePolygon } from './ZonePolygon';

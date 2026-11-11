@@ -1,5 +1,7 @@
+import { setTimeout as delay } from 'node:timers/promises';
 import { type APIRequestContext, expect, type Page, test } from '@playwright/test';
 import { AUTH_TEXTS } from '../../src/pages/auth/config/texts';
+import { AUTH_API_PATHS } from '../../src/shared/api/endpoints/auth';
 import { COURIERS_API_PATHS, type CourierMe } from '../../src/shared/api/endpoints/courier';
 import {
   API_BASE_PATH,
@@ -7,7 +9,6 @@ import {
   CSRF_HEADER_VALUE,
 } from '../../src/shared/api/request-config';
 import { APP_ROUTES } from '../../src/shared/routes/app-routes';
-import { readSavedCourierCookies } from './courier-session';
 
 // Couriers are not registered through the API: the account comes from the seed of the backend,
 // and its email and password are given to the tests through these variables.
@@ -35,18 +36,37 @@ export async function signInAsCourierByForm(page: Page): Promise<void> {
   await page.getByRole('button', { name: AUTH_TEXTS.SUBMIT_LOGIN, exact: true }).click();
 }
 
-// Opens the cabinet signed in as the courier, with the session the global setup saved (the sign-in
-// of the backend is rate-limited); without a saved session it signs in through the form.
-export async function signInAsCourier(page: Page): Promise<void> {
-  const cookies = readSavedCourierCookies();
+const COURIER_LOGIN_URL = `${API_BASE_PATH}${AUTH_API_PATHS.LOGIN}`;
+const HTTP_TOO_MANY_REQUESTS = 429;
+const RETRY_AFTER_HEADER = 'retry-after';
+const DEFAULT_RETRY_AFTER_SECONDS = 60;
+const MAX_SIGN_IN_ATTEMPTS = 3;
+const MS_PER_SECOND = 1000;
 
-  if (cookies === null) {
-    await signInAsCourierByForm(page);
+export async function signInCourierByApi(request: APIRequestContext): Promise<void> {
+  for (let attempt = 1; attempt <= MAX_SIGN_IN_ATTEMPTS; attempt += 1) {
+    const response = await request.post(COURIER_LOGIN_URL, {
+      headers: { [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE },
+      data: { email: COURIER_EMAIL, password: COURIER_PASSWORD },
+    });
 
-    return;
+    if (response.status() !== HTTP_TOO_MANY_REQUESTS || attempt === MAX_SIGN_IN_ATTEMPTS) {
+      expect(response.ok(), `The courier signed in (status ${response.status()})`).toBe(true);
+
+      return;
+    }
+
+    const retryAfter = Number(
+      response.headers()[RETRY_AFTER_HEADER] ?? DEFAULT_RETRY_AFTER_SECONDS,
+    );
+    await delay(
+      (Number.isFinite(retryAfter) ? retryAfter : DEFAULT_RETRY_AFTER_SECONDS) * MS_PER_SECOND,
+    );
   }
+}
 
-  await page.context().addCookies(cookies);
+export async function signInAsCourier(page: Page): Promise<void> {
+  await signInCourierByApi(page.request);
   await page.goto(APP_ROUTES.COURIER_WORK);
 }
 

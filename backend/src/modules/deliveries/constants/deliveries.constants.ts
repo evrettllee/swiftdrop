@@ -1,12 +1,14 @@
+import { LIST_VALIDATION_MESSAGES } from '@/common/constants/list.constants';
 import {
   COURIER_ACTIVE_ORDER_STATUSES,
+  COURIER_HISTORY_STATUSES,
   ORDER_BUSY_MESSAGE,
   ORDER_NOT_FOUND_MESSAGE,
-} from '../../../common/constants/orders.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { ORDER_STATUS, type OrderStatus } from '../../../common/enums/order-status.enum';
-import { ORDER_ID_ROUTE_PARAM } from '../../orders/constants/orders.constants';
-import { ROUTE_PATH_SEGMENT } from '../../routing/constants/routing.constants';
+} from '@/common/constants/orders.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { ORDER_ID_ROUTE_PARAM } from '@/modules/orders/constants/orders.constants';
+import { ROUTE_PATH_SEGMENT } from '@/modules/routing/constants/routing.constants';
 
 // Routes
 export const COURIER_ORDERS_ROUTES = {
@@ -77,15 +79,9 @@ export const DELIVERY_CODE_VISIBLE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.IN_TRANSIT,
 ];
 
-// The courier's last name is cut to its first letter and this mark.
-export const LAST_NAME_INITIAL_MARK = '.';
-
 // History
 // Orders that ended while they were with the courier.
-export const HISTORY_STATUSES: readonly OrderStatus[] = [
-  ORDER_STATUS.DELIVERED,
-  ORDER_STATUS.CANCELLED,
-];
+export const HISTORY_STATUSES: readonly OrderStatus[] = COURIER_HISTORY_STATUSES;
 // The stages of an order the courier took part in: a finished order shows only these.
 export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.COURIER_ASSIGNED,
@@ -94,16 +90,26 @@ export const COURIER_STAGE_STATUSES: readonly OrderStatus[] = [
   ORDER_STATUS.DELIVERED,
   ORDER_STATUS.CANCELLED,
 ];
-export const HISTORY_FIRST_PAGE = 1;
-export const HISTORY_PAGE_SIZE_MIN = 1;
-export const HISTORY_PAGE_SIZE_DEFAULT = 10;
-export const HISTORY_PAGE_SIZE_MAX = 50;
+export const HISTORY_PAGE_SIZE_DEFAULT = 20;
+
+export const HISTORY_SORT_KEY = {
+  ID: 'id',
+  FINISHED_AT: 'finishedAt',
+  DISTANCE_KM: 'distanceKm',
+} as const;
+
+export const HISTORY_NUMBER_SEARCH = /^\d+$/;
+export const HISTORY_DISTANCE_DECIMALS = 1;
+export const HISTORY_VALIDATION_MESSAGES = {
+  SEARCH_NOT_NUMBER: 'Введите номер заказа цифрами',
+  STATUS_INVALID: 'Статус истории: delivered или cancelled',
+} as const;
 
 // Validation
 export const DELIVERIES_VALIDATION_MESSAGES = {
   CODE_INVALID: `Введите ${DELIVERY_CODE_LENGTH} цифры кода`,
-  PAGE_INVALID: 'Некорректный номер страницы',
-  LIMIT_INVALID: `Размер страницы: от ${HISTORY_PAGE_SIZE_MIN} до ${HISTORY_PAGE_SIZE_MAX}`,
+  PAGE_INVALID: LIST_VALIDATION_MESSAGES.PAGE_INVALID,
+  LIMIT_INVALID: LIST_VALIDATION_MESSAGES.LIMIT_INVALID,
 } as const;
 
 // Errors

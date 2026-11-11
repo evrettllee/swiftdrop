@@ -1,0 +1,67 @@
+import { z } from 'zod';
+import { CALENDAR_PERIOD, type CalendarPeriod, isCalendarDate } from '@/shared/lib/calendar';
+import type { ListParamsConfig } from '@/shared/lib/list-params';
+import type { PeriodDraftOf } from '@/shared/ui/period-picker';
+import {
+  HISTORY_FIRST_PAGE,
+  HISTORY_PAGE_MAX,
+  HISTORY_SEARCH_PATTERN,
+  HISTORY_SORT,
+  HISTORY_STATUS,
+  type HistorySort,
+  type HistoryStatus,
+} from './list';
+
+const dateParam = z.string().refine(isCalendarDate);
+
+export type HistoryParams = {
+  period: CalendarPeriod;
+  from: string | null;
+  to: string | null;
+  q: string | null;
+  sort: HistorySort | null;
+  status: HistoryStatus | null;
+  page: number;
+};
+
+export const HISTORY_PARAMS_CONFIG: ListParamsConfig<HistoryParams> = {
+  schema: z.object({
+    period: z.enum(CALENDAR_PERIOD),
+    from: dateParam,
+    to: dateParam,
+    q: z.string().trim().regex(HISTORY_SEARCH_PATTERN),
+    sort: z.enum(HISTORY_SORT),
+    status: z.enum(HISTORY_STATUS),
+    page: z.coerce.number().int().min(HISTORY_FIRST_PAGE).max(HISTORY_PAGE_MAX),
+  }),
+  defaults: {
+    period: CALENDAR_PERIOD.THIS_WEEK,
+    from: null,
+    to: null,
+    q: null,
+    sort: null,
+    status: null,
+    page: HISTORY_FIRST_PAGE,
+  },
+  pageKey: 'page',
+  searchKey: 'q',
+};
+
+export const PERIOD_RESET: Partial<HistoryParams> = {
+  period: HISTORY_PARAMS_CONFIG.defaults.period,
+  from: null,
+  to: null,
+};
+
+export const DEFAULT_PERIOD_DRAFT: PeriodDraftOf<CalendarPeriod> & {
+  status: HistoryStatus | null;
+} = {
+  preset: HISTORY_PARAMS_CONFIG.defaults.period,
+  from: HISTORY_PARAMS_CONFIG.defaults.from,
+  to: HISTORY_PARAMS_CONFIG.defaults.to,
+  status: HISTORY_PARAMS_CONFIG.defaults.status,
+};
+
+export const STATUS_RESET: Partial<HistoryParams> = { status: null };
+
+export const FILTERS_RESET: Partial<HistoryParams> = { ...PERIOD_RESET, ...STATUS_RESET, q: null };

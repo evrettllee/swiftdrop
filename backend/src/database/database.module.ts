@@ -2,7 +2,7 @@ import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/c
 import { ConfigService } from '@nestjs/config';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { ENV_KEYS } from '../config/env.constants';
+import { ENV_KEYS } from '@/config/env.constants';
 import * as schema from './schema';
 import {
   DB_CASING,

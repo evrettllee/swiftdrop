@@ -1,12 +1,12 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { AUTH_ROUTES } from '../../../src/modules/auth/constants/routes.constants';
-import { CSRF_ERROR_MESSAGE, CSRF_HEADER_NAME } from '../../../src/common/constants/csrf.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/database/schema';
-import { createTestApp } from '../../support/app';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
+import { CSRF_ERROR_MESSAGE, CSRF_HEADER_NAME } from '@/common/constants/csrf.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { users } from '@/database/schema';
+import { createTestApp } from '@test/support/app';
 import {
   COOKIE_HEADER,
   getAuth,
@@ -15,8 +15,8 @@ import {
   refreshCookie,
   registerUser,
   validRegistration,
-} from '../../support/auth';
-import { resetTestData } from '../../support/database';
+} from '@test/support/auth';
+import { resetTestData } from '@test/support/database';
 
 const WRONG_HEADER_VALUE = 'something-else';
 

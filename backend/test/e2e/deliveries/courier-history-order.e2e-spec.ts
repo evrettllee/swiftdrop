@@ -1,25 +1,25 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS, type OrderStatus } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
 import {
   COURIER_ORDERS_ROUTES,
   DELIVERIES_ERROR_MESSAGES,
-} from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { addCourierOnShift, addCourierSession } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '../../support/couriers';
-import { ROUTE, SMALL_PACKAGE, VALID_ORDER } from '../../support/fixtures';
-import { COURIER_STAGES, finishOrder, historyOrderPath } from '../../support/history-orders';
-import { getApi } from '../../support/http';
-import { type Cookies, placeOrders } from '../../support/orders';
+} from '@/modules/deliveries/constants/deliveries.constants';
+import { addCourierOnShift, addCourierSession } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, CAR, COURIER_ACCOUNT, SECOND_COURIER_ACCOUNT } from '@test/support/couriers';
+import { ROUTE, SMALL_PACKAGE, VALID_ORDER } from '@test/support/fixtures';
+import { COURIER_STAGES, finishOrder, historyOrderPath } from '@test/support/history-orders';
+import { getApi } from '@test/support/http';
+import { type Cookies, placeOrders } from '@test/support/orders';
 import {
   COURIER_POINT,
   createRoutingMocks,
   createRoutingTestApp,
   resetRouting,
-} from '../../support/routing';
+} from '@test/support/routing';
 
 const MISSING_ORDER_ID = 999_999_999;
 

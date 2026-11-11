@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CHAT_SENDER_ROLE, chatMessageSchema, dateSchema, orderStatusSchema } from '@/shared/api';
-import { onSocketEvent } from './app-socket';
+import { onParsedSocketEvent } from './parsed-event';
 import { SOCKET_EVENTS } from './socket-events';
 
 // Where the line of the courier leads (the CourierLegTarget of the backend).
@@ -19,7 +19,7 @@ export type CourierLeg = z.infer<typeof courierLegSchema>;
 
 // The events of the room of an order, as the backend sends them. A courier never gets their own
 // courier:location.
-const ORDER_EVENT_SCHEMAS = {
+export const ORDER_EVENT_SCHEMAS = {
   // updatedAt: when the backend stored the position, by its clock.
   [SOCKET_EVENTS.COURIER_LOCATION]: z.object({
     orderId: z.number(),
@@ -48,6 +48,10 @@ const ORDER_EVENT_SCHEMAS = {
     readerRole: z.enum(CHAT_SENDER_ROLE),
     upToMessageId: z.number(),
   }),
+  [SOCKET_EVENTS.ORDER_COURIER]: z.object({
+    orderId: z.number(),
+    courierId: z.number().nullable(),
+  }),
 };
 
 type OrderEventSchemas = typeof ORDER_EVENT_SCHEMAS;
@@ -63,15 +67,5 @@ export function onOrderEvent<E extends OrderEvent>(
   event: E,
   handler: (payload: OrderEventPayload<E>) => void,
 ): () => void {
-  const schema = ORDER_EVENT_SCHEMAS[event];
-
-  return onSocketEvent(event, (payload) => {
-    const parsed = schema.safeParse(payload);
-
-    if (parsed.success) {
-      handler(parsed.data as OrderEventPayload<E>);
-    } else if (import.meta.env.DEV) {
-      console.warn(`Socket event ${event} dropped: ${parsed.error.message}`);
-    }
-  });
+  return onParsedSocketEvent<OrderEventPayload<E>>(event, ORDER_EVENT_SCHEMAS[event], handler);
 }

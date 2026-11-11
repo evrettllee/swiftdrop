@@ -1,16 +1,14 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import type { OrderStatus } from '../../src/common/enums/order-status.enum';
-import type { Database } from '../../src/database/database.module';
-import { orders } from '../../src/database/schema';
-import {
-  ORDER_ID_ROUTE_PARAM,
-  ORDERS_ROUTES,
-} from '../../src/modules/orders/constants/orders.constants';
+import type { OrderStatus } from '@/common/enums/order-status.enum';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { ORDER_ID_ROUTE_PARAM, ORDERS_ROUTES } from '@/modules/orders/constants/orders.constants';
 import { COOKIE_HEADER, type registerUser, validRegistration } from './auth';
 import { VALID_ORDER } from './fixtures';
 import { getApi, postApi } from './http';
+import { statusChange } from './order-status';
 
 export type Cookies = Awaited<ReturnType<typeof registerUser>>['cookies'];
 
@@ -68,7 +66,7 @@ export async function setOrderStatus(
   orderId: number,
   status: OrderStatus,
 ): Promise<void> {
-  await db.update(orders).set({ status }).where(eq(orders.orderId, orderId));
+  await db.update(orders).set(statusChange(status)).where(eq(orders.orderId, orderId));
 }
 
 export async function readOrderStatus(db: Database, orderId: number): Promise<OrderStatus> {

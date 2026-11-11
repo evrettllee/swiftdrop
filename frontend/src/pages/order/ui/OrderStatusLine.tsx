@@ -6,13 +6,12 @@ import {
   XCircleIcon,
 } from '@phosphor-icons/react';
 import { memo, useState } from 'react';
+import { type OrderTracking, useTrackingState } from '@/entities/order';
 import type { OrderDetails, OrderStatus } from '@/shared/api';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { getStatusLine, STATUS_LINE_ICON, type StatusLineIcon } from '../lib/status-line';
 import { getStatusLineAnchorMs } from '../lib/status-line-anchor';
-import type { OrderTracking } from '../model/order-tracking';
 import { useMinuteNow } from '../model/useMinuteNow';
-import { useTrackingState } from '../model/useOrderTracking';
 
 const ICONS: Record<StatusLineIcon, { icon: Icon; className: string }> = {
   [STATUS_LINE_ICON.CLOCK]: { icon: ClockIcon, className: 'text-warning' },

@@ -3,21 +3,21 @@ import { Logger, ServiceUnavailableException, HttpStatus } from '@nestjs/common'
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Response } from 'supertest';
-import { MS_PER_MINUTE } from '../../../src/common/constants/time.constants';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { PAYMENT_STATUS } from '../../../src/common/enums/payment-status.enum';
-import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { UNPAID_ORDER_TTL_MS } from '../../../src/modules/orders/constants/orders.constants';
-import { UnpaidOrdersService } from '../../../src/modules/orders/services/unpaid-orders.service';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { PAYMENT_EVENT } from '../../../src/modules/payments/constants/payments.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { LOCK_TEST_MARGIN_MS } from '../../support/constants';
-import { placeOrders, readOrderStatus } from '../../support/orders';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
+import { DB_LOCK_TIMEOUT_MS, DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { UNPAID_ORDER_TTL_MS } from '@/modules/orders/constants/orders.constants';
+import { UnpaidOrdersService } from '@/modules/orders/services/unpaid-orders.service';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENT_EVENT } from '@/modules/payments/constants/payments.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { LOCK_TEST_MARGIN_MS } from '@test/support/constants';
+import { placeOrders, readOrderStatus } from '@test/support/orders';
 import {
   CHECKOUT_SESSION,
   createGatewayMock,
@@ -26,8 +26,8 @@ import {
   readPaymentStatus,
   resetGatewayMock,
   WEBHOOK_SIGNATURE,
-} from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
 
 const PAYMENT_REF = 'pi_test_race';
 // Time for the webhook to mark the payment paid and reach the lock of the order row, which the

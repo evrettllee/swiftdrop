@@ -7,19 +7,16 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { and, eq } from 'drizzle-orm';
-import {
-  ROW_LOCK_NO_KEY_UPDATE,
-  SINGLE_ROW_LIMIT,
-} from '../../../common/constants/database.constants';
-import { isLockTimeout } from '../../../common/database/pg-errors';
-import { ORDER_NOT_FOUND_MESSAGE } from '../../../common/constants/orders.constants';
-import { MS_PER_MINUTE } from '../../../common/constants/time.constants';
-import { ORDER_STATUS } from '../../../common/enums/order-status.enum';
-import { ENV_KEYS } from '../../../config/env.constants';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database, Transaction } from '../../../database/database.module';
-import { orders } from '../../../database/schema';
-import { NbrbService } from '../../../integrations/nbrb/services/nbrb.service';
+import { ROW_LOCK_NO_KEY_UPDATE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { isLockConflict } from '@/common/database/lock-conflict';
+import { ORDER_NOT_FOUND_MESSAGE } from '@/common/constants/orders.constants';
+import { MS_PER_MINUTE } from '@/common/constants/time.constants';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { ENV_KEYS } from '@/config/env.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { orders } from '@/database/schema';
+import { NbrbService } from '@/integrations/nbrb/services/nbrb.service';
 import { convertBynToUsdMinor, formatMinorAmount } from '../utils/payment-amount';
 import { buildOrderReturnUrl } from '../utils/payment-urls';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
@@ -105,7 +102,7 @@ export class PaymentsService {
         // that only refer to the order (a new payment, an entry of the history).
         .for(ROW_LOCK_NO_KEY_UPDATE);
     } catch (error) {
-      if (isLockTimeout(error)) {
+      if (isLockConflict(error)) {
         throw new ConflictException(PAYMENTS_ERROR_MESSAGES.PAYMENT_ALREADY_STARTED);
       }
 

@@ -30,3 +30,9 @@ export const OFFER_NOTICE_TEXTS: Record<OfferNotice, { title: string; text: stri
     text: 'Его отменили или принял другой курьер.',
   },
 };
+
+export const ASSIGNMENT_TEXTS = {
+  OPEN: 'Открыть',
+  assigned: (orderNumber: string) => `Вам назначен заказ ${orderNumber}`,
+  unassigned: (orderNumber: string) => `Заказ ${orderNumber} передан другому курьеру`,
+} as const;

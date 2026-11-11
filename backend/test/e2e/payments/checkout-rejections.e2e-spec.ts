@@ -1,22 +1,23 @@
 import { ServiceUnavailableException, HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orders, payments } from '../../../src/database/schema';
-import { NBRB_ERROR_MESSAGES } from '../../../src/integrations/nbrb/constants/nbrb.constants';
-import { NbrbService } from '../../../src/integrations/nbrb/services/nbrb.service';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { ORDERS_ERROR_MESSAGES } from '../../../src/modules/orders/constants/orders.constants';
-import { PaymentGateway } from '../../../src/modules/payments/contracts/payment-gateway.contract';
-import { PAYMENTS_ERROR_MESSAGES } from '../../../src/modules/payments/constants/payments.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { MISSING_ORDER_ID } from '../../support/constants';
-import { placeOrders, SECOND_CLIENT } from '../../support/orders';
-import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '../../support/payments';
-import { resetServiceArea } from '../../support/pricing';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, payments } from '@/database/schema';
+import { NBRB_ERROR_MESSAGES } from '@/integrations/nbrb/constants/nbrb.constants';
+import { NbrbService } from '@/integrations/nbrb/services/nbrb.service';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ORDERS_ERROR_MESSAGES } from '@/modules/orders/constants/orders.constants';
+import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
+import { PAYMENTS_ERROR_MESSAGES } from '@/modules/payments/constants/payments.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { MISSING_ORDER_ID } from '@test/support/constants';
+import { placeOrders, SECOND_CLIENT } from '@test/support/orders';
+import { createGatewayMock, postPayment, resetGatewayMock, USD_RATE } from '@test/support/payments';
+import { resetServiceArea } from '@test/support/pricing';
+import { statusChange } from '@test/support/order-status';
 
 // At this rate 9.23 BYN is one cent, below the 50 cents that Stripe accepts.
 const TINY_AMOUNT_RATE = 1000;
@@ -53,7 +54,7 @@ describe('Payments rejections (e2e)', () => {
     const [orderId] = await placeOrders(app, cookies, 1);
     await db
       .update(orders)
-      .set({ status: ORDER_STATUS.CANCELLED })
+      .set(statusChange(ORDER_STATUS.CANCELLED))
       .where(eq(orders.orderId, orderId));
 
     const response = await postPayment(app, cookies, { orderId }).expect(HttpStatus.CONFLICT);

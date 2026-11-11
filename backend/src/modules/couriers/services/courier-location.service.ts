@@ -1,23 +1,23 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, exists, isNull, lte, or, sql } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '../../../common/constants/database.constants';
-import { courierActiveOrder } from '../../../common/database/courier-active-order';
-import { isLockTimeout } from '../../../common/database/pg-errors';
-import type { GeoPoint } from '../../../common/schemas/geo-point.schema';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { courierProfiles, orders, users } from '../../../database/schema';
+import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { courierActiveOrder } from '@/common/database/courier-active-order';
+import { isLockTimeout } from '@/common/database/pg-errors';
+import type { GeoPoint } from '@/common/schemas/geo-point.schema';
+import { describeError } from '@/common/utils/describe-error';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { courierProfiles, orders, users } from '@/database/schema';
 import {
   LOCATION_MIN_INTERVAL_MS,
   LOCATION_UPDATE_REJECTIONS,
-} from '../constants/couriers-socket.constants';
+} from '../constants/courier-location.constants';
 import { locationUpdateBodySchema } from '../dto/location-update.dto';
 import type {
-  CourierSocketData,
+  CourierLocationSession,
   LocationUpdateRejection,
   LocationUpdateResult,
-} from '../types/couriers-socket.types';
+} from '../types/courier-location.types';
 import { rejectLocationUpdate } from '../utils/location-update';
 
 // A stored position: the time of the database and the order the courier carries, if any.
@@ -26,6 +26,7 @@ export type SavedLocation = { locationUpdatedAt: Date; activeOrderId: number | n
 const REFUSED = (reason: LocationUpdateRejection): LocationUpdateResult => ({
   ack: { ok: false, reason },
   event: null,
+  saved: null,
 });
 
 @Injectable()
@@ -36,7 +37,7 @@ export class CourierLocationService {
 
   // A position sent on the socket of a courier: checked, then saved when the checks pass. The
   // socket check is only a cheap filter; the limit per courier is kept by the query itself.
-  async update(data: CourierSocketData, body: unknown): Promise<LocationUpdateResult> {
+  async update(data: CourierLocationSession, body: unknown): Promise<LocationUpdateResult> {
     const nowMs = Date.now();
     const rejection = rejectLocationUpdate(data, nowMs);
     const point = locationUpdateBodySchema.safeParse(body);
@@ -57,20 +58,22 @@ export class CourierLocationService {
   // Saves the position and answers the socket: a failure is a refusal in the acknowledgement,
   // never an error the client does not wait for.
   async record(courierProfileId: number, point: GeoPoint): Promise<LocationUpdateResult> {
-    let result: LocationUpdateResult = { ack: { ok: true }, event: null };
+    let result: LocationUpdateResult = { ack: { ok: true }, event: null, saved: null };
 
     try {
       const saved = await this.save(courierProfileId, point);
 
       if (!saved) {
         result = REFUSED(await this.refusalReason(courierProfileId));
-      } else if (saved.activeOrderId !== null) {
-        result.event = {
-          orderId: saved.activeOrderId,
-          latitude: point.latitude,
-          longitude: point.longitude,
-          updatedAt: saved.locationUpdatedAt.toISOString(),
-        };
+      } else {
+        const { latitude, longitude } = point;
+        const updatedAt = saved.locationUpdatedAt.toISOString();
+
+        result.saved = { courierProfileId, latitude, longitude, updatedAt };
+        result.event =
+          saved.activeOrderId === null
+            ? null
+            : { orderId: saved.activeOrderId, latitude, longitude, updatedAt };
       }
     } catch (error) {
       // Going on or off shift holds the profile row: the next position comes in a few seconds.

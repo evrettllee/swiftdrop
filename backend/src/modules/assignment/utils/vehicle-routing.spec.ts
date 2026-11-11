@@ -1,4 +1,4 @@
-import { VEHICLE_TYPE } from '../../../common/enums/vehicle-type.enum';
+import { VEHICLE_TYPE } from '@/common/enums/vehicle-type.enum';
 import { vehiclesThatCarry } from './vehicle-routing';
 
 const SMALL_PACKAGE = { weightKg: 1, lengthCm: 20, widthCm: 15, heightCm: 10, isFragile: false };

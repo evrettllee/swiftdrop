@@ -1,10 +1,18 @@
-import { ChatTextIcon, type Icon, InfoIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
+import {
+  ChatTextIcon,
+  CheckCircleIcon,
+  type Icon,
+  InfoIcon,
+  WarningIcon,
+  XIcon,
+} from '@phosphor-icons/react';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT, UI_TEXTS } from '@/shared/config';
 import { IconButton } from '@/shared/ui/icon-button';
 import type { ToastAction, ToastVariant } from './toast-store';
 
 const VARIANT_ICONS: Record<ToastVariant, { icon: Icon; className: string }> = {
   info: { icon: InfoIcon, className: 'text-accent' },
+  success: { icon: CheckCircleIcon, className: 'text-success' },
   warning: { icon: WarningIcon, className: 'text-warning' },
   chat: { icon: ChatTextIcon, className: 'text-accent' },
 };
@@ -30,7 +38,9 @@ export function Toast({ variant, title, text, action, onClose }: ToastProps) {
       />
       <div className="flex min-w-0 grow flex-col gap-1 text-small">
         <p className="font-semibold">{title}</p>
-        <p className="line-clamp-2 text-pretty break-words text-fg-secondary">{text}</p>
+        {text === '' ? null : (
+          <p className="line-clamp-2 text-pretty break-words text-fg-secondary">{text}</p>
+        )}
         {action === undefined ? null : (
           <button
             type="button"

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { describeError } from '../../../common/utils/describe-error';
-import type { CourierLocationEvent } from '../types/couriers-socket.types';
+import { describeError } from '@/common/utils/describe-error';
+import type { CourierLocationEvent } from '../types/courier-location.types';
 
 type CourierLocationListener = (event: CourierLocationEvent) => void;
 

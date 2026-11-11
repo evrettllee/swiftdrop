@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PACKAGE_VALIDATION_MESSAGES } from '../constants/package.constants';
+import { PACKAGE_VALIDATION_MESSAGES } from '@/common/constants/package.constants';
 
 const packageValueSchema = z
   .number(PACKAGE_VALIDATION_MESSAGES.PACKAGE_VALUE_INVALID)

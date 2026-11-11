@@ -43,5 +43,5 @@ test('should show the same profile to the courier inside the cabinet with its me
     'aria-current',
     'page',
   );
-  await expect(menu.getByRole('link')).toHaveCount(3);
+  await expect(menu.getByRole('link')).toHaveCount(4);
 });

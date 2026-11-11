@@ -1,30 +1,30 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
-import { ROW_LOCK_NO_KEY_UPDATE } from '../../../src/common/constants/database.constants';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database, Transaction } from '../../../src/database/database.module';
-import { courierProfiles, orderOffers, orders } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ROW_LOCK_NO_KEY_UPDATE } from '@/common/constants/database.constants';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database, Transaction } from '@/database/database.module';
+import { courierProfiles, orderOffers, orders } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   ASSIGNMENT_ERROR_MESSAGES,
   COURIER_OFFERS_ROUTES,
   OFFER_ID_ROUTE_PARAM,
-} from '../../../src/modules/assignment/constants/assignment.constants';
-import { COURIERS_ERROR_MESSAGES } from '../../../src/modules/couriers/constants/couriers.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierSession, insertOffer } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { placeConfirmedOrder } from '../../support/chat';
-import { CAR, COURIER_ACCOUNT, putAvailability } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { postApi } from '../../support/http';
-import { commitOnceBlocked } from '../../support/locks';
-import { readOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { readCourierProfile } from '../../support/tracking';
+} from '@/modules/assignment/constants/assignment.constants';
+import { COURIERS_ERROR_MESSAGES } from '@/modules/couriers/constants/couriers.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierSession, insertOffer } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { placeConfirmedOrder } from '@test/support/chat';
+import { CAR, COURIER_ACCOUNT, putAvailability } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { postApi } from '@test/support/http';
+import { commitOnceBlocked } from '@test/support/locks';
+import { readOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { readCourierProfile } from '@test/support/tracking';
 
 // Going off shift and accepting an offer in a fixed order: one side holds the courier profile row
 // as the app does, the other is shown to wait for it, then the first commits.

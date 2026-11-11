@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DB_INTEGER_MAX } from '../../../common/constants/database.constants';
+import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import { CHAT_VALIDATION_MESSAGES } from '../constants/chat.constants';
 
 // The messages to the current user are marked read up to this id. Unknown fields are refused.

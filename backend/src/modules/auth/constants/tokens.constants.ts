@@ -1,10 +1,10 @@
 import { CronExpression } from '@nestjs/schedule';
-import { GLOBAL_PREFIX } from '../../../common/constants/http.constants';
+import { GLOBAL_PREFIX } from '@/common/constants/http.constants';
 import {
   MS_PER_SECOND,
   SECONDS_PER_DAY,
   SECONDS_PER_MINUTE,
-} from '../../../common/constants/time.constants';
+} from '@/common/constants/time.constants';
 import { AUTH_ROUTES } from './routes.constants';
 
 // Tokens

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { OAUTH_PROVIDER, type OAuthProvider } from '../../../common/enums/oauth-provider.enum';
+import { OAUTH_PROVIDER, type OAuthProvider } from '@/common/enums/oauth-provider.enum';
 import {
   GOOGLE_STRATEGY_NAME,
   OAUTH_ERROR_MESSAGES,

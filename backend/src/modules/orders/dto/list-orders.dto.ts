@@ -1,30 +1,32 @@
 import { z } from 'zod';
 import {
-  ORDER_LIST_FILTER,
-  ORDER_LIST_FILTER_VALUES,
-  ORDERS_FIRST_PAGE,
-  ORDERS_PAGE_SIZE_DEFAULT,
-  ORDERS_PAGE_SIZE_MAX,
-  ORDERS_PAGE_SIZE_MIN,
-  ORDERS_VALIDATION_MESSAGES,
-} from '../constants/orders.constants';
+  csvEnumSchema,
+  listPeriodShape,
+  listSearchSchema,
+  listSortParamSchema,
+  resolveListQuery,
+  unknownParameterError,
+} from '@/common/schemas/list-query.schema';
+import { listPaginationShape } from '@/common/schemas/pagination.schema';
+import { ORDER_STATUS_GROUP_VALUES, ORDERS_PAGE_SIZE_DEFAULT } from '../constants/orders.constants';
+import { parseClientOrderSearch } from '../utils/order-search';
+import { ORDERS_SORT } from '../utils/orders-sort';
 
-// Query values arrive as strings, so numbers are coerced.
-export const listOrdersSchema = z.object({
-  page: z.coerce
-    .number({ error: ORDERS_VALIDATION_MESSAGES.PAGE_INVALID })
-    .int(ORDERS_VALIDATION_MESSAGES.PAGE_INVALID)
-    .min(ORDERS_FIRST_PAGE, ORDERS_VALIDATION_MESSAGES.PAGE_INVALID)
-    .default(ORDERS_FIRST_PAGE),
-  limit: z.coerce
-    .number({ error: ORDERS_VALIDATION_MESSAGES.LIMIT_INVALID })
-    .int(ORDERS_VALIDATION_MESSAGES.LIMIT_INVALID)
-    .min(ORDERS_PAGE_SIZE_MIN, ORDERS_VALIDATION_MESSAGES.LIMIT_INVALID)
-    .max(ORDERS_PAGE_SIZE_MAX, ORDERS_VALIDATION_MESSAGES.LIMIT_INVALID)
-    .default(ORDERS_PAGE_SIZE_DEFAULT),
-  filter: z
-    .enum(ORDER_LIST_FILTER_VALUES, { error: ORDERS_VALIDATION_MESSAGES.FILTER_INVALID })
-    .default(ORDER_LIST_FILTER.ALL),
-});
+export const listOrdersSchema = z
+  .strictObject(
+    {
+      ...listPaginationShape(ORDERS_PAGE_SIZE_DEFAULT),
+      ...listPeriodShape,
+      sort: listSortParamSchema,
+      status: csvEnumSchema(ORDER_STATUS_GROUP_VALUES).optional(),
+      q: listSearchSchema.transform(parseClientOrderSearch).optional(),
+    },
+    { error: unknownParameterError },
+  )
+  .transform((query, ctx) => {
+    const list = resolveListQuery(query, ORDERS_SORT, ctx);
+
+    return list ? { ...list, status: query.status ?? null, search: query.q ?? null } : z.NEVER;
+  });
 
 export type ListOrdersDto = z.infer<typeof listOrdersSchema>;

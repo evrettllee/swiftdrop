@@ -1,27 +1,27 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   FINISHED_STATUSES,
   ORDERS_ERROR_MESSAGES,
   ORDERS_ROUTES,
   ORDERS_VALIDATION_MESSAGES,
-} from '../../../src/modules/orders/constants/orders.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser } from '../../support/auth';
-import { MISSING_ORDER_ID } from '../../support/constants';
-import { postApi } from '../../support/http';
+} from '@/modules/orders/constants/orders.constants';
+import { createTestApp } from '@test/support/app';
+import { registerUser } from '@test/support/auth';
+import { MISSING_ORDER_ID } from '@test/support/constants';
+import { postApi } from '@test/support/http';
 import {
   cancelOrder,
   placeOrders,
   readOrderStatus,
   SECOND_CLIENT,
   setOrderStatus,
-} from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 const PICKED_UP_STATUSES = [ORDER_STATUS.PICKED_UP, ORDER_STATUS.IN_TRANSIT];
 

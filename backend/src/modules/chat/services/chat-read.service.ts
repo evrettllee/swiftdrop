@@ -1,22 +1,20 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { orderParticipant, participantActor } from '../../../common/database/order-participant';
-import type { RoleName } from '../../../common/enums/role.enum';
-import { describeError } from '../../../common/utils/describe-error';
-import { DRIZZLE } from '../../../database/database.constants';
-import type { Database } from '../../../database/database.module';
-import { CouriersGateway } from '../../couriers/gateways/couriers.gateway';
-import { CHAT_ERROR_MESSAGES, CHAT_SOCKET_EVENTS } from '../constants/chat.constants';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { orderParticipant, participantActor } from '@/common/database/order-participant';
+import type { RoleName } from '@/common/enums/role.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { SOCKET_EVENTS } from '@/modules/realtime/constants/socket-events.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
+import { CHAT_ERROR_MESSAGES } from '../constants/chat.constants';
 import type { ChatReadResult, MessageReadEvent } from '../types/chat.types';
 import { ChatUnreadService } from './chat-unread.service';
 
 @Injectable()
 export class ChatReadService {
-  private readonly logger = new Logger(ChatReadService.name);
-
   constructor(
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly unread: ChatUnreadService,
-    private readonly gateway: CouriersGateway,
+    private readonly events: RealtimeEventsService,
   ) {}
 
   // Either side marks the messages to them, in any status of the order: a finished chat can still
@@ -49,12 +47,6 @@ export class ChatReadService {
 
   // A room that cannot be told does not undo the marking: the other side sees it in the history.
   private publish(event: MessageReadEvent): void {
-    try {
-      this.gateway.emitToOrder(event.orderId, CHAT_SOCKET_EVENTS.MESSAGE_READ, event);
-    } catch (error) {
-      this.logger.error(
-        `Reading of order ${event.orderId} up to message ${event.upToMessageId} not sent to the room: ${describeError(error)}`,
-      );
-    }
+    this.events.toOrder(event.orderId, SOCKET_EVENTS.MESSAGE_READ, event);
   }
 }

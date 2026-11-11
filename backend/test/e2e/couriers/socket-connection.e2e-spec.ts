@@ -3,22 +3,34 @@ import { JwtService } from '@nestjs/jwt';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import type { Socket } from 'socket.io-client';
-import { ROLE, type RoleName } from '../../../src/common/enums/role.enum';
-import { ENV_KEYS } from '../../../src/config/env.constants';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { users } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { ACCESS_COOKIE_NAME } from '../../../src/modules/auth/constants/tokens.constants';
-import { SOCKET_ERRORS } from '../../../src/modules/realtime/constants/realtime.constants';
-import { createTestApp } from '../../support/app';
-import { registerUser, validRegistration } from '../../support/auth';
-import { COURIER_ACCOUNT, createCourier } from '../../support/couriers';
-import { resetServiceArea } from '../../support/pricing';
-import { connectAppSocket, listenTestApp, waitForEvent } from '../../support/sockets';
-import { ADMIN_ACCOUNT, createUserWithRole, MANAGER_ACCOUNT } from '../../support/users';
+import { ROLE, type RoleName } from '@/common/enums/role.enum';
+import { ENV_KEYS } from '@/config/env.constants';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { users } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ACCESS_COOKIE_NAME } from '@/modules/auth/constants/tokens.constants';
+import { LOCATION_UPDATE_REJECTIONS } from '@/modules/couriers/constants/courier-location.constants';
+import {
+  ORDER_JOIN_REJECTIONS,
+  SOCKET_ERRORS,
+} from '@/modules/realtime/constants/realtime.constants';
+import { RealtimeEventsService } from '@/modules/realtime/services/realtime-events.service';
+import { createTestApp } from '@test/support/app';
+import { registerUser, validRegistration } from '@test/support/auth';
+import { COURIER_ACCOUNT, createCourier } from '@test/support/couriers';
+import { resetServiceArea } from '@test/support/pricing';
+import {
+  connectAppSocket,
+  joinOrderRoom,
+  listenTestApp,
+  waitForEvent,
+} from '@test/support/sockets';
+import { sendLocation } from '@test/support/tracking';
+import { ADMIN_ACCOUNT, createUserWithRole, MANAGER_ACCOUNT } from '@test/support/users';
 
 const FOREIGN_ORIGIN = 'https://evil.example';
+const STAFF_TEST_EVENT = 'staff:test';
 // The access token of the test lives this long, so the server closes the socket within the wait.
 const SHORT_SESSION_SECONDS = 2;
 const DISCONNECT_EVENT = 'disconnect';
@@ -85,16 +97,26 @@ describe('App socket connection (e2e)', () => {
     expect(socket.connected).toBe(true);
   });
 
-  it('should refuse a manager like a missing session', async () => {
-    const cookies = await createUserWithRole(app, db, MANAGER_ACCOUNT, ROLE.MANAGER);
+  it.each([
+    [ROLE.MANAGER, MANAGER_ACCOUNT],
+    [ROLE.ADMIN, ADMIN_ACCOUNT],
+  ])('should admit a %s into the staff room only', async (role, account) => {
+    const cookies = await createUserWithRole(app, db, account, role);
+    const socket = await connectAppSocket(baseUrl, cookies);
+    sockets.push(socket);
+    const received = waitForEvent<{ ok: boolean }>(socket, STAFF_TEST_EVENT);
 
-    await expect(connectAppSocket(baseUrl, cookies)).rejects.toThrow(SOCKET_ERRORS.UNAUTHORIZED);
-  });
+    app.get(RealtimeEventsService).toStaff(STAFF_TEST_EVENT, { ok: true });
 
-  it('should refuse an admin like a missing session', async () => {
-    const cookies = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
-
-    await expect(connectAppSocket(baseUrl, cookies)).rejects.toThrow(SOCKET_ERRORS.UNAUTHORIZED);
+    await expect(received).resolves.toEqual({ ok: true });
+    await expect(joinOrderRoom(socket, { orderId: 1 })).resolves.toEqual({
+      ok: false,
+      reason: ORDER_JOIN_REJECTIONS.NOT_FOUND,
+    });
+    await expect(sendLocation(socket)).resolves.toEqual({
+      ok: false,
+      reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN,
+    });
   });
 
   it('should refuse the connection when there is no session cookie', async () => {

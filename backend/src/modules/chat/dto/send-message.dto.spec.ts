@@ -1,4 +1,4 @@
-import { MESSAGE_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
+import { MESSAGE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { CHAT_VALIDATION_MESSAGES } from '../constants/chat.constants';
 import { sendMessageSchema } from './send-message.dto';
 

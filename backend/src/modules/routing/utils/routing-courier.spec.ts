@@ -1,6 +1,6 @@
-import { VEHICLE_TYPE } from '../../../common/enums/vehicle-type.enum';
-import { OSRM_PROFILE } from '../../../integrations/osrm/constants/osrm.constants';
-import { COURIER_LOCATION_FRESH_MS } from '../../assignment/constants/assignment.constants';
+import { VEHICLE_TYPE } from '@/common/enums/vehicle-type.enum';
+import { OSRM_PROFILE } from '@/integrations/osrm/constants/osrm.constants';
+import { COURIER_LOCATION_FRESH_MS } from '@/modules/assignment/constants/assignment.constants';
 import { toRoutingCourier } from './routing-courier';
 
 const NOW = new Date('2026-10-16T12:00:00Z');

@@ -1,29 +1,32 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { MS_PER_DAY } from '../../../src/common/constants/time.constants';
-import { ORDER_OFFER_STATUS } from '../../../src/common/enums/order-offer-status.enum';
-import { ORDER_STATUS, type OrderStatus } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { orderStatusHistory } from '../../../src/database/schema';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
+import { eq } from 'drizzle-orm';
+import { MS_PER_DAY } from '@/common/constants/time.constants';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { orders, orderStatusHistory } from '@/database/schema';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import {
   COURIER_ORDERS_ROUTES,
   COURIER_STATS_ROUTES,
-} from '../../../src/modules/deliveries/constants/deliveries.constants';
-import { createTestApp } from '../../support/app';
-import { addCourierSession, insertOffer } from '../../support/assignment';
-import { COOKIE_HEADER, registerUser } from '../../support/auth';
-import { assignOrder, CAR, COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '../../support/fixtures';
-import { getApi } from '../../support/http';
-import { placeOrders } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
+} from '@/modules/deliveries/constants/deliveries.constants';
+import { createTestApp } from '@test/support/app';
+import { addCourierSession, insertOffer } from '@test/support/assignment';
+import { COOKIE_HEADER, registerUser } from '@test/support/auth';
+import { assignOrder, CAR, COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_PICKUP, ROUTE, SMALL_PACKAGE } from '@test/support/fixtures';
+import { getApi } from '@test/support/http';
+import { statusChange } from '@test/support/order-status';
+import { placeOrders } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
 
 const HISTORY_PATH = `${COURIER_ORDERS_ROUTES.BASE}/${COURIER_ORDERS_ROUTES.HISTORY}`;
 const TODAY_PATH = `${COURIER_STATS_ROUTES.BASE}/${COURIER_STATS_ROUTES.TODAY}`;
 // Far enough back to be another day in any time zone.
 const TWO_DAYS_MS = 2 * MS_PER_DAY;
+const HOUR_MS = MS_PER_DAY / 24;
 
 describe('Courier history and today stats (e2e)', () => {
   let app: NestExpressApplication;
@@ -42,6 +45,7 @@ describe('Courier history and today stats (e2e)', () => {
   // Ends the order with the courier and writes the final status to its history at that moment.
   async function finish(orderId: number, status: OrderStatus, at: Date = new Date()) {
     await assignOrder(db, orderId, courierId, status);
+    await db.update(orders).set(statusChange(status, at)).where(eq(orders.orderId, orderId));
     await db.insert(orderStatusHistory).values({ orderId, status, changedBy: null, changedAt: at });
   }
 
@@ -67,19 +71,19 @@ describe('Courier history and today stats (e2e)', () => {
     await app.close();
   });
 
-  it('should list the finished orders the newest first and leave out the active one', async () => {
+  it('should list the finished orders the last finished first and leave out the active one', async () => {
+    await finish(cancelledId, ORDER_STATUS.CANCELLED, new Date(Date.now() - HOUR_MS));
     await finish(deliveredId, ORDER_STATUS.DELIVERED);
-    await finish(cancelledId, ORDER_STATUS.CANCELLED);
     await assignOrder(db, activeId, courierId, ORDER_STATUS.IN_TRANSIT);
 
     const response = await get(HISTORY_PATH).expect(HttpStatus.OK);
 
     expect(response.body.total).toBe(2);
     expect(response.body.items.map((item: { orderId: number }) => item.orderId)).toEqual([
-      cancelledId,
       deliveredId,
+      cancelledId,
     ]);
-    expect(response.body.items[1]).toMatchObject({
+    expect(response.body.items[0]).toMatchObject({
       status: ORDER_STATUS.DELIVERED,
       finishedAt: expect.any(String),
       distanceKm: ROUTE.distanceKm,
@@ -88,13 +92,13 @@ describe('Courier history and today stats (e2e)', () => {
   });
 
   it('should return the requested page of the history', async () => {
+    await finish(cancelledId, ORDER_STATUS.CANCELLED, new Date(Date.now() - HOUR_MS));
     await finish(deliveredId, ORDER_STATUS.DELIVERED);
-    await finish(cancelledId, ORDER_STATUS.CANCELLED);
 
     const response = await get(HISTORY_PATH, { page: 2, limit: 1 }).expect(HttpStatus.OK);
 
     expect(response.body.items.map((item: { orderId: number }) => item.orderId)).toEqual([
-      deliveredId,
+      cancelledId,
     ]);
   });
 

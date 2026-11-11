@@ -13,20 +13,19 @@ import { HistoryRoute } from './HistoryRoute';
 
 type HistoryCardProps = {
   item: CourierHistoryItem;
-  // The page of the history the card is on: the order page leads back to it.
-  page: number;
+  listSearch: string;
 };
 
 // A finished order: six columns on the desktop, three rows on a phone. The whole card opens the
 // order. Memoised, so the renders that change nothing of a card skip it.
-export const HistoryCard = memo(function HistoryCard({ item, page }: HistoryCardProps) {
+export const HistoryCard = memo(function HistoryCard({ item, listSearch }: HistoryCardProps) {
   const distance = formatDistanceKm(item.distanceKm);
   const weight = formatParcelWeight(item);
 
   return (
     <li>
       <Link
-        to={getCourierHistoryOrderPath(item.orderId, page)}
+        to={getCourierHistoryOrderPath(item.orderId, listSearch)}
         className={`${HISTORY_CARD_CLASS} hover:bg-surface-muted ${COLOR_TRANSITION_CLASS}`}
       >
         <div className="self-start [grid-area:no] lg:self-center">

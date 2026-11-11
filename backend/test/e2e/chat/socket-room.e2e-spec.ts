@@ -1,26 +1,26 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ORDER_STATUS } from '../../../src/common/enums/order-status.enum';
-import { DRIZZLE } from '../../../src/database/database.constants';
-import type { Database } from '../../../src/database/database.module';
-import { OsrmService } from '../../../src/integrations/osrm/services/osrm.service';
-import { ORDER_JOIN_REJECTIONS } from '../../../src/modules/couriers/constants/couriers-socket.constants';
-import { OrderRoomsService } from '../../../src/modules/couriers/services/order-rooms.service';
-import { createTestApp } from '../../support/app';
-import { addCourierSession } from '../../support/assignment';
-import { registerUser } from '../../support/auth';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
+import { DRIZZLE } from '@/database/database.constants';
+import type { Database } from '@/database/database.module';
+import { OsrmService } from '@/integrations/osrm/services/osrm.service';
+import { ORDER_JOIN_REJECTIONS } from '@/modules/realtime/constants/realtime.constants';
+import { OrderRoomsService } from '@/modules/realtime/services/order-rooms.service';
+import { createTestApp } from '@test/support/app';
+import { addCourierSession } from '@test/support/assignment';
+import { registerUser } from '@test/support/auth';
 import {
   assignCourier,
   OpenSockets,
   ORDER_JOIN_OK,
   orderJoinRefusal,
   placeConfirmedOrder,
-} from '../../support/chat';
-import { MISSING_ORDER_ID } from '../../support/constants';
-import { CAR, SECOND_COURIER_ACCOUNT } from '../../support/couriers';
-import { MINSK_PICKUP } from '../../support/fixtures';
-import { type Cookies, SECOND_CLIENT, setOrderStatus } from '../../support/orders';
-import { resetServiceArea } from '../../support/pricing';
-import { joinOrderRoom, listenTestApp } from '../../support/sockets';
+} from '@test/support/chat';
+import { MISSING_ORDER_ID } from '@test/support/constants';
+import { CAR, SECOND_COURIER_ACCOUNT } from '@test/support/couriers';
+import { MINSK_PICKUP } from '@test/support/fixtures';
+import { type Cookies, SECOND_CLIENT, setOrderStatus } from '@test/support/orders';
+import { resetServiceArea } from '@test/support/pricing';
+import { joinOrderRoom, listenTestApp } from '@test/support/sockets';
 
 const NOT_FOUND = orderJoinRefusal(ORDER_JOIN_REJECTIONS.NOT_FOUND);
 

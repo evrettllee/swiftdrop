@@ -1,7 +1,7 @@
 import { UnauthorizedException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
-import { PERSON_FIELD_LENGTH } from '../../../common/constants/field-lengths.constants';
-import { OAUTH_PROVIDER } from '../../../common/enums/oauth-provider.enum';
+import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
+import { OAUTH_PROVIDER } from '@/common/enums/oauth-provider.enum';
 import {
   OAUTH_ERROR_MESSAGES,
   YANDEX_AUTH_HEADER_SCHEME,

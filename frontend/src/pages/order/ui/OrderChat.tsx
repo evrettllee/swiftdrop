@@ -17,6 +17,7 @@ type OrderChatProps = {
   chat: OrderChatModel;
   courier: NonNullable<ClientOrderCourier['courier']>;
   view: OrderChatView;
+  isCourierChanging: boolean;
 };
 
 function toPerson(courier: OrderChatProps['courier']): ChatPerson {
@@ -34,7 +35,12 @@ function toPerson(courier: OrderChatProps['courier']): ChatPerson {
   };
 }
 
-export const OrderChat = memo(function OrderChat({ chat, courier, view }: OrderChatProps) {
+export const OrderChat = memo(function OrderChat({
+  chat,
+  courier,
+  view,
+  isCourierChanging,
+}: OrderChatProps) {
   const person = toPerson(courier);
   const label = ORDER_COURIER_TEXTS.chatWith(courier.name);
   const call =
@@ -44,13 +50,14 @@ export const OrderChat = memo(function OrderChat({ chat, courier, view }: OrderC
   const body = (
     <Chat chat={chat}>
       <Chat.Messages />
-      {chat.isLoaded && chat.canSend ? (
+      {isCourierChanging ? <Chat.ClosedNote text={ORDER_COURIER_TEXTS.CHANGED_IN_CHAT} /> : null}
+      {!isCourierChanging && chat.isLoaded && chat.canSend ? (
         <Chat.Footer>
           <Chat.QuickReplies replies={ORDER_COURIER_TEXTS.QUICK_REPLIES} />
           <Chat.Composer label={ORDER_COURIER_TEXTS.MESSAGE_LABEL} autoFocus={view.isDrawerOpen} />
         </Chat.Footer>
       ) : null}
-      {chat.isLoaded && !chat.canSend ? <Chat.ClosedNote /> : null}
+      {!isCourierChanging && chat.isLoaded && !chat.canSend ? <Chat.ClosedNote /> : null}
     </Chat>
   );
 
