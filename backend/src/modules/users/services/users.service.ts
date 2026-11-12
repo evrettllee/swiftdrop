@@ -4,7 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { and, eq, isNull, type SQL } from 'drizzle-orm';
+import { and, eq, isNull, sql, type SQL } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { getUniqueViolationConstraint } from '@/common/database/pg-errors';
 import type { RoleName } from '@/common/enums/role.enum';
@@ -40,6 +40,13 @@ export class UsersService {
     await this.db
       .update(users)
       .set({ emailVerifiedAt: new Date(), passwordHash: null })
+      .where(eq(users.userId, userId));
+  }
+
+  async markSignedIn(userId: number): Promise<void> {
+    await this.db
+      .update(users)
+      .set({ lastLoginAt: sql`now()` })
       .where(eq(users.userId, userId));
   }
 

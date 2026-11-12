@@ -46,6 +46,7 @@ export class AuthService {
     }
 
     this.ensureNotBlocked(user);
+    await this.usersService.markSignedIn(user.userId);
 
     return this.buildAuthResult(user, user.roleName);
   }
@@ -54,6 +55,7 @@ export class AuthService {
     const user = await this.oauthService.resolveUser(profile);
 
     this.ensureNotBlocked(user);
+    await this.usersService.markSignedIn(user.userId);
 
     return this.buildAuthResult(user, user.roleName);
   }
