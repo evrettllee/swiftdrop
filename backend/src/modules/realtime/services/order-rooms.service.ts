@@ -20,7 +20,7 @@ import type {
 } from '../types/realtime.types';
 import { countJoinAttempt, rejectJoinAttempt } from '../utils/order-join';
 import { closeAfterAnswer } from '../utils/socket-close';
-import { isStaffSocket } from '../utils/socket-data';
+import { isParticipantSocket } from '../utils/socket-data';
 
 const JOINED: OrderJoinAck = { ok: true };
 const TOO_MANY_ROOMS: OrderJoinAck = { ok: false, reason: ORDER_JOIN_REJECTIONS.TOO_MANY_ROOMS };
@@ -59,7 +59,7 @@ export class OrderRoomsService {
       ack = JOINED;
     } else if (isRoomLimitReached(socket)) {
       ack = TOO_MANY_ROOMS;
-    } else if (isStaffSocket(data)) {
+    } else if (!isParticipantSocket(data)) {
       ack = NOT_FOUND;
     } else {
       ack = await this.enterIfParticipant(socket, data, parsed.data.orderId);

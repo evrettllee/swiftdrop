@@ -20,7 +20,7 @@ import type {
 } from '../types/manager-zones.types';
 
 @Controller(MANAGER_ZONES_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 export class ManagerZonesController {
   constructor(
     private readonly zones: ManagerZonesService,

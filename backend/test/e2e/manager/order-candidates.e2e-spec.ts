@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
-import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
@@ -20,7 +19,6 @@ import { createManager } from '@test/support/manager';
 import { getCandidates, postAssign } from '@test/support/manager-assignment';
 import { type Cookies, placeOrders, setOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
 
 describe('Courier candidates for a manager (e2e)', () => {
   let app: NestExpressApplication;
@@ -59,11 +57,8 @@ describe('Courier candidates for a manager (e2e)', () => {
     await app.close();
   });
 
-  it('should let a manager and an admin in, and keep a client, a courier and a guest out', async () => {
-    const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
-
+  it('should let a manager in, and keep a client, a courier and a guest out', async () => {
     await getCandidates(app, manager, orderIds[0]).expect(HttpStatus.OK);
-    await getCandidates(app, admin, orderIds[0]).expect(HttpStatus.OK);
     await getCandidates(app, client, orderIds[0]).expect(HttpStatus.FORBIDDEN);
     await getCandidates(app, courier, orderIds[0]).expect(HttpStatus.FORBIDDEN);
     await getCandidates(app, null, orderIds[0]).expect(HttpStatus.UNAUTHORIZED);

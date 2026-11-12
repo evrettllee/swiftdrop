@@ -33,7 +33,7 @@ import type {
 const ticketParam = new ZodValidationPipe(ticketIdParamSchema);
 
 @Controller(SUPPORT_STAFF_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 export class SupportStaffController {
   constructor(
     private readonly tickets: SupportStaffTicketsService,

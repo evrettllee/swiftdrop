@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
-import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
@@ -25,7 +24,6 @@ import {
 } from '@test/support/orders';
 import { createGatewayMock, resetGatewayMock } from '@test/support/payments';
 import { resetServiceArea } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
 
 const REASON = 'Адрес доставки вне зоны';
 const BODY = { reason: REASON };
@@ -71,14 +69,13 @@ describe('Cancellation of an order by a manager (e2e)', () => {
     return response.body as { cancelledBy: string | null; cancelReason: string | null };
   }
 
-  it('should let a manager and an admin in, and keep a client, a courier and a guest out', async () => {
+  it('should let a manager in, and keep a client, a courier and a guest out', async () => {
     const courier = await addCourierSession(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
-    const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
 
     await postManagerCancel(app, client, orderId, BODY).expect(HttpStatus.FORBIDDEN);
     await postManagerCancel(app, courier.cookies, orderId, BODY).expect(HttpStatus.FORBIDDEN);
     await postManagerCancel(app, null, orderId, BODY).expect(HttpStatus.UNAUTHORIZED);
-    await postManagerCancel(app, admin, orderId, BODY).expect(HttpStatus.OK);
+    await postManagerCancel(app, manager, orderId, BODY).expect(HttpStatus.OK);
   });
 
   it.each([

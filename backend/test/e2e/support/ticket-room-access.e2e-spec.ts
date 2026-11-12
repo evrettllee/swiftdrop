@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { Socket } from 'socket.io-client';
+import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
@@ -18,7 +19,7 @@ import {
   waitForDisconnect,
 } from '@test/support/sockets';
 import { postTicket, postTicketMessage } from '@test/support/support-tickets';
-import { blockUser } from '@test/support/users';
+import { ADMIN_ACCOUNT, blockUser, createUserWithRole } from '@test/support/users';
 
 describe('Ticket room access (e2e)', () => {
   let app: NestExpressApplication;
@@ -77,5 +78,17 @@ describe('Ticket room access (e2e)', () => {
 
     expect(await join(author, ticketId)).toEqual({ ok: false, reason: 'not_found' });
     expect(await closed).toBe('io server disconnect');
+  });
+
+  it('should keep an admin out of the ticket room and the support events when an admin connects', async () => {
+    const admin = await connect(await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN));
+    const messages = collectEvents(admin, SOCKET_EVENTS.SUPPORT_MESSAGE);
+    const tickets = collectEvents(admin, SOCKET_EVENTS.SUPPORT_TICKET);
+
+    expect(await join(admin, ticketId)).toEqual({ ok: false, reason: 'not_found' });
+    await postTicketMessage(app, client, ticketId, 'Ещё').expect(HttpStatus.CREATED);
+    await roundTrip(admin);
+    expect(messages).toEqual([]);
+    expect(tickets).toEqual([]);
   });
 });

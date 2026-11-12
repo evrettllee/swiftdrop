@@ -9,10 +9,10 @@ export const SOCKET_PATH = `/${GLOBAL_PREFIX}/socket.io`;
 // are in.
 export const APP_SOCKET_NAMESPACE = '/couriers';
 
-export const STAFF_ROLES = [ROLE.MANAGER, ROLE.ADMIN] as const;
+export const STAFF_ROLES = [ROLE.MANAGER] as const;
 
 // Only these roles may open a socket; any other gets the same refusal as a missing session.
-export const SOCKET_ROLES = [ROLE.COURIER, ROLE.CLIENT, ...STAFF_ROLES] as const;
+export const SOCKET_ROLES = [ROLE.COURIER, ROLE.CLIENT, ...STAFF_ROLES, ROLE.ADMIN] as const;
 
 // Reasons a connection is refused: the client reads them from connect_error.message.
 export const SOCKET_ERRORS = {

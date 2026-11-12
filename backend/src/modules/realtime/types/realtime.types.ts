@@ -48,9 +48,13 @@ export type StaffSocketData = SocketSessionState & {
   role: StaffRole;
 };
 
+export type AdminSocketData = SocketSessionState & {
+  role: typeof ROLE.ADMIN;
+};
+
 export type ParticipantSocketData = CourierSocketData | ClientSocketData;
 
-export type AppSocketData = ParticipantSocketData | StaffSocketData;
+export type AppSocketData = ParticipantSocketData | StaffSocketData | AdminSocketData;
 
 export type OrderJoinRejection = (typeof ORDER_JOIN_REJECTIONS)[keyof typeof ORDER_JOIN_REJECTIONS];
 

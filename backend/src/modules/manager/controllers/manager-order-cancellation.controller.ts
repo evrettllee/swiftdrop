@@ -12,7 +12,7 @@ import { ManagerOrderCancellationService } from '../services/manager-order-cance
 import type { StaffCancelledOrder } from '../types/manager-cancellation.types';
 
 @Controller(MANAGER_ORDERS_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 export class ManagerOrderCancellationController {
   constructor(private readonly cancellation: ManagerOrderCancellationService) {}
 

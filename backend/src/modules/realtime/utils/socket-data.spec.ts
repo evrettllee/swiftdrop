@@ -55,7 +55,10 @@ describe('buildSocketData', () => {
     expect(findCourierProfileId).not.toHaveBeenCalled();
   });
 
-  it.each([ROLE.MANAGER, ROLE.ADMIN])('should admit a %s as staff', async (role) => {
+  it.each([
+    [ROLE.MANAGER, true],
+    [ROLE.ADMIN, false],
+  ])('should admit a %s with staff %s when they connect', async (role, isStaff) => {
     const data = await buildSocketData(session(role), findCourierProfileId);
 
     expect(data).toEqual({
@@ -64,7 +67,7 @@ describe('buildSocketData', () => {
       sessionExpiresAtMs: EXPIRES_AT_MS,
       orderJoinAttemptsMs: [],
     });
-    expect(data && isStaffSocket(data)).toBe(true);
+    expect(data && isStaffSocket(data)).toBe(isStaff);
     expect(findCourierProfileId).not.toHaveBeenCalled();
   });
 
@@ -80,7 +83,7 @@ describe('isStaffSocket', () => {
     [ROLE.CLIENT, false],
     [ROLE.COURIER, false],
     [ROLE.MANAGER, true],
-    [ROLE.ADMIN, true],
+    [ROLE.ADMIN, false],
   ])('should tell whether a %s socket is staff: %s', async (role, isStaff) => {
     const data = await buildSocketData(session(role), () => Promise.resolve(COURIER_PROFILE_ID));
 

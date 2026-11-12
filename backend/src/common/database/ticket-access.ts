@@ -11,7 +11,7 @@ export type AccessibleTicket = { ticketId: number; userId: number; status: Suppo
 
 export type TicketRoomAccess = { ticket: AccessibleTicket | null; actorBlocked: boolean };
 
-const TICKET_STAFF_ROLES = new Set<RoleName>([ROLE.MANAGER, ROLE.ADMIN]);
+const TICKET_STAFF_ROLES = new Set<RoleName>([ROLE.MANAGER]);
 const TICKET_AUTHOR_ROLES = new Set<RoleName>([ROLE.CLIENT, ROLE.COURIER]);
 
 export function isTicketStaff(role: RoleName): boolean {
