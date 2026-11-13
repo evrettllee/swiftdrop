@@ -83,6 +83,12 @@ SwiftDrop: веб-приложение и информационная сист�
 | `STRIPE_SECRET_KEY`     | Секретный ключ Stripe тестового режима, начинается с `sk_test_`          | из Stripe Dashboard                                              |
 | `STRIPE_WEBHOOK_SECRET` | Секрет подписи вебхука, начинается с `whsec_`                            | вывод `stripe listen --print-secret`                             |
 | `VITE_MAPBOX_TOKEN`     | Публичный токен Mapbox для frontend                                      | `pk....`                                                         |
+| `MAIL_HOST`             | SMTP-сервер; пустой вне production: письма не уходят, только запись в лог | `smtp.gmail.com`                                                 |
+| `MAIL_PORT`             | Порт SMTP                                                                | `465`                                                            |
+| `MAIL_SECURE`           | TLS с начала соединения: `true` или `false`                              | `true`                                                           |
+| `MAIL_USER`             | Логин SMTP                                                               | адрес ящика                                                      |
+| `MAIL_PASSWORD`         | Пароль SMTP (для Gmail пароль приложения)                                | из настроек аккаунта                                             |
+| `MAIL_FROM`             | Отправитель писем                                                        | `SwiftDrop <no-reply@example.com>`                               |
 
 Отдельно:
 

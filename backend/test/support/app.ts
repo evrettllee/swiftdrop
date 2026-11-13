@@ -3,8 +3,10 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '@/app.module';
 import { configureApp } from '@/app.setup';
+import { MailGateway } from '@/integrations/mail/contracts/mail.gateway';
 import { OsrmTripService } from '@/integrations/osrm/services/osrm-trip.service';
 import { TRUST_PROXY_SETTING } from './constants';
+import { createMailGatewayMock } from './mail';
 
 // A token is a class, an abstract one is allowed, for example the payment gateway.
 export type ProviderOverride = { token: Type<unknown> | Abstract<unknown>; useValue: unknown };
@@ -30,7 +32,9 @@ export async function createTestApp(
     .overrideProvider(SCHEDULE_MODULE_OPTIONS)
     .useValue({ cronJobs: false, intervals: false, timeouts: false });
 
-  for (const { token, useValue } of [UNAVAILABLE_TRIPS, ...overrides]) {
+  const fakeMail: ProviderOverride = { token: MailGateway, useValue: createMailGatewayMock() };
+
+  for (const { token, useValue } of [UNAVAILABLE_TRIPS, fakeMail, ...overrides]) {
     builder.overrideProvider(token).useValue(useValue);
   }
 

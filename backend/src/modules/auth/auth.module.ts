@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ENV_KEYS } from '@/config/env.constants';
+import { MailModule } from '@/integrations/mail/mail.module';
 import { UsersModule } from '@/modules/users/users.module';
 import { AuthCookiesService } from './services/auth-cookies.service';
 import { ACCESS_TOKEN_TTL_SECONDS } from './constants/tokens.constants';
@@ -20,6 +21,7 @@ import { TokensService } from './services/tokens.service';
 
 @Module({
   imports: [
+    MailModule,
     UsersModule,
     PassportModule,
     JwtModule.registerAsync({

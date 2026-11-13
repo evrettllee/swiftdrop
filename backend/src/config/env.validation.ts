@@ -2,7 +2,10 @@ import {
   DEFAULT_PORT,
   ENV_KEYS,
   JWT_SECRET_MIN_LENGTH,
+  MAIL_SECURE_TRUE,
+  MAIL_SECURE_VALUES,
   MIN_REQUIRED_LENGTH,
+  NODE_ENV_PRODUCTION,
   NODE_ENV_VALUES,
   PORT_MAX,
   PORT_MIN,
@@ -58,17 +61,50 @@ function requireUrl(config: Record<string, unknown>, name: string): string {
   return value;
 }
 
-export function validateEnv(config: Record<string, unknown>) {
-  const rawPort = config[ENV_KEYS.PORT] ?? DEFAULT_PORT;
+function requirePort(name: string, rawPort: unknown): number {
   const port = Number(rawPort);
 
   if (!Number.isInteger(port) || port < PORT_MIN || port > PORT_MAX) {
     throw new Error(
-      `${ENV_KEYS.PORT} must be an integer between ${PORT_MIN} and ${PORT_MAX}, got: ${JSON.stringify(rawPort)}`,
+      `${name} must be an integer between ${PORT_MIN} and ${PORT_MAX}, got: ${JSON.stringify(rawPort)}`,
     );
   }
 
-  requireOneOf(config, ENV_KEYS.NODE_ENV, NODE_ENV_VALUES);
+  return port;
+}
+
+function isFilled(config: Record<string, unknown>, name: string): boolean {
+  const value = config[name];
+
+  return typeof value === 'string' && value.length > 0;
+}
+
+function validateMail(config: Record<string, unknown>, nodeEnv: string): Record<string, unknown> {
+  const required = nodeEnv === NODE_ENV_PRODUCTION;
+  const mail: Record<string, unknown> = {};
+
+  if (required) {
+    requireString(config, ENV_KEYS.MAIL_HOST);
+    requireString(config, ENV_KEYS.MAIL_USER);
+    requireString(config, ENV_KEYS.MAIL_PASSWORD);
+    requireString(config, ENV_KEYS.MAIL_FROM);
+  }
+
+  if (required || isFilled(config, ENV_KEYS.MAIL_PORT)) {
+    mail[ENV_KEYS.MAIL_PORT] = requirePort(ENV_KEYS.MAIL_PORT, config[ENV_KEYS.MAIL_PORT]);
+  }
+
+  if (required || isFilled(config, ENV_KEYS.MAIL_SECURE)) {
+    const secure = requireOneOf(config, ENV_KEYS.MAIL_SECURE, MAIL_SECURE_VALUES);
+    mail[ENV_KEYS.MAIL_SECURE] = secure === MAIL_SECURE_TRUE;
+  }
+
+  return mail;
+}
+
+export function validateEnv(config: Record<string, unknown>) {
+  const port = requirePort(ENV_KEYS.PORT, config[ENV_KEYS.PORT] ?? DEFAULT_PORT);
+  const nodeEnv = requireOneOf(config, ENV_KEYS.NODE_ENV, NODE_ENV_VALUES);
   requireUrl(config, ENV_KEYS.APP_URL);
   requireString(config, ENV_KEYS.DATABASE_URL);
   requireString(config, ENV_KEYS.OSRM_URL);
@@ -81,6 +117,7 @@ export function validateEnv(config: Record<string, unknown>) {
   requireString(config, ENV_KEYS.YANDEX_CALLBACK_URL);
   requireWithPrefix(config, ENV_KEYS.STRIPE_SECRET_KEY, STRIPE_SECRET_KEY_PREFIX);
   requireWithPrefix(config, ENV_KEYS.STRIPE_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET_PREFIX);
+  const mail = validateMail(config, nodeEnv);
 
-  return { ...config, [ENV_KEYS.PORT]: port };
+  return { ...config, ...mail, [ENV_KEYS.PORT]: port };
 }

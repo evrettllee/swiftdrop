@@ -16,6 +16,12 @@ export const ENV_KEYS = {
   YANDEX_CALLBACK_URL: 'YANDEX_CALLBACK_URL',
   STRIPE_SECRET_KEY: 'STRIPE_SECRET_KEY',
   STRIPE_WEBHOOK_SECRET: 'STRIPE_WEBHOOK_SECRET',
+  MAIL_HOST: 'MAIL_HOST',
+  MAIL_PORT: 'MAIL_PORT',
+  MAIL_SECURE: 'MAIL_SECURE',
+  MAIL_USER: 'MAIL_USER',
+  MAIL_PASSWORD: 'MAIL_PASSWORD',
+  MAIL_FROM: 'MAIL_FROM',
 } as const;
 
 export const NODE_ENV_PRODUCTION = 'production';
@@ -33,3 +39,6 @@ export const JWT_SECRET_MIN_LENGTH = 32;
 // A publishable key (pk_) pasted by mistake is caught at startup.
 export const STRIPE_SECRET_KEY_PREFIX = 'sk_';
 export const STRIPE_WEBHOOK_SECRET_PREFIX = 'whsec_';
+
+export const MAIL_SECURE_TRUE = 'true';
+export const MAIL_SECURE_VALUES = [MAIL_SECURE_TRUE, 'false'] as const;
