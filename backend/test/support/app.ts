@@ -24,11 +24,12 @@ const UNAVAILABLE_TRIPS: ProviderOverride = {
 // Overrides replace real providers, for example an external service that tests must not call.
 export async function createTestApp(
   overrides: ProviderOverride[] = [],
+  extraImports: Type<unknown>[] = [],
 ): Promise<NestExpressApplication> {
   // Scheduled jobs are not registered: a cron run on the wall clock would race the tests that
   // call the same services, for example cancel an unpaid order a test is about to cancel itself.
   // Tests run the jobs by calling their services.
-  const builder = Test.createTestingModule({ imports: [AppModule] })
+  const builder = Test.createTestingModule({ imports: [AppModule, ...extraImports] })
     .overrideProvider(SCHEDULE_MODULE_OPTIONS)
     .useValue({ cronJobs: false, intervals: false, timeouts: false });
 

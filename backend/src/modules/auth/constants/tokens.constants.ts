@@ -18,7 +18,6 @@ export const ACCESS_TOKEN_TTL_MS = ACCESS_TOKEN_TTL_SECONDS * MS_PER_SECOND;
 export const REFRESH_TOKEN_TTL_DAYS = 30;
 export const REFRESH_TOKEN_TTL_MS = REFRESH_TOKEN_TTL_DAYS * SECONDS_PER_DAY * MS_PER_SECOND;
 export const REFRESH_TOKEN_BYTES = 32;
-export const REFRESH_TOKEN_ENCODING = URL_SAFE_ENCODING;
 
 // A token replaced by a rotation this short while ago is accepted once more: two tabs refreshed
 // at the same moment. Later, its reuse is taken for a theft.

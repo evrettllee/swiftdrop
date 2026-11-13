@@ -8,9 +8,11 @@ import { UsersModule } from '@/modules/users/users.module';
 import { AuthCookiesService } from './services/auth-cookies.service';
 import { ACCESS_TOKEN_TTL_SECONDS } from './constants/tokens.constants';
 import { AuthController } from './controllers/auth.controller';
+import { PasswordLinksController } from './controllers/password-links.controller';
 import { AuthService } from './services/auth.service';
 import { OAuthService } from './services/oauth.service';
 import { OAuthStateService } from './services/oauth-state.service';
+import { PasswordLinksService } from './services/password-links.service';
 import { PasswordService } from './services/password.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -32,7 +34,7 @@ import { TokensService } from './services/tokens.service';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, PasswordLinksController],
   providers: [
     AuthService,
     AuthCookiesService,
@@ -40,6 +42,7 @@ import { TokensService } from './services/tokens.service';
     JwtStrategy,
     OAuthService,
     OAuthStateService,
+    PasswordLinksService,
     PasswordService,
     TokensCleanupJob,
     TokensCleanupService,

@@ -5,6 +5,7 @@ import { ENV_FILE_PATH, ENV_KEYS } from '@/config/env.constants';
 import { DB_CASING } from './database.constants';
 import * as schema from './schema';
 import { seedCourier } from './seed-courier';
+import { seedManager } from './seed-manager';
 import { seedAdmin, seedRoles, seedTariff, seedZone } from './seed-steps';
 import { SEED_ENV_KEYS } from './seed.constants';
 
@@ -30,6 +31,8 @@ async function main() {
   const adminPassword = requireEnv(SEED_ENV_KEYS.ADMIN_PASSWORD);
   const courierEmail = process.env[SEED_ENV_KEYS.COURIER_EMAIL];
   const courierPassword = process.env[SEED_ENV_KEYS.COURIER_PASSWORD];
+  const managerEmail = process.env[SEED_ENV_KEYS.MANAGER_EMAIL];
+  const managerPassword = process.env[SEED_ENV_KEYS.MANAGER_PASSWORD];
 
   const pool = new Pool({ connectionString: databaseUrl });
   const db = drizzle({ client: pool, schema, casing: DB_CASING });
@@ -46,6 +49,12 @@ async function main() {
       await seedCourier(db, normalizeEmail(courierEmail), courierPassword);
     } else {
       console.log('Courier: skipped, SEED_COURIER_EMAIL and SEED_COURIER_PASSWORD are not set');
+    }
+
+    if (managerEmail && managerPassword) {
+      await seedManager(db, normalizeEmail(managerEmail), managerPassword);
+    } else {
+      console.log('Manager: skipped, SEED_MANAGER_EMAIL and SEED_MANAGER_PASSWORD are not set');
     }
   } finally {
     await pool.end();
