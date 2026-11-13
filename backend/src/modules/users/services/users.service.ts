@@ -58,6 +58,16 @@ export class UsersService {
     }
   }
 
+  async changeRole(
+    userId: number,
+    roleName: RoleName,
+    executor: Database | Transaction = this.db,
+  ): Promise<void> {
+    const roleId = await this.findRoleId(roleName);
+
+    await executor.update(users).set({ roleId }).where(eq(users.userId, userId));
+  }
+
   async markSignedIn(userId: number): Promise<void> {
     await this.db
       .update(users)

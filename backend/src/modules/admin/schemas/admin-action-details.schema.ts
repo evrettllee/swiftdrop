@@ -2,16 +2,15 @@ import { z } from 'zod';
 import { ADMIN_ACTION, type AdminAction } from '@/common/enums/admin-action.enum';
 import { INVITABLE_ROLES } from '@/modules/auth/constants/mail.constants';
 import { STAFF_EDITABLE_FIELDS } from '../constants/admin-staff.constants';
-import { MANAGED_ROLES } from '../constants/admin-users.constants';
 
 const emptyDetails = z.object({});
-const managedRole = z.enum(MANAGED_ROLES);
+const staffRole = z.enum(INVITABLE_ROLES);
 
 export const ADMIN_ACTION_DETAILS = {
-  [ADMIN_ACTION.STAFF_INVITED]: z.object({ role: z.enum(INVITABLE_ROLES) }),
+  [ADMIN_ACTION.STAFF_INVITED]: z.object({ role: staffRole }),
   [ADMIN_ACTION.INVITE_RESENT]: emptyDetails,
   [ADMIN_ACTION.USER_UPDATED]: z.object({ fields: z.array(z.enum(STAFF_EDITABLE_FIELDS)).min(1) }),
-  [ADMIN_ACTION.ROLE_CHANGED]: z.object({ from: managedRole, to: managedRole }),
+  [ADMIN_ACTION.ROLE_CHANGED]: z.object({ from: staffRole, to: staffRole }),
   [ADMIN_ACTION.PASSWORD_RESET]: emptyDetails,
   [ADMIN_ACTION.SESSIONS_ENDED]: emptyDetails,
   [ADMIN_ACTION.USER_BLOCKED]: z.object({ reason: z.string() }),

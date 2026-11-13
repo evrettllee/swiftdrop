@@ -5,7 +5,13 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { createTestApp } from '@test/support/app';
 import { createAdmin, findUserId } from '@test/support/admin';
-import { patchAdminUser, postResend, postStaff, STAFF_COURIER } from '@test/support/admin-staff';
+import {
+  patchAdminUser,
+  postResend,
+  postRole,
+  postStaff,
+  STAFF_COURIER,
+} from '@test/support/admin-staff';
 import { registerUser } from '@test/support/auth';
 import { createCourier } from '@test/support/couriers';
 import { resetTestData } from '@test/support/database';
@@ -52,6 +58,7 @@ describe('Admin staff access (e2e)', () => {
       'the staff edit',
       (cookies) => patchAdminUser(app, cookies, invitedId, { lastName: 'Новиков' }),
     ],
+    ['the role change', (cookies) => postRole(app, cookies, invitedId, { role: ROLE.MANAGER })],
   ];
 
   it.each(calls)(

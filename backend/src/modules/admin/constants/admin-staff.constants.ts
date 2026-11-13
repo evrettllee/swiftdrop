@@ -4,6 +4,13 @@ import type { UserThrottleOptions } from '@/common/guards/user-throttle.guard';
 export const ADMIN_STAFF_ROUTES = {
   STAFF: 'staff',
   USER_INVITE: 'users/:userId/invite',
+  USER_ROLE: 'users/:userId/role',
+} as const;
+
+export const ADMIN_ROLE_MESSAGES = {
+  CLIENT_ROLE_LOCKED: 'Роль клиента изменить нельзя',
+  SAME_ROLE: 'У пользователя уже эта роль',
+  ACTIVE_ORDER: 'Есть активный заказ. Сменить роль можно после его завершения',
 } as const;
 
 export const STAFF_EDITABLE_FIELDS = ['firstName', 'lastName', 'phone'] as const;
@@ -21,6 +28,8 @@ export const ADMIN_STAFF_MESSAGES = {
 export const ADMIN_STAFF_LOG_MESSAGES = {
   INVITE_MAIL_FAILED: 'Invitation mail not sent',
   USER_BUSY: 'Admin change waited too long for the user row',
+  ROLE_CHANGED: 'Staff role changed',
+  OFFERS_CLOSE_FAILED: 'Open offers not closed after a role change',
 } as const;
 
 const INVITE_THROTTLE_LIMIT = 20;

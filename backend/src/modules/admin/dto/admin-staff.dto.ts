@@ -29,3 +29,10 @@ export const updateStaffSchema = z
   });
 
 export type UpdateStaffDto = z.infer<typeof updateStaffSchema>;
+
+export const changeRoleSchema = z.strictObject(
+  { role: z.enum(INVITABLE_ROLES, { error: ADMIN_STAFF_MESSAGES.ROLE_INVALID }) },
+  { error: ADMIN_STAFF_MESSAGES.ROLE_INVALID },
+);
+
+export type ChangeRoleDto = z.infer<typeof changeRoleSchema>;

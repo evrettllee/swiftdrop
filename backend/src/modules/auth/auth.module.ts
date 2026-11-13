@@ -49,6 +49,6 @@ import { TokensService } from './services/tokens.service';
     TokensService,
     YandexStrategy,
   ],
-  exports: [PasswordLinksService],
+  exports: [PasswordLinksService, TokensService],
 })
 export class AuthModule {}

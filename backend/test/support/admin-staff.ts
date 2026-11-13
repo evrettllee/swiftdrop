@@ -1,10 +1,13 @@
+import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { asc, eq } from 'drizzle-orm';
 import type { Database } from '@/database/database.module';
 import { adminActions } from '@/database/schema';
 import { ADMIN_STAFF_ROUTES } from '@/modules/admin/constants/admin-staff.constants';
 import { ADMIN_ROUTES } from '@/modules/admin/constants/admin-users.constants';
+import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
 import { withCookies } from './admin';
+import { postAuth, sessionCookieHeader } from './auth';
 import { patchApi, postApi } from './http';
 
 export const STAFF_COURIER = {
@@ -59,6 +62,29 @@ export function patchAdminUser(
     patchApi(app, `${ADMIN_ROUTES.BASE}/${ADMIN_ROUTES.USERS}/${userId}`).send(body),
     cookies,
   );
+}
+
+export function postRole(
+  app: NestExpressApplication,
+  cookies: string | null,
+  userId: number,
+  body: object,
+) {
+  return withCookies(
+    postApi(app, `${ADMIN_ROUTES.BASE}/${ADMIN_ROUTES.USERS}/${userId}/role`).send(body),
+    cookies,
+  );
+}
+
+export async function loginAs(
+  app: NestExpressApplication,
+  account: { email: string; password: string },
+): Promise<string> {
+  const response = await postAuth(app, AUTH_ROUTES.LOGIN)
+    .send({ email: account.email, password: account.password })
+    .expect(HttpStatus.OK);
+
+  return sessionCookieHeader(response);
 }
 
 export function tokenOf(setPasswordUrl: string): string {

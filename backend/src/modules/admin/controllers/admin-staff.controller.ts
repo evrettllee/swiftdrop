@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ROLE } from '@/common/enums/role.enum';
 import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
@@ -12,6 +12,8 @@ import {
 } from '../constants/admin-staff.constants';
 import { ADMIN_ROUTES } from '../constants/admin-users.constants';
 import {
+  type ChangeRoleDto,
+  changeRoleSchema,
   type InviteStaffDto,
   inviteStaffSchema,
   type UpdateStaffDto,
@@ -19,6 +21,7 @@ import {
 } from '../dto/admin-staff.dto';
 import { type UserIdParamDto, userIdParamSchema } from '../dto/admin-users.dto';
 import { AdminStaffInvitesService } from '../services/admin-staff-invites.service';
+import { AdminStaffRolesService } from '../services/admin-staff-roles.service';
 import { AdminStaffUpdatesService } from '../services/admin-staff-updates.service';
 import type { StaffInviteResult } from '../types/admin-staff.types';
 import type { AdminUserCard } from '../types/admin-users.types';
@@ -29,6 +32,7 @@ export class AdminStaffController {
   constructor(
     private readonly invites: AdminStaffInvitesService,
     private readonly updates: AdminStaffUpdatesService,
+    private readonly roles: AdminStaffRolesService,
   ) {}
 
   @Post(ADMIN_STAFF_ROUTES.STAFF)
@@ -47,6 +51,16 @@ export class AdminStaffController {
     @Param(new ZodValidationPipe(userIdParamSchema)) params: UserIdParamDto,
   ): Promise<StaffInviteResult> {
     return this.invites.resend(admin.userId, params.userId);
+  }
+
+  @Post(ADMIN_STAFF_ROUTES.USER_ROLE)
+  @HttpCode(HttpStatus.OK)
+  changeRole(
+    @CurrentUser() admin: AuthUser,
+    @Param(new ZodValidationPipe(userIdParamSchema)) params: UserIdParamDto,
+    @Body(new ZodValidationPipe(changeRoleSchema)) dto: ChangeRoleDto,
+  ): Promise<AdminUserCard> {
+    return this.roles.change(admin.userId, params.userId, dto.role);
   }
 
   @Patch(ADMIN_ROUTES.USER)

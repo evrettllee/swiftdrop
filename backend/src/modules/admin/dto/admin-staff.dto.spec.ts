@@ -1,5 +1,5 @@
 import { ADMIN_STAFF_MESSAGES } from '../constants/admin-staff.constants';
-import { inviteStaffSchema, updateStaffSchema } from './admin-staff.dto';
+import { changeRoleSchema, inviteStaffSchema, updateStaffSchema } from './admin-staff.dto';
 
 const VALID_INVITE = {
   role: 'courier',
@@ -55,6 +55,23 @@ describe('inviteStaffSchema', () => {
   it('should require every field when the body is empty', () => {
     expect(issuesOf(inviteStaffSchema.safeParse({}))).toHaveLength(5);
   });
+});
+
+describe('changeRoleSchema', () => {
+  it.each(['courier', 'manager'])('should take the role %s', (role) => {
+    expect(changeRoleSchema.parse({ role })).toEqual({ role });
+  });
+
+  it.each([{}, { role: 'admin' }, { role: 'client' }, { role: 'courier', reason: 'x' }, null])(
+    'should give the role message for %o',
+    (body) => {
+      const result = changeRoleSchema.safeParse(body);
+
+      expect(result.error?.issues.map((issue) => issue.message)).toEqual([
+        ADMIN_STAFF_MESSAGES.ROLE_INVALID,
+      ]);
+    },
+  );
 });
 
 describe('updateStaffSchema', () => {

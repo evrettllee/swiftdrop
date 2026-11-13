@@ -17,6 +17,7 @@ describe('parseActionDetails', () => {
   it.each([
     [ADMIN_ACTION.USER_BLOCKED, { reason: 42 }],
     [ADMIN_ACTION.ROLE_CHANGED, { from: 'admin', to: 'manager' }],
+    [ADMIN_ACTION.ROLE_CHANGED, { from: 'client', to: 'courier' }],
     [ADMIN_ACTION.STAFF_INVITED, null],
     [ADMIN_ACTION.USER_UPDATED, { changes: { phone: { from: '+375291111111', to: null } } }],
     [ADMIN_ACTION.USER_UPDATED, { fields: ['email'] }],
