@@ -6,6 +6,7 @@ import type { Database } from '@/database/database.module';
 import { createTestApp } from '@test/support/app';
 import { createAdmin, findUserId } from '@test/support/admin';
 import {
+  deleteAdminUser,
   postBlock,
   postEndSessions,
   postPasswordReset,
@@ -69,6 +70,7 @@ describe('Admin staff access (e2e)', () => {
     ['the unblock', (cookies) => postUnblock(app, cookies, invitedId)],
     ['the end of sessions', (cookies) => postEndSessions(app, cookies, invitedId)],
     ['the password reset', (cookies) => postPasswordReset(app, cookies, invitedId)],
+    ['the delete', (cookies) => deleteAdminUser(app, cookies, invitedId)],
   ];
 
   it.each(calls)(

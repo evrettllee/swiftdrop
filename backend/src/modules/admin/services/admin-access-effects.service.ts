@@ -15,6 +15,7 @@ import {
 } from '../constants/admin-staff.constants';
 import {
   hasActiveCourierOrder,
+  hasOpenClientOrder,
   type LockedCourierProfile,
   lockCourierProfile,
 } from '../utils/admin-access-queries';
@@ -41,6 +42,18 @@ export class AdminAccessEffectsService {
       ADMIN_STAFF_MESSAGES.USER_BUSY,
       () => this.logger.warn(`${LOG.USER_BUSY}: user ${userId}`),
     );
+  }
+
+  async stopUser(
+    tx: Transaction,
+    user: LockedTargetUser,
+    activeOrderMessage: string,
+  ): Promise<ShiftStop | null> {
+    if (user.roleName === ROLE.CLIENT && (await hasOpenClientOrder(tx, user.userId))) {
+      throw new ConflictException(activeOrderMessage);
+    }
+
+    return this.stopCourier(tx, user, activeOrderMessage);
   }
 
   async stopCourier(

@@ -9,7 +9,7 @@ import { CourierShiftEventsService } from '@/modules/couriers/services/courier-s
 import type { CourierShiftEvent } from '@/modules/couriers/types/couriers.types';
 import { withCookies } from './admin';
 import { accessCookie } from './auth';
-import { postApi } from './http';
+import { deleteApi, postApi } from './http';
 
 const AGED_TOKEN_SECONDS = 30;
 
@@ -44,6 +44,17 @@ export function postPasswordReset(
   userId: number,
 ) {
   return withCookies(postApi(app, userPath(userId, 'password-reset')), cookies);
+}
+
+export function deleteAdminUser(
+  app: NestExpressApplication,
+  cookies: string | null,
+  userId: number,
+) {
+  return withCookies(
+    deleteApi(app, `${ADMIN_ROUTES.BASE}/${ADMIN_ROUTES.USERS}/${userId}`),
+    cookies,
+  );
 }
 
 export async function agedAccessCookie(

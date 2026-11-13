@@ -1,3 +1,4 @@
+import { fullPersonName } from '@/common/utils/person-name';
 import { staffName } from '@/modules/support/mappers/support.mapper';
 import type { MessageViewer } from '@/modules/support/types/support.types';
 import { ORDER_ACTOR } from '../constants/manager-orders.constants';
@@ -28,7 +29,7 @@ type PersonName = { firstName: string; lastName: string };
 const STAFF_VIEWER: MessageViewer = 'staff';
 
 function fullName({ firstName, lastName }: PersonName): string {
-  return `${firstName} ${lastName}`;
+  return fullPersonName(firstName, lastName);
 }
 
 function toHistoryEntry(row: HistoryRow): ManagerOrderHistoryEntry {

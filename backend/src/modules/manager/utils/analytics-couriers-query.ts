@@ -2,7 +2,7 @@ import { type SQL, sql } from 'drizzle-orm';
 import { SORT_DIRECTION } from '@/common/constants/list.constants';
 import { LIST_FIRST_PAGE } from '@/common/constants/list.constants';
 import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
-import { fullNameSql } from '@/database/sql-expressions';
+import { displayNameSql } from '@/database/sql-expressions';
 import { sqlLiteral } from '@/database/sql-literal';
 import { courierProfiles, courierShifts, orderOffers, users, vehicles } from '@/database/schema';
 import {
@@ -64,7 +64,7 @@ function courierRowsSql(range: AnalyticsRange): SQL {
   shifts as (${shiftHoursSql(range)}),
   courier_rows as (
     select ${courierProfiles.courierProfileId} as courier_id,
-      ${fullNameSql(users.firstName, users.lastName)} as name,
+      ${displayNameSql(users.firstName, users.lastName)} as name,
       ${vehicles.type} as vehicle_type,
       coalesce(done.delivered, 0) as delivered,
       ${roundedSql(sql`100.0 * done.on_time / nullif(done.timed, 0)`, ANALYTICS_DECIMALS.PERCENT)} as on_time_pct,

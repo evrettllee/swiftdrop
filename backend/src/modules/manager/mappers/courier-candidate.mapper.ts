@@ -1,3 +1,4 @@
+import { fullPersonName } from '@/common/utils/person-name';
 import { MS_PER_SECOND } from '@/common/constants/time.constants';
 import {
   UNSUITABLE_REASON,
@@ -37,7 +38,7 @@ export function unsuitableReasons(checks: CourierChecks): UnsuitableReason[] {
 export function toCandidateView(row: CourierCandidateRow): CourierCandidateView {
   return {
     courierId: row.courierId,
-    name: `${row.firstName} ${row.lastName}`,
+    name: fullPersonName(row.firstName, row.lastName),
     vehicleType: row.vehicleType,
     pickupDistanceM: row.pickupDistanceM,
     positionAgeSec:

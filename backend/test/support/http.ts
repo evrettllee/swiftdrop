@@ -34,6 +34,13 @@ export function putApi(app: NestExpressApplication, path: string) {
     .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
 }
 
+export function deleteApi(app: NestExpressApplication, path: string) {
+  return request(app.getHttpServer())
+    .delete(`/${GLOBAL_PREFIX}/${path}`)
+    .set(CLIENT_IP_HEADER, nextClientIp())
+    .set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
+}
+
 export function patchApi(app: NestExpressApplication, path: string) {
   return request(app.getHttpServer())
     .patch(`/${GLOBAL_PREFIX}/${path}`)

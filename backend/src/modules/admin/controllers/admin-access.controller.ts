@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ROLE } from '@/common/enums/role.enum';
 import { UserThrottle } from '@/common/guards/user-throttle.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
@@ -11,6 +11,7 @@ import { type BlockUserDto, blockUserSchema } from '../dto/admin-access.dto';
 import { type UserIdParamDto, userIdParamSchema } from '../dto/admin-users.dto';
 import { AdminPasswordResetService } from '../services/admin-password-reset.service';
 import { AdminUserAccessService } from '../services/admin-user-access.service';
+import { AdminUserDeleteService } from '../services/admin-user-delete.service';
 import type { StaffInviteResult } from '../types/admin-staff.types';
 import type { AdminUserCard } from '../types/admin-users.types';
 
@@ -20,6 +21,7 @@ export class AdminAccessController {
   constructor(
     private readonly access: AdminUserAccessService,
     private readonly resets: AdminPasswordResetService,
+    private readonly deletes: AdminUserDeleteService,
   ) {}
 
   @Post(ADMIN_ACCESS_ROUTES.BLOCK)
@@ -48,6 +50,14 @@ export class AdminAccessController {
     @Param(new ZodValidationPipe(userIdParamSchema)) params: UserIdParamDto,
   ): Promise<AdminUserCard> {
     return this.access.endSessions(admin.userId, params.userId);
+  }
+
+  @Delete(ADMIN_ROUTES.USER)
+  remove(
+    @CurrentUser() admin: AuthUser,
+    @Param(new ZodValidationPipe(userIdParamSchema)) params: UserIdParamDto,
+  ): Promise<AdminUserCard> {
+    return this.deletes.delete(admin.userId, params.userId);
   }
 
   @Post(ADMIN_ACCESS_ROUTES.PASSWORD_RESET)

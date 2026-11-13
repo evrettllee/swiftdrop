@@ -16,6 +16,7 @@ import { AdminStaffRolesService } from './services/admin-staff-roles.service';
 import { AdminStaffUpdatesService } from './services/admin-staff-updates.service';
 import { AdminUserAccessService } from './services/admin-user-access.service';
 import { AdminUserCardService } from './services/admin-user-card.service';
+import { AdminUserDeleteService } from './services/admin-user-delete.service';
 import { AdminUsersService } from './services/admin-users.service';
 
 @Module({
@@ -30,6 +31,7 @@ import { AdminUsersService } from './services/admin-users.service';
     AdminStaffUpdatesService,
     AdminUserAccessService,
     AdminUserCardService,
+    AdminUserDeleteService,
     AdminUsersService,
   ],
 })

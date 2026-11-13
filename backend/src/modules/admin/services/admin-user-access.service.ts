@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
+import { ROW_LOCK_UPDATE } from '@/common/constants/database.constants';
 import { ADMIN_ACTION } from '@/common/enums/admin-action.enum';
 import { ROLE } from '@/common/enums/role.enum';
 import { users } from '@/database/schema';
@@ -11,11 +12,7 @@ import {
 import { ADMIN_STAFF_MESSAGES } from '../constants/admin-staff.constants';
 import { USER_STATUS } from '../constants/admin-users.constants';
 import type { AdminUserCard, UserStatus } from '../types/admin-users.types';
-import {
-  hasActiveCourierOrder,
-  hasOpenClientOrder,
-  lockCourierProfile,
-} from '../utils/admin-access-queries';
+import { hasActiveCourierOrder, lockCourierProfile } from '../utils/admin-access-queries';
 import { recordUserAction } from '../utils/admin-action-log';
 import { type LockedTargetUser, lockTargetUser } from '../utils/admin-target-lock';
 import { deriveUserStatus } from '../utils/user-status';
@@ -53,19 +50,15 @@ export class AdminUserAccessService {
 
   async block(adminId: number, userId: number, reason: string): Promise<AdminUserCard> {
     const stop = await this.effects.inLockedTransaction(userId, async (tx) => {
-      const user = await lockTargetUser(tx, userId);
+      const user = await lockTargetUser(tx, userId, ROW_LOCK_UPDATE);
 
       refuseByStatus(user, BLOCK_REFUSALS);
 
-      const shiftStop = await this.effects.stopCourier(
+      const shiftStop = await this.effects.stopUser(
         tx,
         user,
         ADMIN_ACCESS_MESSAGES.BLOCK_ACTIVE_ORDER,
       );
-
-      if (user.roleName === ROLE.CLIENT && (await hasOpenClientOrder(tx, userId))) {
-        throw new ConflictException(ADMIN_ACCESS_MESSAGES.BLOCK_ACTIVE_ORDER);
-      }
 
       await tx.update(users).set({ isBlocked: true }).where(eq(users.userId, userId));
       await this.effects.endSessions(tx, userId);

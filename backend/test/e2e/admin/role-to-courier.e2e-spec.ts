@@ -8,6 +8,7 @@ import { courierProfiles } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import { createTestApp } from '@test/support/app';
 import { createAdmin, findUserId } from '@test/support/admin';
+import { agedAccessCookie } from '@test/support/admin-access';
 import {
   findActions,
   loginAs,
@@ -83,8 +84,9 @@ describe('Admin role change to courier and of invited staff (e2e)', () => {
   });
 
   it('should leave a manager without a profile until the first courier visit', async () => {
-    const managerCookies = await createManager(app, db);
+    await createManager(app, db);
     const userId = await findUserId(db, MANAGER_ACCOUNT.email);
+    const aged = await agedAccessCookie(app, userId, ROLE.MANAGER);
 
     const response = await postRole(app, admin, userId, { role: ROLE.COURIER }).expect(
       HttpStatus.OK,
@@ -98,7 +100,7 @@ describe('Admin role change to courier and of invited staff (e2e)', () => {
       activeOrderId: null,
     });
     expect(await profilesOf(userId)).toHaveLength(0);
-    await getManagerOrders(app, managerCookies).expect(HttpStatus.FORBIDDEN);
+    await getManagerOrders(app, aged).expect(HttpStatus.UNAUTHORIZED);
 
     const courier = await loginAs(app, MANAGER_ACCOUNT);
     await getCourierMe(app, courier).expect(HttpStatus.OK);
