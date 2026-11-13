@@ -39,7 +39,6 @@ describe('Stand-only mail route (e2e)', () => {
           firstName: 'Павел',
           roleName: ROLE.COURIER,
           link: LINK,
-          expiresAt: new Date(),
         }),
       );
 

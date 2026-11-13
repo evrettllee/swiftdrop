@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PERSON_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
+import { buildNameSchema } from '@/common/schemas/person-fields.schema';
 import {
   AUTH_VALIDATION_MESSAGES,
   PASSWORD_DIGIT_REGEX,
@@ -9,6 +10,18 @@ import {
   PASSWORD_SPECIAL_REGEX,
   PASSWORD_UPPERCASE_REGEX,
 } from '../constants/validation.constants';
+
+export const firstNameSchema = buildNameSchema(
+  AUTH_VALIDATION_MESSAGES.FIRST_NAME_TOO_SHORT,
+  AUTH_VALIDATION_MESSAGES.FIRST_NAME_TOO_LONG,
+  AUTH_VALIDATION_MESSAGES.FIRST_NAME_INVALID,
+);
+
+export const lastNameSchema = buildNameSchema(
+  AUTH_VALIDATION_MESSAGES.LAST_NAME_TOO_SHORT,
+  AUTH_VALIDATION_MESSAGES.LAST_NAME_TOO_LONG,
+  AUTH_VALIDATION_MESSAGES.LAST_NAME_INVALID,
+);
 
 export const emailSchema = z
   .string()

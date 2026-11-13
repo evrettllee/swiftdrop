@@ -13,7 +13,7 @@ const INPUT = {
 };
 
 describe('buildInvitationMail', () => {
-  it('should write the invitation text with the role and the Minsk time when a courier is invited', () => {
+  it('should write the invitation text line by line when a courier is invited', () => {
     const mail = buildInvitationMail(INPUT);
 
     expect(mail).toMatchObject({
@@ -22,7 +22,12 @@ describe('buildInvitationMail', () => {
       subject: 'Приглашение в SwiftDrop',
     });
     expect(mail.text).toBe(
-      `Здравствуйте, Иван! Вас пригласили в SwiftDrop как курьера. Чтобы войти, создайте пароль по ссылке: ${LINK}. Ссылка действует до 13.11.2026 12:05 и только один раз. Если вы не ждали это письмо, просто удалите его.`,
+      [
+        'Здравствуйте, Иван!',
+        'Вас пригласили в SwiftDrop как курьера. Создайте пароль по ссылке, она действует 72 часа:',
+        LINK,
+        'Если вы не ждали это письмо, просто проигнорируйте его.',
+      ].join('\n'),
     );
   });
 
@@ -39,7 +44,8 @@ describe('buildInvitationMail', () => {
     expect(html).toContain(`<a href="${LINK}"`);
     expect(html).toContain('>Создать пароль</a>');
     expect(html.split(LINK)).toHaveLength(3);
-    expect(html).toContain('13.11.2026 12:05');
+    expect(html).toContain('она действует 72 часа:');
+    expect(html).toContain('просто проигнорируйте его.');
     expect(html).not.toMatch(/<img|<link|https?:\/\/(?!swiftdrop\.example)/);
   });
 

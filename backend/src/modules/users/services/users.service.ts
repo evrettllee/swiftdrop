@@ -46,6 +46,18 @@ export class UsersService {
       .where(eq(users.userId, userId));
   }
 
+  async updateFields(
+    userId: number,
+    values: Partial<Pick<User, 'firstName' | 'lastName' | 'phone'>>,
+    executor: Database | Transaction = this.db,
+  ): Promise<void> {
+    try {
+      await executor.update(users).set(values).where(eq(users.userId, userId));
+    } catch (error) {
+      throw this.toConflictException(error);
+    }
+  }
+
   async markSignedIn(userId: number): Promise<void> {
     await this.db
       .update(users)

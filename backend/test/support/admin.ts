@@ -74,7 +74,7 @@ export async function insertAdminAction(
   await db.insert(adminActions).values({ details: {}, ...values });
 }
 
-function withCookies<T extends { set(name: string, value: string): T }>(
+export function withCookies<T extends { set(name: string, value: string): T }>(
   request: T,
   cookies: string | null,
 ): T {

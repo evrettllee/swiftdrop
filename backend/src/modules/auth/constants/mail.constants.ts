@@ -17,9 +17,9 @@ export const AUTH_MAIL_TEXTS = {
   BUTTON: 'Создать пароль',
   INVITATION: {
     SUBJECT: 'Приглашение в SwiftDrop',
-    INTRO: (roleLabel: string) => `Вас пригласили в SwiftDrop как ${roleLabel}.`,
-    ACTION: 'Чтобы войти, создайте пароль по ссылке:',
-    OUTRO: 'Если вы не ждали это письмо, просто удалите его.',
+    INTRO: (roleLabel: string, hours: number) =>
+      `Вас пригласили в SwiftDrop как ${roleLabel}. Создайте пароль по ссылке, она действует ${hours} часа:`,
+    OUTRO: 'Если вы не ждали это письмо, просто проигнорируйте его.',
   },
   PASSWORD_RESET_BY_ADMIN: {
     SUBJECT: 'Новый пароль для SwiftDrop',

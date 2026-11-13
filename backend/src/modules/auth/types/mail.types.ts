@@ -1,14 +1,15 @@
 import type { InvitableRole } from '../constants/mail.constants';
 
-type SetPasswordMailFields = {
+type MailLinkFields = {
   to: string;
   firstName: string;
   link: string;
-  expiresAt: Date;
 };
 
-export type InvitationMailInput = SetPasswordMailFields & {
+export type InvitationMailInput = MailLinkFields & {
   roleName: InvitableRole;
 };
 
-export type PasswordResetByAdminMailInput = SetPasswordMailFields;
+export type PasswordResetByAdminMailInput = MailLinkFields & {
+  expiresAt: Date;
+};
