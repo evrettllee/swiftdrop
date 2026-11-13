@@ -72,6 +72,11 @@ export const orders = pgTable(
       table.createdAt.desc().nullsFirst(),
       table.orderId.desc().nullsFirst(),
     ),
+    index('orders_courier_created_at_idx').on(
+      table.courierId,
+      table.createdAt.desc().nullsFirst(),
+      table.orderId.desc().nullsFirst(),
+    ),
     index('orders_courier_finished_at_idx')
       .on(table.courierId, table.finishedAt.desc().nullsFirst(), table.orderId.desc().nullsFirst())
       .where(sql`${table.status} IN (${sqlLiteralList(COURIER_HISTORY_STATUSES)})`),

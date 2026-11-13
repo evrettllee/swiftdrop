@@ -83,13 +83,7 @@ export const MANAGER_SORT_KEY = {
 export const FRAGILE_ONLY = 'true';
 export const OPEN_TICKET_ONLY = 'true';
 
-export const NUMERIC_SEARCH = /^[\d\s+\-()]+$/;
-export const NON_DIGITS = /\D/g;
 export const ORDER_ID_MAX_DIGITS = 10;
-export const PHONE_PREFIX = '+';
-export const BELARUS_COUNTRY_CODE = '375';
-export const BELARUS_TRUNK_PREFIX = '80';
-export const BELARUS_NATIONAL_DIGITS = 9;
 export const TEXT_SEARCH_MIN_LENGTH = 3;
 
 export const MANAGER_ORDERS_VALIDATION_MESSAGES = {
