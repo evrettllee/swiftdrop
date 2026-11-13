@@ -43,6 +43,6 @@ describe('parseActionDetails', () => {
   });
 
   it('should give empty details for an action without a user shape', () => {
-    expect(parseActionDetails(ADMIN_ACTION.TARIFF_CREATED, { name: 'Стандарт' })).toEqual({});
+    expect(parseActionDetails(ADMIN_ACTION.STAFF_PURGED, { name: 'Стандарт' })).toEqual({});
   });
 });

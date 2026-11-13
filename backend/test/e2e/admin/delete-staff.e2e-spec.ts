@@ -7,7 +7,7 @@ import { ROLE } from '@/common/enums/role.enum';
 import { TOKEN_KIND } from '@/common/enums/token-kind.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
-import { orderOffers } from '@/database/schema';
+import { courierProfiles, orderOffers, vehicles } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import { SOCKET_ERRORS } from '@/modules/realtime/constants/realtime.constants';
 import { createTestApp } from '@test/support/app';
@@ -71,6 +71,29 @@ describe('Admin delete of staff (e2e)', () => {
     await expect(connectAppSocket(baseUrl, courier.cookies)).rejects.toThrow(
       SOCKET_ERRORS.UNAUTHORIZED,
     );
+  });
+
+  it('should drop the avatar and the licence plate and keep the vehicle model', async () => {
+    const courier = await addCourierSession(app, db, COURIER_ACCOUNT, CAR, MINSK_PICKUP);
+    await db
+      .update(courierProfiles)
+      .set({ avatarUrl: 'https://cdn.example/avatar.png' })
+      .where(eq(courierProfiles.courierProfileId, courier.courierProfileId));
+
+    await deleteAdminUser(app, admin, await findUserId(db, COURIER_ACCOUNT.email)).expect(
+      HttpStatus.OK,
+    );
+
+    const [profile] = await db
+      .select({ avatarUrl: courierProfiles.avatarUrl })
+      .from(courierProfiles)
+      .where(eq(courierProfiles.courierProfileId, courier.courierProfileId));
+    const [vehicle] = await db
+      .select()
+      .from(vehicles)
+      .where(eq(vehicles.courierProfileId, courier.courierProfileId));
+    expect(profile.avatarUrl).toBeNull();
+    expect(vehicle).toMatchObject({ licensePlate: null, brand: CAR.brand, model: CAR.model });
   });
 
   it('should delete an invited courier and invite the same email and phone again', async () => {

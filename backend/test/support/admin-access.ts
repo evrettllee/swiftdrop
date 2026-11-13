@@ -1,7 +1,10 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { eq } from 'drizzle-orm';
 import type { RoleName } from '@/common/enums/role.enum';
+import type { Database } from '@/database/database.module';
+import { emailVerificationTokens, notifications } from '@/database/schema';
 import { ENV_KEYS } from '@/config/env.constants';
 import { ACCESS_TOKEN_TTL_SECONDS } from '@/modules/auth/constants/tokens.constants';
 import { ADMIN_ROUTES } from '@/modules/admin/constants/admin-users.constants';
@@ -55,6 +58,24 @@ export function deleteAdminUser(
     deleteApi(app, `${ADMIN_ROUTES.BASE}/${ADMIN_ROUTES.USERS}/${userId}`),
     cookies,
   );
+}
+
+export async function insertPersonalLeftovers(db: Database, userId: number): Promise<void> {
+  await db.insert(notifications).values({ userId, type: 'order', message: 'Заказ доставлен' });
+  await db.insert(emailVerificationTokens).values({
+    userId,
+    tokenHash: 'a'.repeat(64),
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+}
+
+export async function countPersonalLeftovers(db: Database, userId: number): Promise<number> {
+  const [notes, tokens] = await Promise.all([
+    db.select().from(notifications).where(eq(notifications.userId, userId)),
+    db.select().from(emailVerificationTokens).where(eq(emailVerificationTokens.userId, userId)),
+  ]);
+
+  return notes.length + tokens.length;
 }
 
 export async function agedAccessCookie(

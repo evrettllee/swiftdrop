@@ -50,7 +50,7 @@ const failureOf = async (promise: Promise<unknown>) =>
 
 describe('ManagerZoneWritesService', () => {
   it('should save the change, then tell the staff after the commit', async () => {
-    const { service, fake, log, toStaff } = setUp([[], LOCKED, [{ tariffId: 2 }], []]);
+    const { service, fake, log, toStaff } = setUp([[], LOCKED, [{ isActive: true }], []]);
 
     await service.update(5, { ...EXPECTED, tariffId: 2, polygon: [RECTANGLE] });
 
@@ -104,7 +104,7 @@ describe('ManagerZoneWritesService', () => {
       code: '23505',
       constraint: 'service_zones_name_lower_uidx',
     });
-    const { service } = setUp([[{ tariffId: 2 }], [{ zoneId: 5 }]], violation);
+    const { service } = setUp([[{ isActive: true }], [{ zoneId: 5 }]], violation);
 
     expect(
       await failureOf(

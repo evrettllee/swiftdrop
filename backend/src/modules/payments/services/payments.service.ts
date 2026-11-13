@@ -17,6 +17,7 @@ import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
 import { orders } from '@/database/schema';
 import { NbrbService } from '@/integrations/nbrb/services/nbrb.service';
+import { lockActiveUser } from '@/modules/users/utils/active-user-lock';
 import { convertBynToUsdMinor, formatMinorAmount } from '../utils/payment-amount';
 import { buildOrderReturnUrl } from '../utils/payment-urls';
 import { PaymentGateway } from '../contracts/payment-gateway.contract';
@@ -46,6 +47,7 @@ export class PaymentsService {
   // never has two open sessions, so it cannot be paid twice.
   async start(clientId: number, orderId: number): Promise<StartedPayment> {
     return this.db.transaction(async (tx) => {
+      await lockActiveUser(tx, clientId);
       const order = await this.lockPayableOrder(tx, clientId, orderId);
       await this.attempts.closePending(tx, orderId);
 

@@ -3,7 +3,14 @@ import { eq, sql } from 'drizzle-orm';
 import { ROW_LOCK_UPDATE } from '@/common/constants/database.constants';
 import { ADMIN_ACTION } from '@/common/enums/admin-action.enum';
 import type { Transaction } from '@/database/database.module';
-import { userOauthAccounts, users } from '@/database/schema';
+import {
+  courierProfiles,
+  emailVerificationTokens,
+  notifications,
+  userOauthAccounts,
+  users,
+  vehicles,
+} from '@/database/schema';
 import { PasswordLinksService } from '@/modules/auth/services/password-links.service';
 import {
   ADMIN_DELETE_LOG_MESSAGES as LOG,
@@ -31,6 +38,21 @@ async function anonymize(tx: Transaction, userId: number): Promise<void> {
     })
     .where(eq(users.userId, userId));
   await tx.delete(userOauthAccounts).where(eq(userOauthAccounts.userId, userId));
+  await tx.delete(notifications).where(eq(notifications.userId, userId));
+  await tx.delete(emailVerificationTokens).where(eq(emailVerificationTokens.userId, userId));
+
+  const [profile] = await tx
+    .update(courierProfiles)
+    .set({ avatarUrl: null })
+    .where(eq(courierProfiles.userId, userId))
+    .returning({ courierProfileId: courierProfiles.courierProfileId });
+
+  if (profile) {
+    await tx
+      .update(vehicles)
+      .set({ licensePlate: null })
+      .where(eq(vehicles.courierProfileId, profile.courierProfileId));
+  }
 }
 
 @Injectable()

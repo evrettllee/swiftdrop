@@ -8,6 +8,7 @@ import { addresses, orders, orderStatusHistory, packages } from '@/database/sche
 import { PricingService } from '@/modules/pricing/services/pricing.service';
 import type { PriceQuote } from '@/modules/pricing/types/pricing.types';
 import { OrderEventsService } from '@/modules/tracking/services/order-events.service';
+import { lockActiveUser } from '@/modules/users/utils/active-user-lock';
 import type { CreateOrderDto } from '../dto/create-order.dto';
 import { toAddressRow, toPackageRow } from '../mappers/order-rows.mapper';
 import { ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';
@@ -59,6 +60,8 @@ export class OrderPlacementService {
     estimatedDeliveryAt: Date,
   ) {
     return this.db.transaction(async (tx) => {
+      await lockActiveUser(tx, clientId);
+
       const [pickup, delivery] = await tx
         .insert(addresses)
         .values([toAddressRow(dto.pickup), toAddressRow(dto.delivery)])

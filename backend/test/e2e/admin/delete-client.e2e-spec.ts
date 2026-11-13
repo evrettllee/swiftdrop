@@ -11,7 +11,12 @@ import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
 import { AuthService } from '@/modules/auth/services/auth.service';
 import { createTestApp } from '@test/support/app';
 import { createAdmin, emailsOf, findUserId, getAdminUsers } from '@test/support/admin';
-import { agedAccessCookie, deleteAdminUser } from '@test/support/admin-access';
+import {
+  agedAccessCookie,
+  countPersonalLeftovers,
+  deleteAdminUser,
+  insertPersonalLeftovers,
+} from '@test/support/admin-access';
 import { findActions } from '@test/support/admin-staff';
 import {
   buildOAuthProfile,
@@ -49,6 +54,8 @@ describe('Admin delete of a client (e2e)', () => {
   });
 
   it('should anonymize the client, drop the sign-in ways and keep the trail', async () => {
+    await insertPersonalLeftovers(db, userId);
+
     const response = await deleteAdminUser(app, admin, userId).expect(HttpStatus.OK);
 
     expect(response.body).toMatchObject({
@@ -68,6 +75,7 @@ describe('Admin delete of a client (e2e)', () => {
     expect(
       await db.select().from(userOauthAccounts).where(eq(userOauthAccounts.userId, userId)),
     ).toEqual([]);
+    expect(await countPersonalLeftovers(db, userId)).toBe(0);
     expect(await findActions(db, userId)).toHaveLength(1);
   });
 

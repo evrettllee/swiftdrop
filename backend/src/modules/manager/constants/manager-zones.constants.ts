@@ -14,6 +14,7 @@ export const ZONE_ERROR_CODE = {
   ZONE_CHANGED: 'ZONE_CHANGED',
   ZONE_NAME_TAKEN: 'ZONE_NAME_TAKEN',
   TARIFF_NOT_FOUND: 'TARIFF_NOT_FOUND',
+  TARIFF_INACTIVE: 'TARIFF_INACTIVE',
   LAST_ACTIVE_ZONE: 'LAST_ACTIVE_ZONE',
   INVALID_POLYGON: 'INVALID_POLYGON',
 } as const;
@@ -24,6 +25,7 @@ export const MANAGER_ZONES_MESSAGES = {
   ZONE_CHANGED: 'Зону уже изменили. Обновите её и повторите правку',
   ZONE_NAME_TAKEN: 'Зона с таким названием уже есть',
   TARIFF_NOT_FOUND: 'Тариф не найден',
+  TARIFF_INACTIVE: 'Тариф выключен. Выберите другой тариф',
   LAST_ACTIVE_ZONE: 'Нельзя выключить последнюю активную зону: без неё нельзя оформить заказ',
   NAME_INVALID: 'Название: от 1 до 80 символов',
   PRIORITY_INVALID: 'Приоритет: целое число от 0 до 100',
