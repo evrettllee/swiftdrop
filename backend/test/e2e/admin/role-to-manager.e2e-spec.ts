@@ -6,12 +6,13 @@ import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
-import { courierProfiles, courierShifts } from '@/database/schema';
+import { courierProfiles, courierShifts, users } from '@/database/schema';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
 import { ADMIN_ROLE_MESSAGES } from '@/modules/admin/constants/admin-staff.constants';
 import { AUTH_ROUTES } from '@/modules/auth/constants/routes.constants';
 import { createTestApp } from '@test/support/app';
 import { createAdmin, findUserId } from '@test/support/admin';
+import { agedAccessCookie, recordShiftEvents } from '@test/support/admin-access';
 import { findActions, loginAs, postRole } from '@test/support/admin-staff';
 import { addCourierSession } from '@test/support/assignment';
 import { COOKIE_HEADER, postAuth, registerUser } from '@test/support/auth';
@@ -89,10 +90,16 @@ describe('Admin role change courier to manager (e2e)', () => {
     ]);
   });
 
-  it('should refuse the old refresh token and the old access token on courier routes', async () => {
+  it('should end the sessions and tell the map that the courier left the line', async () => {
+    const aged = await agedAccessCookie(app, userId, ROLE.COURIER);
+    const events = recordShiftEvents(app);
+
     await postRole(app, admin, userId, { role: ROLE.MANAGER }).expect(HttpStatus.OK);
 
-    await getCourierMe(app, courier.cookies).expect(HttpStatus.FORBIDDEN);
+    const [user] = await db.select().from(users).where(eq(users.userId, userId));
+    expect(user.sessionsValidAfter).toBeInstanceOf(Date);
+    expect(events).toEqual([{ courierProfileId: courier.courierProfileId, isAvailable: false }]);
+    await getCourierMe(app, aged).expect(HttpStatus.UNAUTHORIZED);
     await postAuth(app, AUTH_ROUTES.REFRESH)
       .set(COOKIE_HEADER, courier.cookies)
       .expect(HttpStatus.UNAUTHORIZED);

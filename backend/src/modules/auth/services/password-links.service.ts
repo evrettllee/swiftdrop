@@ -50,7 +50,7 @@ export class PasswordLinksService {
     const token = generateOpaqueToken(PASSWORD_LINK_TOKEN_BYTES);
     const expiresAt = new Date(Date.now() + PASSWORD_LINK_TTL_MS[input.kind]);
 
-    await this.markActiveUsed(tx, input.userId);
+    await this.invalidateAll(tx, input.userId);
     await tx.insert(passwordResetTokens).values({
       userId: input.userId,
       kind: input.kind,
@@ -113,7 +113,7 @@ export class PasswordLinksService {
         .update(users)
         .set({ passwordHash, emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, now())` })
         .where(eq(users.userId, userId));
-      await this.markActiveUsed(tx, userId);
+      await this.invalidateAll(tx, userId);
       await this.tokens.revokeAllForUser(userId, tx);
 
       return { ...row.user, passwordHash, roleName: row.roleName };
@@ -124,7 +124,7 @@ export class PasswordLinksService {
     return user;
   }
 
-  private async markActiveUsed(tx: Transaction, userId: number): Promise<void> {
+  async invalidateAll(tx: Transaction, userId: number): Promise<void> {
     await tx
       .update(passwordResetTokens)
       .set({ usedAt: NOW })

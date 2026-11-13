@@ -7,6 +7,8 @@ export type AccessTokenPayload = {
   role: RoleName;
 };
 
+export type IssuedAccessTokenPayload = AccessTokenPayload & { iat?: number };
+
 export type AuthUser = {
   userId: number;
   firstName: string;

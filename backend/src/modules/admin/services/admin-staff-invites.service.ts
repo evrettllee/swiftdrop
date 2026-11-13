@@ -1,17 +1,12 @@
 import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { withLockConflict } from '@/common/database/lock-conflict';
 import { ADMIN_ACTION } from '@/common/enums/admin-action.enum';
 import { TOKEN_KIND } from '@/common/enums/token-kind.enum';
-import { ENV_KEYS } from '@/config/env.constants';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
-import { MailGateway } from '@/integrations/mail/contracts/mail.gateway';
-import { mailFailureCodeOf } from '@/integrations/mail/utils/mail-failure-code';
 import { INVITABLE_ROLES } from '@/modules/auth/constants/mail.constants';
 import { buildInvitationMail } from '@/modules/auth/mail/invitation.mail';
 import { PasswordLinksService } from '@/modules/auth/services/password-links.service';
-import { buildSetPasswordUrl } from '@/modules/auth/utils/set-password-url';
 import { UsersService } from '@/modules/users/services/users.service';
 import {
   ADMIN_STAFF_LOG_MESSAGES as LOG,
@@ -27,6 +22,7 @@ import type {
 import { recordUserAction } from '../utils/admin-action-log';
 import { lockTargetUser } from '../utils/admin-target-lock';
 import { deriveUserStatus } from '../utils/user-status';
+import { AdminLinkMailService } from './admin-link-mail.service';
 
 @Injectable()
 export class AdminStaffInvitesService {
@@ -36,8 +32,7 @@ export class AdminStaffInvitesService {
     @Inject(DRIZZLE) private readonly db: Database,
     private readonly users: UsersService,
     private readonly links: PasswordLinksService,
-    private readonly mail: MailGateway,
-    private readonly config: ConfigService,
+    private readonly linkMail: AdminLinkMailService,
   ) {}
 
   async invite(adminId: number, dto: InviteStaffDto): Promise<StaffInviteResult> {
@@ -111,37 +106,14 @@ export class AdminStaffInvitesService {
     return { member, link };
   }
 
-  private async deliver({ member, link }: IssuedInvite): Promise<StaffInviteResult> {
-    const setPasswordUrl = buildSetPasswordUrl(
-      this.config.getOrThrow<string>(ENV_KEYS.APP_URL),
-      link.token,
+  private deliver({ member, link }: IssuedInvite): Promise<StaffInviteResult> {
+    return this.linkMail.deliver(member, link, (setPasswordUrl) =>
+      buildInvitationMail({
+        to: member.email,
+        firstName: member.firstName,
+        roleName: member.role,
+        link: setPasswordUrl,
+      }),
     );
-    const emailSent = await this.mail
-      .send(
-        buildInvitationMail({
-          to: member.email,
-          firstName: member.firstName,
-          roleName: member.role,
-          link: setPasswordUrl,
-        }),
-      )
-      .then(
-        () => true,
-        (error: unknown) => {
-          this.logger.error(
-            `${LOG.INVITE_MAIL_FAILED}: user ${member.userId}, ${mailFailureCodeOf(error)}`,
-          );
-
-          return false;
-        },
-      );
-
-    return {
-      userId: member.userId,
-      email: member.email,
-      setPasswordUrl,
-      expiresAt: link.expiresAt,
-      emailSent,
-    };
   }
 }

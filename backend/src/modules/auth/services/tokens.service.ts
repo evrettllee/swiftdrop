@@ -4,7 +4,7 @@ import { and, eq, gt, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
-import { refreshTokens } from '@/database/schema';
+import { refreshTokens, users } from '@/database/schema';
 import {
   REFRESH_TOKEN_BYTES,
   REFRESH_REUSE_GRACE_MS,
@@ -87,6 +87,14 @@ export class TokensService {
 
   // Also takes the grace window away from tokens rotated a moment ago: after a theft is noticed,
   // none of the old tokens may open a session again.
+  async endAllSessions(userId: number, executor: Database | Transaction = this.db): Promise<void> {
+    await this.revokeAllForUser(userId, executor);
+    await executor
+      .update(users)
+      .set({ sessionsValidAfter: sql`now()` })
+      .where(eq(users.userId, userId));
+  }
+
   async revokeAllForUser(
     userId: number,
     executor: Database | Transaction = this.db,

@@ -26,10 +26,10 @@ export const ADMIN_STAFF_MESSAGES = {
 } as const;
 
 export const ADMIN_STAFF_LOG_MESSAGES = {
-  INVITE_MAIL_FAILED: 'Invitation mail not sent',
+  LINK_MAIL_FAILED: 'Set-password mail not sent',
   USER_BUSY: 'Admin change waited too long for the user row',
   ROLE_CHANGED: 'Staff role changed',
-  OFFERS_CLOSE_FAILED: 'Open offers not closed after a role change',
+  OFFERS_CLOSE_FAILED: 'Open offers not closed after an access change',
 } as const;
 
 const INVITE_THROTTLE_LIMIT = 20;

@@ -6,12 +6,13 @@ import { describeError } from '@/common/utils/describe-error';
 import { ENV_KEYS } from '@/config/env.constants';
 import { ACCESS_COOKIE_NAME } from '@/modules/auth/constants/tokens.constants';
 import { toAuthUser } from '@/modules/auth/mappers/auth-user.mapper';
-import type { AccessTokenPayload } from '@/modules/auth/types/auth.types';
+import type { IssuedAccessTokenPayload } from '@/modules/auth/types/auth.types';
+import { isIssuedBeforeCutoff } from '@/modules/auth/utils/session-cutoff';
 import { UsersService } from '@/modules/users/services/users.service';
 import type { SocketSession } from '../types/realtime.types';
 import { parseCookieHeader } from '../utils/cookie-header';
 
-type VerifiedPayload = AccessTokenPayload & { exp: number };
+type VerifiedPayload = IssuedAccessTokenPayload & { exp: number };
 
 @Injectable()
 export class SocketAuthService {
@@ -37,7 +38,11 @@ export class SocketAuthService {
         const payload = await this.jwt.verifyAsync<VerifiedPayload>(token, { secret: this.secret });
         const user = await this.users.findById(Number(payload.sub));
 
-        if (user && !user.isBlocked) {
+        if (
+          user &&
+          !user.isBlocked &&
+          !isIssuedBeforeCutoff(payload.iat, user.sessionsValidAfter)
+        ) {
           session = {
             user: toAuthUser(user, user.roleName),
             expiresAtMs: payload.exp * MS_PER_SECOND,

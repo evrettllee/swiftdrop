@@ -28,6 +28,7 @@ export const users = pgTable(
     emailVerifiedAt: timestamp({ withTimezone: true }),
     deletedAt: timestamp({ withTimezone: true }),
     lastLoginAt: timestamp({ withTimezone: true }),
+    sessionsValidAfter: timestamp({ withTimezone: true }),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [

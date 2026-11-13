@@ -197,6 +197,13 @@
       "when": 1794578643673,
       "tag": "0027_orders_courier_created_at_index",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794581037275,
+      "tag": "0028_users_sessions_valid_after",
+      "breakpoints": true
     }
   ]
 }

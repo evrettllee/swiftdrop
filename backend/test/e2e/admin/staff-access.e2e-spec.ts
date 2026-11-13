@@ -6,6 +6,12 @@ import type { Database } from '@/database/database.module';
 import { createTestApp } from '@test/support/app';
 import { createAdmin, findUserId } from '@test/support/admin';
 import {
+  postBlock,
+  postEndSessions,
+  postPasswordReset,
+  postUnblock,
+} from '@test/support/admin-access';
+import {
   patchAdminUser,
   postResend,
   postRole,
@@ -59,6 +65,10 @@ describe('Admin staff access (e2e)', () => {
       (cookies) => patchAdminUser(app, cookies, invitedId, { lastName: 'Новиков' }),
     ],
     ['the role change', (cookies) => postRole(app, cookies, invitedId, { role: ROLE.MANAGER })],
+    ['the block', (cookies) => postBlock(app, cookies, invitedId)],
+    ['the unblock', (cookies) => postUnblock(app, cookies, invitedId)],
+    ['the end of sessions', (cookies) => postEndSessions(app, cookies, invitedId)],
+    ['the password reset', (cookies) => postPasswordReset(app, cookies, invitedId)],
   ];
 
   it.each(calls)(
