@@ -28,11 +28,10 @@ export function analyticsKpiSql({ current, previous }: AnalyticsPeriod): SQL {
   ),
   paid as (
     select ${payments.paidAt} >= ${current.start} as is_current,
-      sum(${orders.price}) as revenue,
+      sum(${payments.amount}) as revenue,
       count(*)::int as paid_orders,
-      round(avg(${orders.price}), 2)::text as avg_check
+      round(avg(${payments.amount}), 2)::text as avg_check
     from ${payments}
-    inner join ${orders} on ${orders.orderId} = ${payments.orderId}
     where ${payments.status} = ${sqlLiteral(PAYMENT_STATUS.PAID)}
       and ${payments.paidAt} >= ${previous.start} and ${payments.paidAt} < ${current.end}
     group by 1

@@ -39,7 +39,7 @@ async function assertTestDatabase(db: Database): Promise<void> {
 export async function resetTestData(db: Database): Promise<void> {
   await assertTestDatabase(db);
   await db.execute(
-    sql`TRUNCATE TABLE admin_actions, password_reset_tokens, users, tariffs, service_zones, exchange_rates RESTART IDENTITY CASCADE`,
+    sql`TRUNCATE TABLE service_failures, admin_actions, password_reset_tokens, users, tariffs, service_zones, exchange_rates RESTART IDENTITY CASCADE`,
   );
 }
 

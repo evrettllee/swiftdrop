@@ -19,6 +19,7 @@ import { orderOffers, orders } from '@/database/schema';
 import { CourierProfilesService } from '@/modules/couriers/services/courier-profiles.service';
 import { OrderTransactionsService } from '@/modules/tracking/services/order-transactions.service';
 import { ASSIGNMENT_ERROR_MESSAGES } from '../constants/assignment.constants';
+import { firstPromiseChanges } from '../utils/delivery-promise';
 import { openOfferOf } from '../utils/open-offer';
 import { OfferNotifierService } from './offer-notifier.service';
 
@@ -112,12 +113,14 @@ export class OfferResponsesService {
       return this.rejectClosed(tx, courierProfileId, offerId);
     }
 
+    const promise = await firstPromiseChanges(tx, offer.orderId, now);
     const assigned = await transitionOrderStatus(orderTx, {
       orderId: offer.orderId,
       from: ORDER_STATUS.CONFIRMED,
       to: ORDER_STATUS.COURIER_ASSIGNED,
       changedBy: userId,
-      changes: { courierId: courierProfileId },
+      changes: { courierId: courierProfileId, ...promise },
+      firstAssignmentAuto: true,
     });
 
     if (!assigned) {

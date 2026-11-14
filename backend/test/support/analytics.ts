@@ -2,6 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_OFFER_STATUS, type OrderOfferStatus } from '@/common/enums/order-offer-status.enum';
+import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { PAYMENT_STATUS } from '@/common/enums/payment-status.enum';
 import type { Database } from '@/database/database.module';
 import { courierShifts, orders, orderStatusHistory, users } from '@/database/schema';
@@ -12,7 +13,7 @@ import {
   type AnalyticsActor,
   type AnalyticsPlan,
 } from './analytics-plans';
-import { insertOffer } from './assignment';
+import { insertAcceptedOffer, insertOffer } from './assignment';
 import { COOKIE_HEADER, registerUser } from './auth';
 import {
   CAR,
@@ -26,6 +27,7 @@ import {
 } from './couriers';
 import { MINSK_PICKUP } from './fixtures';
 import { getApi } from './http';
+import { orderFactsOf } from './order-facts';
 import { placeOrders } from './orders';
 import { insertPayment } from './payments';
 import { MANAGER_ACCOUNT } from './users';
@@ -102,6 +104,7 @@ async function applyPlan(
       price: plan.price,
       courierId,
       estimatedMinutes: ANALYTICS_ESTIMATED_MINUTES,
+      ...orderFactsOf(plan.steps, 'courier'),
       createdAt: new Date(plan.createdAt),
       finishedAt: plan.finishedAt === null ? null : new Date(plan.finishedAt),
     })
@@ -111,10 +114,15 @@ async function applyPlan(
     await db
       .insert(orderStatusHistory)
       .values({ orderId, status, changedBy: actors[actor], changedAt: new Date(at) });
+
+    if (status === ORDER_STATUS.COURIER_ASSIGNED && actor === 'courier' && courierId !== null) {
+      await insertAcceptedOffer(db, orderId, courierId, new Date(at));
+    }
   }
 
   if (plan.paidAt !== null) {
     await insertPayment(db, orderId, {
+      amount: plan.price,
       status: plan.refunded ? PAYMENT_STATUS.REFUNDED : PAYMENT_STATUS.PAID,
       paidAt: new Date(plan.paidAt),
       refundedAt: plan.refunded ? new Date(plan.paidAt) : null,

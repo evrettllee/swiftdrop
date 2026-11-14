@@ -82,3 +82,12 @@ export async function insertTariff(db: Database, name: string, isActive = true):
 
   return tariff.tariffId;
 }
+
+export async function zoneIdOf(db: Database, name: string): Promise<number> {
+  const [zone] = await db
+    .select({ zoneId: serviceZones.zoneId })
+    .from(serviceZones)
+    .where(eq(serviceZones.name, name));
+
+  return zone.zoneId;
+}

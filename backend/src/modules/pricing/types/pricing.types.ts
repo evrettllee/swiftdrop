@@ -29,4 +29,5 @@ export type PriceQuote = {
   estimate: PriceEstimate;
   // The tariff of the pickup zone: an order keeps it, so its price stays explainable later.
   tariffId: number;
+  zoneId: number;
 };

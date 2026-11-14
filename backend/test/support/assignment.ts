@@ -7,6 +7,7 @@ import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import type { Database } from '@/database/database.module';
 import { courierProfiles, orderOffers, orderStatusHistory, roles, users } from '@/database/schema';
 import { OFFER_TTL_MS } from '@/modules/assignment/constants/assignment.constants';
+import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
 import {
   type COURIER_ACCOUNT,
   createCourier,
@@ -15,6 +16,8 @@ import {
   putAvailability,
   putVehicle,
 } from './couriers';
+
+const ACCEPTED_OFFER_ROUND = 9;
 
 export const OFFER_ETA = { pickupEtaSec: 300, totalEtaSec: 1200 };
 
@@ -102,4 +105,18 @@ export async function recordConfirmation(db: Database, orderId: number, at: Date
   await db
     .insert(orderStatusHistory)
     .values({ orderId, status: ORDER_STATUS.CONFIRMED, changedBy: null, changedAt: at });
+}
+
+export function insertAcceptedOffer(
+  db: Database,
+  orderId: number,
+  courierId: number,
+  at: Date,
+): Promise<number> {
+  return insertOffer(db, orderId, courierId, {
+    status: ORDER_OFFER_STATUS.ACCEPTED,
+    round: ACCEPTED_OFFER_ROUND,
+    offeredAt: at,
+    respondedAt: at,
+  });
 }

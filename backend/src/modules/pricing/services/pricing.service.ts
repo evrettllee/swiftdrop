@@ -74,6 +74,7 @@ export class PricingService {
 
     return {
       tariffId: pickupZone.tariffId,
+      zoneId: pickupZone.zoneId,
       estimate: {
         price: calculatePrice({ distanceKm, spec: dto.package, vehicleType, rates, coefficient }),
         currency: CURRENCY,

@@ -63,7 +63,8 @@ const FINISH = `UPDATE perf_orders SET d1 = CASE
 
 const ORDERS = `INSERT INTO orders (order_id, client_id, courier_id, tariff_id, pickup_address_id,
   delivery_address_id, status, recipient_name, recipient_phone, price, distance_km,
-  estimated_delivery_at, otp_code, created_at, finished_at, status_changed_at, estimated_minutes)
+  estimated_delivery_at, otp_code, created_at, finished_at, status_changed_at, estimated_minutes,
+  promised_delivery_at, zone_id)
 OVERRIDING SYSTEM VALUE
 SELECT order_id, client_id, courier_id, 1 + order_id % 3, 2 * order_id - 1, 2 * order_id,
   status::order_status, ${personName('(order_id + 7)')} || ' ' || ${personSurname('(order_id + 7)')},
@@ -74,7 +75,9 @@ SELECT order_id, client_id, courier_id, 1 + order_id % 3, 2 * order_id - 1, 2 * 
   CASE status WHEN 'pending' THEN t0 WHEN 'confirmed' THEN c1
     WHEN 'awaiting_manual_assignment' THEN c1 + interval '5 minutes' WHEN 'courier_assigned' THEN a1
     WHEN 'picked_up' THEN p1 WHEN 'in_transit' THEN p1 + interval '1 minute' ELSE d1 END,
-  30 + order_id % 30
+  30 + order_id % 30,
+  CASE WHEN reached_assigned AND order_id % 10 <> 0 THEN a1 + interval '35 minutes' END,
+  CASE WHEN order_id % 50 <> 0 THEN 1 + order_id % 20 END
 FROM perf_orders`;
 
 const HISTORY = `INSERT INTO order_status_history (order_id, status, changed_by, changed_at)

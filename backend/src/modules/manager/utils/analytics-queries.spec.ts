@@ -55,17 +55,16 @@ describe('analytics definitions', () => {
   it('should take the first confirmation, the first assignment and the last cancellation', () => {
     const text = flat(render(analyticsKpiSql(period)).sql);
 
+    expect(text).toContain(`"orders"."paid_at" as confirmed_at`);
+    expect(text).toContain(`"orders"."first_assigned_at" as assigned_at`);
     expect(text).toContain(
-      `min("order_status_history"."changed_at") filter (where "order_status_history"."status" = 'confirmed') as confirmed_at`,
+      `coalesce("orders"."first_assigned_at" is not null and not "orders"."first_assigned_auto", false) as assigned_by_staff`,
     );
     expect(text).toContain(
-      `order by "order_status_history"."changed_at", "order_status_history"."status_history_id") filter (where "order_status_history"."status" = 'courier_assigned'))[1] as assigned_by`,
+      `order by last_cancel.order_id, last_cancel.changed_at desc, last_cancel.status_history_id desc`,
     );
-    expect(text).toContain(
-      `order by "order_status_history"."changed_at" desc, "order_status_history"."status_history_id" desc) filter (where "order_status_history"."status" = 'cancelled'))[1] as cancelled_by`,
-    );
-    expect(text).toContain(`"roles"."name" in ('manager', 'admin')`);
-    expect(text).toContain(`when timeline.cancelled_by = "orders"."client_id" then 'client'`);
+    expect(text).not.toContain(`"roles"."name"`);
+    expect(text).toContain(`when cancelled.changed_by = "orders"."client_id" then 'client'`);
   });
 
   it('should count revenue by paid and not refunded payments', () => {
@@ -83,9 +82,7 @@ describe('analytics definitions', () => {
       limit: 20,
     } as const;
 
-    expect(confirmed).toContain(
-      `exists ( select 1 from "order_status_history" where "order_status_history"."order_id" = "orders"."order_id" and "order_status_history"."status" = 'confirmed' )`,
-    );
+    expect(confirmed).toContain(`"orders"."paid_at" is not null`);
     expect(confirmed).not.toContain('pending');
 
     for (const query of [

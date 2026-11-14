@@ -80,3 +80,8 @@ export const MESSAGE_FIELD_LENGTH = {
 } as const;
 
 export const CURRENCY_CODE_LENGTH = 3;
+
+export const SERVICE_FAILURE_FIELD_LENGTH = {
+  CODE: 64,
+  MESSAGE: 300,
+} as const;

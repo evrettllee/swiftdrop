@@ -2,7 +2,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { Database, Transaction } from '@/database/database.module';
 import { orders, orderStatusHistory } from '@/database/schema';
 import { ORDER_FINISHED_STATUSES } from '@/common/constants/orders.constants';
-import type { OrderStatus } from '@/common/enums/order-status.enum';
+import { ORDER_STATUS, type OrderStatus } from '@/common/enums/order-status.enum';
 
 const finishedStatuses = new Set<OrderStatus>(ORDER_FINISHED_STATUSES);
 
@@ -14,6 +14,20 @@ const changeColumns = {
   courierId: orders.courierId,
 };
 
+function factsOf({ to, firstAssignmentAuto }: { to: OrderStatus; firstAssignmentAuto?: boolean }) {
+  const paid =
+    to === ORDER_STATUS.CONFIRMED ? { paidAt: sql`coalesce(${orders.paidAt}, now())` } : {};
+  const firstAssignment =
+    to === ORDER_STATUS.COURIER_ASSIGNED && firstAssignmentAuto !== undefined
+      ? {
+          firstAssignedAt: sql`coalesce(${orders.firstAssignedAt}, now())`,
+          firstAssignedAuto: sql`coalesce(${orders.firstAssignedAuto}, ${firstAssignmentAuto})`,
+        }
+      : {};
+
+  return { ...paid, ...firstAssignment };
+}
+
 function statusIn(from: OrderStatus | readonly OrderStatus[]) {
   return typeof from === 'string' ? eq(orders.status, from) : inArray(orders.status, [...from]);
 }
@@ -22,7 +36,12 @@ function statusIn(from: OrderStatus | readonly OrderStatus[]) {
 export type OrderTransitionChanges = Partial<
   Pick<
     typeof orders.$inferInsert,
-    'courierId' | 'otpCode' | 'otpFailedAttempts' | 'otpLockedUntil' | 'assignmentRound'
+    | 'courierId'
+    | 'otpCode'
+    | 'otpFailedAttempts'
+    | 'otpLockedUntil'
+    | 'assignmentRound'
+    | 'promisedDeliveryAt'
   >
 >;
 
@@ -39,6 +58,7 @@ export type OrderStatusTransition = {
   courierId?: number;
   changes?: OrderTransitionChanges;
   comment?: string | null;
+  firstAssignmentAuto?: boolean;
 };
 
 // A status an order got, as it is right after the change.
@@ -90,7 +110,13 @@ export async function transitionOrderStatus(
   const finishedAt = finishedStatuses.has(to) ? sql`now()` : undefined;
   const [updated] = await orderTx.tx
     .update(orders)
-    .set({ ...changes, status: to, statusChangedAt: sql`now()`, ...(finishedAt && { finishedAt }) })
+    .set({
+      ...changes,
+      ...factsOf(transition),
+      status: to,
+      statusChangedAt: sql`now()`,
+      ...(finishedAt && { finishedAt }),
+    })
     .where(
       and(
         eq(orders.orderId, orderId),

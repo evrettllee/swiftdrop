@@ -21,3 +21,4 @@ export * from './notifications';
 export * from './reviews';
 export * from './exchange-rates';
 export * from './admin-actions';
+export * from './service-failures';

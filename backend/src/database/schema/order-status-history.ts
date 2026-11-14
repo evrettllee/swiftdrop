@@ -19,6 +19,7 @@ export const orderStatusHistory = pgTable(
   },
   (table) => [
     index('order_status_history_order_id_idx').on(table.orderId),
+    index('order_status_history_status_changed_at_idx').on(table.status, table.changedAt),
     check(
       'order_status_history_comment_length_check',
       sql`${table.comment} IS NULL OR char_length(${table.comment}) <= ${sqlIntegerLiteral(ORDER_STATUS_HISTORY_FIELD_LENGTH.COMMENT)}`,

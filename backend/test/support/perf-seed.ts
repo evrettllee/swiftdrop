@@ -1,3 +1,4 @@
+import { orderFactsBackfill } from './order-facts-backfill';
 import { Pool } from 'pg';
 import { TEST_DB_NAME_SUFFIX } from './constants';
 import { prepareTestDatabase } from './database';
@@ -6,7 +7,12 @@ import { PERF_SEED_ORDERS } from './perf-seed-orders.sql';
 import { PERF_SEED_PEOPLE } from './perf-seed-people.sql';
 import { PERF_SEED_TALK } from './perf-seed-talk.sql';
 
-const STEPS = [...PERF_SEED_PEOPLE, ...PERF_SEED_ORDERS, ...PERF_SEED_TALK];
+const STEPS = [
+  ...PERF_SEED_PEOPLE,
+  ...PERF_SEED_ORDERS,
+  ...orderFactsBackfill(),
+  ...PERF_SEED_TALK,
+];
 
 async function timed(label: string, work: () => Promise<unknown>): Promise<void> {
   const startedAt = performance.now();
