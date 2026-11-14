@@ -1,3 +1,7 @@
+import type { ExternalService } from '@/common/constants/service-failure-codes.constants';
+import type { ServiceName } from '@/common/enums/service-name.enum';
+import type { TicketTopic } from '@/common/enums/support-ticket.enum';
+
 export type Compared<T> = { value: T; previous: T };
 
 export type AnalyticsPeriodDates = { from: string; to: string };
@@ -49,4 +53,58 @@ export type DeliveryAnalytics = {
     maxDeclinesBeforeManual: number;
   };
   zones: DeliveryZoneRow[];
+};
+
+export type UsersAnalytics = {
+  period: AnalyticsPeriodDates;
+  kpis: {
+    newClients: Compared<number>;
+    activeClients: Compared<number>;
+    repeatClients: Compared<{ repeat: number; active: number }>;
+    couriersOnline: { onShift: number; total: number };
+    averageDeliveriesPerCourier: Compared<number | null>;
+  };
+  newClientsByDay: { date: string; count: number }[];
+  ordersPerClient: { one: number; two: number; threeToFive: number; sixPlus: number };
+};
+
+export type SupportAnalytics = {
+  period: AnalyticsPeriodDates;
+  kpis: {
+    ticketsCreated: Compared<number>;
+    firstResponseMedianMinutes: Compared<number | null>;
+    closed: Compared<{ closed: number; total: number }>;
+    unansweredNow: { count: number; longestWaitMinutes: number | null };
+  };
+  topics: { topic: TicketTopic; count: number }[];
+  firstResponseByDay: { date: string; medianMinutes: number | null; tickets: number }[];
+};
+
+export type ExternalServiceRow = {
+  service: ExternalService;
+  failures: number;
+  lastAt: string | null;
+  lastCode: string | null;
+};
+
+export type RecentFailure = {
+  lastAt: string;
+  firstAt: string;
+  service: ServiceName;
+  code: string;
+  message: string;
+  repeats: number;
+};
+
+export type ServiceAnalytics = {
+  period: AnalyticsPeriodDates;
+  kpis: {
+    serverErrors: Compared<number>;
+    externalFailures: Compared<{ failures: number; services: number }>;
+    mailFailures: { count: number; lastAt: string | null };
+    savedRateUsed: number;
+  };
+  serverErrorsByDay: { date: string; count: number }[];
+  services: ExternalServiceRow[];
+  recent: RecentFailure[];
 };

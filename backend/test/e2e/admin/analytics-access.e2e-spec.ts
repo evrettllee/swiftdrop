@@ -13,7 +13,14 @@ import { createCourier } from '@test/support/couriers';
 import { resetTestData, seedServiceArea } from '@test/support/database';
 import { createManager } from '@test/support/manager';
 
-const ROUTES = ['business', 'delivery'];
+const DAYS_KEY: Record<string, string> = {
+  business: 'revenueByDay',
+  delivery: 'onTimeByDay',
+  users: 'newClientsByDay',
+  support: 'firstResponseByDay',
+  service: 'serverErrorsByDay',
+};
+const ROUTES = Object.keys(DAYS_KEY);
 const BAD_PERIODS: [Record<string, string>, string][] = [
   [{ from: '2026-10-05', to: '2026-10-01' }, LIST_VALIDATION_MESSAGES.PERIOD_INVALID],
   [{ from: '2026-01-01', to: '2026-04-03' }, ANALYTICS_VALIDATION_MESSAGES.PERIOD_TOO_LONG],
@@ -58,7 +65,7 @@ describe('Admin analytics access and period (e2e)', () => {
     }).expect(HttpStatus.OK);
 
     expect(body.period).toEqual({ from: '2026-10-01', to: '2026-10-02' });
-    expect(body.revenueByDay ?? body.onTimeByDay).toHaveLength(2);
+    expect(body[DAYS_KEY[route]]).toHaveLength(2);
   });
 
   it.each(ROUTES)(

@@ -218,6 +218,13 @@
       "when": 1794651900530,
       "tag": "0030_orders_analytics_facts",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794689233579,
+      "tag": "0031_support_tickets_first_response",
+      "breakpoints": true
     }
   ]
 }

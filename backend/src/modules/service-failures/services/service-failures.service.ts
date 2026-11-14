@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { SERVICE_FAILURE_FIELD_LENGTH } from '@/common/constants/field-lengths.constants';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import type { ServiceFailureCode } from '@/common/constants/service-failure-codes.constants';
 import type { ServiceName } from '@/common/enums/service-name.enum';
 import { describeError } from '@/common/utils/describe-error';
 import { DRIZZLE } from '@/database/database.constants';
@@ -21,15 +22,15 @@ export class ServiceFailuresService {
 
   constructor(@Inject(DRIZZLE) private readonly db: Database) {}
 
-  async record(
-    service: ServiceName,
-    code: string,
+  async record<S extends ServiceName>(
+    service: S,
+    code: ServiceFailureCode<S>,
     message: string,
     now: Date = new Date(),
   ): Promise<void> {
     const entry = {
       service,
-      code: clipText(code, SERVICE_FAILURE_FIELD_LENGTH.CODE),
+      code,
       message: clipText(message, SERVICE_FAILURE_FIELD_LENGTH.MESSAGE),
       now,
     };
@@ -37,7 +38,7 @@ export class ServiceFailuresService {
     try {
       await this.db.transaction((tx) => this.mergeOrInsert(tx, entry));
     } catch (error) {
-      this.logger.error(`${LOG.NOT_RECORDED}: ${service} ${entry.code}, ${describeError(error)}`);
+      this.logger.error(`${LOG.NOT_RECORDED}: ${service} ${code}, ${describeError(error)}`);
     }
   }
 

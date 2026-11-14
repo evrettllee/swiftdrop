@@ -14,14 +14,17 @@ import { AdminAccessEffectsService } from './services/admin-access-effects.servi
 import { AdminAnalyticsService } from './services/admin-analytics.service';
 import { AdminLinkMailService } from './services/admin-link-mail.service';
 import { AdminPasswordResetService } from './services/admin-password-reset.service';
+import { AdminServiceAnalyticsService } from './services/admin-service-analytics.service';
 import { AdminStaffInvitesService } from './services/admin-staff-invites.service';
 import { AdminStaffRolesService } from './services/admin-staff-roles.service';
 import { AdminStaffUpdatesService } from './services/admin-staff-updates.service';
+import { AdminSupportAnalyticsService } from './services/admin-support-analytics.service';
 import { AdminTariffWritesService } from './services/admin-tariff-writes.service';
 import { AdminTariffsService } from './services/admin-tariffs.service';
 import { AdminUserAccessService } from './services/admin-user-access.service';
 import { AdminUserCardService } from './services/admin-user-card.service';
 import { AdminUserDeleteService } from './services/admin-user-delete.service';
+import { AdminUsersAnalyticsService } from './services/admin-users-analytics.service';
 import { AdminUsersService } from './services/admin-users.service';
 
 @Module({
@@ -38,14 +41,17 @@ import { AdminUsersService } from './services/admin-users.service';
     AdminAnalyticsService,
     AdminLinkMailService,
     AdminPasswordResetService,
+    AdminServiceAnalyticsService,
     AdminStaffInvitesService,
     AdminStaffRolesService,
     AdminStaffUpdatesService,
+    AdminSupportAnalyticsService,
     AdminTariffWritesService,
     AdminTariffsService,
     AdminUserAccessService,
     AdminUserCardService,
     AdminUserDeleteService,
+    AdminUsersAnalyticsService,
     AdminUsersService,
   ],
 })

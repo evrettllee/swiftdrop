@@ -5,6 +5,9 @@ export const ADMIN_ANALYTICS_ROUTES = {
   BASE: 'admin/analytics',
   BUSINESS: 'business',
   DELIVERY: 'delivery',
+  USERS: 'users',
+  SUPPORT: 'support',
+  SERVICE: 'service',
 } as const;
 
 export const NO_ZONE_NAME = 'Без зоны';
