@@ -1,8 +1,11 @@
+import type { ServiceFailuresService } from '@/modules/service-failures/services/service-failures.service';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OSRM_PROFILE } from '../constants/osrm.constants';
 import { OsrmClient } from './osrm-client.service';
 import { OsrmTripService } from './osrm-trip.service';
+
+const NO_FAILURES = { record: () => Promise.resolve() } as unknown as ServiceFailuresService;
 
 const BASE_URL = 'https://osrm.test';
 const COURIER = { latitude: 53.92, longitude: 27.6 };
@@ -40,7 +43,9 @@ describe('OsrmTripService', () => {
   let fetchSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    service = new OsrmTripService(new OsrmClient(new ConfigService({ OSRM_URL: BASE_URL })));
+    service = new OsrmTripService(
+      new OsrmClient(new ConfigService({ OSRM_URL: BASE_URL }), NO_FAILURES),
+    );
     fetchSpy = jest.spyOn(globalThis, 'fetch');
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
     jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);

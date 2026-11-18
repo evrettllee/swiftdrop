@@ -5,6 +5,7 @@ import {
   NBRB_RATE_CURRENCY,
   NBRB_RETRY_DELAY_MS,
 } from '../constants/nbrb.constants';
+import type { ServiceFailuresService } from '@/modules/service-failures/services/service-failures.service';
 import type { NbrbClient } from './nbrb-client.service';
 import { NbrbService } from './nbrb.service';
 import type { SavedRateService } from './saved-rate.service';
@@ -46,6 +47,7 @@ describe('NbrbService', () => {
     service = new NbrbService(
       { fetchUsdRate } as unknown as NbrbClient,
       { find, save } as unknown as SavedRateService,
+      { record: () => Promise.resolve() } as unknown as ServiceFailuresService,
     );
   });
 

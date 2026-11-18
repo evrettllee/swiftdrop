@@ -1,13 +1,14 @@
 import {
   BadRequestException,
-  HttpStatus,
   Injectable,
   Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { SERVICE_FAILURE_CODE } from '@/common/constants/service-failure-codes.constants';
 import { MS_PER_SECOND } from '@/common/constants/time.constants';
+import { SERVICE_NAME } from '@/common/enums/service-name.enum';
 import { describeError } from '@/common/utils/describe-error';
 import { ENV_KEYS } from '@/config/env.constants';
 import { PaymentGateway } from '@/modules/payments/contracts/payment-gateway.contract';
@@ -22,7 +23,10 @@ import type {
   PaymentEvent,
   SessionExpireResult,
 } from '@/modules/payments/types/payments.types';
+import { FAILURE_MESSAGES } from '@/modules/service-failures/constants/service-failures.constants';
+import { ServiceFailuresService } from '@/modules/service-failures/services/service-failures.service';
 import { mapStripeEvent, mapStripeSession } from '../mappers/stripe-event.mapper';
+import { isNotOpenSessionError, stripeFailureOf } from '../utils/stripe-failure';
 import {
   SINGLE_ITEM_QUANTITY,
   STRIPE_CHECKOUT_MODE,
@@ -39,6 +43,7 @@ export class StripePaymentAdapter extends PaymentGateway {
   constructor(
     private readonly client: StripeCheckoutApi,
     config: ConfigService,
+    private readonly failures: ServiceFailuresService,
   ) {
     super();
     this.webhookSecret = config.getOrThrow<string>(ENV_KEYS.STRIPE_WEBHOOK_SECRET);
@@ -109,6 +114,11 @@ export class StripePaymentAdapter extends PaymentGateway {
       event = Stripe.webhooks.constructEvent(rawBody, signature, this.webhookSecret);
     } catch {
       this.logger.warn('Stripe webhook signature check failed');
+      void this.failures.record(
+        SERVICE_NAME.STRIPE,
+        SERVICE_FAILURE_CODE.stripe.WEBHOOK_BAD_SIGNATURE,
+        FAILURE_MESSAGES.BAD_SIGNATURE,
+      );
       throw new BadRequestException(PAYMENTS_ERROR_MESSAGES.INVALID_SIGNATURE);
     }
 
@@ -126,16 +136,9 @@ export class StripePaymentAdapter extends PaymentGateway {
   // Any unexpected failure of Stripe becomes one clear answer for the client, details go to the log.
   private unavailable(error: unknown): ServiceUnavailableException {
     this.logger.error(`Stripe request failed: ${describeError(error)}`);
+    const failure = stripeFailureOf(error);
+    void this.failures.record(SERVICE_NAME.STRIPE, failure.code, failure.message);
 
     return new ServiceUnavailableException(PAYMENTS_ERROR_MESSAGES.GATEWAY_UNAVAILABLE);
   }
-}
-
-// Stripe refuses to close a session that is not open (paid or expired) with an invalid request of
-// status 400. A missing session is 404 and stays an unexpected failure.
-function isNotOpenSessionError(error: unknown): boolean {
-  return (
-    error instanceof Stripe.errors.StripeInvalidRequestError &&
-    error.statusCode === HttpStatus.BAD_REQUEST
-  );
 }
