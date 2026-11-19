@@ -6,11 +6,13 @@ import { CouriersModule } from '@/modules/couriers/couriers.module';
 import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { UsersModule } from '@/modules/users/users.module';
 import { AdminAccessController } from './controllers/admin-access.controller';
+import { AdminAnalyticsExportController } from './controllers/admin-analytics-export.controller';
 import { AdminAnalyticsController } from './controllers/admin-analytics.controller';
 import { AdminStaffController } from './controllers/admin-staff.controller';
 import { AdminTariffsController } from './controllers/admin-tariffs.controller';
 import { AdminUsersController } from './controllers/admin-users.controller';
 import { AdminAccessEffectsService } from './services/admin-access-effects.service';
+import { AdminAnalyticsExportService } from './services/admin-analytics-export.service';
 import { AdminAnalyticsService } from './services/admin-analytics.service';
 import { AdminLinkMailService } from './services/admin-link-mail.service';
 import { AdminPasswordResetService } from './services/admin-password-reset.service';
@@ -35,9 +37,11 @@ import { AdminUsersService } from './services/admin-users.service';
     AdminAccessController,
     AdminTariffsController,
     AdminAnalyticsController,
+    AdminAnalyticsExportController,
   ],
   providers: [
     AdminAccessEffectsService,
+    AdminAnalyticsExportService,
     AdminAnalyticsService,
     AdminLinkMailService,
     AdminPasswordResetService,

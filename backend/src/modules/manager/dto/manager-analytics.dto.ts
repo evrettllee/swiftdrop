@@ -26,7 +26,7 @@ import { periodDays } from '../utils/analytics-period';
 
 type RawPeriod = { from?: string; to?: string };
 
-function checkPeriod(query: RawPeriod, ctx: z.RefinementCtx): void {
+export function checkPeriod(query: RawPeriod, ctx: z.RefinementCtx): void {
   if (query.from === undefined || query.to === undefined) {
     return;
   }

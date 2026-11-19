@@ -1,13 +1,12 @@
 import { type SQL, sql } from 'drizzle-orm';
 import { orders, serviceZones } from '@/database/schema';
-import { NO_ZONE_NAME } from '@/modules/admin/constants/admin-analytics.constants';
-import type { AnalyticsRange } from '@/modules/manager/types/manager-analytics.types';
+import { NO_ZONE_NAME } from '@/common/constants/analytics.constants';
 import { moneySql, STATUS_SQL } from './analytics-sql';
 
 const MINUTE_SECONDS = sql.raw('60');
 const isDelivered = sql`${orders.status} = ${STATUS_SQL.DELIVERED}`;
 
-export function deliveryZonesSql({ start, end }: AnalyticsRange): SQL {
+export function deliveryZonesSql({ start, end }: { start: Date; end: Date }): SQL {
   return sql`select ${orders.zoneId} as "zoneId",
       coalesce(${serviceZones.name}, ${NO_ZONE_NAME}) as "name",
       count(*)::int as "orders",

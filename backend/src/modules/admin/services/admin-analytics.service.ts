@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { APP_TIME_ZONE } from '@/common/constants/time.constants';
+import type { DeliveryZoneRow } from '@/common/types/delivery-zone.types';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { MAX_OFFERS_PER_ORDER } from '@/modules/assignment/constants/assignment.constants';
@@ -11,18 +12,14 @@ import {
   type DeliveryKpiRow,
   splitPeriods,
 } from '../mappers/admin-analytics.mapper';
-import type {
-  BusinessAnalytics,
-  DeliveryAnalytics,
-  DeliveryZoneRow,
-} from '../types/admin-analytics.types';
+import type { BusinessAnalytics, DeliveryAnalytics } from '../types/admin-analytics.types';
 import {
   businessFunnelSql,
   businessKpiSql,
   revenueByDaySql,
 } from '../utils/analytics/business-queries';
 import { deliveryKpiSql, offersSql, onTimeByDaySql } from '../utils/analytics/delivery-queries';
-import { deliveryZonesSql } from '../utils/analytics/delivery-zones-query';
+import { deliveryZonesSql } from '@/common/database/delivery-zones-query';
 import { fillDays } from '../utils/analytics/fill-days';
 
 type FunnelRow = BusinessAnalytics['funnel'] & {

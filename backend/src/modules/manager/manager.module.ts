@@ -5,12 +5,14 @@ import { DeliveriesModule } from '@/modules/deliveries/deliveries.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { RealtimeModule } from '@/modules/realtime/realtime.module';
 import { TrackingModule } from '@/modules/tracking/tracking.module';
+import { ManagerAnalyticsExportController } from './controllers/manager-analytics-export.controller';
 import { ManagerAnalyticsController } from './controllers/manager-analytics.controller';
 import { ManagerOrderAssignmentController } from './controllers/manager-order-assignment.controller';
 import { ManagerCouriersController } from './controllers/manager-couriers.controller';
 import { ManagerOrderCancellationController } from './controllers/manager-order-cancellation.controller';
 import { ManagerOrdersController } from './controllers/manager-orders.controller';
 import { ManagerZonesController } from './controllers/manager-zones.controller';
+import { ManagerAnalyticsExportService } from './services/manager-analytics-export.service';
 import { ManagerAnalyticsService } from './services/manager-analytics.service';
 import { ManagerOrderCountsService } from './services/manager-order-counts.service';
 import { ManagerOrderDetailsService } from './services/manager-order-details.service';
@@ -44,6 +46,7 @@ import { ManagerZonesService } from './services/manager-zones.service';
     ManagerCouriersController,
     ManagerZonesController,
     ManagerAnalyticsController,
+    ManagerAnalyticsExportController,
   ],
   providers: [
     ManagerOrdersService,
@@ -62,6 +65,7 @@ import { ManagerZonesService } from './services/manager-zones.service';
     ManagerZonesService,
     ManagerZoneWritesService,
     ManagerAnalyticsService,
+    ManagerAnalyticsExportService,
   ],
 })
 export class ManagerModule {}

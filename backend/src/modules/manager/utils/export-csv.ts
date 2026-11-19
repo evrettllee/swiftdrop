@@ -7,11 +7,14 @@ import {
   CSV_NEEDS_QUOTES,
   CSV_QUOTE,
   CSV_SEPARATOR,
+  DECIMAL_DIGITS,
   FORMULA_GUARD,
   FORMULA_START,
   MONEY_DIGITS,
+  PERCENT_SCALE,
 } from '../constants/manager-export.constants';
 import type { ExportCell, ExportCellKind, ExportTable } from '../types/manager-export.types';
+import { cellKindOf, formatDay, plainCell } from './export-cells';
 
 const DOUBLED_QUOTE = `${CSV_QUOTE}${CSV_QUOTE}`;
 const ALL_QUOTES = new RegExp(CSV_QUOTE, 'g');
@@ -26,22 +29,39 @@ export function quoteCsvField(text: string): string {
     : text;
 }
 
-function cellText(cell: ExportCell, kind: ExportCellKind): string {
-  if (cell === null) {
+function decimalText(value: number, digits: number): string {
+  return value.toFixed(digits).replace('.', CSV_DECIMAL_SEPARATOR);
+}
+
+function numberText(value: number, kind: ExportCellKind): string {
+  if (kind === 'money') {
+    return decimalText(value, MONEY_DIGITS);
+  }
+
+  if (kind === 'decimal') {
+    return decimalText(value, DECIMAL_DIGITS);
+  }
+
+  return kind === 'percent' ? String(Math.round(value * PERCENT_SCALE)) : String(value);
+}
+
+function cellText(cell: ExportCell, columnKind: ExportCellKind): string {
+  const kind = cellKindOf(cell, columnKind);
+  const value = plainCell(cell);
+
+  if (value === null) {
     return '';
   }
 
-  if (cell instanceof Date) {
-    return formatWallDateTime(wallClock(cell, APP_TIME_ZONE));
+  if (value instanceof Date) {
+    return formatWallDateTime(wallClock(value, APP_TIME_ZONE));
   }
 
-  if (typeof cell === 'number') {
-    return kind === 'money'
-      ? cell.toFixed(MONEY_DIGITS).replace('.', CSV_DECIMAL_SEPARATOR)
-      : String(cell);
+  if (typeof value === 'number') {
+    return numberText(value, kind);
   }
 
-  return guardFormula(cell);
+  return guardFormula(kind === 'day' ? formatDay(value) : value);
 }
 
 export function toCsv({ columns, rows }: ExportTable): Buffer {

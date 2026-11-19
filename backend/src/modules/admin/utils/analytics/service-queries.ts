@@ -63,7 +63,10 @@ export function servicesSql({ start, end }: AnalyticsRange): SQL {
     order by ${serviceFailures.service}, ${serviceFailures.lastAt} desc, ${serviceFailures.failureId} desc`;
 }
 
-export function recentFailuresSql({ start, end }: AnalyticsRange): SQL {
+export function recentFailuresSql(
+  { start, end }: AnalyticsRange,
+  limit: number = RECENT_FAILURES_LIMIT,
+): SQL {
   return sql`select ${isoSql(sql`${serviceFailures.lastAt}`)} as "lastAt",
       ${isoSql(sql`${serviceFailures.firstAt}`)} as "firstAt",
       ${serviceFailures.service} as "service", ${serviceFailures.code} as "code",
@@ -71,5 +74,5 @@ export function recentFailuresSql({ start, end }: AnalyticsRange): SQL {
     from ${serviceFailures}
     where ${lastIn(start, end)}
     order by ${serviceFailures.lastAt} desc, ${serviceFailures.failureId} desc
-    limit ${RECENT_FAILURES_LIMIT}`;
+    limit ${limit}`;
 }

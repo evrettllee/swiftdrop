@@ -6,7 +6,8 @@ import type {
   AnalyticsPeriod,
   AnalyticsRange,
 } from '@/modules/manager/types/manager-analytics.types';
-import { localDateSql, PERIODS, STATUS_SQL } from './analytics-sql';
+import { STATUS_SQL } from '@/common/database/analytics-sql';
+import { localDateSql, PERIODS } from './analytics-sql';
 
 const MINUTE_SECONDS = sql.raw('60');
 

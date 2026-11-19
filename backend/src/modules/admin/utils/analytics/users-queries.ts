@@ -5,7 +5,8 @@ import type {
   AnalyticsPeriod,
   AnalyticsRange,
 } from '@/modules/manager/types/manager-analytics.types';
-import { localDateSql, PERIODS, roleIdSql, STATUS_SQL } from './analytics-sql';
+import { STATUS_SQL } from '@/common/database/analytics-sql';
+import { localDateSql, PERIODS, roleIdSql } from './analytics-sql';
 
 function clientOrdersSql(start: Date, end: Date, currentStart: Date): SQL {
   return sql`select ${orders.createdAt} >= ${currentStart} as is_current,

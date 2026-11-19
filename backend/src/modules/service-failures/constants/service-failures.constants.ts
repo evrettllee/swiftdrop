@@ -23,5 +23,6 @@ export const FAILURE_MESSAGES = {
   BAD_SHAPE: 'Ответ не по схеме',
   NO_ROUTE_DATA: 'В ответе нет маршрута',
   BAD_SIGNATURE: 'Неверная подпись',
+  NO_PAYMENT_PAGE: 'Нет адреса страницы оплаты',
   SAVED_RATE: (date: string) => `Курс от ${date}`,
 } as const;

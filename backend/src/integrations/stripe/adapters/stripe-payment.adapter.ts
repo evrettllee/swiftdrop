@@ -73,6 +73,11 @@ export class StripePaymentAdapter extends PaymentGateway {
 
     if (!session.url) {
       this.logger.error(`Stripe session ${session.id} has no payment page address`);
+      void this.failures.record(
+        SERVICE_NAME.STRIPE,
+        SERVICE_FAILURE_CODE.stripe.API_ERROR,
+        FAILURE_MESSAGES.NO_PAYMENT_PAGE,
+      );
       throw new ServiceUnavailableException(PAYMENTS_ERROR_MESSAGES.GATEWAY_UNAVAILABLE);
     }
 

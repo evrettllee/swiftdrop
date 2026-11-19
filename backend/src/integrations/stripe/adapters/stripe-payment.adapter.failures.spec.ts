@@ -13,6 +13,7 @@ describe('StripePaymentAdapter failures', () => {
   const client = {
     createRefund: jest.fn<Promise<void>, [string, string]>(),
     expireSession: jest.fn<Promise<void>, [string]>(),
+    createSession: jest.fn<Promise<{ id: string; url: string | null }>, [unknown]>(),
   };
   let adapter: StripePaymentAdapter;
 
@@ -61,5 +62,22 @@ describe('StripePaymentAdapter failures', () => {
       BadRequestException,
     );
     expect(record).toHaveBeenCalledWith('stripe', 'webhook_bad_signature', 'Неверная подпись');
+  });
+
+  it('should record a session that comes back without a payment page', async () => {
+    client.createSession.mockResolvedValue({ id: 'cs_test_a1B2c3D4e5F6g7H8', url: null });
+
+    await expect(
+      adapter.createCheckoutSession({
+        orderId: 7,
+        amountMinor: 304,
+        currency: 'usd',
+        description: 'Доставка',
+        successUrl: 'https://swiftdrop.test/ok',
+        cancelUrl: 'https://swiftdrop.test/cancel',
+        expiresAt: new Date('2026-11-19T12:00:00Z'),
+      }),
+    ).rejects.toThrow(ServiceUnavailableException);
+    expect(record).toHaveBeenCalledWith('stripe', 'api_error', 'Нет адреса страницы оплаты');
   });
 });

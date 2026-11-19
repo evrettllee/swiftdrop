@@ -1,5 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { APP_TIME_ZONE } from '@/common/constants/time.constants';
+import { deliveryZonesSql } from '@/common/database/delivery-zones-query';
+import type { DeliveryZoneRow } from '@/common/types/delivery-zone.types';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import type { AnalyticsCouriersDto, AnalyticsSummaryDto } from '../dto/manager-analytics.dto';
@@ -21,12 +23,13 @@ export class ManagerAnalyticsService {
 
   async summary(query: AnalyticsSummaryDto, now = new Date()): Promise<AnalyticsSummary> {
     const period = resolveAnalyticsPeriod(query, now, APP_TIME_ZONE);
-    const [kpis, activity] = await Promise.all([
+    const [kpis, activity, zones] = await Promise.all([
       this.db.execute<AnalyticsKpiRow>(analyticsKpiSql(period)),
       this.db.execute<AnalyticsActivityRow>(analyticsActivitySql(period, APP_TIME_ZONE)),
+      this.db.execute<DeliveryZoneRow>(deliveryZonesSql(period.current)),
     ]);
 
-    return toAnalyticsSummary(period, kpis.rows, activity.rows);
+    return toAnalyticsSummary(period, kpis.rows, activity.rows, zones.rows);
   }
 
   async couriers(query: AnalyticsCouriersDto, now = new Date()): Promise<AnalyticsCouriersPage> {

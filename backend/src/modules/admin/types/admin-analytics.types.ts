@@ -1,3 +1,4 @@
+import type { DeliveryZoneRow } from '@/common/types/delivery-zone.types';
 import type { ExternalService } from '@/common/constants/service-failure-codes.constants';
 import type { ServiceName } from '@/common/enums/service-name.enum';
 import type { TicketTopic } from '@/common/enums/support-ticket.enum';
@@ -22,17 +23,6 @@ export type BusinessAnalytics = {
     inProgress: number;
   };
   revenueByDay: { date: string; revenue: number; delivered: number }[];
-};
-
-export type DeliveryZoneRow = {
-  zoneId: number | null;
-  name: string;
-  orders: number;
-  onTime: number;
-  onTimeTotal: number;
-  averageDeliveryMinutes: number | null;
-  manualAssigned: number;
-  revenue: number;
 };
 
 export type DeliveryAnalytics = {

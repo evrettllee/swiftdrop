@@ -10,8 +10,6 @@ export const ADMIN_ANALYTICS_ROUTES = {
   SERVICE: 'service',
 } as const;
 
-export const NO_ZONE_NAME = 'Без зоны';
-
 export const ADMIN_ANALYTICS_THROTTLE: UserThrottleOptions = {
   key: 'admin-analytics',
   limit: 30,

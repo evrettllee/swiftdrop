@@ -7,7 +7,8 @@ import type {
   AnalyticsPeriod,
   AnalyticsRange,
 } from '@/modules/manager/types/manager-analytics.types';
-import { localDateSql, moneySql, PERIODS, STATUS_SQL } from './analytics-sql';
+import { moneySql, STATUS_SQL } from '@/common/database/analytics-sql';
+import { localDateSql, PERIODS } from './analytics-sql';
 
 const FINISHED = sqlLiteralList(ORDER_FINISHED_STATUSES);
 
@@ -76,5 +77,13 @@ export function revenueByDaySql({ start, end }: AnalyticsRange, timeZone: string
     from ${orders}
     where ${orders.status} = ${STATUS_SQL.DELIVERED}
       and ${orders.finishedAt} >= ${start} and ${orders.finishedAt} < ${end}
+    group by 1`;
+}
+
+export function ordersCreatedByDaySql({ start, end }: AnalyticsRange, timeZone: string): SQL {
+  return sql`select ${localDateSql(sql`${orders.createdAt}`, timeZone)} as "date",
+      count(*)::int as "count"
+    from ${orders}
+    where ${orders.createdAt} >= ${start} and ${orders.createdAt} < ${end}
     group by 1`;
 }
