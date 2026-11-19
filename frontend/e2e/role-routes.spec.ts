@@ -38,16 +38,22 @@ const MANAGER_PAGES = [
   APP_ROUTES.MANAGER_PROFILE,
 ];
 
-const FOREIGN_PAGES: Record<
-  typeof ROLE.CLIENT | typeof ROLE.COURIER | typeof ROLE.MANAGER,
-  string[]
-> = {
-  [ROLE.CLIENT]: [...COURIER_PAGES, ...MANAGER_PAGES],
-  [ROLE.COURIER]: [...CLIENT_PAGES, ...MANAGER_PAGES],
-  [ROLE.MANAGER]: [...CLIENT_PAGES, ...COURIER_PAGES],
+const ADMIN_PAGES = [
+  APP_ROUTES.ADMIN,
+  APP_ROUTES.ADMIN_USERS,
+  APP_ROUTES.ADMIN_TARIFFS,
+  APP_ROUTES.ADMIN_ANALYTICS,
+  APP_ROUTES.ADMIN_PROFILE,
+];
+
+const FOREIGN_PAGES: Record<Role, string[]> = {
+  [ROLE.CLIENT]: [...COURIER_PAGES, ...MANAGER_PAGES, ...ADMIN_PAGES],
+  [ROLE.COURIER]: [...CLIENT_PAGES, ...MANAGER_PAGES, ...ADMIN_PAGES],
+  [ROLE.MANAGER]: [...CLIENT_PAGES, ...COURIER_PAGES, ...ADMIN_PAGES],
+  [ROLE.ADMIN]: [...CLIENT_PAGES, ...COURIER_PAGES, ...MANAGER_PAGES],
 };
 
-for (const role of [ROLE.CLIENT, ROLE.COURIER, ROLE.MANAGER] satisfies Role[]) {
+for (const role of [ROLE.CLIENT, ROLE.COURIER, ROLE.MANAGER, ROLE.ADMIN] satisfies Role[]) {
   for (const path of FOREIGN_PAGES[role]) {
     test(`should close ${path} to a ${role} by the 403 page`, async ({ page }) => {
       await stubSession(page, role);

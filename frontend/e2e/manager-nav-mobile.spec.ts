@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { MANAGER_LAYOUT_TEXTS } from '../src/app/layouts/manager-layout/navigation';
+import { MANAGER_LAYOUT_TEXTS } from '../src/app/layouts/staff-layout/navigation';
 import { UI_TEXTS } from '../src/shared/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { managerMenu, openAsManager } from './support/manager';

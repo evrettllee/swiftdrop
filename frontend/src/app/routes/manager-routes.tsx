@@ -5,11 +5,11 @@ import { ROLE } from '@/shared/session';
 import { ProtectedRoute } from './ProtectedRoute';
 
 export const managerRoutes: RouteObject = {
-  element: <ProtectedRoute roles={[ROLE.MANAGER, ROLE.ADMIN]} />,
+  element: <ProtectedRoute roles={[ROLE.MANAGER]} />,
   children: [
     {
       Component: lazy(() =>
-        import('../layouts/manager-layout/ManagerLayout').then((module) => ({
+        import('../layouts/staff-layout/ManagerLayout').then((module) => ({
           default: module.ManagerLayout,
         })),
       ),

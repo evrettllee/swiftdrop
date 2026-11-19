@@ -30,6 +30,11 @@ export const APP_ROUTES = {
   MANAGER_ANALYTICS: '/manager/analytics',
   MANAGER_ANALYTICS_COURIERS: '/manager/analytics/couriers',
   MANAGER_PROFILE: '/manager/profile',
+  ADMIN: '/admin',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_TARIFFS: '/admin/tariffs',
+  ADMIN_ANALYTICS: '/admin/analytics',
+  ADMIN_PROFILE: '/admin/profile',
 } as const;
 
 // The router pattern of the page of one order and the path to a concrete order.

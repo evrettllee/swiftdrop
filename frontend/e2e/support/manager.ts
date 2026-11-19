@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { MANAGER_LAYOUT_TEXTS } from '../../src/app/layouts/manager-layout/navigation';
+import { MANAGER_LAYOUT_TEXTS } from '../../src/app/layouts/staff-layout/navigation';
 import { MANAGER_ORDERS_API_PATHS } from '../../src/shared/staff-api/manager-orders';
 import { ORDER_STATUS } from '../../src/shared/api/endpoints/order';
 import { SUPPORT_STAFF_API_PATHS } from '../../src/shared/staff-api/support';

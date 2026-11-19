@@ -8,11 +8,11 @@ import {
 } from '@phosphor-icons/react';
 import { UI_TEXTS } from '@/shared/config';
 import { APP_ROUTES } from '@/shared/routes';
-import { ROLE } from '@/shared/session';
 import type { NavItem } from '../account-shell/nav-item';
 
 export const MANAGER_LAYOUT_TEXTS = {
   NAV_LABEL: 'Меню менеджера',
+  ROLE: 'Менеджер',
   NAV_ORDERS: UI_TEXTS.ORDERS,
   NAV_MAP: 'Карта курьеров',
   NAV_MAP_SHORT: 'Карта',
@@ -24,11 +24,6 @@ export const MANAGER_LAYOUT_TEXTS = {
   attention: (count: number) =>
     `${count} ${count % 10 === 1 && count % 100 !== 11 ? 'требует' : 'требуют'} внимания`,
   awaiting: (count: number) => `${count} без ответа`,
-} as const;
-
-export const STAFF_ROLE_LABEL = {
-  [ROLE.MANAGER]: 'Менеджер',
-  [ROLE.ADMIN]: 'Администратор',
 } as const;
 
 export type NavCounts = {
