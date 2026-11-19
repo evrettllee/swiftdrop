@@ -1,6 +1,7 @@
 export {
   APP_ROUTES,
   CATCH_ALL_ROUTE,
+  getAdminUserPath,
   getCourierHistoryOrderPath,
   getCourierHistoryPath,
   getManagerOrderPath,

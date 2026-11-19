@@ -33,6 +33,7 @@ export const APP_ROUTES = {
   MANAGER_PROFILE: '/manager/profile',
   ADMIN: '/admin',
   ADMIN_USERS: '/admin/users',
+  ADMIN_USER: '/admin/users/:userId',
   ADMIN_TARIFFS: '/admin/tariffs',
   ADMIN_ANALYTICS: '/admin/analytics',
   ADMIN_PROFILE: '/admin/profile',
@@ -62,6 +63,10 @@ export function getCourierHistoryOrderPath(orderId: number, listSearch = ''): st
 
 export function getManagerOrderPath(orderId: number): string {
   return `${APP_ROUTES.MANAGER_ORDERS}/${orderId}`;
+}
+
+export function getAdminUserPath(userId: number): string {
+  return `${APP_ROUTES.ADMIN_USERS}/${userId}`;
 }
 
 export const ZONE_ID_PARAM = 'zoneId';

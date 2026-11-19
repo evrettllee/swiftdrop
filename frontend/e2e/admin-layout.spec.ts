@@ -5,7 +5,7 @@ import { AUTH_API_PATHS } from '../src/shared/api/endpoints/auth';
 import { API_BASE_PATH } from '../src/shared/api/request-config';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { ROLE } from '../src/shared/session/auth-user';
-import { adminMenu, openAsAdmin } from './support/admin';
+import { adminMenu, openAsAdmin, stubAdminUsersApi } from './support/admin';
 import { stubAppSocket } from './support/app-socket';
 
 const SECTIONS = [
@@ -27,6 +27,7 @@ test('should send an admin to the users when a session is found on the sign-in p
 
 test('should send an admin to the users after signing in with a password', async ({ page }) => {
   await stubAppSocket(page);
+  await stubAdminUsersApi(page);
   await page.route(`**${API_BASE_PATH}${AUTH_API_PATHS.ME}`, (route) =>
     route.fulfill({ status: 401, json: { message: 'Unauthorized' } }),
   );

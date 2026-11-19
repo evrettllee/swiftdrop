@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ROLE } from '@/common/enums/role.enum';
 import { DB_INTEGER_MAX } from '@/common/constants/database.constants';
 import { SORT_DIRECTION } from '@/common/constants/list.constants';
 import {
@@ -13,6 +14,7 @@ import {
   ADMIN_USER_SORT_KEY,
   ADMIN_USER_SORT_VALUES,
   ADMIN_USERS_PAGE_SIZE_DEFAULT,
+  ADMIN_VEHICLE_FILTER_VALUES,
   ADMIN_USERS_VALIDATION_MESSAGES as MESSAGES,
   DEFAULT_USER_STATUSES,
   MANAGED_ROLES,
@@ -45,6 +47,7 @@ export const adminUsersSchema = z
       ...filterShape,
       role: z.enum(MANAGED_ROLES, { error: MESSAGES.ROLE_INVALID }),
       sort: z.enum(ADMIN_USER_SORT_VALUES, { error: MESSAGES.SORT_INVALID }).optional(),
+      vehicle: csvEnumSchema(ADMIN_VEHICLE_FILTER_VALUES).optional(),
       page,
       limit,
       until,
@@ -52,6 +55,12 @@ export const adminUsersSchema = z
     { error: unknownParameterError },
   )
   .transform((query, ctx) => {
+    if (query.vehicle !== undefined && query.role !== ROLE.COURIER) {
+      ctx.addIssue({ code: 'custom', path: ['vehicle'], message: MESSAGES.VEHICLE_COURIERS_ONLY });
+
+      return z.NEVER;
+    }
+
     const sort = query.sort ?? ADMIN_USER_SORT.NEWEST;
     const list = resolveListQuery(
       { page: query.page, limit: query.limit, until: query.until, sort: LIST_SORT_OF[sort] },
@@ -59,7 +68,15 @@ export const adminUsersSchema = z
       ctx,
     );
 
-    return list ? { ...list, ...filtersOf(query), role: query.role, sortName: sort } : z.NEVER;
+    return list
+      ? {
+          ...list,
+          ...filtersOf(query),
+          role: query.role,
+          sortName: sort,
+          vehicles: query.vehicle ?? null,
+        }
+      : z.NEVER;
   });
 
 export type AdminUsersDto = z.infer<typeof adminUsersSchema>;

@@ -6,6 +6,7 @@ import {
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
 } from '../../src/shared/api/request-config';
+import { paceAdminWrite } from './admin-pace';
 import { STAND, STAND_FRONTEND_URL } from './stand';
 
 const LINK_WINDOW_MS = 61_000;
@@ -75,6 +76,7 @@ export async function inviteStaff(
   role: StaffRole,
   firstName = 'Иван',
 ): Promise<IssuedLink> {
+  await paceAdminWrite();
   const response = await admin.post(STAFF_PATH, {
     headers: CSRF_HEADERS,
     data: {
@@ -90,6 +92,7 @@ export async function inviteStaff(
 }
 
 export async function resetPassword(admin: APIRequestContext, userId: number): Promise<IssuedLink> {
+  await paceAdminWrite();
   const response = await admin.post(`${API_BASE_PATH}/admin/users/${userId}/password-reset`, {
     headers: CSRF_HEADERS,
   });

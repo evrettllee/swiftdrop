@@ -12,6 +12,8 @@ const SERVER_START_TIMEOUT_MS = 180_000;
 const SEEDED_COURIER_SPECS =
   /(courier-(cabinet|delivery-code|history-order|history-url|history|offer-route|offer|order-map|order|shift|vehicle)|delivery-flow)\.spec\.ts$/;
 
+const STAND_ADMIN_SPECS = /(admin-users-[a-z-]+|set-password)\.spec\.ts$/;
+
 export default defineConfig({
   testDir: './e2e',
   tsconfig: './e2e/tsconfig.json',
@@ -29,7 +31,14 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: SEEDED_COURIER_SPECS,
+      testIgnore: [SEEDED_COURIER_SPECS, STAND_ADMIN_SPECS],
+    },
+    {
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: STAND_ADMIN_SPECS,
+      fullyParallel: false,
+      workers: 1,
     },
     {
       name: 'courier',

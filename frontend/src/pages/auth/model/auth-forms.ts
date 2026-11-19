@@ -1,19 +1,21 @@
 import { z } from 'zod';
 import { newPasswordSchema, PASSWORD_MESSAGES } from '@/features/password-fields';
 import { CHECKBOX_CHECKED_VALUE } from '@/shared/config';
-import { buildNameSchema, buildPhoneSchema } from '@/shared/lib/person-validation';
+import {
+  buildEmailSchema,
+  buildNameSchema,
+  buildPhoneSchema,
+} from '@/shared/lib/person-validation';
 import { AUTH_FIELD } from '../config/forms';
-import { EMAIL_MAX_LENGTH, VALIDATION_MESSAGES } from '../config/validation';
+import { VALIDATION_MESSAGES } from '../config/validation';
 
 // Forms: the same rules as on the backend, so mistakes are shown before the request is sent.
 
-const emailSchema = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .min(1, VALIDATION_MESSAGES.EMAIL_REQUIRED)
-  .max(EMAIL_MAX_LENGTH, VALIDATION_MESSAGES.EMAIL_TOO_LONG)
-  .pipe(z.email(VALIDATION_MESSAGES.EMAIL_INVALID));
+const emailSchema = buildEmailSchema(
+  VALIDATION_MESSAGES.EMAIL_REQUIRED,
+  VALIDATION_MESSAGES.EMAIL_INVALID,
+  VALIDATION_MESSAGES.EMAIL_TOO_LONG,
+);
 
 export const loginFormSchema = z.object({
   [AUTH_FIELD.EMAIL]: emailSchema,

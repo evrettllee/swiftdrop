@@ -4,6 +4,7 @@ import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 import type { Page } from '@/common/types/page.types';
 import type {
   ADMIN_USER_SORT_VALUES,
+  ADMIN_VEHICLE_FILTER_VALUES,
   MANAGED_ROLES,
   USER_STATUS_VALUES,
 } from '../constants/admin-users.constants';
@@ -12,6 +13,8 @@ import type { AnyAdminActionDetails } from '../schemas/admin-action-details.sche
 export type ManagedRole = (typeof MANAGED_ROLES)[number];
 
 export type UserStatus = (typeof USER_STATUS_VALUES)[number];
+
+export type AdminVehicleFilter = (typeof ADMIN_VEHICLE_FILTER_VALUES)[number];
 
 export type AdminUserSort = (typeof ADMIN_USER_SORT_VALUES)[number];
 
