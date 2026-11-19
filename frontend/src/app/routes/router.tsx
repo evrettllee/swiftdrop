@@ -127,6 +127,14 @@ export const router = createBrowserRouter([
           managerRoutes,
           adminRoutes,
           {
+            path: APP_ROUTES.SET_PASSWORD,
+            Component: lazy(() =>
+              import('@/pages/set-password').then((module) => ({
+                default: module.SetPasswordPage,
+              })),
+            ),
+          },
+          {
             path: APP_ROUTES.FORGOT_PASSWORD,
             element: <PlaceholderPage title={PLACEHOLDER_TEXTS.FORGOT_PASSWORD_TITLE} />,
           },

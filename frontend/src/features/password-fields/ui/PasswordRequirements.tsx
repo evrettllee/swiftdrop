@@ -1,8 +1,7 @@
 import { CheckCircleIcon, CircleIcon } from '@phosphor-icons/react';
 import { useId } from 'react';
 import { ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
-import { AUTH_TEXTS } from '../config/texts';
-import { PASSWORD_RULES, STRENGTH_LABELS } from '../config/validation';
+import { PASSWORD_RULES, PASSWORD_TEXTS, STRENGTH_LABELS } from '../config/password-rules';
 
 type PasswordRequirementsProps = {
   value: string;
@@ -28,7 +27,7 @@ export function PasswordRequirements({ value }: PasswordRequirementsProps) {
   return (
     <div>
       <p id={titleId} className="text-small text-fg-secondary">
-        {AUTH_TEXTS.PASSWORD_REQUIREMENTS}
+        {PASSWORD_TEXTS.REQUIREMENTS}
       </p>
       <ul aria-labelledby={titleId} className="mt-2 flex flex-col gap-2">
         {PASSWORD_RULES.map((rule) => {
@@ -45,7 +44,7 @@ export function PasswordRequirements({ value }: PasswordRequirementsProps) {
               />
               <span className={isMet ? 'text-fg' : 'text-fg-secondary'}>{rule.label}</span>
               <span className="sr-only">
-                : {isMet ? AUTH_TEXTS.RULE_MET : AUTH_TEXTS.RULE_NOT_MET}
+                : {isMet ? PASSWORD_TEXTS.RULE_MET : PASSWORD_TEXTS.RULE_NOT_MET}
               </span>
             </li>
           );
@@ -55,7 +54,7 @@ export function PasswordRequirements({ value }: PasswordRequirementsProps) {
         <div className="mt-3 flex items-center gap-3">
           <div
             role="img"
-            aria-label={`${AUTH_TEXTS.STRENGTH}: ${strengthLabel}`}
+            aria-label={`${PASSWORD_TEXTS.STRENGTH}: ${strengthLabel}`}
             className="flex flex-1 gap-1"
           >
             {PASSWORD_RULES.map((rule, index) => (

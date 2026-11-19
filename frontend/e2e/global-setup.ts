@@ -7,6 +7,7 @@ import {
   CSRF_HEADER_VALUE,
 } from '../src/shared/api/request-config';
 import { STAND, STAND_ENV } from './support/stand';
+import { seedStandAdmin } from './support/stand-admin';
 import { warmUpPages } from './support/stand-warmup';
 
 const BACKEND_DIR = '../backend';
@@ -47,6 +48,7 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
   }
 
   seedStand();
+  seedStandAdmin();
   await signInCourier(baseURL);
   await warmUpPages(baseURL);
 }

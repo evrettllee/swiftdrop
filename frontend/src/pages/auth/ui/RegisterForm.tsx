@@ -1,3 +1,4 @@
+import { PasswordField, PasswordRequirements } from '@/features/password-fields';
 import { useForm } from '@/shared/lib/forms';
 import { useAuthStore } from '@/shared/session';
 import { Checkbox } from '@/shared/ui/checkbox';
@@ -7,8 +8,6 @@ import { AUTH_TEXTS } from '../config/texts';
 import { registerFormSchema } from '../model/auth-forms';
 import { FormFooter } from './FormFooter';
 import { LegalLinks } from './LegalLinks';
-import { PasswordField } from './PasswordField';
-import { PasswordRequirements } from './PasswordRequirements';
 
 export function RegisterForm() {
   const signUp = useAuthStore((state) => state.signUp);

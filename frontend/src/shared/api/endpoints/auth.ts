@@ -6,6 +6,7 @@ export const AUTH_API_PATHS = {
   ME: '/auth/me',
   GOOGLE: '/auth/google',
   YANDEX: '/auth/yandex',
+  PASSWORD_LINKS: '/auth/password-links',
 } as const;
 
 // Session

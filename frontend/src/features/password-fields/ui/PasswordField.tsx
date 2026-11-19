@@ -2,14 +2,14 @@ import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { Input, type InputProps } from '@/shared/ui/input';
-import { AUTH_TEXTS } from '../config/texts';
+import { PASSWORD_TEXTS } from '../config/password-rules';
 
 type PasswordFieldProps = Omit<InputProps, 'type' | 'endAdornment'>;
 
 export function PasswordField(props: PasswordFieldProps) {
   const [isVisible, setIsVisible] = useState(false);
   const ToggleIcon = isVisible ? EyeSlashIcon : EyeIcon;
-  const toggleLabel = isVisible ? AUTH_TEXTS.HIDE_PASSWORD : AUTH_TEXTS.SHOW_PASSWORD;
+  const toggleLabel = isVisible ? PASSWORD_TEXTS.HIDE : PASSWORD_TEXTS.SHOW;
 
   const toggle = (
     <button

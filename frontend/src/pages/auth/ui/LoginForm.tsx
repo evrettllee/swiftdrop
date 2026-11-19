@@ -1,3 +1,4 @@
+import { PasswordField } from '@/features/password-fields';
 import { useForm } from '@/shared/lib/forms';
 import { APP_ROUTES } from '@/shared/routes';
 import { useAuthStore } from '@/shared/session';
@@ -7,7 +8,6 @@ import { AUTH_FIELD, LOGIN_INITIAL_VALUES } from '../config/forms';
 import { AUTH_TEXTS } from '../config/texts';
 import { loginFormSchema } from '../model/auth-forms';
 import { FormFooter } from './FormFooter';
-import { PasswordField } from './PasswordField';
 
 export function LoginForm() {
   const signIn = useAuthStore((state) => state.signIn);

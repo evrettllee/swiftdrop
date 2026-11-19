@@ -8,6 +8,7 @@ export const APP_ROUTES = {
   SUPPORT: '/support',
   SUPPORT_TICKET: '/support/:ticketId',
   FORGOT_PASSWORD: '/forgot-password',
+  SET_PASSWORD: '/set-password/:token',
   TERMS: '/terms',
   PRIVACY: '/privacy',
   COURIER_WORK: '/courier',
@@ -36,6 +37,8 @@ export const APP_ROUTES = {
   ADMIN_ANALYTICS: '/admin/analytics',
   ADMIN_PROFILE: '/admin/profile',
 } as const;
+
+export const SET_PASSWORD_TOKEN_PARAM = 'token';
 
 // The router pattern of the page of one order and the path to a concrete order.
 export const ORDER_ID_PARAM = 'orderId';

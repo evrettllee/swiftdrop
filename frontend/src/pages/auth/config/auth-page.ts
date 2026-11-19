@@ -4,12 +4,14 @@ export const AUTH_ERROR_QUERY_PARAM = 'error';
 export const AUTH_ERROR_CODES = {
   OAUTH_FAILED: 'oauth_failed',
   ACCOUNT_BLOCKED: 'account_blocked',
+  INVITE_PENDING: 'invite_pending',
 } as const;
 
 // Title and explanation of the alert above the form, by error code.
 export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   [AUTH_ERROR_CODES.OAUTH_FAILED]: 'Не удалось войти через сервис',
   [AUTH_ERROR_CODES.ACCOUNT_BLOCKED]: 'Аккаунт заблокирован',
+  [AUTH_ERROR_CODES.INVITE_PENDING]: 'Сначала создайте пароль по ссылке из письма',
 };
 
 export const AUTH_ERROR_HINTS: Record<string, string> = {
