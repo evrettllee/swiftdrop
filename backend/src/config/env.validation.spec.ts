@@ -53,6 +53,17 @@ describe('validateEnv', () => {
     expect(() => validateEnv(without(config, key))).toThrow(key);
   });
 
+  it.each(['', '   '])(
+    'should refuse to start in production when MAIL_HOST is %j instead of logging mails',
+    (host) => {
+      const config = { ...VALID_CONFIG, ...MAIL_CONFIG, [ENV_KEYS.NODE_ENV]: 'production' };
+
+      expect(() => validateEnv({ ...config, [ENV_KEYS.MAIL_HOST]: host })).toThrow(
+        ENV_KEYS.MAIL_HOST,
+      );
+    },
+  );
+
   it.each(['development', 'test'])(
     'should start without mail settings when NODE_ENV is %s',
     (nodeEnv) => {

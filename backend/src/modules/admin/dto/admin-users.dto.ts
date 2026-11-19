@@ -70,7 +70,7 @@ export const adminUserCountsSchema = z
 
 export type AdminUserCountsDto = z.infer<typeof adminUserCountsSchema>;
 
-export const userIdParamSchema = z.object({
+export const userIdParamSchema = z.strictObject({
   userId: z.coerce
     .number({ error: MESSAGES.USER_ID_INVALID })
     .int({ error: MESSAGES.USER_ID_INVALID })

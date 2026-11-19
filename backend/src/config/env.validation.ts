@@ -84,7 +84,12 @@ function validateMail(config: Record<string, unknown>, nodeEnv: string): Record<
   const mail: Record<string, unknown> = {};
 
   if (required) {
-    requireString(config, ENV_KEYS.MAIL_HOST);
+    const host = config[ENV_KEYS.MAIL_HOST];
+
+    requireString(
+      { [ENV_KEYS.MAIL_HOST]: typeof host === 'string' ? host.trim() : host },
+      ENV_KEYS.MAIL_HOST,
+    );
     requireString(config, ENV_KEYS.MAIL_USER);
     requireString(config, ENV_KEYS.MAIL_PASSWORD);
     requireString(config, ENV_KEYS.MAIL_FROM);

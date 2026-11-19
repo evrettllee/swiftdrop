@@ -111,9 +111,12 @@ describe('Admin access to manager features (e2e)', () => {
   );
 
   it.each([MANAGER_ANALYTICS_ROUTES.SUMMARY, MANAGER_ANALYTICS_ROUTES.COURIERS])(
-    'should give an admin the analytics %s when the admin reads it',
+    'should refuse an admin with 403 on the manager analytics %s',
     async (route) => {
-      await getAnalytics(app, admin, route).expect(HttpStatus.OK);
+      const response = await getAnalytics(app, admin, route).expect(HttpStatus.FORBIDDEN);
+
+      expect(messageOf(response)).toBe(FORBIDDEN_MESSAGE);
+      await getAnalytics(app, manager, route).expect(HttpStatus.OK);
     },
   );
 });

@@ -9,13 +9,13 @@ import { ConfigService } from '@nestjs/config';
 import { MS_PER_SECOND } from '@/common/constants/time.constants';
 import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { CircuitBreaker } from '@/common/utils/circuit-breaker';
-import { describeError } from '@/common/utils/describe-error';
 import { SERVICE_NAME } from '@/common/enums/service-name.enum';
 import { ENV_KEYS } from '@/config/env.constants';
 import { FAILURE_MESSAGES } from '@/modules/service-failures/constants/service-failures.constants';
 import { ServiceFailuresService } from '@/modules/service-failures/services/service-failures.service';
 import {
   badResponseFailure,
+  errorCodeOf,
   type Failure,
   type FetchFailureCode,
   fetchFailureOf,
@@ -152,7 +152,7 @@ export class OsrmClient {
     try {
       response = await fetch(url, { signal: AbortSignal.timeout(OSRM_REQUEST_TIMEOUT_MS) });
     } catch (error) {
-      this.logger.error(`OSRM request failed: ${describeError(error)}`);
+      this.logger.error(`OSRM request failed: ${errorCodeOf(error)}`);
       throw this.failed(fetchFailureOf(error, OSRM_REQUEST_TIMEOUT_MS));
     }
 
@@ -164,7 +164,7 @@ export class OsrmClient {
     try {
       return await response.json();
     } catch (error) {
-      this.logger.error(`OSRM answer could not be read: ${describeError(error)}`);
+      this.logger.error(`OSRM answer could not be read: ${errorCodeOf(error)}`);
       throw this.failed(
         isTimeoutError(error)
           ? fetchFailureOf(error, OSRM_REQUEST_TIMEOUT_MS)

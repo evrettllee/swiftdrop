@@ -44,7 +44,7 @@ export const tariffStatusSchema = z.strictObject({
 
 export type TariffStatusDto = z.infer<typeof tariffStatusSchema>;
 
-export const tariffIdParamSchema = z.object({
+export const tariffIdParamSchema = z.strictObject({
   tariffId: z.coerce
     .number({ error: MESSAGES.TARIFF_ID_INVALID })
     .int(MESSAGES.TARIFF_ID_INVALID)

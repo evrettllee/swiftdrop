@@ -73,7 +73,6 @@ export const orders = pgTable(
     assignmentRound: smallint().notNull().default(1),
   },
   (table) => [
-    index('orders_courier_id_idx').on(table.courierId),
     index('orders_client_created_at_idx').on(
       table.clientId,
       table.createdAt.desc().nullsFirst(),

@@ -225,6 +225,13 @@
       "when": 1794689233579,
       "tag": "0031_support_tickets_first_response",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795074074003,
+      "tag": "0032_drop_orders_courier_id_index",
+      "breakpoints": true
     }
   ]
 }
