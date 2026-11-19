@@ -17,9 +17,11 @@ export type ManagerExportRow = {
   finishedAt: Date | null;
 };
 
-export type ExportCellKind = 'number' | 'text' | 'date' | 'money';
+export type ExportCellKind = 'number' | 'text' | 'date' | 'money' | 'day' | 'percent' | 'decimal';
 
-export type ExportCell = string | number | Date | null;
+export type ExportTypedCell = { value: number | null; kind: ExportCellKind };
+
+export type ExportCell = string | number | Date | ExportTypedCell | null;
 
 export type ExportColumn = {
   header: string;
@@ -30,6 +32,11 @@ export type ExportColumn = {
 export type ExportTable = {
   columns: ExportColumn[];
   rows: ExportCell[][];
+};
+
+export type ExportSheet = {
+  name: string;
+  table: ExportTable;
 };
 
 export type ExportFile = {

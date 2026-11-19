@@ -44,6 +44,7 @@ export const supportTickets = pgTable(
     awaitingStaff: boolean().notNull().default(true),
     closedAt: timestamp({ withTimezone: true }),
     closedBy: integer().references(() => users.userId),
+    firstResponseAt: timestamp({ withTimezone: true }),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true })
       .notNull()

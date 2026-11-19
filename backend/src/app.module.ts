@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AdminModule } from '@/modules/admin/admin.module';
+import { ServiceFailuresModule } from '@/modules/service-failures/service-failures.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
@@ -53,6 +55,8 @@ import { ZonesModule } from '@/modules/zones/zones.module';
     ChatModule,
     ManagerModule,
     SupportModule,
+    AdminModule,
+    ServiceFailuresModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -11,6 +11,7 @@ import {
   WEBHOOK_SIGNATURE_HEADER,
 } from '@/modules/payments/constants/payments.constants';
 import { createTestApp } from '@test/support/app';
+import { NO_FAILURES } from '@test/support/service-failures';
 import { CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE } from '@test/support/constants';
 import { rawPostApi } from '@test/support/http';
 
@@ -40,7 +41,7 @@ describe('Payment webhook signature over the raw body (e2e)', () => {
     app = await createTestApp([
       {
         token: PaymentGateway,
-        useValue: new StripePaymentAdapter(new StripeCheckoutClient(config), config),
+        useValue: new StripePaymentAdapter(new StripeCheckoutClient(config), config, NO_FAILURES),
       },
     ]);
   });

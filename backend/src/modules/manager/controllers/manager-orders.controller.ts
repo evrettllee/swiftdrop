@@ -32,7 +32,7 @@ import type { ManagerOrderCounts, ManagerOrdersPage } from '../types/manager-ord
 import { exportHeaders } from '../utils/export-headers';
 
 @Controller(MANAGER_ORDERS_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 export class ManagerOrdersController {
   constructor(
     private readonly ordersList: ManagerOrdersService,

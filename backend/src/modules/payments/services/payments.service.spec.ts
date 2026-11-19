@@ -19,12 +19,15 @@ function failedQuery(code: string): Error {
   return new Error('Failed query', { cause });
 }
 
+const ACTIVE_CLIENT = [{ isBlocked: false, deletedAt: null }];
+
 function setUp(error: Error) {
+  const lockResults = [() => Promise.resolve(ACTIVE_CLIENT), () => Promise.reject(error)];
   const locked = {
     from: () => locked,
     where: () => locked,
     limit: () => locked,
-    for: () => Promise.reject(error),
+    for: () => (lockResults.shift() ?? (() => Promise.reject(error)))(),
   };
   const tx = { select: () => locked };
   const db = {

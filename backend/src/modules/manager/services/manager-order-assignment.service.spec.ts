@@ -11,6 +11,7 @@ import { ManagerOrderAssignmentService } from './manager-order-assignment.servic
 const ORDER = fakeOrderRow('confirmed');
 const COURIER = FAKE_COURIER_ROW;
 const CHECKS = FAKE_CHECKS;
+const PROMISE_FACTS = { estimatedMinutes: 25, promisedDeliveryAt: null };
 const CHANGED = {
   orderId: 42,
   status: 'courier_assigned',
@@ -36,6 +37,7 @@ describe('ManagerOrderAssignmentService', () => {
       [{ offerId: 5, courierId: 9 }],
       [{ offerId: 6, courierId: 3 }],
       [{ ...COURIER, ...CHECKS }],
+      [PROMISE_FACTS],
       [CHANGED],
       [],
     ]);
@@ -53,7 +55,11 @@ describe('ManagerOrderAssignmentService', () => {
     expect(fake.calls.filter((call) => call.method === 'set').map((call) => call.args[0])).toEqual([
       { status: 'revoked' },
       { status: 'revoked' },
-      expect.objectContaining({ status: 'courier_assigned', courierId: 3 }),
+      expect.objectContaining({
+        status: 'courier_assigned',
+        courierId: 3,
+        promisedDeliveryAt: expect.any(Date),
+      }),
     ]);
   });
 
@@ -100,7 +106,15 @@ describe('ManagerOrderAssignmentService', () => {
 
   it('should send nothing when the transaction rolls back after the change', async () => {
     const { service, notifier, log } = setUp(
-      [[ORDER], [{ offerId: 5, courierId: 9 }], [], [{ ...COURIER, ...CHECKS }], [CHANGED], []],
+      [
+        [ORDER],
+        [{ offerId: 5, courierId: 9 }],
+        [],
+        [{ ...COURIER, ...CHECKS }],
+        [PROMISE_FACTS],
+        [CHANGED],
+        [],
+      ],
       new Error('rolled back'),
     );
 
@@ -117,7 +131,7 @@ describe('ManagerOrderAssignmentService', () => {
       constraint: 'orders_one_active_per_courier_uidx',
     });
     const { service } = setUp(
-      [[ORDER], [], [], [{ ...COURIER, ...CHECKS }], [CHANGED], []],
+      [[ORDER], [], [], [{ ...COURIER, ...CHECKS }], [PROMISE_FACTS], [CHANGED], []],
       violation,
     );
 

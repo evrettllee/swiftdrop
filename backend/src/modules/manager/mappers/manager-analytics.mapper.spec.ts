@@ -95,6 +95,7 @@ describe('toAnalyticsSummary', () => {
         { ...EMPTY, isCurrent: false, total: 4, delivered: 4 },
       ],
       [],
+      [],
     );
 
     expect(summary.period).toEqual({

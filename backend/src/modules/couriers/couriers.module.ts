@@ -18,6 +18,7 @@ import { CourierVehiclesService } from './services/courier-vehicles.service';
     CourierShiftEventsService,
   ],
   exports: [
+    CourierAvailabilityService,
     CourierProfilesService,
     CourierLocationService,
     CourierLocationEventsService,

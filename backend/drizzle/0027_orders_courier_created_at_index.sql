@@ -1,0 +1,1 @@
+CREATE INDEX "orders_courier_created_at_idx" ON "orders" USING btree ("courier_id","created_at" DESC NULLS FIRST,"order_id" DESC NULLS FIRST);

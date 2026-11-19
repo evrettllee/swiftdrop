@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   check,
   index,
   integer,
@@ -24,6 +25,7 @@ import { ORDER_STATUS, ORDER_STATUS_VALUES } from '@/common/enums/order-status.e
 import { sqlLiteralList } from '../sql-literal';
 import { addresses } from './addresses';
 import { courierProfiles } from './courier-profiles';
+import { serviceZones } from './service-zones';
 import { tariffs } from './tariffs';
 import { users } from './users';
 
@@ -56,6 +58,11 @@ export const orders = pgTable(
     // arrival estimate moves estimatedDeliveryAt. Null for orders placed before it was kept.
     estimatedMinutes: integer(),
     estimatedDeliveryAt: timestamp({ withTimezone: true }),
+    promisedDeliveryAt: timestamp({ withTimezone: true }),
+    paidAt: timestamp({ withTimezone: true }),
+    firstAssignedAt: timestamp({ withTimezone: true }),
+    firstAssignedAuto: boolean(),
+    zoneId: integer().references(() => serviceZones.zoneId),
     otpCode: varchar({ length: ORDER_FIELD_LENGTH.OTP_CODE }),
     // Wrong delivery codes in a row; entering is locked until otpLockedUntil after too many.
     otpFailedAttempts: smallint().notNull().default(0),
@@ -66,9 +73,13 @@ export const orders = pgTable(
     assignmentRound: smallint().notNull().default(1),
   },
   (table) => [
-    index('orders_courier_id_idx').on(table.courierId),
     index('orders_client_created_at_idx').on(
       table.clientId,
+      table.createdAt.desc().nullsFirst(),
+      table.orderId.desc().nullsFirst(),
+    ),
+    index('orders_courier_created_at_idx').on(
+      table.courierId,
       table.createdAt.desc().nullsFirst(),
       table.orderId.desc().nullsFirst(),
     ),
@@ -79,6 +90,8 @@ export const orders = pgTable(
       table.createdAt.desc().nullsFirst(),
       table.orderId.desc().nullsFirst(),
     ),
+    index('orders_status_finished_at_idx').on(table.status, table.finishedAt),
+    index('orders_first_assigned_at_idx').on(table.firstAssignedAt),
     index('orders_status_created_at_idx').on(
       table.status,
       table.createdAt.desc().nullsFirst(),
@@ -95,6 +108,10 @@ export const orders = pgTable(
     check('orders_otp_failed_attempts_check', sql`${table.otpFailedAttempts} >= 0`),
     check('orders_estimated_minutes_check', sql`${table.estimatedMinutes} >= 0`),
     check('orders_assignment_round_check', sql`${table.assignmentRound} >= 1`),
+    check(
+      'orders_first_assignment_check',
+      sql`(${table.firstAssignedAt} IS NULL) = (${table.firstAssignedAuto} IS NULL)`,
+    ),
     check(
       'orders_finished_at_check',
       sql`${table.status} NOT IN (${sqlLiteralList(ORDER_FINISHED_STATUSES)}) OR ${table.finishedAt} IS NOT NULL`,

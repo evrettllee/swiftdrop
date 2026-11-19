@@ -183,6 +183,55 @@
       "when": 1794403037847,
       "tag": "0025_exchange_rates",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794517263386,
+      "tag": "0026_admin_slice",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794578643673,
+      "tag": "0027_orders_courier_created_at_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794581037275,
+      "tag": "0028_users_sessions_valid_after",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1794586930645,
+      "tag": "0029_analytics_promise_zone_failures",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794651900530,
+      "tag": "0030_orders_analytics_facts",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794689233579,
+      "tag": "0031_support_tickets_first_response",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795074074003,
+      "tag": "0032_drop_orders_courier_id_index",
+      "breakpoints": true
     }
   ]
 }

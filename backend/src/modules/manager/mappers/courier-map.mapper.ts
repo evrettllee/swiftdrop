@@ -1,3 +1,4 @@
+import { fullPersonName } from '@/common/utils/person-name';
 import { MS_PER_SECOND } from '@/common/constants/time.constants';
 import {
   COURIER_MAP_STATE,
@@ -8,7 +9,7 @@ import type { CourierMapItem, CourierMapRow } from '../types/manager-couriers-ma
 export function toCourierMapItem(row: CourierMapRow): CourierMapItem {
   return {
     courierId: row.courierId,
-    name: `${row.firstName} ${row.lastName}`,
+    name: fullPersonName(row.firstName, row.lastName),
     phone: row.phone,
     vehicleType: row.vehicleType,
     lat: row.lat,

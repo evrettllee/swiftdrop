@@ -2,7 +2,6 @@ import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { eq } from 'drizzle-orm';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
-import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { orderOffers } from '@/database/schema';
@@ -21,7 +20,6 @@ import { MINSK_PICKUP } from '@test/support/fixtures';
 import { createManager } from '@test/support/manager';
 import { type Cookies, placeOrders, setOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
 
 describe('Couriers map for a manager (e2e)', () => {
   let app: NestExpressApplication;
@@ -55,11 +53,8 @@ describe('Couriers map for a manager (e2e)', () => {
     return getCouriersMap(app, cookies, query);
   }
 
-  it('should let a manager and an admin in, and keep a client, a courier and a guest out', async () => {
-    const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
-
+  it('should let a manager in, and keep a client, a courier and a guest out', async () => {
     await getMap(manager).expect(HttpStatus.OK);
-    await getMap(admin).expect(HttpStatus.OK);
     await getMap(client).expect(HttpStatus.FORBIDDEN);
     await getMap(courierCookies).expect(HttpStatus.FORBIDDEN);
     await getMap(null).expect(HttpStatus.UNAUTHORIZED);

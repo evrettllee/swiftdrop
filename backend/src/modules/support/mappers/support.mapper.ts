@@ -1,5 +1,5 @@
 import type { TicketTopic } from '@/common/enums/support-ticket.enum';
-import { firstGraphemes, shortPersonName } from '@/common/utils/person-name';
+import { firstGraphemes, fullPersonName, shortPersonName } from '@/common/utils/person-name';
 import {
   LAST_MESSAGE_PREVIEW_LENGTH,
   STAFF_AUTHOR_SUFFIX,
@@ -89,7 +89,7 @@ export function toTicketMessage(
     fromStaff,
     authorName: fromStaff
       ? staffName(row.senderFirstName, row.senderLastName, viewer)
-      : `${row.senderFirstName} ${row.senderLastName}`,
+      : fullPersonName(row.senderFirstName, row.senderLastName),
     isRead: row.isRead,
   };
 }

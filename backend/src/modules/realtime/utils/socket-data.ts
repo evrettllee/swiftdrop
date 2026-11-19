@@ -2,6 +2,7 @@ import { ROLE } from '@/common/enums/role.enum';
 import { STAFF_ROLES } from '../constants/realtime.constants';
 import type {
   AppSocketData,
+  ParticipantSocketData,
   SocketSession,
   StaffRole,
   StaffSocketData,
@@ -15,6 +16,10 @@ function isStaffRole(role: string): role is StaffRole {
 
 export function isStaffSocket(data: AppSocketData): data is StaffSocketData {
   return isStaffRole(data.role);
+}
+
+export function isParticipantSocket(data: AppSocketData): data is ParticipantSocketData {
+  return data.role === ROLE.CLIENT || data.role === ROLE.COURIER;
 }
 
 // What a socket keeps about who opened it, or null when the role may not open one. The courier
@@ -38,6 +43,8 @@ export async function buildSocketData(
     data = { ...common, role: ROLE.CLIENT };
   } else if (isStaffRole(user.role)) {
     data = { ...common, role: user.role };
+  } else if (user.role === ROLE.ADMIN) {
+    data = { ...common, role: ROLE.ADMIN };
   }
 
   return data;

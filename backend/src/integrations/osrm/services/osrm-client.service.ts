@@ -1,4 +1,5 @@
 import {
+  HttpStatus,
   Injectable,
   Logger,
   ServiceUnavailableException,
@@ -8,8 +9,19 @@ import { ConfigService } from '@nestjs/config';
 import { MS_PER_SECOND } from '@/common/constants/time.constants';
 import type { GeoPoint } from '@/common/schemas/geo-point.schema';
 import { CircuitBreaker } from '@/common/utils/circuit-breaker';
-import { describeError } from '@/common/utils/describe-error';
+import { SERVICE_NAME } from '@/common/enums/service-name.enum';
 import { ENV_KEYS } from '@/config/env.constants';
+import { FAILURE_MESSAGES } from '@/modules/service-failures/constants/service-failures.constants';
+import { ServiceFailuresService } from '@/modules/service-failures/services/service-failures.service';
+import {
+  badResponseFailure,
+  errorCodeOf,
+  type Failure,
+  type FetchFailureCode,
+  fetchFailureOf,
+  httpStatusFailure,
+  isTimeoutError,
+} from '@/modules/service-failures/utils/failure-message';
 import {
   COORDINATE_SEPARATOR,
   OSRM_COOLDOWN_MS,
@@ -35,7 +47,10 @@ export class OsrmClient {
   // One for the whole app: pricing, assignment and the maps share the same routing service.
   private readonly breaker = new CircuitBreaker(OSRM_FAILURE_THRESHOLD, OSRM_COOLDOWN_MS);
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly failures: ServiceFailuresService,
+  ) {
     this.baseUrl = config.getOrThrow<string>(ENV_KEYS.OSRM_URL).replace(TRAILING_SLASHES, '');
   }
 
@@ -87,7 +102,7 @@ export class OsrmClient {
 
     if (!parsed.success) {
       this.logger.error(`Unexpected OSRM response: ${parsed.error.message}`);
-      throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
+      throw this.failed(badResponseFailure(FAILURE_MESSAGES.BAD_SHAPE));
     }
 
     const { code, routes, waypoints } = parsed.data;
@@ -100,7 +115,7 @@ export class OsrmClient {
 
     if (code !== OSRM_OK_CODE || !route) {
       this.logger.error(`OSRM returned no usable route, code: ${code}`);
-      throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
+      throw this.failed(badResponseFailure(FAILURE_MESSAGES.NO_ROUTE_DATA));
     }
 
     return { route, waypoints: waypoints ?? [] };
@@ -132,13 +147,35 @@ export class OsrmClient {
 
   // The body is read even for non-2xx answers, because OSRM reports "NoRoute" with an error status.
   private async fetchPayload(url: string): Promise<unknown> {
-    try {
-      const response = await fetch(url, { signal: AbortSignal.timeout(OSRM_REQUEST_TIMEOUT_MS) });
+    let response: Response;
 
+    try {
+      response = await fetch(url, { signal: AbortSignal.timeout(OSRM_REQUEST_TIMEOUT_MS) });
+    } catch (error) {
+      this.logger.error(`OSRM request failed: ${errorCodeOf(error)}`);
+      throw this.failed(fetchFailureOf(error, OSRM_REQUEST_TIMEOUT_MS));
+    }
+
+    if (response.status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      this.logger.error(`OSRM answered with status ${response.status}`);
+      throw this.failed(httpStatusFailure(response.status));
+    }
+
+    try {
       return await response.json();
     } catch (error) {
-      this.logger.error(`OSRM request failed: ${describeError(error)}`);
-      throw new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
+      this.logger.error(`OSRM answer could not be read: ${errorCodeOf(error)}`);
+      throw this.failed(
+        isTimeoutError(error)
+          ? fetchFailureOf(error, OSRM_REQUEST_TIMEOUT_MS)
+          : badResponseFailure(FAILURE_MESSAGES.NOT_JSON),
+      );
     }
+  }
+
+  private failed(failure: Failure<FetchFailureCode>): ServiceUnavailableException {
+    void this.failures.record(SERVICE_NAME.OSRM, failure.code, failure.message);
+
+    return new ServiceUnavailableException(OSRM_UNAVAILABLE_MESSAGE);
   }
 }

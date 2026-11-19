@@ -11,7 +11,7 @@ import type { CourierLookupItem } from '../types/manager-courier-lookup.types';
 import type { CouriersMap } from '../types/manager-couriers-map.types';
 
 @Controller(MANAGER_COURIERS_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 export class ManagerCouriersController {
   constructor(
     private readonly map: ManagerCouriersMapService,

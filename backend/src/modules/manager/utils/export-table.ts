@@ -1,3 +1,4 @@
+import { fullPersonName } from '@/common/utils/person-name';
 import { ORDER_STATUS_LABELS, PAYMENT_STATE_LABELS } from '../constants/manager-labels.constants';
 import type {
   ExportCell,
@@ -13,7 +14,7 @@ type ColumnSpec = ExportColumn & {
 };
 
 function personName(person: { firstName: string; lastName: string } | null): string | null {
-  return person === null ? null : `${person.firstName} ${person.lastName}`;
+  return person === null ? null : fullPersonName(person.firstName, person.lastName);
 }
 
 function streetLine({ street, house }: ManagerOrderStreet): string {

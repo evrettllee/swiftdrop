@@ -14,7 +14,7 @@ import { createTestApp } from '@test/support/app';
 import { APP_HOOK_TIMEOUT_MS } from '@test/support/constants';
 import { createManager, getManagerExport } from '@test/support/manager';
 import { resetServiceArea } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
+import { createUserWithRole, SECOND_MANAGER_ACCOUNT } from '@test/support/users';
 
 const BAD_ANALYTICS_QUERY = { sort: 'nope' };
 
@@ -22,7 +22,7 @@ describe('Manager export and analytics limits per user (e2e)', () => {
   let app: NestExpressApplication;
   let db: Database;
   let manager: string;
-  let admin: string;
+  let otherManager: string;
   const getRoute = jest.fn();
 
   beforeAll(async () => {
@@ -30,7 +30,7 @@ describe('Manager export and analytics limits per user (e2e)', () => {
     db = app.get<Database>(DRIZZLE);
     await resetServiceArea(db, getRoute);
     manager = await createManager(app, db);
-    admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
+    otherManager = await createUserWithRole(app, db, SECOND_MANAGER_ACCOUNT, ROLE.MANAGER);
   }, APP_HOOK_TIMEOUT_MS);
 
   afterAll(async () => {
@@ -43,7 +43,7 @@ describe('Manager export and analytics limits per user (e2e)', () => {
     }
 
     await getManagerExport(app, manager, {}).expect(HttpStatus.TOO_MANY_REQUESTS);
-    await getManagerExport(app, admin, {}).expect(HttpStatus.BAD_REQUEST);
+    await getManagerExport(app, otherManager, {}).expect(HttpStatus.BAD_REQUEST);
   });
 
   it('should take 30 analytics requests a minute from one user across both reports', async () => {
@@ -56,6 +56,6 @@ describe('Manager export and analytics limits per user (e2e)', () => {
     }
 
     await getAnalytics(app, manager, COURIERS).expect(HttpStatus.TOO_MANY_REQUESTS);
-    await getAnalytics(app, admin, SUMMARY).expect(HttpStatus.OK);
+    await getAnalytics(app, otherManager, SUMMARY).expect(HttpStatus.OK);
   });
 });

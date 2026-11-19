@@ -1,20 +1,17 @@
-import { createHash, randomBytes } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { and, eq, gt, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { DRIZZLE } from '@/database/database.constants';
-import type { Database } from '@/database/database.module';
-import { refreshTokens } from '@/database/schema';
+import type { Database, Transaction } from '@/database/database.module';
+import { refreshTokens, users } from '@/database/schema';
 import {
   REFRESH_TOKEN_BYTES,
   REFRESH_REUSE_GRACE_MS,
-  REFRESH_TOKEN_ENCODING,
   REFRESH_TOKEN_TTL_MS,
-  TOKEN_HASH_ALGORITHM,
-  TOKEN_HASH_ENCODING,
 } from '../constants/tokens.constants';
 import type { AccessTokenPayload } from '../types/auth.types';
+import { generateOpaqueToken, hashOpaqueToken } from '../utils/opaque-token';
 
 @Injectable()
 export class TokensService {
@@ -28,11 +25,11 @@ export class TokensService {
   }
 
   async createRefreshToken(userId: number): Promise<string> {
-    const token = randomBytes(REFRESH_TOKEN_BYTES).toString(REFRESH_TOKEN_ENCODING);
+    const token = generateOpaqueToken(REFRESH_TOKEN_BYTES);
 
     await this.db.insert(refreshTokens).values({
       userId,
-      tokenHash: this.hashToken(token),
+      tokenHash: hashOpaqueToken(token),
       expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
     });
 
@@ -42,7 +39,7 @@ export class TokensService {
   // Rotates the token in a single atomic UPDATE; returns the owner, or null if the token is not
   // usable. A token rotated a moment ago is accepted once more: two tabs refreshed at the same time.
   async consumeRefreshToken(token: string): Promise<number | null> {
-    const tokenHash = this.hashToken(token);
+    const tokenHash = hashOpaqueToken(token);
     const now = new Date();
 
     const [consumed] = await this.db
@@ -76,7 +73,7 @@ export class TokensService {
       .update(refreshTokens)
       .set({ revokedAt: new Date() })
       .where(
-        and(eq(refreshTokens.tokenHash, this.hashToken(token)), isNull(refreshTokens.revokedAt)),
+        and(eq(refreshTokens.tokenHash, hashOpaqueToken(token)), isNull(refreshTokens.revokedAt)),
       )
       .returning({ userId: refreshTokens.userId });
 
@@ -90,8 +87,19 @@ export class TokensService {
 
   // Also takes the grace window away from tokens rotated a moment ago: after a theft is noticed,
   // none of the old tokens may open a session again.
-  async revokeAllForUser(userId: number): Promise<void> {
-    await this.db
+  async endAllSessions(userId: number, executor: Database | Transaction = this.db): Promise<void> {
+    await this.revokeAllForUser(userId, executor);
+    await executor
+      .update(users)
+      .set({ sessionsValidAfter: sql`now()` })
+      .where(eq(users.userId, userId));
+  }
+
+  async revokeAllForUser(
+    userId: number,
+    executor: Database | Transaction = this.db,
+  ): Promise<void> {
+    await executor
       .update(refreshTokens)
       .set({ revokedAt: sql`coalesce(${refreshTokens.revokedAt}, ${new Date()})`, rotatedAt: null })
       .where(
@@ -100,10 +108,6 @@ export class TokensService {
           or(isNull(refreshTokens.revokedAt), isNotNull(refreshTokens.rotatedAt)),
         ),
       );
-  }
-
-  hashToken(token: string): string {
-    return createHash(TOKEN_HASH_ALGORITHM).update(token).digest(TOKEN_HASH_ENCODING);
   }
 
   // The owner of a token replaced by a rotation within the grace window, still unexpired. A token

@@ -18,6 +18,7 @@ import {
   WEBHOOK_SIGNATURE_HEADER,
 } from '@/modules/payments/constants/payments.constants';
 import { createTestApp } from '@test/support/app';
+import { NO_FAILURES } from '@test/support/service-failures';
 import { registerUser } from '@test/support/auth';
 import {
   APP_HOOK_TIMEOUT_MS,
@@ -66,7 +67,7 @@ describe('Payments through the fake Stripe client (e2e)', () => {
 
   beforeAll(async () => {
     const config = { getOrThrow: (key: string) => TEST_SETTINGS[key] } as unknown as ConfigService;
-    const gateway = new StripePaymentAdapter(new FakeStripeCheckoutClient(), config);
+    const gateway = new StripePaymentAdapter(new FakeStripeCheckoutClient(), config, NO_FAILURES);
 
     app = await createTestApp([
       { token: OsrmService, useValue: { getRoute } },

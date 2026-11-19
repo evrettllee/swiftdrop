@@ -1,3 +1,4 @@
+import { fullPersonName } from '@/common/utils/person-name';
 import { CLOSED_BY } from '../constants/support-staff.constants';
 import type {
   StaffTicketDetails,
@@ -15,7 +16,7 @@ export function toStaffTicketItem(row: StaffTicketRow): StaffTicketListItem {
     waitingSec: row.waitingSec,
     author: {
       userId: row.userId,
-      name: `${row.authorFirstName} ${row.authorLastName}`,
+      name: fullPersonName(row.authorFirstName, row.authorLastName),
       role: row.authorRole,
     },
     lastMessage:
@@ -31,7 +32,7 @@ function closedByOf(row: StaffTicketDetailsRow): StaffTicketDetails['closedBy'] 
   }
 
   return row.closedById === row.userId
-    ? { role: CLOSED_BY.AUTHOR, name: `${row.closerFirstName} ${row.closerLastName}` }
+    ? { role: CLOSED_BY.AUTHOR, name: fullPersonName(row.closerFirstName, row.closerLastName) }
     : { role: CLOSED_BY.STAFF, name: staffName(row.closerFirstName, row.closerLastName, 'staff') };
 }
 

@@ -46,9 +46,11 @@ FROM (
 
 const TICKET_MESSAGES = `INSERT INTO messages (sender_id, ticket_id, content, sent_at, is_read)
 SELECT CASE WHEN m % 2 = 1 AND NOT (m = 5 AND is_open AND NOT awaiting) THEN user_id ELSE staff_id END,
-  ticket_id, ${TICKET_TEXTS}[m], created_at + (m - 1) * interval '10 minutes',
+  ticket_id, ${TICKET_TEXTS}[m],
+  created_at + (m - 1) * interval '10 minutes' + (m > 1)::int * (ticket_id % 90) * interval '1 minute',
   NOT is_open OR m < 5
-FROM perf_tickets, generate_series(1, 5) m`;
+FROM perf_tickets, generate_series(1, 5) m
+WHERE m = 1 OR ticket_id % 10 <> 7`;
 
 const SEQUENCES = `SELECT setval(pg_get_serial_sequence(tbl, col), max_id)
 FROM (VALUES

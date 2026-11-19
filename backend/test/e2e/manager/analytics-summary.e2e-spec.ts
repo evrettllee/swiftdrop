@@ -33,12 +33,13 @@ describe('Manager analytics summary (e2e)', () => {
     await app.close();
   });
 
-  it('should let a manager and an admin in, and keep a client and a guest out', async () => {
+  it('should let only a manager in and keep an admin, a client and a guest out', async () => {
     const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
     const { cookies: client } = await registerUser(app, SECOND_CLIENT);
 
-    await getAnalytics(app, admin, SUMMARY).expect(HttpStatus.OK);
-    await getAnalytics(app, admin, COURIERS).expect(HttpStatus.OK);
+    await getAnalytics(app, manager, SUMMARY).expect(HttpStatus.OK);
+    await getAnalytics(app, admin, SUMMARY).expect(HttpStatus.FORBIDDEN);
+    await getAnalytics(app, admin, COURIERS).expect(HttpStatus.FORBIDDEN);
     await getAnalytics(app, client, SUMMARY).expect(HttpStatus.FORBIDDEN);
     await getAnalytics(app, client, COURIERS).expect(HttpStatus.FORBIDDEN);
     await getAnalytics(app, null, SUMMARY).expect(HttpStatus.UNAUTHORIZED);

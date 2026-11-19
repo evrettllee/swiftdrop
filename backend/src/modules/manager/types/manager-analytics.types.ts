@@ -1,3 +1,4 @@
+import type { DeliveryZoneRow } from '@/common/types/delivery-zone.types';
 import type { SortDirection } from '@/common/database/list-sort';
 import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 import type { OrderCancelledBy } from '@/modules/orders/types/orders.types';
@@ -69,6 +70,7 @@ export type AnalyticsSummary = {
   kpis: AnalyticsKpis;
   days: AnalyticsDay[];
   hours: AnalyticsHour[];
+  zones: DeliveryZoneRow[];
 };
 
 export type AnalyticsCourierSort = { key: AnalyticsCourierSortKey; direction: SortDirection };
@@ -97,4 +99,9 @@ export type AnalyticsCouriersPage = {
   page: number;
   limit: number;
   period: { from: string; to: string };
+};
+
+export type AnalyticsCourierExportRow = Omit<AnalyticsCourier, 'name'> & {
+  firstName: string;
+  lastName: string;
 };

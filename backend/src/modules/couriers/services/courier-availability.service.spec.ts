@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, ForbiddenException } from '@nestjs/common';
 import type { Database, Transaction } from '@/database/database.module';
 import { queueDatabase } from '@test/support/queue-database';
 import { CourierAvailabilityService } from './courier-availability.service';
@@ -32,11 +32,13 @@ function setUp(wasAvailable: boolean, results: unknown[][], activeOrderId: numbe
   return { service, log, fake };
 }
 
+const COURIER_ROLE = [{ roleName: 'courier' }];
+
 const methods = (fake: ReturnType<typeof queueDatabase>) => fake.calls.map((call) => call.method);
 
 describe('CourierAvailabilityService shift events', () => {
   it('should announce going on shift after the commit', async () => {
-    const { service, log } = setUp(false, [[{ vehicleId: 1 }], []]);
+    const { service, log } = setUp(false, [COURIER_ROLE, [{ vehicleId: 1 }], []]);
 
     await service.set(9, true);
 
@@ -52,7 +54,7 @@ describe('CourierAvailabilityService shift events', () => {
   });
 
   it('should announce nothing when the shift does not change', async () => {
-    const { service, log } = setUp(true, [[{ vehicleId: 1 }], []]);
+    const { service, log } = setUp(true, [COURIER_ROLE, [{ vehicleId: 1 }], []]);
 
     await service.set(9, true);
 
@@ -60,7 +62,7 @@ describe('CourierAvailabilityService shift events', () => {
   });
 
   it('should open a shift in the same transaction when the courier goes on the line', async () => {
-    const { service, fake } = setUp(false, [[{ vehicleId: 1 }], []]);
+    const { service, fake } = setUp(false, [COURIER_ROLE, [{ vehicleId: 1 }], []]);
 
     await service.set(9, true);
 
@@ -81,7 +83,7 @@ describe('CourierAvailabilityService shift events', () => {
   });
 
   it('should open no second shift when the courier is already on the line', async () => {
-    const { service, fake } = setUp(true, [[{ vehicleId: 1 }], []]);
+    const { service, fake } = setUp(true, [COURIER_ROLE, [{ vehicleId: 1 }], []]);
 
     await service.set(9, true);
 
@@ -92,6 +94,15 @@ describe('CourierAvailabilityService shift events', () => {
     const { service, log } = setUp(true, [], 42);
 
     await expect(service.set(9, false)).rejects.toThrow(ConflictException);
+    expect(log).toEqual([]);
+  });
+
+  it('should refuse going on shift and write nothing when the user is no longer a courier', async () => {
+    const { service, log, fake } = setUp(false, [[{ roleName: 'manager' }]]);
+
+    await expect(service.set(9, true)).rejects.toThrow(ForbiddenException);
+    expect(methods(fake)).not.toContain('update');
+    expect(methods(fake)).not.toContain('insert');
     expect(log).toEqual([]);
   });
 });

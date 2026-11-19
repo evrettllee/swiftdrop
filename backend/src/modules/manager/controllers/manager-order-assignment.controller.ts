@@ -28,7 +28,7 @@ import type {
 } from '../types/manager-assignment.types';
 
 @Controller(MANAGER_ORDERS_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 export class ManagerOrderAssignmentController {
   constructor(
     private readonly candidates: ManagerCourierCandidatesService,

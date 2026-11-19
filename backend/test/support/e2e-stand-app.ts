@@ -6,19 +6,24 @@ import { AppModule } from '@/app.module';
 import { configureApp } from '@/app.setup';
 import { GLOBAL_PREFIX } from '@/common/constants/http.constants';
 import { ENV_KEYS } from '@/config/env.constants';
+import { MailGateway } from '@/integrations/mail/contracts/mail.gateway';
 import { NbrbService } from '@/integrations/nbrb/services/nbrb.service';
 import { StripeCheckoutApi } from '@/integrations/stripe/contracts/stripe-checkout.contract';
+import { E2eMailModule } from './e2e-mail.module';
 import { FakeStripeCheckoutClient } from './fake-stripe';
+import { createMailGatewayMock } from './mail';
 import { USD_RATE } from './payments';
 
 const FIXED_RATE = { getUsdRate: () => Promise.resolve(USD_RATE) };
 
 export async function startE2eStand(): Promise<void> {
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+  const moduleRef = await Test.createTestingModule({ imports: [AppModule, E2eMailModule] })
     .overrideProvider(NbrbService)
     .useValue(FIXED_RATE)
     .overrideProvider(StripeCheckoutApi)
     .useValue(new FakeStripeCheckoutClient())
+    .overrideProvider(MailGateway)
+    .useValue(createMailGatewayMock())
     .compile();
   const app = moduleRef.createNestApplication<NestExpressApplication>({ rawBody: true });
 

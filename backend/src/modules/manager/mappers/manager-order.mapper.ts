@@ -1,3 +1,4 @@
+import { fullPersonName } from '@/common/utils/person-name';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { PaymentState } from '../constants/manager-orders.constants';
 import type { ManagerOrderListItem, ManagerOrderStreet } from '../types/manager-orders.types';
@@ -20,7 +21,7 @@ export type ManagerOrderRow = {
 };
 
 function fullName({ firstName, lastName }: PersonName): string {
-  return `${firstName} ${lastName}`;
+  return fullPersonName(firstName, lastName);
 }
 
 export function toManagerOrderListItem(row: ManagerOrderRow): ManagerOrderListItem {

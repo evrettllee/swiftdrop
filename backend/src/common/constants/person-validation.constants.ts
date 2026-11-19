@@ -10,5 +10,12 @@ export const PHONE_REGEX = new RegExp(`^\\+\\d{${PHONE_MIN_DIGITS},${PHONE_MAX_D
 export const PHONE_SEPARATORS_REGEX = /[\s\-()]/g;
 export const PHONE_SEPARATOR_REPLACEMENT = '';
 
+export const NUMERIC_SEARCH = /^[\d\s+\-()]+$/;
+export const NON_DIGITS = /\D/g;
+export const PHONE_PREFIX = '+';
+export const BELARUS_COUNTRY_CODE = '375';
+export const BELARUS_TRUNK_PREFIX = '80';
+export const BELARUS_NATIONAL_DIGITS = 9;
+
 export const PHONE_INVALID_MESSAGE =
   'Введите телефон в международном формате, например +375291234567';

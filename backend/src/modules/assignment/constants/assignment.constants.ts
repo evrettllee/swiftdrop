@@ -71,3 +71,6 @@ export const ASSIGNMENT_ERROR_MESSAGES = {
   // The order row is held by another operation (a cancellation, a payment being settled).
   BUSY: ORDER_BUSY_MESSAGE,
 } as const;
+
+export const PROMISE_PICKUP_ALLOWANCE_MIN = 20;
+export const PROMISE_ROUNDING_MIN = 5;

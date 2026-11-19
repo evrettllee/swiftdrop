@@ -1,3 +1,4 @@
+import type { ServiceFailuresService } from '@/modules/service-failures/services/service-failures.service';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -7,6 +8,8 @@ import {
 } from '../constants/osrm.constants';
 import { OsrmClient } from './osrm-client.service';
 import { OsrmGeometryService } from './osrm-geometry.service';
+
+const NO_FAILURES = { record: () => Promise.resolve() } as unknown as ServiceFailuresService;
 
 const BASE_URL = 'https://osrm.test';
 const FROM = { latitude: 53.9006, longitude: 27.559 };
@@ -28,7 +31,9 @@ describe('OsrmGeometryService', () => {
   let fetchSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    service = new OsrmGeometryService(new OsrmClient(new ConfigService({ OSRM_URL: BASE_URL })));
+    service = new OsrmGeometryService(
+      new OsrmClient(new ConfigService({ OSRM_URL: BASE_URL }), NO_FAILURES),
+    );
     jest.spyOn(Date, 'now').mockReturnValue(START_MS);
     fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(() => jsonResponse(okBody));
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);

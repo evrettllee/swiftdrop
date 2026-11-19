@@ -8,6 +8,7 @@ import {
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
 import { orderOffers } from '@/database/schema';
 import { OfferNotifierService } from '@/modules/assignment/services/offer-notifier.service';
+import { firstPromiseChanges } from '@/modules/assignment/utils/delivery-promise';
 import { UNSUITABLE_REASON } from '../constants/manager-assignment.constants';
 import type { AssignedOrder, RevokedOffer } from '../types/manager-assignment.types';
 import { courierNotAvailable, loadAssignableOrder } from '../utils/assignable-order';
@@ -53,12 +54,14 @@ export class ManagerOrderAssignmentService {
 
     await this.locks.lockAvailableCourier(tx, order, courierId, now);
 
+    const promise = await firstPromiseChanges(tx, orderId, now);
     const assigned = await transitionOrderStatus(orderTx, {
       orderId,
       from: STAFF_ASSIGNABLE_STATUSES,
       to: ORDER_STATUS.COURIER_ASSIGNED,
       changedBy: managerUserId,
-      changes: { courierId },
+      changes: { courierId, ...promise },
+      firstAssignmentAuto: false,
     });
 
     if (!assigned) {

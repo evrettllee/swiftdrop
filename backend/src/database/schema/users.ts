@@ -27,9 +27,12 @@ export const users = pgTable(
     isBlocked: boolean().notNull().default(false),
     emailVerifiedAt: timestamp({ withTimezone: true }),
     deletedAt: timestamp({ withTimezone: true }),
+    lastLoginAt: timestamp({ withTimezone: true }),
+    sessionsValidAfter: timestamp({ withTimezone: true }),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
+    index('users_role_created_idx').on(table.roleId, table.createdAt.desc(), table.userId.desc()),
     uniqueIndex('users_email_active_uidx')
       .on(table.email)
       .where(sql`${table.deletedAt} IS NULL`),

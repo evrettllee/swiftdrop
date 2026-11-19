@@ -1,6 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
@@ -18,7 +17,6 @@ import {
   WEST_POLYGON,
 } from '@test/support/manager-zones';
 import { postEstimate, resetServiceArea, validEstimate } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
 
 type Zone = { id: number; updatedAt: string; isActive: boolean };
 
@@ -45,11 +43,10 @@ describe('Service zones for a manager (e2e)', () => {
     await app.close();
   });
 
-  it('should let a manager and an admin in, and keep a client and a guest out', async () => {
-    const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
+  it('should let a manager in, and keep a client and a guest out', async () => {
     const { cookies: client } = await registerUser(app);
 
-    await getZones(app, admin).expect(HttpStatus.OK);
+    await getZones(app, manager).expect(HttpStatus.OK);
     await getTariffs(app, manager).expect(HttpStatus.OK);
     await getZones(app, client).expect(HttpStatus.FORBIDDEN);
     await postZone(app, client, westZone).expect(HttpStatus.FORBIDDEN);

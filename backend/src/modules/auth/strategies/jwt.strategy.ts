@@ -8,8 +8,9 @@ import { UsersService } from '@/modules/users/services/users.service';
 import { AUTH_ERROR_MESSAGES, JWT_STRATEGY_NAME } from '../constants/access.constants';
 import { ACCESS_COOKIE_NAME } from '../constants/tokens.constants';
 import { toAuthUser } from '../mappers/auth-user.mapper';
-import type { AccessTokenPayload, AuthUser } from '../types/auth.types';
+import type { AuthUser, IssuedAccessTokenPayload } from '../types/auth.types';
 import { readCookie } from '../utils/request-cookies';
+import { isIssuedBeforeCutoff } from '../utils/session-cutoff';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
@@ -26,10 +27,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   }
 
   // Reads the user on every request, so blocking or deleting an account takes effect immediately.
-  async validate(payload: AccessTokenPayload): Promise<AuthUser> {
+  async validate(payload: IssuedAccessTokenPayload): Promise<AuthUser> {
     const user = await this.usersService.findById(Number(payload.sub));
 
-    if (!user || user.isBlocked) {
+    if (!user || user.isBlocked || isIssuedBeforeCutoff(payload.iat, user.sessionsValidAfter)) {
       throw new UnauthorizedException(AUTH_ERROR_MESSAGES.INVALID_SESSION);
     }
 

@@ -61,12 +61,13 @@ describe('AppGateway', () => {
     ]);
   });
 
-  it.each([ROLE.MANAGER, ROLE.ADMIN])(
-    'should put a %s into their user room and the staff room',
-    async (role) => {
-      await expect(roomsJoinedBy(role)).resolves.toEqual([[userRoom(USER_ID), STAFF_ROOM]]);
-    },
-  );
+  it('should put a manager into their user room and the staff room when a manager connects', async () => {
+    await expect(roomsJoinedBy(ROLE.MANAGER)).resolves.toEqual([[userRoom(USER_ID), STAFF_ROOM]]);
+  });
+
+  it('should put an admin into their user room only when an admin connects', async () => {
+    await expect(roomsJoinedBy(ROLE.ADMIN)).resolves.toEqual([[userRoom(USER_ID)]]);
+  });
 
   it.each([ROLE.CLIENT, ROLE.MANAGER, ROLE.ADMIN])(
     'should refuse a position from a %s socket without reading it',

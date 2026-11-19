@@ -20,7 +20,6 @@ import { createManager, getManagerOrder } from '@test/support/manager';
 import { postReassign, postRestartAssignment } from '@test/support/manager-assignment';
 import { type Cookies, placeOrders, setOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
 
 type Session = { courierProfileId: number; cookies: string };
 
@@ -75,8 +74,7 @@ describe('Reassignment of a courier before the pickup (e2e)', () => {
     return order;
   }
 
-  it('should let a manager and an admin in, and keep a client, a courier and a guest out', async () => {
-    const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
+  it('should let a manager in, and keep a client, a courier and a guest out', async () => {
     const body = { courierId: other.courierProfileId, expectedCourierId: courier.courierProfileId };
 
     for (const [cookies, status] of [
@@ -88,7 +86,7 @@ describe('Reassignment of a courier before the pickup (e2e)', () => {
       await postRestartAssignment(app, cookies, orderIds[0], body).expect(status);
     }
 
-    await postReassign(app, admin, orderIds[0], body).expect(HttpStatus.OK);
+    await postReassign(app, manager, orderIds[0], body).expect(HttpStatus.OK);
   });
 
   it('should change only the courier and write the reason to the history as staff', async () => {

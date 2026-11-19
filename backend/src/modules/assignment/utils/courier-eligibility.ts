@@ -13,7 +13,8 @@ import {
 import { courierActiveOrder } from '@/common/database/courier-active-order';
 import type { PackageSpec } from '@/common/schemas/package-spec.schema';
 import type { Database } from '@/database/database.module';
-import { courierProfiles, orders, users, vehicles } from '@/database/schema';
+import { ROLE } from '@/common/enums/role.enum';
+import { courierProfiles, orders, roles, users, vehicles } from '@/database/schema';
 import { COURIER_LOCATION_FRESH_MS } from '../constants/assignment.constants';
 import { vehiclesThatCarry } from './vehicle-routing';
 
@@ -58,4 +59,6 @@ export function isTrue(condition: SQL): SQL<boolean> {
   return sql<boolean>`coalesce(${condition}, false)`;
 }
 
-export const courierAccountActive: SQL = sql`(${and(eq(users.isBlocked, false), isNull(users.deletedAt))})`;
+const hasCourierRole: SQL = sql`${users.roleId} = (select ${roles.roleId} from ${roles} where ${roles.name} = ${ROLE.COURIER})`;
+
+export const courierAccountActive: SQL = sql`(${and(eq(users.isBlocked, false), isNull(users.deletedAt), hasCourierRole)})`;

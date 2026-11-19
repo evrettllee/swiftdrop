@@ -18,9 +18,76 @@ const VALID_CONFIG: Record<string, unknown> = {
   [ENV_KEYS.STRIPE_WEBHOOK_SECRET]: 'whsec_unit',
 };
 
+const MAIL_CONFIG: Record<string, unknown> = {
+  [ENV_KEYS.MAIL_HOST]: 'smtp.example.com',
+  [ENV_KEYS.MAIL_PORT]: '465',
+  [ENV_KEYS.MAIL_SECURE]: 'true',
+  [ENV_KEYS.MAIL_USER]: 'user',
+  [ENV_KEYS.MAIL_PASSWORD]: 'password',
+  [ENV_KEYS.MAIL_FROM]: 'SwiftDrop <no-reply@example.com>',
+};
+
+const MAIL_KEYS = [
+  ENV_KEYS.MAIL_HOST,
+  ENV_KEYS.MAIL_PORT,
+  ENV_KEYS.MAIL_SECURE,
+  ENV_KEYS.MAIL_USER,
+  ENV_KEYS.MAIL_PASSWORD,
+  ENV_KEYS.MAIL_FROM,
+];
+
+function without(config: Record<string, unknown>, key: string): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(config).filter(([name]) => name !== key));
+}
+
 describe('validateEnv', () => {
   it.each(NODE_ENV_VALUES)('should accept NODE_ENV=%s', (nodeEnv) => {
-    expect(() => validateEnv({ ...VALID_CONFIG, [ENV_KEYS.NODE_ENV]: nodeEnv })).not.toThrow();
+    expect(() =>
+      validateEnv({ ...VALID_CONFIG, ...MAIL_CONFIG, [ENV_KEYS.NODE_ENV]: nodeEnv }),
+    ).not.toThrow();
+  });
+
+  it.each(MAIL_KEYS)('should refuse to start in production when %s is missing', (key) => {
+    const config = { ...VALID_CONFIG, ...MAIL_CONFIG, [ENV_KEYS.NODE_ENV]: 'production' };
+
+    expect(() => validateEnv(without(config, key))).toThrow(key);
+  });
+
+  it.each(['', '   '])(
+    'should refuse to start in production when MAIL_HOST is %j instead of logging mails',
+    (host) => {
+      const config = { ...VALID_CONFIG, ...MAIL_CONFIG, [ENV_KEYS.NODE_ENV]: 'production' };
+
+      expect(() => validateEnv({ ...config, [ENV_KEYS.MAIL_HOST]: host })).toThrow(
+        ENV_KEYS.MAIL_HOST,
+      );
+    },
+  );
+
+  it.each(['development', 'test'])(
+    'should start without mail settings when NODE_ENV is %s',
+    (nodeEnv) => {
+      expect(() => validateEnv({ ...VALID_CONFIG, [ENV_KEYS.NODE_ENV]: nodeEnv })).not.toThrow();
+    },
+  );
+
+  it.each(MAIL_KEYS)(
+    'should start outside production when only %s is missing from the mail settings',
+    (key) => {
+      expect(() => validateEnv(without({ ...VALID_CONFIG, ...MAIL_CONFIG }, key))).not.toThrow();
+    },
+  );
+
+  it('should turn the mail port into a number and secure into a boolean when mail is set', () => {
+    const result = validateEnv({ ...VALID_CONFIG, ...MAIL_CONFIG });
+
+    expect(result).toMatchObject({ [ENV_KEYS.MAIL_PORT]: 465, [ENV_KEYS.MAIL_SECURE]: true });
+  });
+
+  it('should refuse a mail secure flag that is not true or false', () => {
+    expect(() =>
+      validateEnv({ ...VALID_CONFIG, ...MAIL_CONFIG, [ENV_KEYS.MAIL_SECURE]: 'yes' }),
+    ).toThrow(ENV_KEYS.MAIL_SECURE);
   });
 
   it('should refuse to start when NODE_ENV is missing', () => {

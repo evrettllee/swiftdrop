@@ -1,3 +1,4 @@
+import type { VehicleType } from '@/common/enums/vehicle-type.enum';
 import type { OrderStatus } from '@/common/enums/order-status.enum';
 import type { PaymentState } from './manager-orders.constants';
 
@@ -17,4 +18,12 @@ export const PAYMENT_STATE_LABELS: Record<PaymentState, string> = {
   paid: 'Оплачен',
   refunded: 'Возвращён',
   unpaid: 'Не оплачен',
+};
+
+export const VEHICLE_TYPE_LABELS: Record<VehicleType, string> = {
+  foot: 'Пешком',
+  bicycle: 'Велосипед',
+  scooter: 'Самокат',
+  car: 'Легковой',
+  truck: 'Грузовой',
 };

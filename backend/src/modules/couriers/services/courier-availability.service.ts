@@ -1,10 +1,12 @@
-import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { withLockConflict } from '@/common/database/lock-conflict';
+import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database, Transaction } from '@/database/database.module';
-import { courierProfiles, courierShifts, vehicles } from '@/database/schema';
+import { courierProfiles, courierShifts, roles, users, vehicles } from '@/database/schema';
+import { FORBIDDEN_MESSAGE } from '@/modules/auth/constants/access.constants';
 import { COURIERS_ERROR_MESSAGES } from '../constants/couriers.constants';
 import type { CourierMe, CourierShiftEvent } from '../types/couriers.types';
 import { CourierProfilesService } from './courier-profiles.service';
@@ -45,6 +47,10 @@ export class CourierAvailabilityService {
   ): Promise<CourierShiftEvent | null> {
     const profile = await this.profiles.lockOwnProfile(tx, userId);
 
+    if (isAvailable && !(await this.isCourier(tx, userId))) {
+      throw new ForbiddenException(FORBIDDEN_MESSAGE);
+    }
+
     if (isAvailable && !(await this.hasVehicle(tx, profile.courierProfileId))) {
       throw new ConflictException(COURIERS_ERROR_MESSAGES.VEHICLE_REQUIRED);
     }
@@ -59,22 +65,40 @@ export class CourierAvailabilityService {
 
     // A courier off shift keeps no position: assignment must never use a stale one. Only reached
     // without an active order, so a tracked courier never loses the position.
-    const location = isAvailable
-      ? {}
-      : { currentLat: null, currentLng: null, locationUpdatedAt: null };
-
-    await tx
-      .update(courierProfiles)
-      .set({ isAvailable, ...location })
-      .where(eq(courierProfiles.courierProfileId, profile.courierProfileId));
-
-    await this.recordShift(tx, profile.courierProfileId, isAvailable, profile.isAvailable);
+    if (isAvailable) {
+      await tx
+        .update(courierProfiles)
+        .set({ isAvailable })
+        .where(eq(courierProfiles.courierProfileId, profile.courierProfileId));
+      await this.recordShift(tx, profile.courierProfileId, isAvailable, profile.isAvailable);
+    } else {
+      await this.takeOffShift(tx, profile.courierProfileId);
+    }
 
     this.logger.log(`Courier ${profile.courierProfileId} is ${isAvailable ? 'on' : 'off'} shift`);
 
     return profile.isAvailable === isAvailable
       ? null
       : { courierProfileId: profile.courierProfileId, isAvailable };
+  }
+
+  async takeOffShift(tx: Transaction, courierProfileId: number): Promise<void> {
+    await tx
+      .update(courierProfiles)
+      .set({ isAvailable: false, currentLat: null, currentLng: null, locationUpdatedAt: null })
+      .where(eq(courierProfiles.courierProfileId, courierProfileId));
+    await this.recordShift(tx, courierProfileId, false, true);
+  }
+
+  private async isCourier(tx: Transaction, userId: number): Promise<boolean> {
+    const [row] = await tx
+      .select({ roleName: roles.name })
+      .from(users)
+      .innerJoin(roles, eq(roles.roleId, users.roleId))
+      .where(eq(users.userId, userId))
+      .limit(SINGLE_ROW_LIMIT);
+
+    return row?.roleName === ROLE.COURIER;
   }
 
   private async recordShift(

@@ -68,6 +68,8 @@ export class ManagerZoneWritesService {
 
       if (changes.tariffId !== undefined) {
         await ensureActiveTariff(tx, changes.tariffId);
+      } else if (changes.isActive === true && !zone.isActive) {
+        await ensureActiveTariff(tx, zone.tariffId);
       }
 
       if (changes.isActive === false && zone.isActive && !(await hasOtherActiveZone(tx, zoneId))) {

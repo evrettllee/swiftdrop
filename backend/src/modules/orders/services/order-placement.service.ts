@@ -8,6 +8,7 @@ import { addresses, orders, orderStatusHistory, packages } from '@/database/sche
 import { PricingService } from '@/modules/pricing/services/pricing.service';
 import type { PriceQuote } from '@/modules/pricing/types/pricing.types';
 import { OrderEventsService } from '@/modules/tracking/services/order-events.service';
+import { lockActiveUser } from '@/modules/users/utils/active-user-lock';
 import type { CreateOrderDto } from '../dto/create-order.dto';
 import { toAddressRow, toPackageRow } from '../mappers/order-rows.mapper';
 import { ORDERS_ERROR_MESSAGES } from '../constants/orders.constants';
@@ -25,7 +26,7 @@ export class OrderPlacementService {
 
   async place(clientId: number, dto: CreateOrderDto): Promise<CreatedOrder> {
     // The price is always calculated here, the client cannot send its own.
-    const { estimate, tariffId } = await this.pricing.quote({
+    const { estimate, tariffId, zoneId } = await this.pricing.quote({
       pickup: dto.pickup,
       delivery: dto.delivery,
       package: dto.package,
@@ -35,7 +36,7 @@ export class OrderPlacementService {
     const created = await this.insertOrder(
       clientId,
       dto,
-      { estimate, tariffId },
+      { estimate, tariffId, zoneId },
       estimatedDeliveryAt,
     );
     const { orderId } = created;
@@ -55,10 +56,12 @@ export class OrderPlacementService {
   private insertOrder(
     clientId: number,
     dto: CreateOrderDto,
-    { estimate, tariffId }: PriceQuote,
+    { estimate, tariffId, zoneId }: PriceQuote,
     estimatedDeliveryAt: Date,
   ) {
     return this.db.transaction(async (tx) => {
+      await lockActiveUser(tx, clientId);
+
       const [pickup, delivery] = await tx
         .insert(addresses)
         .values([toAddressRow(dto.pickup), toAddressRow(dto.delivery)])
@@ -73,6 +76,7 @@ export class OrderPlacementService {
         .values({
           clientId,
           tariffId,
+          zoneId,
           pickupAddressId: pickup.addressId,
           deliveryAddressId: delivery.addressId,
           status: ORDER_STATUS.PENDING,

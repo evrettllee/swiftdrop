@@ -21,9 +21,11 @@ import { registerUser, validRegistration } from '@test/support/auth';
 import { COURIER_ACCOUNT, createCourier } from '@test/support/couriers';
 import { resetServiceArea } from '@test/support/pricing';
 import {
+  collectEvents,
   connectAppSocket,
   joinOrderRoom,
   listenTestApp,
+  roundTrip,
   waitForEvent,
 } from '@test/support/sockets';
 import { sendLocation } from '@test/support/tracking';
@@ -97,11 +99,8 @@ describe('App socket connection (e2e)', () => {
     expect(socket.connected).toBe(true);
   });
 
-  it.each([
-    [ROLE.MANAGER, MANAGER_ACCOUNT],
-    [ROLE.ADMIN, ADMIN_ACCOUNT],
-  ])('should admit a %s into the staff room only', async (role, account) => {
-    const cookies = await createUserWithRole(app, db, account, role);
+  it('should admit a manager into the staff room only when a manager connects', async () => {
+    const cookies = await createUserWithRole(app, db, MANAGER_ACCOUNT, ROLE.MANAGER);
     const socket = await connectAppSocket(baseUrl, cookies);
     sockets.push(socket);
     const received = waitForEvent<{ ok: boolean }>(socket, STAFF_TEST_EVENT);
@@ -109,6 +108,26 @@ describe('App socket connection (e2e)', () => {
     app.get(RealtimeEventsService).toStaff(STAFF_TEST_EVENT, { ok: true });
 
     await expect(received).resolves.toEqual({ ok: true });
+    await expect(joinOrderRoom(socket, { orderId: 1 })).resolves.toEqual({
+      ok: false,
+      reason: ORDER_JOIN_REJECTIONS.NOT_FOUND,
+    });
+    await expect(sendLocation(socket)).resolves.toEqual({
+      ok: false,
+      reason: LOCATION_UPDATE_REJECTIONS.FORBIDDEN,
+    });
+  });
+
+  it('should keep an admin out of the staff room when an admin connects', async () => {
+    const cookies = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
+    const socket = await connectAppSocket(baseUrl, cookies);
+    sockets.push(socket);
+    const received = collectEvents(socket, STAFF_TEST_EVENT);
+
+    app.get(RealtimeEventsService).toStaff(STAFF_TEST_EVENT, { ok: true });
+    await roundTrip(socket);
+
+    expect(received).toEqual([]);
     await expect(joinOrderRoom(socket, { orderId: 1 })).resolves.toEqual({
       ok: false,
       reason: ORDER_JOIN_REJECTIONS.NOT_FOUND,

@@ -24,6 +24,12 @@ export const MANAGER_ACCOUNT: Account = {
   password: validRegistration.password,
 };
 
+export const SECOND_MANAGER_ACCOUNT: Account = {
+  ...MANAGER_ACCOUNT,
+  email: 'manager2@example.com',
+  phone: '+375297770000',
+};
+
 export const ADMIN_ACCOUNT: Account = {
   firstName: 'Сергей',
   lastName: 'Лебедев',

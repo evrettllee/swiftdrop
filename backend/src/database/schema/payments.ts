@@ -43,6 +43,9 @@ export const payments = pgTable(
   },
   (table) => [
     index('payments_order_id_idx').on(table.orderId),
+    index('payments_refunded_at_idx')
+      .on(table.refundedAt)
+      .where(sql`${table.refundedAt} IS NOT NULL`),
     // An order has at most one open attempt, so it cannot be paid twice through two sessions.
     uniqueIndex(PAYMENTS_ONE_PENDING_PER_ORDER_INDEX)
       .on(table.orderId)

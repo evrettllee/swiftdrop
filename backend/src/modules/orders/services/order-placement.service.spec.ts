@@ -38,9 +38,17 @@ function fakeDatabase(calls: string[], failure?: Error) {
     },
   });
 
+  const clientRow = {
+    from: () => clientRow,
+    where: () => clientRow,
+    limit: () => clientRow,
+    for: () => Promise.resolve([{ isBlocked: false, deletedAt: null }]),
+  };
+  const select = () => clientRow;
+
   return {
     transaction: async (work: (tx: unknown) => Promise<unknown>) => {
-      const result = await work({ insert });
+      const result = await work({ insert, select });
 
       if (failure) {
         calls.push('rollback');

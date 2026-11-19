@@ -2,7 +2,7 @@ import { type SQL, sql } from 'drizzle-orm';
 import { SORT_DIRECTION } from '@/common/constants/list.constants';
 import { LIST_FIRST_PAGE } from '@/common/constants/list.constants';
 import { ORDER_OFFER_STATUS } from '@/common/enums/order-offer-status.enum';
-import { fullNameSql } from '@/database/sql-expressions';
+import { displayNameSql } from '@/database/sql-expressions';
 import { sqlLiteral } from '@/database/sql-literal';
 import { courierProfiles, courierShifts, orderOffers, users, vehicles } from '@/database/schema';
 import {
@@ -10,7 +10,11 @@ import {
   ANALYTICS_OPEN_SHIFT_TAIL,
   type AnalyticsCourierSortKey,
 } from '../constants/manager-analytics.constants';
-import type { AnalyticsCouriersQuery, AnalyticsRange } from '../types/manager-analytics.types';
+import type {
+  AnalyticsCouriersQuery,
+  AnalyticsPeriod,
+  AnalyticsRange,
+} from '../types/manager-analytics.types';
 import { averageOf, countIf, ORDER_FACT, orderFactsSql, roundedSql } from './analytics-metrics';
 
 const SECONDS_PER_HOUR = sql.raw('3600');
@@ -64,7 +68,8 @@ function courierRowsSql(range: AnalyticsRange): SQL {
   shifts as (${shiftHoursSql(range)}),
   courier_rows as (
     select ${courierProfiles.courierProfileId} as courier_id,
-      ${fullNameSql(users.firstName, users.lastName)} as name,
+      ${displayNameSql(users.firstName, users.lastName)} as name,
+      ${users.firstName} as first_name, ${users.lastName} as last_name,
       ${vehicles.type} as vehicle_type,
       coalesce(done.delivered, 0) as delivered,
       ${roundedSql(sql`100.0 * done.on_time / nullif(done.timed, 0)`, ANALYTICS_DECIMALS.PERCENT)} as on_time_pct,
@@ -97,4 +102,15 @@ export function analyticsCouriersSql({ period, sort, page, limit }: AnalyticsCou
 export function analyticsCouriersCountSql({ period }: AnalyticsCouriersQuery): SQL {
   return sql`${courierRowsSql(period.current)}
   select count(*)::int as "total" from courier_rows`;
+}
+
+export function analyticsCouriersExportSql(period: AnalyticsPeriod, limit: number): SQL {
+  return sql`${courierRowsSql(period.current)}
+  select courier_id as "courierId", first_name as "firstName", last_name as "lastName",
+    vehicle_type as "vehicleType", delivered, on_time_pct as "onTimePct",
+    avg_delivery_min as "avgDeliveryMin", declined_offers as "declinedOffers",
+    hours_online as "hoursOnline"
+  from courier_rows
+  order by delivered desc, name asc, courier_id asc
+  limit ${limit}`;
 }

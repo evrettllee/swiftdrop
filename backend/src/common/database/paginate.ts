@@ -36,6 +36,7 @@ export type ListSource<K extends string, TRow extends SortedRow> = {
   count: (where: SQL | undefined) => Promise<number>;
   maxId: (where: SQL | undefined) => Promise<number | null>;
   idOf: (row: TRow) => number;
+  orderBy?: SQL[];
 };
 
 type Resolved<K extends string, TRow extends SortedRow> = {
@@ -98,7 +99,7 @@ export function paginate<K extends string, TRow extends SortedRow>(
   const resolved: Resolved<K, TRow> = {
     source,
     field,
-    orderBy: sortOrderBy(field, source.idColumn, query.sort),
+    orderBy: source.orderBy ?? sortOrderBy(field, source.idColumn, query.sort),
     sortValue: sortValueSql(field),
   };
 

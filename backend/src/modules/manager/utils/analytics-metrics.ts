@@ -1,57 +1,28 @@
 import { type SQL, sql } from 'drizzle-orm';
+import { cancelledByJoin } from '@/common/database/order-cancelled-by';
 import { ORDER_STATUS } from '@/common/enums/order-status.enum';
-import { ROLE } from '@/common/enums/role.enum';
 import { sqlLiteral, sqlLiteralList } from '@/database/sql-literal';
-import { orders, orderStatusHistory, roles, users } from '@/database/schema';
+import { orders } from '@/database/schema';
 import { ORDER_CANCELLED_BY } from '@/modules/orders/constants/orders.constants';
 import { MANAGER_STATUS_GROUP_STATUSES } from '../constants/manager-orders.constants';
 
 const STATUS = {
-  CONFIRMED: sqlLiteral(ORDER_STATUS.CONFIRMED),
-  ASSIGNED: sqlLiteral(ORDER_STATUS.COURIER_ASSIGNED),
   DELIVERED: sqlLiteral(ORDER_STATUS.DELIVERED),
   CANCELLED: sqlLiteral(ORDER_STATUS.CANCELLED),
 };
 const CANCELLED_STATUSES = sqlLiteralList(MANAGER_STATUS_GROUP_STATUSES.cancelled);
-const STAFF_ROLES = sqlLiteralList([ROLE.MANAGER, ROLE.ADMIN]);
-const TIMELINE_STATUSES = sqlLiteralList([
-  ORDER_STATUS.CONFIRMED,
-  ORDER_STATUS.COURIER_ASSIGNED,
-  ORDER_STATUS.CANCELLED,
-]);
 const SECONDS_PER_MINUTE = sql.raw('60');
 
 export function placedInPeriod(start: Date, end: Date): SQL {
-  return sql`${orders.createdAt} >= ${start} and ${orders.createdAt} < ${end} and exists (
-    select 1 from ${orderStatusHistory}
-    where ${orderStatusHistory.orderId} = ${orders.orderId} and ${orderStatusHistory.status} = ${STATUS.CONFIRMED}
-  )`;
+  return sql`${orders.createdAt} >= ${start} and ${orders.createdAt} < ${end} and ${orders.paidAt} is not null`;
 }
 
-function timelineSql(start: Date, end: Date): SQL {
-  return sql`select ${orderStatusHistory.orderId} as order_id,
-    min(${orderStatusHistory.changedAt}) filter (where ${orderStatusHistory.status} = ${STATUS.CONFIRMED}) as confirmed_at,
-    min(${orderStatusHistory.changedAt}) filter (where ${orderStatusHistory.status} = ${STATUS.ASSIGNED}) as assigned_at,
-    (array_agg(${orderStatusHistory.changedBy} order by ${orderStatusHistory.changedAt}, ${orderStatusHistory.statusHistoryId})
-      filter (where ${orderStatusHistory.status} = ${STATUS.ASSIGNED}))[1] as assigned_by,
-    (array_agg(${orderStatusHistory.changedBy} order by ${orderStatusHistory.changedAt} desc, ${orderStatusHistory.statusHistoryId} desc)
-      filter (where ${orderStatusHistory.status} = ${STATUS.CANCELLED}))[1] as cancelled_by
-  from ${orderStatusHistory}
-  where ${orderStatusHistory.status} in (${TIMELINE_STATUSES}) and ${orderStatusHistory.orderId} in (
-    select ${orders.orderId} from ${orders} where ${orders.createdAt} >= ${start} and ${orders.createdAt} < ${end}
-  )
-  group by ${orderStatusHistory.orderId}`;
-}
-
-const assignedByStaff = sql`coalesce(timeline.assigned_by in (
-    select ${users.userId} from ${users} inner join ${roles} on ${roles.roleId} = ${users.roleId}
-    where ${roles.name} in (${STAFF_ROLES})
-  ), false)`;
+const assignedByStaff = sql`coalesce(${orders.firstAssignedAt} is not null and not ${orders.firstAssignedAuto}, false)`;
 
 const cancelledBy = sql`case when ${orders.status} = ${STATUS.CANCELLED} then
     case
-      when timeline.cancelled_by is null then ${sqlLiteral(ORDER_CANCELLED_BY.SYSTEM)}
-      when timeline.cancelled_by = ${orders.clientId} then ${sqlLiteral(ORDER_CANCELLED_BY.CLIENT)}
+      when cancelled.changed_by is null then ${sqlLiteral(ORDER_CANCELLED_BY.SYSTEM)}
+      when cancelled.changed_by = ${orders.clientId} then ${sqlLiteral(ORDER_CANCELLED_BY.CLIENT)}
       else ${sqlLiteral(ORDER_CANCELLED_BY.STAFF)}
     end
   end`;
@@ -60,10 +31,10 @@ export function orderFactsSql(start: Date, end: Date): SQL {
   return sql`select ${orders.orderId} as order_id, ${orders.courierId} as courier_id,
     ${orders.status} as status, ${orders.createdAt} as created_at, ${orders.finishedAt} as finished_at,
     ${orders.estimatedMinutes} as estimated_minutes, ${orders.price} as price,
-    timeline.confirmed_at, timeline.assigned_at,
+    ${orders.paidAt} as confirmed_at, ${orders.firstAssignedAt} as assigned_at,
     ${assignedByStaff} as assigned_by_staff, ${cancelledBy} as cancelled_by
   from ${orders}
-  left join (${timelineSql(start, end)}) as timeline on timeline.order_id = ${orders.orderId}
+  ${cancelledByJoin(start, end)}
   where ${placedInPeriod(start, end)}`;
 }
 

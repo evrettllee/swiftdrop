@@ -21,13 +21,8 @@ import { createManager } from '@test/support/manager';
 import { postAssign } from '@test/support/manager-assignment';
 import { placeOrders, setOrderStatus } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
-import { createUserWithRole, MANAGER_ACCOUNT } from '@test/support/users';
+import { createUserWithRole, SECOND_MANAGER_ACCOUNT } from '@test/support/users';
 
-const SECOND_MANAGER = {
-  ...MANAGER_ACCOUNT,
-  email: 'manager2@example.com',
-  phone: '+375297770000',
-};
 const CONFLICT_PAIR = [HttpStatus.OK, HttpStatus.CONFLICT];
 
 describe('Manual assignment under concurrent changes (e2e)', () => {
@@ -85,7 +80,7 @@ describe('Manual assignment under concurrent changes (e2e)', () => {
   });
 
   it('should let one of two managers assign the order and refuse the other', async () => {
-    const second = await createUserWithRole(app, db, SECOND_MANAGER, ROLE.MANAGER);
+    const second = await createUserWithRole(app, db, SECOND_MANAGER_ACCOUNT, ROLE.MANAGER);
 
     const responses = await Promise.all([
       postAssign(app, manager, orderIds[0], courier.courierProfileId),

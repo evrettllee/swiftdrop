@@ -17,7 +17,7 @@ import { ManagerAnalyticsService } from '../services/manager-analytics.service';
 import type { AnalyticsCouriersPage, AnalyticsSummary } from '../types/manager-analytics.types';
 
 @Controller(MANAGER_ANALYTICS_ROUTES.BASE)
-@Roles(ROLE.MANAGER, ROLE.ADMIN)
+@Roles(ROLE.MANAGER)
 @UserThrottle(MANAGER_ANALYTICS_THROTTLE)
 export class ManagerAnalyticsController {
   constructor(private readonly analytics: ManagerAnalyticsService) {}

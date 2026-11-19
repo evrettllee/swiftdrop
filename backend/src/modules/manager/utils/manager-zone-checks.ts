@@ -6,7 +6,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { and, count, eq, ne } from 'drizzle-orm';
-import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
+import { ROW_LOCK_SHARE, SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import type { Transaction } from '@/database/database.module';
 import { serviceZones, tariffs } from '@/database/schema';
 import { checkZonePolygon } from '@/modules/zones/utils/zone-polygon';
@@ -39,7 +39,11 @@ export function zoneConflict(code: string, message: string, extra: object = {}):
 
 export async function lockZone(tx: Transaction, zoneId: number) {
   const [zone] = await tx
-    .select({ isActive: serviceZones.isActive, updatedAt: serviceZones.updatedAt })
+    .select({
+      isActive: serviceZones.isActive,
+      tariffId: serviceZones.tariffId,
+      updatedAt: serviceZones.updatedAt,
+    })
     .from(serviceZones)
     .where(eq(serviceZones.zoneId, zoneId))
     .limit(SINGLE_ROW_LIMIT)
@@ -54,10 +58,11 @@ export async function lockZone(tx: Transaction, zoneId: number) {
 
 export async function ensureActiveTariff(tx: Transaction, tariffId: number): Promise<void> {
   const [tariff] = await tx
-    .select({ tariffId: tariffs.tariffId })
+    .select({ isActive: tariffs.isActive })
     .from(tariffs)
-    .where(and(eq(tariffs.tariffId, tariffId), eq(tariffs.isActive, true)))
-    .limit(SINGLE_ROW_LIMIT);
+    .where(eq(tariffs.tariffId, tariffId))
+    .limit(SINGLE_ROW_LIMIT)
+    .for(ROW_LOCK_SHARE);
 
   if (!tariff) {
     throw new UnprocessableEntityException({
@@ -65,6 +70,10 @@ export async function ensureActiveTariff(tx: Transaction, tariffId: number): Pro
       code: ZONE_ERROR_CODE.TARIFF_NOT_FOUND,
       message: MESSAGES.TARIFF_NOT_FOUND,
     });
+  }
+
+  if (!tariff.isActive) {
+    throw zoneConflict(ZONE_ERROR_CODE.TARIFF_INACTIVE, MESSAGES.TARIFF_INACTIVE);
   }
 }
 

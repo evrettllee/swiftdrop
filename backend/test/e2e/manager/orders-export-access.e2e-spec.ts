@@ -1,6 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import { ROLE } from '@/common/enums/role.enum';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
 import { OsrmService } from '@/integrations/osrm/services/osrm.service';
@@ -12,7 +11,6 @@ import { createCourier } from '@test/support/couriers';
 import { createManager, csvLines, getManagerExport } from '@test/support/manager';
 import { type Cookies, placeOrders } from '@test/support/orders';
 import { resetServiceArea } from '@test/support/pricing';
-import { ADMIN_ACCOUNT, createUserWithRole } from '@test/support/users';
 
 const FILE_NAME = /^swiftdrop-orders-\d{4}-\d{2}-\d{2}\.(csv|xlsx)$/;
 
@@ -63,10 +61,8 @@ describe('Manager orders export access (e2e)', () => {
     expect(response.headers['x-content-type-options']).toBe('nosniff');
   });
 
-  it('should give an admin the export too', async () => {
-    const admin = await createUserWithRole(app, db, ADMIN_ACCOUNT, ROLE.ADMIN);
-
-    const response = await getManagerExport(app, admin, { format: 'csv' }).expect(HttpStatus.OK);
+  it('should give a manager a header and every order in the csv when a manager exports', async () => {
+    const response = await getManagerExport(app, manager, { format: 'csv' }).expect(HttpStatus.OK);
 
     expect(csvLines(response.body as Buffer)).toHaveLength(4);
   });

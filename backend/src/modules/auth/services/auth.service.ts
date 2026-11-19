@@ -1,13 +1,20 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ROLE, type RoleName } from '@/common/enums/role.enum';
 import { UsersService } from '@/modules/users/services/users.service';
 import type { User, UserWithRole } from '@/modules/users/types/users.types';
 import { AUTH_ERROR_MESSAGES } from '../constants/access.constants';
+import { PASSWORD_LINK_INVALID_MESSAGE } from '../constants/password-links.constants';
 import { toAuthUser } from '../mappers/auth-user.mapper';
 import type { AuthResult, OAuthProfile } from '../types/auth.types';
 import type { LoginDto } from '../dto/login.dto';
 import type { RegisterDto } from '../dto/register.dto';
 import { OAuthService } from './oauth.service';
+import { isWellFormedLinkToken, PasswordLinksService } from './password-links.service';
 import { PasswordService } from './password.service';
 import { TokensService } from './tokens.service';
 
@@ -18,6 +25,7 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly tokensService: TokensService,
     private readonly oauthService: OAuthService,
+    private readonly passwordLinks: PasswordLinksService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
@@ -46,6 +54,7 @@ export class AuthService {
     }
 
     this.ensureNotBlocked(user);
+    await this.usersService.markSignedIn(user.userId);
 
     return this.buildAuthResult(user, user.roleName);
   }
@@ -54,6 +63,24 @@ export class AuthService {
     const user = await this.oauthService.resolveUser(profile);
 
     this.ensureNotBlocked(user);
+    await this.usersService.markSignedIn(user.userId);
+
+    return this.buildAuthResult(user, user.roleName);
+  }
+
+  async setPasswordByLink(token: string, password: string): Promise<AuthResult> {
+    if (!isWellFormedLinkToken(token)) {
+      throw new NotFoundException(PASSWORD_LINK_INVALID_MESSAGE);
+    }
+
+    const passwordHash = await this.passwordService.hash(password);
+    const user = await this.passwordLinks.setPassword(token, passwordHash);
+
+    if (!user) {
+      throw new NotFoundException(PASSWORD_LINK_INVALID_MESSAGE);
+    }
+
+    await this.usersService.markSignedIn(user.userId);
 
     return this.buildAuthResult(user, user.roleName);
   }

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { SINGLE_ROW_LIMIT } from '@/common/constants/database.constants';
 import { DRIZZLE } from '@/database/database.constants';
 import type { Database } from '@/database/database.module';
@@ -46,9 +46,12 @@ export class SupportMessageWriterService {
         sentAt: messages.sentAt,
         isRead: messages.isRead,
       });
+    const firstResponse = input.fromStaff
+      ? { firstResponseAt: sql`coalesce(${supportTickets.firstResponseAt}, ${message.sentAt})` }
+      : {};
     const [ticket] = await tx
       .update(supportTickets)
-      .set({ lastMessageAt: message.sentAt, awaitingStaff: !input.fromStaff })
+      .set({ lastMessageAt: message.sentAt, awaitingStaff: !input.fromStaff, ...firstResponse })
       .where(eq(supportTickets.ticketId, input.ticketId))
       .returning(TICKET_STATE_COLUMNS);
     const [sender] = await tx

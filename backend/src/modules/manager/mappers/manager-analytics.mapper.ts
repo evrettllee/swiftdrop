@@ -1,3 +1,4 @@
+import type { DeliveryZoneRow } from '@/common/types/delivery-zone.types';
 import {
   ANALYTICS_DECIMALS,
   ANALYTICS_HOURS_PER_DAY,
@@ -113,6 +114,7 @@ export function toAnalyticsSummary(
   period: AnalyticsPeriod,
   kpiRows: readonly AnalyticsKpiRow[],
   activity: readonly AnalyticsActivityRow[],
+  zones: readonly DeliveryZoneRow[],
 ): AnalyticsSummary {
   const { current, previous, days } = period;
 
@@ -126,5 +128,6 @@ export function toAnalyticsSummary(
     kpis: toKpis(kpiRows),
     days: toDays(activity, current.from, current.to),
     hours: toHours(activity, days),
+    zones: [...zones],
   };
 }

@@ -7,5 +7,9 @@ export function firstGraphemes(text: string, count: number): string {
 }
 
 export function shortPersonName(firstName: string, lastName: string): string {
-  return `${firstName} ${firstGraphemes(lastName, 1)}.`;
+  return lastName === '' ? firstName : `${firstName} ${firstGraphemes(lastName, 1)}.`;
+}
+
+export function fullPersonName(firstName: string, lastName: string): string {
+  return lastName === '' ? firstName : `${firstName} ${lastName}`;
 }

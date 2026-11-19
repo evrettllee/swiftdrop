@@ -1,9 +1,11 @@
-// Variables the seed reads besides the ones of the app. The courier ones are optional.
+// Variables the seed reads besides the ones of the app. The courier and manager ones are optional.
 export const SEED_ENV_KEYS = {
   ADMIN_EMAIL: 'SEED_ADMIN_EMAIL',
   ADMIN_PASSWORD: 'SEED_ADMIN_PASSWORD',
   COURIER_EMAIL: 'SEED_COURIER_EMAIL',
   COURIER_PASSWORD: 'SEED_COURIER_PASSWORD',
+  MANAGER_EMAIL: 'SEED_MANAGER_EMAIL',
+  MANAGER_PASSWORD: 'SEED_MANAGER_PASSWORD',
 } as const;
 
 export const DEFAULT_TARIFF = {
@@ -40,3 +42,5 @@ export const ADMIN_LAST_NAME = 'SwiftDrop';
 
 export const COURIER_FIRST_NAME = 'Дмитрий';
 export const COURIER_LAST_NAME = 'Соколов';
+export const MANAGER_FIRST_NAME = 'Ольга';
+export const MANAGER_LAST_NAME = 'Миронова';
