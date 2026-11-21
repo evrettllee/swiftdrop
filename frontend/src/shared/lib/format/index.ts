@@ -10,4 +10,5 @@ export {
   formatTime,
 } from './format';
 export { getInitials, getNameInitials } from './initials';
+export { formatShortPersonName } from './person-name';
 export { buildTelHref, formatPhone } from './phone';

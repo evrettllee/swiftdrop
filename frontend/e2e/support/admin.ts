@@ -8,6 +8,8 @@ import { ROLE } from '../../src/shared/session/auth-user';
 import { type AppSocketStub, stubAppSocket } from './app-socket';
 import { stubSession } from './stub-session';
 
+const ADMIN_TARIFFS_API_PATH = '/admin/tariffs';
+
 export type StaffRequests = {
   orderCounts: number;
   supportCounts: number;
@@ -30,7 +32,10 @@ async function countStaffRequests(page: Page): Promise<StaffRequests> {
   return requests;
 }
 
-export async function stubAdminUsersApi(page: Page): Promise<void> {
+export async function stubAdminApi(page: Page): Promise<void> {
+  await page.route(`**${API_BASE_PATH}${ADMIN_TARIFFS_API_PATH}`, (route) =>
+    route.fulfill({ json: [] }),
+  );
   await page.route(`**${API_BASE_PATH}${ADMIN_USERS_API_PATHS.COUNTS}**`, (route) =>
     route.fulfill({ json: { client: 0, courier: 0, manager: 0 } }),
   );
@@ -43,7 +48,7 @@ export async function openAsAdmin(
   page: Page,
 ): Promise<{ requests: StaffRequests; socket: AppSocketStub }> {
   await stubSession(page, ROLE.ADMIN);
-  await stubAdminUsersApi(page);
+  await stubAdminApi(page);
   const requests = await countStaffRequests(page);
   const socket = await stubAppSocket(page);
 

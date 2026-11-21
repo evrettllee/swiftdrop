@@ -1,4 +1,5 @@
 import type { Icon } from '@phosphor-icons/react';
+import { formatShortPersonName } from '@/shared/lib/format';
 import type { HistoryEntry, PersonName } from '../api/admin-user-card';
 import {
   FIELD_NAMES,
@@ -24,9 +25,7 @@ function capitalize(text: string): string {
 }
 
 export function personShort({ firstName, lastName }: PersonName): string {
-  const initial = lastName.charAt(0);
-
-  return initial === '' ? firstName : `${firstName} ${initial}.`;
+  return formatShortPersonName(firstName, lastName);
 }
 
 function detailsOf(action: HistoryAction, details: HistoryEntry['details']): string | null {

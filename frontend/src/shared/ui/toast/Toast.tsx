@@ -4,6 +4,7 @@ import {
   type Icon,
   InfoIcon,
   WarningIcon,
+  XCircleIcon,
   XIcon,
 } from '@phosphor-icons/react';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT, UI_TEXTS } from '@/shared/config';
@@ -14,6 +15,7 @@ const VARIANT_ICONS: Record<ToastVariant, { icon: Icon; className: string }> = {
   info: { icon: InfoIcon, className: 'text-accent' },
   success: { icon: CheckCircleIcon, className: 'text-success' },
   warning: { icon: WarningIcon, className: 'text-warning' },
+  error: { icon: XCircleIcon, className: 'text-danger' },
   chat: { icon: ChatTextIcon, className: 'text-accent' },
 };
 
