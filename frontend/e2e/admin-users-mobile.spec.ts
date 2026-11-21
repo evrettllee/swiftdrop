@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin-users/config/texts';
-import { INVITE_STAFF_TEXTS as INVITE } from '../src/pages/admin-users/config/invite-texts';
+import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin/users/config/texts';
+import { INVITE_STAFF_TEXTS as INVITE } from '../src/pages/admin/users/config/invite-texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import {
   type AdminSession,

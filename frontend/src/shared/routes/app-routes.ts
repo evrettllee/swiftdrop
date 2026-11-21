@@ -65,9 +65,15 @@ export function getManagerOrderPath(orderId: number): string {
   return `${APP_ROUTES.MANAGER_ORDERS}/${orderId}`;
 }
 
-export function getAdminUserPath(userId: number): string {
-  return `${APP_ROUTES.ADMIN_USERS}/${userId}`;
+export function getAdminUsersPath(listSearch = ''): string {
+  return withSearch(APP_ROUTES.ADMIN_USERS, listSearch);
 }
+
+export function getAdminUserPath(userId: number, listSearch = ''): string {
+  return withSearch(`${APP_ROUTES.ADMIN_USERS}/${userId}`, listSearch);
+}
+
+export const USER_ID_PARAM = 'userId';
 
 export const ZONE_ID_PARAM = 'zoneId';
 

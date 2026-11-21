@@ -6,7 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { Divider } from '@/shared/ui/divider';
 import { ORDER_ACTION, type OrderAction } from '@/features/manager-order-actions';
 import { ACTION_TEXTS, MANAGER_ORDER_TEXTS } from '../config/texts';
-import { Panel } from './Panel';
+import { Panel } from '@/shared/ui/panel';
 
 function iconOf(ActionIcon: Icon) {
   return <ActionIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />;

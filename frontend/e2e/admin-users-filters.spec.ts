@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin-users/config/texts';
+import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin/users/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import {
   type AdminSession,

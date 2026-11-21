@@ -6,7 +6,7 @@ import { getManagerTicketPath } from '@/shared/routes';
 import type { ManagerOrderTicket } from '@/shared/staff-api';
 import { MANAGER_ORDER_TEXTS } from '../config/texts';
 import { ticketCaption, ticketTitle } from '../lib/order-facts';
-import { Panel } from './Panel';
+import { Panel } from '@/shared/ui/panel';
 
 type TicketsPanelProps = {
   tickets: readonly ManagerOrderTicket[];

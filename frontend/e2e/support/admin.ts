@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { ADMIN_LAYOUT_TEXTS } from '../../src/app/layouts/staff-layout/admin-navigation';
-import { ADMIN_USERS_API_PATHS } from '../../src/pages/admin-users/api/admin-users';
+import { ADMIN_USERS_API_PATHS } from '../../src/pages/admin/users/api/paths';
 import { MANAGER_ORDERS_API_PATHS } from '../../src/shared/staff-api/manager-orders';
 import { SUPPORT_STAFF_API_PATHS } from '../../src/shared/staff-api/support';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';

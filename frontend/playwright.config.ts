@@ -12,7 +12,7 @@ const SERVER_START_TIMEOUT_MS = 180_000;
 const SEEDED_COURIER_SPECS =
   /(courier-(cabinet|delivery-code|history-order|history-url|history|offer-route|offer|order-map|order|shift|vehicle)|delivery-flow)\.spec\.ts$/;
 
-const STAND_ADMIN_SPECS = /(admin-users-[a-z-]+|set-password)\.spec\.ts$/;
+const STAND_ADMIN_SPECS = /(admin-users?-[a-z-]+|set-password)\.spec\.ts$/;
 
 export default defineConfig({
   testDir: './e2e',

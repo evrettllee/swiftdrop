@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin-users/config/texts';
+import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin/users/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import {
   type AdminSession,
@@ -56,7 +56,7 @@ test('should find a courier by the phone and lead the row to the card', async ()
   await expect(usersRows(session.page)).toHaveCount(1);
   await expect(
     usersRows(session.page).getByRole('link', { name: `${seed.firstName} ${seed.lastName}` }),
-  ).toHaveAttribute('href', `${APP_ROUTES.ADMIN_USERS}/${userId}`);
+  ).toHaveAttribute('href', new RegExp(`^${APP_ROUTES.ADMIN_USERS}/${userId}\\?role=courier&q=`));
 });
 
 test('should keep the search in the URL after a reload', async () => {

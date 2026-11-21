@@ -2,6 +2,7 @@ export {
   APP_ROUTES,
   CATCH_ALL_ROUTE,
   getAdminUserPath,
+  getAdminUsersPath,
   getCourierHistoryOrderPath,
   getCourierHistoryPath,
   getManagerOrderPath,
@@ -19,6 +20,7 @@ export {
   SUPPORT_ORDER_PARAM,
   SET_PASSWORD_TOKEN_PARAM,
   SUPPORT_TICKET_PARAM,
+  USER_ID_PARAM,
   ZONE_ID_PARAM,
 } from './app-routes';
 export { AUTH_TAB, AUTH_TAB_QUERY_PARAM } from './auth-tab';

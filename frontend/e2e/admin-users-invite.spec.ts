@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
-import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin-users/config/texts';
-import { INVITE_STAFF_TEXTS as INVITE } from '../src/pages/admin-users/config/invite-texts';
+import { ADMIN_USERS_TEXTS as TEXTS } from '../src/pages/admin/users/config/texts';
+import { INVITE_STAFF_TEXTS as INVITE } from '../src/pages/admin/users/config/invite-texts';
+import { PASSWORD_LINK_TEXTS as LINK } from '../src/features/password-link/config/texts';
 import { APP_ROUTES } from '../src/shared/routes/app-routes';
 import { paceAdminWrite } from './support/admin-pace';
 import {
@@ -73,13 +74,13 @@ test('should invite a courier, copy the link and open the couriers with them', a
   await expect(done).toContainText(`${courier.firstName} ${courier.lastName} добавлен как курьер`);
   await expect(done).toContainText(courier.email);
   await expect(done).toContainText('ссылка действует 72 часа');
-  await done.getByRole('button', { name: INVITE.COPY }).click();
-  await expect(done.getByRole('button', { name: INVITE.COPIED })).toBeVisible();
+  await done.getByRole('button', { name: LINK.COPY }).click();
+  await expect(done.getByRole('button', { name: LINK.COPIED })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(
     /\/set-password\/[\w-]{43}$/,
   );
 
-  await done.getByRole('button', { name: INVITE.DONE }).click();
+  await done.getByRole('button', { name: LINK.DONE }).click();
 
   await expect(page).toHaveURL(/role=courier/);
   await expect(usersRows(page).first()).toContainText(courier.email);
@@ -94,7 +95,7 @@ test('should open the managers after inviting a manager', async () => {
   await paceAdminWrite();
   await inviteDialog(page).getByRole('button', { name: INVITE.SUBMIT }).click();
 
-  await page.getByRole('button', { name: INVITE.DONE }).click();
+  await page.getByRole('button', { name: LINK.DONE }).click();
 
   await expect(page).toHaveURL(/role=manager/);
   await expect(usersRows(page).first()).toContainText(manager.email);
@@ -142,8 +143,8 @@ test('should warn when the letter was not sent', async () => {
 
   const created = page.getByRole('dialog', { name: INVITE.CREATED_TITLE });
   await expect(created.getByRole('alert').or(created.getByRole('status'))).toContainText(
-    INVITE.NOT_SENT,
+    LINK.NOT_SENT,
   );
-  await expect(created.getByText(INVITE.FALLBACK_TITLE)).toBeVisible();
+  await expect(created.getByText(LINK.FALLBACK_TITLE)).toBeVisible();
   await page.unroute('**/api/admin/staff');
 });

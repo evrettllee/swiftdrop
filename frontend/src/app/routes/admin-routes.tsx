@@ -21,15 +21,23 @@ export const adminRoutes: RouteObject = {
         {
           path: APP_ROUTES.ADMIN_USERS,
           Component: lazy(() =>
-            import('@/pages/admin-users').then((module) => ({
+            import('@/pages/admin/users').then((module) => ({
               default: module.AdminUsersPage,
+            })),
+          ),
+        },
+        {
+          path: APP_ROUTES.ADMIN_USER,
+          Component: lazy(() =>
+            import('@/pages/admin/user-card').then((module) => ({
+              default: module.AdminUserCardPage,
             })),
           ),
         },
         {
           path: APP_ROUTES.ADMIN_TARIFFS,
           Component: lazy(() =>
-            import('@/pages/admin-tariffs').then((module) => ({
+            import('@/pages/admin/tariffs').then((module) => ({
               default: module.AdminTariffsPage,
             })),
           ),
@@ -37,7 +45,7 @@ export const adminRoutes: RouteObject = {
         {
           path: APP_ROUTES.ADMIN_ANALYTICS,
           Component: lazy(() =>
-            import('@/pages/admin-analytics').then((module) => ({
+            import('@/pages/admin/analytics').then((module) => ({
               default: module.AdminAnalyticsPage,
             })),
           ),
