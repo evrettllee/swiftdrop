@@ -7,8 +7,8 @@ import {
 } from '@/shared/analytics-api';
 import { useListParams } from '@/shared/lib/list-params';
 import { COURIERS_PARAMS_CONFIG } from '../config/params';
-import { MANAGER_ANALYTICS_TEXTS } from '../config/texts';
-import { useAnalyticsPeriod } from './useAnalyticsPeriod';
+import { MANAGER_ANALYTICS_TEXTS, PERIOD_TEXTS } from '../config/texts';
+import { useAnalyticsPeriod } from '@/features/analytics-period';
 import { useAnalyticsRequest } from './useAnalyticsRequest';
 
 function loadCouriers(query: AnalyticsCouriersQuery, signal: AbortSignal) {
@@ -17,7 +17,7 @@ function loadCouriers(query: AnalyticsCouriersQuery, signal: AbortSignal) {
 
 export function useCouriersPage() {
   const { values, update } = useListParams(COURIERS_PARAMS_CONFIG);
-  const period = useAnalyticsPeriod(values, update);
+  const period = useAnalyticsPeriod(values, update, { tooLong: PERIOD_TEXTS.TOO_LONG });
   const { sort, page } = values;
   const periodRequest = period.request;
 

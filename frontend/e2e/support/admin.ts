@@ -6,9 +6,11 @@ import { SUPPORT_STAFF_API_PATHS } from '../../src/shared/staff-api/support';
 import { API_BASE_PATH } from '../../src/shared/api/request-config';
 import { ROLE } from '../../src/shared/session/auth-user';
 import { type AppSocketStub, stubAppSocket } from './app-socket';
+import { businessPayload } from './admin-analytics-fixtures';
 import { stubSession } from './stub-session';
 
 const ADMIN_TARIFFS_API_PATH = '/admin/tariffs';
+const ADMIN_ANALYTICS_BUSINESS_PATH = '/admin/analytics/business';
 
 export type StaffRequests = {
   orderCounts: number;
@@ -35,6 +37,9 @@ async function countStaffRequests(page: Page): Promise<StaffRequests> {
 export async function stubAdminApi(page: Page): Promise<void> {
   await page.route(`**${API_BASE_PATH}${ADMIN_TARIFFS_API_PATH}`, (route) =>
     route.fulfill({ json: [] }),
+  );
+  await page.route(`**${API_BASE_PATH}${ADMIN_ANALYTICS_BUSINESS_PATH}**`, (route) =>
+    route.fulfill({ json: businessPayload('2026-11-06', '2026-11-12') }),
   );
   await page.route(`**${API_BASE_PATH}${ADMIN_USERS_API_PATHS.COUNTS}**`, (route) =>
     route.fulfill({ json: { client: 0, courier: 0, manager: 0 } }),

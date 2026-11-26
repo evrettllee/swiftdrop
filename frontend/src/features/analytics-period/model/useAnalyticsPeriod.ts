@@ -1,15 +1,21 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { AnalyticsPeriodQuery } from '@/shared/analytics-api';
-import { calendarToday } from '@/shared/lib/calendar';
+import {
+  ANALYTICS_PERIOD,
+  type AnalyticsPeriod,
+  calendarToday,
+  PERIOD_PARAMS_CONFIG,
+  type PeriodParams,
+  type PeriodValidationErrors,
+  resolvePeriod,
+} from '@/shared/lib/calendar';
 import { useMinuteNow } from '@/shared/lib/clock';
 import { writeListParams } from '@/shared/lib/list-params';
-import { ANALYTICS_PERIOD, type AnalyticsPeriod } from '../config/analytics';
-import { PERIOD_PARAMS_CONFIG, type PeriodParams } from '../config/params';
-import { resolvePeriod } from '../lib/period';
+import { PERIOD_TEXTS } from '../config/texts';
 
 export type PeriodRequest = { key: string; query: AnalyticsPeriodQuery };
 
-export type PeriodControl = {
+export type AnalyticsPeriodControlState = {
   values: PeriodParams;
   error: string | null;
   request: PeriodRequest | null;
@@ -20,6 +26,12 @@ export type PeriodControl = {
 };
 
 type DateDraft = { from: string | null; to: string | null; synced: string };
+
+const PERIOD_VALIDATION_ERRORS = {
+  required: PERIOD_TEXTS.REQUIRED,
+  reversed: PERIOD_TEXTS.REVERSED,
+  tooLong: PERIOD_TEXTS.TOO_LONG,
+} as const;
 
 function useDateDraft(
   from: string | null,
@@ -51,12 +63,17 @@ function useDateDraft(
 export function useAnalyticsPeriod(
   { period, from, to }: PeriodParams,
   onChange: (patch: Partial<PeriodParams>) => void,
-): PeriodControl {
+  validationErrors?: Partial<PeriodValidationErrors>,
+): AnalyticsPeriodControlState {
   const now = useMinuteNow();
   const today = calendarToday(new Date(now));
   const values = useMemo(() => ({ period, from, to }), [period, from, to]);
   const dates = useDateDraft(from, to, onChange);
-  const resolution = useMemo(() => resolvePeriod(values, today), [values, today]);
+  const errors = useMemo(
+    () => ({ ...PERIOD_VALIDATION_ERRORS, ...validationErrors }),
+    [validationErrors],
+  );
+  const resolution = useMemo(() => resolvePeriod(values, today, errors), [values, today, errors]);
   const queryFrom = resolution.query?.from ?? null;
   const queryTo = resolution.query?.to ?? null;
 

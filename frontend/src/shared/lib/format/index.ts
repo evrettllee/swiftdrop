@@ -1,3 +1,13 @@
+export {
+  changePercent,
+  formatDecimal,
+  formatDurationMinutes,
+  formatDurationSeconds,
+  formatFine,
+  formatSignedPercent,
+  formatWhole,
+  shareOf,
+} from './analytics-numbers';
 export { countCharacters } from './character-count';
 export type { PluralForms } from './count';
 export { formatCount, pluralize } from './count';

@@ -1,4 +1,6 @@
-import { ANALYTICS_DEFAULT_COURIER_SORT } from '@/shared/analytics-api';
+import { useState } from 'react';
+import { AnalyticsExportButton, AnalyticsExportDialog } from '@/features/analytics-export';
+import { ANALYTICS_DEFAULT_COURIER_SORT, ANALYTICS_EXPORT_ROLE } from '@/shared/analytics-api';
 import { DESKTOP_MEDIA_QUERY } from '@/shared/config';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { APP_ROUTES } from '@/shared/routes';
@@ -19,7 +21,12 @@ function withSearch(path: string, search: string): string {
 export function ManagerAnalyticsPage() {
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const { period, summary, couriers } = useAnalyticsPage();
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const data = summary.data;
+  const exportPeriod =
+    data === null
+      ? (period.request?.query ?? null)
+      : { from: data.period.from, to: data.period.to };
 
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
@@ -28,6 +35,12 @@ export function ManagerAnalyticsPage() {
         period={period}
         line={data === null ? null : summaryLine(data.period)}
         isLoading={summary.isLoading}
+        action={
+          <AnalyticsExportButton
+            disabled={exportPeriod === null}
+            onClick={() => setIsExportOpen(true)}
+          />
+        }
       />
       {summary.failure === null ? (
         <>
@@ -55,6 +68,12 @@ export function ManagerAnalyticsPage() {
           sort={ANALYTICS_DEFAULT_COURIER_SORT}
         />
       </section>
+      <AnalyticsExportDialog
+        role={ANALYTICS_EXPORT_ROLE.MANAGER}
+        period={exportPeriod}
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+      />
     </div>
   );
 }
