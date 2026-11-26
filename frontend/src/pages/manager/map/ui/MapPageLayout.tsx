@@ -45,9 +45,11 @@ export function MapPageLayout({
           {card.content}
         </section>
       )}
-      <section aria-label={TEXTS.PANEL_LABEL} className={`p-6 ${PANEL_CLASS}`}>
-        {list}
-      </section>
+      {list === null ? null : (
+        <section aria-label={TEXTS.PANEL_LABEL} className={`p-6 ${PANEL_CLASS}`}>
+          {list}
+        </section>
+      )}
     </>
   );
 }

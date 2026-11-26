@@ -35,10 +35,13 @@ export function ManagerMapPage() {
         isDesktop={isDesktop}
         toolbar={
           <MapToolbar
+            isDesktop={isDesktop}
             searchText={params.searchText}
+            searchQuery={page.query.search}
             chips={page.chips}
             filter={params.values.state}
             vehicleTypes={params.values.vehicleType}
+            committedCount={page.committedCount}
             onSearchChange={params.setSearchText}
             onFilterChange={(state) => params.update({ state })}
             onVehicleTypesChange={(vehicleType) => params.update({ vehicleType })}
@@ -72,11 +75,12 @@ export function ManagerMapPage() {
               now={page.now}
               selectedId={page.selectedId}
               search={page.query.search}
-              isFiltered={params.values.state !== null || params.values.vehicleType.length > 0}
+              hasStateFilter={params.values.state !== null}
+              hasVehicleFilter={params.values.vehicleType.length > 0}
               isLoading={page.isLoading}
               onSelect={select}
             />
-          ) : (
+          ) : page.isFailed ? null : (
             <BlockLoader className="py-24" />
           )
         }

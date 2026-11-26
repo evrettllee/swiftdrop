@@ -17,7 +17,7 @@ function mapRegion(page: Page) {
 }
 
 function chips(page: Page) {
-  return page.getByRole('group', { name: 'Состояние' }).getByRole('button');
+  return page.getByRole('radiogroup', { name: 'Состояние' }).getByRole('radio');
 }
 
 test('should list the couriers with the chips of the states and their counts', async ({ page }) => {
@@ -38,24 +38,28 @@ test('should list the couriers with the chips of the states and their counts', a
 
 test('should keep the state, the search and the transport in the address', async ({ page }) => {
   const stub = await stubCouriersMap(page);
-  await page.goto(`${MAP_PATH}?vehicleType=car`);
+  await page.goto(`${MAP_PATH}?vehicleType=foot,bicycle,scooter`);
   await expect(chips(page)).toHaveCount(4);
-  expect(lastMapRequest(stub).get('vehicleType')).toBe('car');
+  expect(lastMapRequest(stub).get('vehicleType')).toBe('foot,bicycle,scooter');
 
   await chips(page).filter({ hasText: 'Свободны' }).click();
   await expect(page).toHaveURL(/state=free/);
   await expect.poll(() => lastMapRequest(stub).get('state')).toBe('free,offer');
   await expect(panel(page).getByRole('listitem')).toHaveCount(3);
+  await expect(chips(page).filter({ hasText: 'Свободны' })).toBeChecked();
+  await expect(chips(page).filter({ hasText: 'Все' })).not.toBeChecked();
 
   await page.getByRole('searchbox', { name: 'Поиск курьера' }).fill('Ег');
   await expect(page.getByText('Введите не меньше 3 символов')).toBeVisible();
   await page.getByRole('searchbox', { name: 'Поиск курьера' }).fill('Егор');
   await expect(page).toHaveURL(/q=%D0%95%D0%B3%D0%BE%D1%80/);
   await expect.poll(() => lastMapRequest(stub).get('q')).toBe('Егор');
+  await expect(panel(page).getByRole('listitem')).toHaveCount(1);
 
   await page.reload();
   await expect(page.getByRole('searchbox', { name: 'Поиск курьера' })).toHaveValue('Егор');
-  await expect(chips(page).filter({ hasText: 'Свободны' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(chips(page).filter({ hasText: 'Свободны' })).toBeChecked();
+  await expect(page.getByRole('button', { name: 'Убрать фильтр Транспорт: Пеший' })).toBeVisible();
 });
 
 test('should select a courier by the row and by the marker, the courier in the address', async ({

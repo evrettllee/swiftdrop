@@ -45,7 +45,7 @@ test('should bring a courier back on the line by a new position', async ({ page 
 
   pushLocation(stub, 4, 53.881, 27.601);
   await expect(marker(page, 'Никита Волчек, Свободен')).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Состояние' }).getByRole('button')).toHaveText([
+  await expect(page.getByRole('radiogroup', { name: 'Состояние' }).getByRole('radio')).toHaveText([
     'Все5',
     'Свободны4',
     'С заказом1',

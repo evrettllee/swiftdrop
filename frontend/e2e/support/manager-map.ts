@@ -1,83 +1,24 @@
 import type { Page } from '@playwright/test';
 import { SOCKET_EVENTS } from '../../src/shared/realtime/socket-events';
 import type { AppSocketStub } from './app-socket';
+import { fromFixedNow } from './clock';
 import { openAsManager } from './manager';
 import {
-  assignedOrder,
-  MANAGER_ORDER_ID,
-  minutesAhead,
-  type RawManagerOrder,
-} from './manager-order-fixtures';
+  mapCouriers,
+  type MapState,
+  OFFER_ORDER_ID,
+  type RawMapCourier,
+} from './manager-map-fixtures';
+import { assignedOrder, minutesAhead, type RawManagerOrder } from './manager-order-fixtures';
 import { stubMapbox } from './mapbox';
 import { COURIER_SEGMENT, PARCEL_SEGMENT } from './routing';
-import { fromFixedNow } from './clock';
 
 const MAP_URL = /\/api\/manager\/couriers\/map(\?.*)?$/;
 const ORDER_URL = /\/api\/manager\/orders\/(\d+)$/;
 const ROUTE_URL = /\/api\/manager\/orders\/\d+\/route$/;
 
 export const MAP_PATH = '/manager/map';
-export const OFFER_ORDER_ID = 48240;
-
-type MapState = 'free' | 'on_order' | 'offer' | 'no_signal';
-
-export type RawMapCourier = {
-  courierId: number;
-  name: string;
-  phone: string | null;
-  vehicleType: 'foot' | 'bicycle' | 'scooter' | 'car' | 'truck' | null;
-  lat: number | null;
-  lng: number | null;
-  positionAt: string | null;
-  positionAgeSec: number | null;
-  state: MapState;
-  activeOrder: { orderId: number; status: string } | null;
-  openOfferOrderId: number | null;
-};
-
-function courier(
-  courierId: number,
-  name: string,
-  point: [number, number],
-  patch: Partial<RawMapCourier> = {},
-): RawMapCourier {
-  const ageSec = patch.positionAgeSec ?? 5;
-
-  return {
-    courierId,
-    name,
-    phone: '+375293771290',
-    vehicleType: 'car',
-    lat: point[0],
-    lng: point[1],
-    positionAt: fromFixedNow(-ageSec * 1000).toISOString(),
-    positionAgeSec: ageSec,
-    state: 'free',
-    activeOrder: null,
-    openOfferOrderId: null,
-    ...patch,
-  };
-}
-
-export function mapCouriers(): RawMapCourier[] {
-  return [
-    courier(1, 'Алина Гордей', [53.91, 27.55], { vehicleType: 'scooter' }),
-    courier(2, 'Андрей Король', [53.9, 27.58], {
-      state: 'on_order',
-      activeOrder: { orderId: MANAGER_ORDER_ID, status: 'in_transit' },
-    }),
-    courier(3, 'Егор Тарасевич', [53.89, 27.53], {
-      vehicleType: 'bicycle',
-      state: 'offer',
-      openOfferOrderId: OFFER_ORDER_ID,
-    }),
-    courier(4, 'Никита Волчек', [53.88, 27.6], {
-      state: 'no_signal',
-      positionAgeSec: 240,
-    }),
-    courier(5, 'Игорь Рыбак', [53.92, 27.57], { vehicleType: 'foot', phone: null }),
-  ];
-}
+export { mapCouriers, OFFER_ORDER_ID, type RawMapCourier };
 
 export type CouriersMapStub = {
   items: RawMapCourier[];
@@ -99,6 +40,19 @@ function countsOf(items: readonly RawMapCourier[]): Record<MapState, number> {
   return counts;
 }
 
+function matchesSearch(item: RawMapCourier, search: string | null): boolean {
+  if (search === null || search === '') {
+    return true;
+  }
+
+  const normalized = search.toLowerCase();
+
+  return (
+    item.name.toLowerCase().includes(normalized) ||
+    (item.phone?.toLowerCase().includes(normalized) ?? false)
+  );
+}
+
 export async function stubCouriersMap(page: Page): Promise<CouriersMapStub> {
   const { socket } = await openAsManager(page);
   await stubMapbox(page);
@@ -116,10 +70,18 @@ export async function stubCouriersMap(page: Page): Promise<CouriersMapStub> {
     const url = new URL(route.request().url());
     stub.requests.push(url);
     const states = url.searchParams.get('state')?.split(',') ?? null;
-    const items = stub.items.filter((item) => states === null || states.includes(item.state));
+    const vehicleTypes = url.searchParams.get('vehicleType')?.split(',') ?? null;
+    const search = url.searchParams.get('q')?.trim() ?? null;
+    const scoped = stub.items.filter(
+      (item) =>
+        (vehicleTypes === null ||
+          (item.vehicleType !== null && vehicleTypes.includes(item.vehicleType))) &&
+        matchesSearch(item, search),
+    );
+    const items = scoped.filter((item) => states === null || states.includes(item.state));
 
     return stub.status === 200
-      ? route.fulfill({ json: { items, counts: countsOf(stub.items) } })
+      ? route.fulfill({ json: { items, counts: countsOf(scoped) } })
       : route.fulfill({ status: stub.status, json: { message: 'error' } });
   });
   await page.route(ORDER_URL, (route) => {

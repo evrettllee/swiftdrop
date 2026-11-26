@@ -1,56 +1,127 @@
 import { expect, type Page, test } from '@playwright/test';
 import { lastMapRequest, MAP_PATH, stubCouriersMap } from './support/manager-map';
 
-function vehicles(page: Page) {
-  return page.getByRole('group', { name: 'Транспорт' }).getByRole('button');
+const PHONE = { width: 375, height: 812 };
+
+function panel(page: Page) {
+  return page.getByRole('region', { name: 'Курьеры на линии' });
 }
 
-function vehicle(page: Page, name: string) {
-  return vehicles(page).filter({ hasText: name });
+function transportButton(page: Page) {
+  return page.getByRole('button', { name: 'Транспорт', exact: true });
 }
 
-test('should choose several transports into the address and keep them after a reload', async ({
+function transportDialog(page: Page) {
+  return page.getByRole('dialog', { name: /Транспорт|Фильтр по транспорту/ });
+}
+
+function applyButton(page: Page) {
+  return transportDialog(page).getByRole('button', { name: /^Показать/ });
+}
+
+function appliedFilters(page: Page) {
+  return page.getByRole('group', { name: 'Применённые фильтры' });
+}
+
+test('should select multiple vehicles via popover, show server count, and keep across reload', async ({
   page,
 }) => {
   const stub = await stubCouriersMap(page);
   await page.goto(MAP_PATH);
 
-  await expect(vehicles(page)).toHaveText([
-    'Пеший',
-    'Велосипед',
-    'Самокат',
-    'Легковой',
-    'Грузовой',
-  ]);
-  await expect(vehicles(page).and(page.locator('[aria-pressed="true"]'))).toHaveCount(0);
-  expect(lastMapRequest(stub).get('vehicleType')).toBeNull();
+  await expect(appliedFilters(page)).toHaveCount(0);
+  await expect(transportButton(page)).toHaveText('Транспорт');
 
-  await vehicle(page, 'Легковой').click();
-  await vehicle(page, 'Пеший').click();
+  await transportButton(page).click();
+  const dialog = transportDialog(page);
+  await expect(dialog).toBeVisible();
+  await expect(applyButton(page)).toHaveText('Показать 5 курьеров');
 
+  await dialog.getByRole('checkbox', { name: 'Легковой' }).check({ force: true });
+  await expect(applyButton(page)).toHaveText('Показать 2 курьеров');
+  await dialog.getByRole('checkbox', { name: 'Пеший' }).check({ force: true });
+  await expect(applyButton(page)).toHaveText('Показать 3 курьеров');
+
+  await applyButton(page).click();
+  await expect(dialog).toBeHidden();
   await expect(page).toHaveURL(/vehicleType=foot(%2C|,)car$/);
   await expect.poll(() => lastMapRequest(stub).get('vehicleType')).toBe('foot,car');
-  await expect(vehicle(page, 'Пеший')).toHaveAttribute('aria-pressed', 'true');
-  await expect(vehicle(page, 'Легковой')).toHaveAttribute('aria-pressed', 'true');
+  await expect(transportButton(page)).toHaveText('Транспорт2');
+  await expect(panel(page).getByRole('listitem')).toHaveCount(3);
+  await expect(appliedFilters(page).getByRole('button', { name: /Убрать фильтр/ })).toHaveCount(2);
+  await expect(
+    appliedFilters(page).getByRole('button', { name: 'Убрать фильтр Транспорт: Пеший' }),
+  ).toBeVisible();
+  await expect(
+    appliedFilters(page).getByRole('button', { name: 'Убрать фильтр Транспорт: Легковой' }),
+  ).toBeVisible();
 
   await page.reload();
-  await expect(vehicle(page, 'Пеший')).toHaveAttribute('aria-pressed', 'true');
-  await expect(vehicle(page, 'Легковой')).toHaveAttribute('aria-pressed', 'true');
-  await expect(vehicle(page, 'Самокат')).toHaveAttribute('aria-pressed', 'false');
-  await expect.poll(() => lastMapRequest(stub).get('vehicleType')).toBe('foot,car');
+  await expect(transportButton(page)).toHaveText('Транспорт2');
+  await expect(panel(page).getByRole('listitem')).toHaveCount(3);
+  await transportButton(page).click();
+  await expect(transportDialog(page).getByRole('checkbox', { name: 'Пеший' })).toBeChecked();
+  await expect(transportDialog(page).getByRole('checkbox', { name: 'Легковой' })).toBeChecked();
+  await expect(transportDialog(page).getByRole('checkbox', { name: 'Самокат' })).not.toBeChecked();
 });
 
-test('should show every transport again once the last chosen chip is pressed off', async ({
+test('should clear single vehicle chip, reset all chips, and reset inside panel while keeping other filters', async ({
   page,
 }) => {
   const stub = await stubCouriersMap(page);
-  await page.goto(`${MAP_PATH}?vehicleType=truck`);
-  await expect(vehicle(page, 'Грузовой')).toHaveAttribute('aria-pressed', 'true');
-  await expect.poll(() => lastMapRequest(stub).get('vehicleType')).toBe('truck');
+  await page.goto(`${MAP_PATH}?state=on_order&vehicleType=foot,car&q=Король`);
+  await expect(panel(page).getByRole('listitem')).toHaveCount(1);
 
-  await vehicle(page, 'Грузовой').click();
+  await appliedFilters(page)
+    .getByRole('button', { name: 'Убрать фильтр Транспорт: Пеший' })
+    .click();
+  await expect(page).toHaveURL(/state=on_order/);
+  await expect(page).toHaveURL(/vehicleType=car/);
+  await expect(page).toHaveURL(/q=%D0%9A%D0%BE%D1%80%D0%BE%D0%BB%D1%8C/);
+  await expect(transportButton(page)).toHaveText('Транспорт1');
+  await expect(appliedFilters(page).getByRole('button', { name: /Убрать фильтр/ })).toHaveCount(1);
 
-  await expect(page).toHaveURL(MAP_PATH);
-  await expect(vehicle(page, 'Грузовой')).toHaveAttribute('aria-pressed', 'false');
+  await appliedFilters(page).getByRole('button', { name: 'Сбросить всё' }).click();
+  await expect(appliedFilters(page)).toHaveCount(0);
+  await expect(transportButton(page)).toHaveText('Транспорт');
+  await expect(page).toHaveURL(/state=on_order/);
+  await expect(page).toHaveURL(/q=%D0%9A%D0%BE%D1%80%D0%BE%D0%BB%D1%8C/);
+  await expect(page).not.toHaveURL(/vehicleType=/);
   await expect.poll(() => lastMapRequest(stub).get('vehicleType')).toBeNull();
+
+  await transportButton(page).click();
+  const dialog = transportDialog(page);
+  await dialog.getByRole('checkbox', { name: 'Грузовой' }).check({ force: true });
+  await expect(applyButton(page)).toHaveText('Показать 0 курьеров');
+  await applyButton(page).click();
+  await expect(page.getByRole('heading', { name: 'Ничего не найдено' })).toBeVisible();
+
+  await transportButton(page).click();
+  await dialog.getByRole('button', { name: 'Сбросить' }).click();
+  await expect(dialog.getByRole('checkbox', { name: 'Грузовой' })).not.toBeChecked();
+  await applyButton(page).click();
+  await expect(page).not.toHaveURL(/vehicleType=/);
+  await expect(panel(page).getByRole('listitem')).toHaveCount(1);
+});
+
+test('should show empty state for vehicle filter and open transport sheet on mobile', async ({
+  page,
+}) => {
+  await page.setViewportSize(PHONE);
+  await stubCouriersMap(page);
+  await page.goto(`${MAP_PATH}?vehicleType=truck`);
+
+  await expect(page.getByRole('heading', { name: 'Ничего не найдено' })).toBeVisible();
+  await expect(page.getByText('Курьеров по выбранным фильтрам сейчас нет.')).toBeVisible();
+
+  await transportButton(page).click();
+  const dialog = transportDialog(page);
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Сбросить' }).click();
+  await expect(applyButton(page)).toHaveText('Показать 5 курьеров');
+  await applyButton(page).click();
+
+  await expect(dialog).toBeHidden();
+  await expect(panel(page).getByRole('listitem')).toHaveCount(5);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(PHONE.width);
 });

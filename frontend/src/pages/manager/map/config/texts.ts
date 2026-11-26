@@ -1,6 +1,9 @@
-import { MANAGER_SEARCH_TEXT_MIN_LENGTH } from '@/shared/staff-api';
 import { UI_TEXTS } from '@/shared/config';
+import { formatCount, pluralize } from '@/shared/lib/format';
+import { MANAGER_SEARCH_TEXT_MIN_LENGTH } from '@/shared/staff-api';
 import { MAP_FILTER, type MapFilter } from './map';
+
+const COURIER_FORMS = { one: 'курьера', few: 'курьеров', many: 'курьеров' } as const;
 
 export const MANAGER_MAP_TEXTS = {
   TITLE: 'Карта курьеров',
@@ -12,13 +15,22 @@ export const MANAGER_MAP_TEXTS = {
   SEARCH_TOO_SHORT: `Введите не меньше ${MANAGER_SEARCH_TEXT_MIN_LENGTH} символов`,
   FILTERS_LABEL: 'Состояние',
   VEHICLE_FILTERS_LABEL: 'Транспорт',
+  VEHICLE_PANEL_LABEL: 'Фильтр по транспорту',
   ALL: 'Все',
+  RESET: 'Сбросить',
+  RESET_ALL: 'Сбросить всё',
+  APPLIED_FILTERS: 'Применённые фильтры',
+  SHOW: 'Показать',
+  showCouriers: (count: number): string =>
+    `Показать ${formatCount(count)} ${pluralize(count, COURIER_FORMS)}`,
+  removeFilter: (name: string, value: string): string => `Убрать фильтр ${name}: ${value}`,
   LOAD_FAILED_TITLE: 'Не удалось загрузить курьеров',
   LOAD_FAILED: 'Проверьте соединение и попробуйте ещё раз.',
   RETRY: UI_TEXTS.RETRY,
   EMPTY_TITLE: 'Ничего не найдено',
   bySearch: (query: string) => `По запросу «${query}» курьеров нет. Проверьте запрос или фильтр.`,
   BY_FILTER: 'Курьеров в этом состоянии сейчас нет.',
+  BY_FILTERS: 'Курьеров по выбранным фильтрам сейчас нет.',
   NOBODY_TITLE: 'Курьеров на линии нет',
   NOBODY_TEXT: 'Здесь появятся курьеры, которые вышли на линию.',
   NO_VEHICLE: 'Нет транспорта',
