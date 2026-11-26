@@ -7,6 +7,7 @@ import {
   CSRF_HEADER_VALUE,
 } from '../src/shared/api/request-config';
 import { STAND, STAND_ENV } from './support/stand';
+import { paceStandLogin } from './support/admin/admin-pace';
 import { seedStandAdmin } from './support/stand-admin';
 import { warmUpPages } from './support/stand-warmup';
 
@@ -27,6 +28,7 @@ async function signInCourier(baseURL: string): Promise<void> {
   const context = await request.newContext({ baseURL });
 
   try {
+    await paceStandLogin();
     const response = await context.post(`${API_BASE_PATH}${AUTH_API_PATHS.LOGIN}`, {
       headers: { [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE },
       data: { email: STAND.COURIER_EMAIL, password: STAND.COURIER_PASSWORD },

@@ -6,7 +6,7 @@ import {
   CSRF_HEADER_NAME,
   CSRF_HEADER_VALUE,
 } from '../../src/shared/api/request-config';
-import { paceAdminWrite } from './admin-pace';
+import { paceAdminWrite, paceStandLogin } from './admin/admin-pace';
 import { STAND, STAND_FRONTEND_URL } from './stand';
 
 const LINK_WINDOW_MS = 61_000;
@@ -52,11 +52,12 @@ async function readLink(
 
 export async function signInStandAdmin(): Promise<APIRequestContext> {
   const admin = await request.newContext({ baseURL: STAND_FRONTEND_URL });
+  await paceStandLogin();
   const response = await admin.post(`${API_BASE_PATH}${AUTH_API_PATHS.LOGIN}`, {
     headers: CSRF_HEADERS,
     data: { email: STAND.ADMIN_EMAIL, password: STAND.ADMIN_PASSWORD },
   });
-  expect(response.ok()).toBe(true);
+  expect(response.ok(), await response.text()).toBe(true);
 
   return admin;
 }

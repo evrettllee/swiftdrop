@@ -11,8 +11,8 @@ import {
   type RawMyTicket,
   rawMyTickets,
 } from './author-support-fixtures';
-import { buildOrderStubState, buildTestOrder, stubCourierOnOrder } from './courier-order';
-import { messagesPage, type RawMessage } from './manager-support-fixtures';
+import { buildOrderStubState, buildTestOrder, stubCourierOnOrder } from './courier/courier-order';
+import { messagesPage, type RawMessage } from './manager/manager-support-fixtures';
 import { stubSession } from './stub-session';
 import { fixClock } from './clock';
 

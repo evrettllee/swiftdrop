@@ -10,9 +10,10 @@ const SERVER_START_TIMEOUT_MS = 180_000;
 // cannot run at the same time, so they make a project of their own with one worker. The other
 // specs run in parallel with them; the courier of those is a stub.
 const SEEDED_COURIER_SPECS =
-  /(courier-(cabinet|delivery-code|history-order|history-url|history|offer-route|offer|order-map|order|shift|vehicle)|delivery-flow)\.spec\.ts$/;
+  /(?:^|[\\/])courier[\\/](courier-(cabinet|delivery-code|history-order|history-url|history|offer-route|offer|order-map|order|shift|vehicle)|delivery-flow)\.spec\.ts$/;
 
-const STAND_ADMIN_SPECS = /(admin-(users?|tariffs)-[a-z-]+|set-password)\.spec\.ts$/;
+const STAND_ADMIN_SPECS =
+  /(?:^|[\\/])(admin[\\/]admin-(users?|tariffs)-[a-z-]+|auth[\\/]set-password)\.spec\.ts$/;
 
 export default defineConfig({
   testDir: './e2e',
