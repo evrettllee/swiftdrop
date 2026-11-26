@@ -63,9 +63,16 @@ export function useAdminAnalytics(): AdminAnalyticsController {
   );
 
   const [retryCount, setRetryCount] = useState(0);
+  const isWeek = period.values.period === ANALYTICS_PERIOD.WEEK;
   const requestKey = period.request === null ? '' : `${tab}|${period.request.key}|${retryCount}`;
   const debounceMs = period.values.period === ANALYTICS_PERIOD.CUSTOM ? PERIOD_DEBOUNCE_MS : 0;
-  const fetchState = useTabFetch(tab, period.request?.query ?? null, requestKey, debounceMs);
+  const fetchState = useTabFetch(
+    tab,
+    period.request?.query ?? null,
+    isWeek,
+    requestKey,
+    debounceMs,
+  );
 
   return {
     tab,

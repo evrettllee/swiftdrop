@@ -86,3 +86,30 @@ test('should fit admin analytics on 375px phone viewport without horizontal page
   );
   expect(hasOverflow).toBe(false);
 });
+
+test('should keep loaded period labels consistent while a new period is loading', async ({
+  page,
+}) => {
+  await stubAdminAnalytics(page);
+  await page.goto(`${ADMIN_ANALYTICS_PATH}?tab=users`);
+  await expect(page.getByText('+23% к прошлой неделе')).toBeVisible();
+
+  let entered = false;
+  let release: () => void = () => undefined;
+  await page.route(/\/api\/admin\/analytics\/users\?from=2026-10-14/, async (route) => {
+    entered = true;
+    await new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await route.fallback();
+  });
+
+  await page.getByRole('combobox', { name: 'Период' }).selectOption('30d');
+  await expect(page).toHaveURL('/admin/analytics?period=30d&tab=users');
+  await expect.poll(() => entered).toBe(true);
+  await expect(page.getByText('+23% к прошлой неделе')).toBeVisible();
+  await expect(page.getByText('+23% к прошлому периоду')).toHaveCount(0);
+
+  release();
+  await expect(page.getByText('+23% к прошлому периоду')).toBeVisible();
+});

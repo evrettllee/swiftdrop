@@ -25,7 +25,7 @@ export type AdminTabDataMap = {
 };
 
 export type AdminAnalyticsLoaded = {
-  [T in AdminAnalyticsTab]: { tab: T; data: AdminTabDataMap[T] };
+  [T in AdminAnalyticsTab]: { tab: T; data: AdminTabDataMap[T]; isWeek: boolean };
 }[AdminAnalyticsTab];
 
 type FetchState = {
@@ -45,6 +45,7 @@ const FETCHERS = {
 async function loadTabData(
   tab: AdminAnalyticsTab,
   query: { from: string; to: string },
+  isWeek: boolean,
   requestKey: string,
   signal: AbortSignal,
   setState: React.Dispatch<React.SetStateAction<FetchState>>,
@@ -53,7 +54,11 @@ async function loadTabData(
     const data = await FETCHERS[tab](query, { signal });
 
     if (!signal.aborted) {
-      setState({ requestKey, loaded: { tab, data } as AdminAnalyticsLoaded, failure: null });
+      setState({
+        requestKey,
+        loaded: { tab, data, isWeek } as AdminAnalyticsLoaded,
+        failure: null,
+      });
     }
   } catch (caught) {
     if (!signal.aborted) {
@@ -71,6 +76,7 @@ async function loadTabData(
 export function useTabFetch(
   tab: AdminAnalyticsTab,
   query: { from: string; to: string } | null,
+  isWeek: boolean,
   requestKey: string,
   debounceMs: number,
 ) {
@@ -88,7 +94,7 @@ export function useTabFetch(
 
     const controller = new AbortController();
     timerRef.current = window.setTimeout(
-      () => void loadTabData(tab, query, requestKey, controller.signal, setState),
+      () => void loadTabData(tab, query, isWeek, requestKey, controller.signal, setState),
       debounceMs,
     );
 
@@ -100,7 +106,7 @@ export function useTabFetch(
 
       controller.abort();
     };
-  }, [tab, query, requestKey, debounceMs]);
+  }, [tab, query, isWeek, requestKey, debounceMs]);
 
   return {
     loaded: state.loaded?.tab === tab ? state.loaded : null,

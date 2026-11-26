@@ -3,7 +3,7 @@ import { AnalyticsExportButton, AnalyticsExportDialog } from '@/features/analyti
 import { AnalyticsPeriodControl, PERIOD_TEXTS } from '@/features/analytics-period';
 import { ANALYTICS_EXPORT_ROLE } from '@/shared/analytics-api';
 import { DESKTOP_MEDIA_QUERY } from '@/shared/config';
-import { ANALYTICS_PERIOD, formatDateRange, previousPeriodDates } from '@/shared/lib/calendar';
+import { formatDateRange, previousPeriodDates } from '@/shared/lib/calendar';
 import { useMediaQuery } from '@/shared/lib/dom';
 import { LoadFailure } from '@/shared/ui/analytics';
 import { PageTitle } from '@/shared/ui/page-title';
@@ -34,18 +34,14 @@ function comparisonText(dates: { from: string; to: string } | null): string | nu
   );
 }
 
-function renderActiveContent(
-  loaded: AdminAnalyticsLoaded,
-  isWeekPreset: boolean,
-  isDesktop: boolean,
-) {
+function renderActiveContent(loaded: AdminAnalyticsLoaded, isDesktop: boolean) {
   switch (loaded.tab) {
     case ADMIN_ANALYTICS_TAB.BUSINESS:
-      return <BusinessTab data={loaded.data} isWeekPreset={isWeekPreset} isDesktop={isDesktop} />;
+      return <BusinessTab data={loaded.data} isWeekPreset={loaded.isWeek} isDesktop={isDesktop} />;
     case ADMIN_ANALYTICS_TAB.DELIVERY:
       return <DeliveryTab data={loaded.data} isDesktop={isDesktop} />;
     case ADMIN_ANALYTICS_TAB.USERS:
-      return <UsersTab data={loaded.data} isWeekPreset={isWeekPreset} isDesktop={isDesktop} />;
+      return <UsersTab data={loaded.data} isWeekPreset={loaded.isWeek} isDesktop={isDesktop} />;
     case ADMIN_ANALYTICS_TAB.SUPPORT:
       return <SupportTab data={loaded.data} isDesktop={isDesktop} />;
     case ADMIN_ANALYTICS_TAB.SERVICE:
@@ -59,7 +55,6 @@ export function AdminAnalyticsPage() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const exportPeriod = analytics.loaded?.data.period ?? analytics.period.request?.query ?? null;
   const subtitle = comparisonText(exportPeriod);
-  const isWeekPreset = analytics.period.values.period === ANALYTICS_PERIOD.WEEK;
   const tabItems = ADMIN_ANALYTICS_TABS_LIST.map((id) => ({
     id,
     label: ADMIN_ANALYTICS_TAB_LABELS[id],
@@ -101,7 +96,7 @@ export function AdminAnalyticsPage() {
           {analytics.failure !== null ? (
             <LoadFailure message={analytics.failure} onRetry={analytics.retry} />
           ) : analytics.loaded !== null && analytics.loaded.tab === tabId ? (
-            renderActiveContent(analytics.loaded, isWeekPreset, isDesktop)
+            renderActiveContent(analytics.loaded, isDesktop)
           ) : (
             <AnalyticsTabSkeleton />
           )}
