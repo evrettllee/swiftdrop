@@ -92,15 +92,19 @@ test('should sum the orders of a client and the deliveries of a courier, without
   ];
   const client = (total: number, delivered: number, cancelled: number) =>
     ordersSummary(
-      cardFixture({ role: 'client', courier: null, orders: { total, delivered, cancelled, recent } }),
+      cardFixture({
+        role: 'client',
+        courier: null,
+        orders: { total, delivered, cancelled, recent },
+      }),
     );
 
   expect(client(12, 11, 1)).toBe('Всего 12, доставлено 11, отменено 1');
   expect(client(3, 3, 0)).toBe('Всего 3, доставлено 3');
   expect(client(2, 0, 0)).toBe('Всего 2');
-  expect(ordersSummary(cardFixture({ orders: { total: 151, delivered: 148, cancelled: 3, recent } }))).toBe(
-    'Доставлено 148, отменено 3',
-  );
+  expect(
+    ordersSummary(cardFixture({ orders: { total: 151, delivered: 148, cancelled: 3, recent } })),
+  ).toBe('Доставлено 148, отменено 3');
   expect(ordersSummary(cardFixture())).toBeNull();
 });
 
@@ -144,7 +148,9 @@ test('should tell until when the invitation works and when it has run out', () =
 
   expect(sent?.variant).toBe('info');
   expect(sent?.title).toMatch(/^Приглашение отправлено 12 ноя 2026, \d{2}:15$/);
-  expect(sent?.text).toMatch(/^Сотрудник ещё не создал пароль\. Ссылка действует до 15 ноя, \d{2}:58\.$/);
+  expect(sent?.text).toMatch(
+    /^Сотрудник ещё не создал пароль\. Ссылка действует до 15 ноя, \d{2}:58\.$/,
+  );
   expect(stateAlert(cardFixture({ status: 'invited', invite: null }))).toEqual({
     variant: 'info',
     kind: 'invite',

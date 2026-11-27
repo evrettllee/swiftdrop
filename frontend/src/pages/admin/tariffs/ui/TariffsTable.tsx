@@ -17,7 +17,10 @@ export function TariffsTable({ items, edit, status }: TariffsTableProps) {
   const isLocked = edit.target !== null;
 
   return (
-    <Table label={TEXTS.TABLE_LABEL} footer={<span className="tabular-nums">{TEXTS.counter(items.length)}</span>}>
+    <Table
+      label={TEXTS.TABLE_LABEL}
+      footer={<span className="tabular-nums">{TEXTS.counter(items.length)}</span>}
+    >
       <thead>
         <tr>
           <TableHeaderCell>{TEXTS.COLUMN_NAME}</TableHeaderCell>

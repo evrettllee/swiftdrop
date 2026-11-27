@@ -17,7 +17,7 @@ jobs:
   backend:
     name: Backend
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     defaults:
       run:
         working-directory: backend
@@ -60,9 +60,9 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
-      - run: npm run test:e2e
+      - run: npm run test:e2e -- --maxWorkers=1
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
+          NODE_OPTIONS: --max-old-space-size=8192
 
   frontend:
     name: Frontend
@@ -81,4 +81,61 @@ jobs:
       - run: npm run lint
       - run: npm run lint:fsd
       - run: npm run typecheck
+      - run: npm run test:unit -- --workers=6
       - run: npm run build
+
+  frontend-e2e:
+    name: Frontend E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: swiftdrop
+          POSTGRES_PASSWORD: swiftdrop
+          POSTGRES_DB: swiftdrop_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U swiftdrop -d swiftdrop_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://swiftdrop:swiftdrop@localhost:5432/swiftdrop_test
+      APP_URL: http://localhost:5174
+      OSRM_URL: http://localhost:5000
+      JWT_ACCESS_SECRET: ci-only-jwt-secret-not-used-anywhere-else
+      GOOGLE_CLIENT_ID: ci-google-client-id
+      GOOGLE_CLIENT_SECRET: ci-google-client-secret
+      GOOGLE_CALLBACK_URL: http://localhost:5174/api/auth/google/callback
+      YANDEX_CLIENT_ID: ci-yandex-client-id
+      YANDEX_CLIENT_SECRET: ci-yandex-client-secret
+      YANDEX_CALLBACK_URL: http://localhost:5174/api/auth/yandex/callback
+      STRIPE_SECRET_KEY: sk_test_ci_only_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_ci_only_placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - working-directory: backend
+        run: npm ci
+      - working-directory: frontend
+        run: npm ci
+      - working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Run Playwright chromium project
+        working-directory: frontend
+        run: npx playwright test --project=chromium --workers=3 --retries=0
+      - name: Run Playwright admin project
+        working-directory: frontend
+        run: npx playwright test --project=admin --workers=1 --retries=0
+      - name: Run Playwright courier project
+        working-directory: frontend
+        run: npx playwright test --project=courier --workers=1 --retries=0

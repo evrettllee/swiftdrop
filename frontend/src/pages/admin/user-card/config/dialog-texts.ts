@@ -9,8 +9,7 @@ export const DIALOG_TEXTS = {
     `${name} станет курьером. Все сессии завершатся, войти придётся заново.`,
   BLOCK_TITLE: 'Заблокировать пользователя',
   BLOCK_CONFIRM: 'Заблокировать',
-  block: (name: string) =>
-    `${name} не сможет войти в аккаунт, текущие сессии завершатся сразу.`,
+  block: (name: string) => `${name} не сможет войти в аккаунт, текущие сессии завершатся сразу.`,
   REASON: 'Причина',
   REASON_PLACEHOLDER: 'Например, жалобы курьеров на оскорбления в чате',
   REASON_HINT: 'Причину видят только администраторы',
@@ -18,8 +17,7 @@ export const DIALOG_TEXTS = {
   reasonCounter: (length: number, max: number) => `${length} / ${max}`,
   UNBLOCK_TITLE: 'Разблокировать пользователя?',
   UNBLOCK_CONFIRM: 'Разблокировать',
-  unblockClient: (name: string) =>
-    `${name} снова сможет входить в аккаунт и оформлять заказы.`,
+  unblockClient: (name: string) => `${name} снова сможет входить в аккаунт и оформлять заказы.`,
   unblockStaff: (name: string) => `${name} снова сможет входить в аккаунт.`,
   SESSIONS_TITLE: 'Завершить все сеансы?',
   SESSIONS_CONFIRM: 'Завершить сеансы',

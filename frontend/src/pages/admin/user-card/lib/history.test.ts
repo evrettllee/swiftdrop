@@ -38,7 +38,9 @@ test('should name every action of an administrator on a user', () => {
 });
 
 test('should date every row and name the administrator short', () => {
-  expect(historyView(entry('sessions_ended'))?.meta).toMatch(/^20 окт 2026, \d{2}:15 · Андрей К\.$/);
+  expect(historyView(entry('sessions_ended'))?.meta).toMatch(
+    /^20 окт 2026, \d{2}:15 · Андрей К\.$/,
+  );
 });
 
 test('should skip an action it does not know', () => {
@@ -46,7 +48,10 @@ test('should skip an action it does not know', () => {
 });
 
 test('should keep a block without a reason short', () => {
-  expect(historyView(entry('user_blocked'))).toMatchObject({ title: 'Заблокирован', details: null });
+  expect(historyView(entry('user_blocked'))).toMatchObject({
+    title: 'Заблокирован',
+    details: null,
+  });
 });
 
 test('should name a person by the first name and the initial of the last name', () => {

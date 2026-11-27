@@ -113,7 +113,8 @@ function sentence(text: string): string {
 }
 
 function blockedAlert(block: NonNullable<AdminUserCard['block']>): StateAlert {
-  const reason = block.reason === null || block.reason === '' ? [] : [sentence(ALERTS.reason(block.reason))];
+  const reason =
+    block.reason === null || block.reason === '' ? [] : [sentence(ALERTS.reason(block.reason))];
 
   return {
     variant: 'error',

@@ -30,11 +30,7 @@ export function TariffsSkeleton() {
 export function TariffsFailed({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="rounded-lg bg-surface shadow-md dark:border dark:border-border">
-      <EmptyState
-        icon={WarningCircleIcon}
-        title={TEXTS.LIST_FAILED_TITLE}
-        text={TEXTS.LIST_FAILED}
-      >
+      <EmptyState icon={WarningCircleIcon} title={TEXTS.LIST_FAILED_TITLE} text={TEXTS.LIST_FAILED}>
         <Button variant="secondary" onClick={onRetry}>
           {TEXTS.RETRY}
         </Button>

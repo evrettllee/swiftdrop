@@ -12,7 +12,13 @@ export {
   USER_STATUS_LABELS,
 } from './config/admin-user';
 export { CONFLICT_TEXTS, USER_FIELD, withConflictField } from './lib/conflicts';
-export { STATUS_TONE, type StatusTone, statusView, type VehicleView, vehicleView } from './lib/labels';
+export {
+  STATUS_TONE,
+  type StatusTone,
+  statusView,
+  type VehicleView,
+  vehicleView,
+} from './lib/labels';
 export { RoleTag } from './ui/RoleTag';
 export { UserIdentity } from './ui/UserIdentity';
 export { UserStatus } from './ui/UserStatus';

@@ -1,6 +1,7 @@
 import { Skeleton } from '@/shared/ui/skeleton';
 
-const PANEL_CLASS = 'flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-md lg:p-6 dark:border dark:border-border';
+const PANEL_CLASS =
+  'flex flex-col gap-4 rounded-xl bg-surface p-4 shadow-md lg:p-6 dark:border dark:border-border';
 const FACT_ROWS = 5;
 const ACTION_ROWS = 4;
 

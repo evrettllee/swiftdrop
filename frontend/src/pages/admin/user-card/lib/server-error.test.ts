@@ -19,7 +19,9 @@ test('should lock the action only after a conflict', () => {
     text: null,
     isConflict: true,
   });
-  expect(actionErrorOf(new ApiError(429, 'Слишком много сбросов пароля. Подождите минуту'), 'Ошибка')).toEqual({
+  expect(
+    actionErrorOf(new ApiError(429, 'Слишком много сбросов пароля. Подождите минуту'), 'Ошибка'),
+  ).toEqual({
     title: 'Слишком много сбросов пароля',
     text: 'Подождите минуту.',
     isConflict: false,

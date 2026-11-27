@@ -1,4 +1,4 @@
-import { expect, type Page, test, type WebSocketRoute } from '@playwright/test';
+import { expect, type Locator, type Page, test, type WebSocketRoute } from '@playwright/test';
 import { OFFER_NOTICE } from '../../src/features/order-offer/config/offer';
 import { OFFER_NOTICE_TEXTS, OFFER_TEXTS } from '../../src/features/order-offer/config/texts';
 import { COURIER_OFFERS_API_PATHS } from '../../src/shared/api/endpoints/courier-offer';
@@ -35,6 +35,21 @@ function offerWindow() {
 
 function takenNotice() {
   return page.getByRole('status').filter({ hasText: OFFER_NOTICE_TEXTS[OFFER_NOTICE.TAKEN].title });
+}
+
+async function expectControlInsideMap(map: Locator, control: Locator): Promise<void> {
+  const mapBox = await map.boundingBox();
+  const controlBox = await control.boundingBox();
+
+  expect(mapBox).not.toBeNull();
+  expect(controlBox).not.toBeNull();
+
+  if (mapBox !== null && controlBox !== null) {
+    expect(controlBox.y).toBeGreaterThanOrEqual(mapBox.y);
+    expect(controlBox.y + controlBox.height).toBeLessThanOrEqual(mapBox.y + mapBox.height);
+    expect(controlBox.x).toBeGreaterThanOrEqual(mapBox.x);
+    expect(controlBox.x + controlBox.width).toBeLessThanOrEqual(mapBox.x + mapBox.width);
+  }
 }
 
 test.beforeAll(async ({ browser }) => {
@@ -87,20 +102,25 @@ test('should put the map of the offer in the full screen and back when the couri
   await openCabinet();
   const map = offerWindow().getByRole('region', { name: MAP_TEXTS.AREA_LABEL });
   const isMapFullscreen = () => map.evaluate((element) => document.fullscreenElement === element);
+  const fullscreenButton = map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN });
 
-  await map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN }).click();
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_IN })).toBeHidden();
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_OUT })).toBeHidden();
+  await expectControlInsideMap(map, fullscreenButton);
+  await fullscreenButton.click();
 
   await expect.poll(isMapFullscreen).toBe(true);
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_IN })).toBeVisible();
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_OUT })).toBeVisible();
   const exitButton = map.getByRole('button', { name: MAP_TEXTS.EXIT_FULLSCREEN });
   await expect(exitButton).toHaveAttribute('aria-pressed', 'true');
 
   await exitButton.click();
 
   await expect.poll(isMapFullscreen).toBe(false);
-  await expect(map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN })).toHaveAttribute(
-    'aria-pressed',
-    'false',
-  );
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_IN })).toBeHidden();
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_OUT })).toBeHidden();
+  await expect(fullscreenButton).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('should show the courier on the map of the offer when their position is known', async () => {
@@ -111,9 +131,15 @@ test('should show the courier on the map of the offer when their position is kno
   await openCabinet();
 
   const map = offerWindow().getByRole('region', { name: MAP_TEXTS.AREA_LABEL });
+  const locateButton = map.getByRole('button', { name: MAP_TEXTS.LOCATE });
+  const fullscreenButton = map.getByRole('button', { name: MAP_TEXTS.FULLSCREEN });
 
   await expect(map.locator(`.${MAP_CLASS.POSITION}`)).toBeVisible();
-  await expect(map.getByRole('button', { name: MAP_TEXTS.LOCATE })).toBeVisible();
+  await expect(locateButton).toBeVisible();
+  await expect(fullscreenButton).toBeVisible();
+  await expect(map.getByRole('button', { name: MAP_TEXTS.ZOOM_IN })).toBeHidden();
+  await expectControlInsideMap(map, locateButton);
+  await expectControlInsideMap(map, fullscreenButton);
 });
 
 test('should close the offer when the courier declines it', async () => {

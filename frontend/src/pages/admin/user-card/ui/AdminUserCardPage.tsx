@@ -25,7 +25,11 @@ export function AdminUserCardPage() {
 
   if (load === CARD_LOAD.NOT_FOUND) {
     return (
-      <EmptyState icon={MagnifyingGlassIcon} title={TEXTS.NOT_FOUND_TITLE} text={TEXTS.NOT_FOUND_TEXT}>
+      <EmptyState
+        icon={MagnifyingGlassIcon}
+        title={TEXTS.NOT_FOUND_TITLE}
+        text={TEXTS.NOT_FOUND_TEXT}
+      >
         <LinkButton variant="secondary" to={getAdminUsersPath()}>
           {TEXTS.BACK_TO_USERS}
         </LinkButton>

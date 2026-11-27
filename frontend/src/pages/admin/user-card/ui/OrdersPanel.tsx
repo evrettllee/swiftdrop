@@ -135,7 +135,9 @@ export function OrdersPanel({ card, isDesktop }: OrdersPanelProps) {
           {isCourier ? TEXTS.NO_DELIVERIES : TEXTS.NO_ORDERS}
         </p>
       ) : null}
-      {orders.length > 0 && isDesktop ? <OrdersTable orders={orders} hasPrice={!isCourier} /> : null}
+      {orders.length > 0 && isDesktop ? (
+        <OrdersTable orders={orders} hasPrice={!isCourier} />
+      ) : null}
       {orders.length > 0 && !isDesktop ? <OrdersList orders={orders} /> : null}
     </Panel>
   );
