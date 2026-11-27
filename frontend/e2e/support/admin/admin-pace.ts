@@ -77,11 +77,9 @@ function readState(now: number): PaceState {
       return { writes: [], logins: [] };
     }
 
-    const record = parsed as Record<string, unknown>;
-
     return {
-      writes: parseTimestamps(record.writes, now),
-      logins: parseTimestamps(record.logins, now),
+      writes: parseTimestamps('writes' in parsed ? parsed.writes : undefined, now),
+      logins: parseTimestamps('logins' in parsed ? parsed.logins : undefined, now),
     };
   } catch {
     return { writes: [], logins: [] };

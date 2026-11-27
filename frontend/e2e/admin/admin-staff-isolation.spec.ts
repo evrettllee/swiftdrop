@@ -69,5 +69,5 @@ test('should keep the menu of the manager as it was', async ({ page }) => {
   ]);
   await expect(page.getByText('Менеджер', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: /Администратор/ })).toHaveCount(0);
-  expect(counts.orderRequests).toBeGreaterThan(0);
+  await expect.poll(() => counts.orderRequests).toBeGreaterThan(0);
 });

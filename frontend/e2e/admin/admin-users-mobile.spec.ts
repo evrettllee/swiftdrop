@@ -65,6 +65,8 @@ test('should open the filters in a sheet', async () => {
   await expectNoOverflow();
 });
 
+const LONG_SEARCH_QUERY = 'very-long-courier-search-query-phone-8888888888888@swiftdrop.test';
+
 test('should open the invite in a sheet with the main button on top', async () => {
   const { page } = session;
   await page.goto(`${APP_ROUTES.ADMIN_USERS}?role=courier`);
@@ -77,4 +79,26 @@ test('should open the invite in a sheet with the main button on top', async () =
   const cancel = await sheet.getByRole('button', { name: INVITE.CANCEL }).boundingBox();
   expect(submit?.y ?? 0).toBeLessThan(cancel?.y ?? 0);
   await expectNoOverflow();
+});
+
+test('should fit a long filter chip inside 375px with full accessible label and clear it', async () => {
+  const { page } = session;
+  await page.goto(
+    `${APP_ROUTES.ADMIN_USERS}?role=courier&q=${encodeURIComponent(LONG_SEARCH_QUERY)}`,
+  );
+  const chip = page.getByRole('button', {
+    name: TEXTS.removeFilter(TEXTS.SEARCH_CHIP, LONG_SEARCH_QUERY),
+  });
+
+  await expect(chip).toBeVisible();
+  await expectNoOverflow();
+
+  const box = await chip.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box?.width ?? 0).toBeLessThanOrEqual(PHONE_VIEWPORT.width);
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(PHONE_VIEWPORT.width);
+
+  await chip.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).not.toHaveURL(/q=/);
 });
