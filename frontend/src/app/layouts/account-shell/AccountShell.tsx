@@ -17,6 +17,7 @@ type AccountShellProps = {
   bottomNavItems?: readonly NavItem[];
   bottomNavEnd?: ReactNode;
   userCaption?: string;
+  profileTo?: string;
   // Shown at the end of the top bar of the phone.
   headerEnd?: ReactNode;
 };
@@ -31,6 +32,7 @@ export function AccountShell({
   bottomNavItems = navItems,
   bottomNavEnd,
   userCaption,
+  profileTo,
   headerEnd,
 }: AccountShellProps) {
   const [searchParams] = useSearchParams();
@@ -44,6 +46,7 @@ export function AccountShell({
         navLabel={navLabel}
         items={navItems}
         userCaption={userCaption}
+        profileTo={profileTo}
       />
       <div className="flex min-w-0 flex-1 flex-col">
         <AccountMobileHeader homeTo={homeTo} end={isChatOpen ? undefined : headerEnd} />

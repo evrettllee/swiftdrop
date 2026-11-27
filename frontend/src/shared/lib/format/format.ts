@@ -1,8 +1,20 @@
 import { APP_LOCALE } from '@/shared/config';
 
 const MONEY_FRACTION_DIGITS = 2;
-// "окт." becomes "окт": the short month is written without the dot.
-const SHORT_MONTH_DOT = /\.$/;
+const SHORT_MONTHS = [
+  'янв',
+  'фев',
+  'мар',
+  'апр',
+  'мая',
+  'июн',
+  'июл',
+  'авг',
+  'сен',
+  'окт',
+  'ноя',
+  'дек',
+] as const;
 
 const moneyFormats = new Map<number, Intl.NumberFormat>();
 
@@ -22,8 +34,6 @@ function moneyFormatOf(fractionDigits: number): Intl.NumberFormat {
 
 const dayMonthFormat = new Intl.DateTimeFormat(APP_LOCALE, { day: 'numeric', month: 'long' });
 
-const shortDateFormat = new Intl.DateTimeFormat(APP_LOCALE, { day: 'numeric', month: 'short' });
-
 const timeFormat = new Intl.DateTimeFormat(APP_LOCALE, { hour: '2-digit', minute: '2-digit' });
 
 // An exact amount, unlike the estimate in the calculator, which starts with "≈".
@@ -42,7 +52,7 @@ export function formatFullDateTime(date: Date): string {
 
 // For example "6 окт, 14:20": the date in lists.
 export function formatShortDateTime(date: Date): string {
-  const day = shortDateFormat.format(date).replace(SHORT_MONTH_DOT, '');
+  const day = formatShortDay(date);
 
   return `${day}, ${timeFormat.format(date)}`;
 }
@@ -53,7 +63,7 @@ export function formatTime(date: Date): string {
 }
 
 export function formatShortDay(date: Date): string {
-  return shortDateFormat.format(date).replace(SHORT_MONTH_DOT, '');
+  return `${date.getDate()} ${SHORT_MONTHS[date.getMonth()]}`;
 }
 
 export function formatShortDate(date: Date): string {

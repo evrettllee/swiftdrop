@@ -6,7 +6,7 @@ import { PAYMENT_STATE, type ManagerOrderDetails } from '@/shared/staff-api';
 import { Divider } from '@/shared/ui/divider';
 import { PriceRow } from '@/shared/ui/price-row';
 import { MANAGER_ORDER_TEXTS } from '../config/texts';
-import { Panel } from './Panel';
+import { Panel } from '@/shared/ui/panel';
 
 type PaymentPanelProps = {
   order: ManagerOrderDetails;

@@ -8,6 +8,7 @@ export const APP_ROUTES = {
   SUPPORT: '/support',
   SUPPORT_TICKET: '/support/:ticketId',
   FORGOT_PASSWORD: '/forgot-password',
+  SET_PASSWORD: '/set-password/:token',
   TERMS: '/terms',
   PRIVACY: '/privacy',
   COURIER_WORK: '/courier',
@@ -30,7 +31,15 @@ export const APP_ROUTES = {
   MANAGER_ANALYTICS: '/manager/analytics',
   MANAGER_ANALYTICS_COURIERS: '/manager/analytics/couriers',
   MANAGER_PROFILE: '/manager/profile',
+  ADMIN: '/admin',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_USER: '/admin/users/:userId',
+  ADMIN_TARIFFS: '/admin/tariffs',
+  ADMIN_ANALYTICS: '/admin/analytics',
+  ADMIN_PROFILE: '/admin/profile',
 } as const;
+
+export const SET_PASSWORD_TOKEN_PARAM = 'token';
 
 // The router pattern of the page of one order and the path to a concrete order.
 export const ORDER_ID_PARAM = 'orderId';
@@ -55,6 +64,16 @@ export function getCourierHistoryOrderPath(orderId: number, listSearch = ''): st
 export function getManagerOrderPath(orderId: number): string {
   return `${APP_ROUTES.MANAGER_ORDERS}/${orderId}`;
 }
+
+export function getAdminUsersPath(listSearch = ''): string {
+  return withSearch(APP_ROUTES.ADMIN_USERS, listSearch);
+}
+
+export function getAdminUserPath(userId: number, listSearch = ''): string {
+  return withSearch(`${APP_ROUTES.ADMIN_USERS}/${userId}`, listSearch);
+}
+
+export const USER_ID_PARAM = 'userId';
 
 export const ZONE_ID_PARAM = 'zoneId';
 

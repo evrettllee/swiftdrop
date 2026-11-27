@@ -1,14 +1,9 @@
-import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { type ReactNode, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { ICON_SIZE, ICON_WEIGHT, MAIN_CONTENT_ID, UI_TEXTS } from '@/shared/config';
-import { APP_ROUTES, AUTH_TAB, AUTH_TAB_QUERY_PARAM } from '@/shared/routes';
-import { LinkButton } from '@/shared/ui/button';
+import { AUTH_TAB, AUTH_TAB_QUERY_PARAM } from '@/shared/routes';
+import { AuthFrame } from '@/shared/ui/auth-frame';
 import { InlineAlert } from '@/shared/ui/inline-alert';
-import { Logo } from '@/shared/ui/logo';
-import { SkipLink } from '@/shared/ui/skip-link';
 import { TabPanel, Tabs } from '@/shared/ui/tabs';
-import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import {
   AUTH_ERROR_HINTS,
   AUTH_ERROR_MESSAGES,
@@ -82,47 +77,26 @@ export function AuthPage() {
   const [tab, setTab] = useState<AuthTabId>(() => getInitialTab(searchParams));
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <SkipLink />
-      <header className="flex items-center justify-between px-2 pt-2 lg:px-12 lg:pt-4">
-        <LinkButton
-          variant="text"
-          to={APP_ROUTES.HOME}
-          icon={<ArrowLeftIcon size={ICON_SIZE.MEDIUM} weight={ICON_WEIGHT} aria-hidden="true" />}
-        >
-          {UI_TEXTS.BACK_HOME}
-        </LinkButton>
-        <ThemeToggle />
-      </header>
-      <main
-        id={MAIN_CONTENT_ID}
-        className="flex flex-1 flex-col items-center px-4 pt-8 pb-10 lg:px-12 lg:pt-12 lg:pb-16"
-      >
-        <div className="mb-6">
-          <Logo />
-        </div>
-        <div className="w-full max-w-120 rounded-lg border border-border bg-surface p-4 shadow-md lg:p-6">
-          <Tabs
-            tabs={TABS}
-            value={tab}
-            onChange={setTab}
-            label={AUTH_TEXTS.TABS_LABEL}
-            idPrefix={AUTH_ID_PREFIX}
-          />
-          <div className="mt-6">
-            <TabPanel idPrefix={AUTH_ID_PREFIX} id={AUTH_TAB.LOGIN} activeId={tab}>
-              <AuthPanel title={AUTH_TEXTS.TITLE_LOGIN} showConsent={false}>
-                <LoginForm />
-              </AuthPanel>
-            </TabPanel>
-            <TabPanel idPrefix={AUTH_ID_PREFIX} id={AUTH_TAB.REGISTER} activeId={tab}>
-              <AuthPanel title={AUTH_TEXTS.TITLE_REGISTER} showConsent>
-                <RegisterForm />
-              </AuthPanel>
-            </TabPanel>
-          </div>
-        </div>
-      </main>
-    </div>
+    <AuthFrame>
+      <Tabs
+        tabs={TABS}
+        value={tab}
+        onChange={setTab}
+        label={AUTH_TEXTS.TABS_LABEL}
+        idPrefix={AUTH_ID_PREFIX}
+      />
+      <div className="mt-6">
+        <TabPanel idPrefix={AUTH_ID_PREFIX} id={AUTH_TAB.LOGIN} activeId={tab}>
+          <AuthPanel title={AUTH_TEXTS.TITLE_LOGIN} showConsent={false}>
+            <LoginForm />
+          </AuthPanel>
+        </TabPanel>
+        <TabPanel idPrefix={AUTH_ID_PREFIX} id={AUTH_TAB.REGISTER} activeId={tab}>
+          <AuthPanel title={AUTH_TEXTS.TITLE_REGISTER} showConsent>
+            <RegisterForm />
+          </AuthPanel>
+        </TabPanel>
+      </div>
+    </AuthFrame>
   );
 }

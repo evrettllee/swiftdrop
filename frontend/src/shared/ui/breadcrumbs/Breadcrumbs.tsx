@@ -1,14 +1,22 @@
 import { ArrowLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
+import { Fragment } from 'react';
 import { Link } from 'react-router';
 import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 
+type Crumb = { label: string; to: string };
+
 type BreadcrumbsProps = {
   label: string;
-  parent: { label: string; to: string };
+  root?: Crumb;
+  parent: Crumb;
   current: string;
 };
 
-export function Breadcrumbs({ label, parent, current }: BreadcrumbsProps) {
+const CRUMB_LINK_CLASS = `rounded-sm text-fg-secondary hover:text-accent hover:underline ${COLOR_TRANSITION_CLASS}`;
+
+export function Breadcrumbs({ label, root, parent, current }: BreadcrumbsProps) {
+  const trail = root === undefined ? [parent] : [root, parent];
+
   return (
     <nav aria-label={label} className="text-small">
       <Link
@@ -19,17 +27,18 @@ export function Breadcrumbs({ label, parent, current }: BreadcrumbsProps) {
         {parent.label}
       </Link>
       <ol className="hidden items-center gap-2 lg:flex">
-        <li>
-          <Link
-            to={parent.to}
-            className={`rounded-sm text-fg-secondary hover:text-accent hover:underline ${COLOR_TRANSITION_CLASS}`}
-          >
-            {parent.label}
-          </Link>
-        </li>
-        <li aria-hidden="true" className="text-fg-muted">
-          <CaretRightIcon size={ICON_SIZE.SMALL} weight={ICON_WEIGHT} />
-        </li>
+        {trail.map((crumb) => (
+          <Fragment key={crumb.label}>
+            <li>
+              <Link to={crumb.to} className={CRUMB_LINK_CLASS}>
+                {crumb.label}
+              </Link>
+            </li>
+            <li aria-hidden="true" className="text-fg-muted">
+              <CaretRightIcon size={ICON_SIZE.SMALL} weight={ICON_WEIGHT} />
+            </li>
+          </Fragment>
+        ))}
         <li aria-current="page">{current}</li>
       </ol>
     </nav>

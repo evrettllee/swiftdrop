@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { setSessionExpiredHandler } from '@/shared/api';
 import { AUTH_STATUS, type AuthStatus } from './auth-status';
 import type { AuthUser, LoginInput, RegisterInput } from './auth-user';
-import { fetchCurrentUser, login, logout, register } from './session-api';
+import { fetchCurrentUser, login, logout, register, setPasswordByLink } from './session-api';
 
 type AuthState = {
   user: AuthUser | null;
@@ -10,6 +10,7 @@ type AuthState = {
   initialize: () => Promise<void>;
   signIn: (input: LoginInput) => Promise<void>;
   signUp: (input: RegisterInput) => Promise<void>;
+  signInByPasswordLink: (token: string, password: string) => Promise<AuthUser>;
   signOut: () => Promise<void>;
 };
 
@@ -41,6 +42,13 @@ export const useAuthStore = create<AuthState>()((set) => ({
   signUp: async (input) => {
     const user = await register(input);
     set({ user, status: AUTH_STATUS.AUTHENTICATED });
+  },
+
+  signInByPasswordLink: async (token, password) => {
+    const user = await setPasswordByLink(token, password);
+    set({ user, status: AUTH_STATUS.AUTHENTICATED });
+
+    return user;
   },
 
   signOut: async () => {

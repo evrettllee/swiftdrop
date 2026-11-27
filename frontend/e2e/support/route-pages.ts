@@ -3,7 +3,7 @@ import { LANDING_TEXTS } from '../../src/pages/landing/config/texts';
 import { ROUTE_POINT, ROUTE_POINT_LABELS } from '../../src/shared/config/route-point';
 import { APP_ROUTES } from '../../src/shared/routes/app-routes';
 import { MAP_TEXTS } from '../../src/shared/ui/route-map/map';
-import { checkoutAddressField, chooseAddress } from './checkout';
+import { checkoutAddressField, chooseAddress } from './client/checkout';
 import { TEST_ADDRESSES } from './mapbox';
 
 const TEST_ROUTE = [

@@ -123,6 +123,7 @@ export function AreaMap({
           onLocate={courierPoint === null ? undefined : () => handleLocate(courierPoint)}
           isFullscreen={isFullscreen}
           onToggleFullscreen={isSupported ? toggle : undefined}
+          showZoom={isFullscreen}
         />
         {route.isUnavailable ? <RouteUnavailableBadge /> : null}
       </div>

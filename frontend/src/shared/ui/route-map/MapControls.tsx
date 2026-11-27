@@ -21,6 +21,7 @@ type MapControlsProps = {
   // gets none.
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  showZoom?: boolean;
 };
 
 // One look of the controls for every map: a column of 44px buttons in the top-right corner, away
@@ -31,9 +32,10 @@ export function MapControls({
   onLocate,
   isFullscreen = false,
   onToggleFullscreen,
+  showZoom = true,
 }: MapControlsProps) {
   const zoomOptions = { animate: !usePrefersReducedMotion() };
-  const zoomClassName = isFullscreen ? '' : 'max-lg:hidden';
+  const zoomClassName = isFullscreen ? '' : showZoom ? 'max-lg:hidden' : 'hidden';
 
   return (
     <div className="absolute end-3 top-3 flex flex-col gap-2">

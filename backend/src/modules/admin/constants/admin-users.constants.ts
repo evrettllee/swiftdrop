@@ -1,4 +1,5 @@
 import { ROLE } from '@/common/enums/role.enum';
+import { VEHICLE_TYPE_VALUES } from '@/common/enums/vehicle-type.enum';
 
 const USERS_SEGMENT = 'users';
 
@@ -50,6 +51,10 @@ export const ADMIN_USER_SORT_KEY = {
   NAME: 'name',
 } as const;
 
+export const VEHICLE_FILTER_NONE = 'none';
+
+export const ADMIN_VEHICLE_FILTER_VALUES = [...VEHICLE_TYPE_VALUES, VEHICLE_FILTER_NONE] as const;
+
 export const ADMIN_USERS_PAGE_SIZE_DEFAULT = 20;
 export const PHONE_SEARCH_MIN_DIGITS = 7;
 export const ADMIN_RECENT_ORDERS_LIMIT = 5;
@@ -62,4 +67,5 @@ export const ADMIN_USERS_VALIDATION_MESSAGES = {
   STATUS_INVALID: 'Неизвестный статус пользователя',
   SORT_INVALID: 'Сортировка: newest, oldest или name',
   USER_ID_INVALID: 'Некорректный номер пользователя',
+  VEHICLE_COURIERS_ONLY: 'Фильтр по транспорту только для курьеров',
 } as const;

@@ -7,8 +7,8 @@ import {
 import { useListParams } from '@/shared/lib/list-params';
 import { TOP_COURIERS_LIMIT } from '../config/analytics';
 import { PERIOD_PARAMS_CONFIG } from '../config/params';
-import { MANAGER_ANALYTICS_TEXTS } from '../config/texts';
-import { useAnalyticsPeriod } from './useAnalyticsPeriod';
+import { MANAGER_ANALYTICS_TEXTS, PERIOD_TEXTS } from '../config/texts';
+import { useAnalyticsPeriod } from '@/features/analytics-period';
 import { useAnalyticsRequest } from './useAnalyticsRequest';
 
 function loadSummary(query: AnalyticsPeriodQuery, signal: AbortSignal) {
@@ -24,7 +24,7 @@ function loadTopCouriers(query: AnalyticsPeriodQuery, signal: AbortSignal) {
 
 export function useAnalyticsPage() {
   const { values, update } = useListParams(PERIOD_PARAMS_CONFIG);
-  const period = useAnalyticsPeriod(values, update);
+  const period = useAnalyticsPeriod(values, update, { tooLong: PERIOD_TEXTS.TOO_LONG });
   const summary = useAnalyticsRequest(
     period.request,
     loadSummary,

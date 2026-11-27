@@ -1,14 +1,22 @@
-import { COLOR_TRANSITION_CLASS } from '@/shared/config';
+import { CheckIcon } from '@phosphor-icons/react';
+import { COLOR_TRANSITION_CLASS, ICON_SIZE, ICON_WEIGHT } from '@/shared/config';
 import { joinClassNames } from '@/shared/lib/class-names';
 
 type ToggleChipProps = {
   label: string;
   count?: number;
   isPressed: boolean;
+  hasCheck?: boolean;
   onClick: () => void;
 };
 
-export function ToggleChip({ label, count, isPressed, onClick }: ToggleChipProps) {
+export function ToggleChip({
+  label,
+  count,
+  isPressed,
+  hasCheck = false,
+  onClick,
+}: ToggleChipProps) {
   return (
     <button
       type="button"
@@ -22,6 +30,9 @@ export function ToggleChip({ label, count, isPressed, onClick }: ToggleChipProps
           : 'border-border bg-surface text-fg hover:bg-surface-muted',
       )}
     >
+      {hasCheck && isPressed ? (
+        <CheckIcon size={ICON_SIZE.SMALL} weight={ICON_WEIGHT} aria-hidden="true" />
+      ) : null}
       {label}
       {count === undefined ? null : (
         <span className="font-normal text-fg-secondary tabular-nums">{count}</span>

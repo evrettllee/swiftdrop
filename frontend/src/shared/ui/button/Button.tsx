@@ -27,7 +27,11 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
 const SOLID_VARIANTS: ReadonlySet<ButtonVariant> = new Set(['primary', 'danger']);
 
 // The text and the icons of a button, laid out as the button lays them out.
-const CONTENT_CLASS = 'inline-flex items-center justify-center gap-1';
+const CONTENT_CLASS = 'inline-flex items-center justify-center';
+
+const CONTENT_GAP_CLASSES = { center: 'gap-1', start: 'gap-2' } as const;
+
+type ButtonAlign = 'center' | 'start';
 
 type CommonProps = {
   variant?: ButtonVariant;
@@ -36,10 +40,16 @@ type CommonProps = {
   children: ReactNode;
 };
 
-function buildClassName(variant: ButtonVariant, fullWidth: boolean, isLoading: boolean): string {
+function buildClassName(
+  variant: ButtonVariant,
+  fullWidth: boolean,
+  isLoading: boolean,
+  align: ButtonAlign = 'center',
+): string {
   return joinClassNames(
     BASE_CLASS,
     VARIANT_CLASSES[variant],
+    align === 'start' ? 'justify-start' : '',
     fullWidth ? 'w-full' : '',
     // A disabled button still takes the hover of its variant: none while it is busy.
     isLoading ? 'pointer-events-none' : '',
@@ -47,10 +57,11 @@ function buildClassName(variant: ButtonVariant, fullWidth: boolean, isLoading: b
 }
 
 // `ref` reaches the <button>, for example to focus it.
-type ButtonProps = CommonProps & { loading?: boolean; ref?: Ref<HTMLButtonElement> } & Omit<
-    ButtonHTMLAttributes<HTMLButtonElement>,
-    'children'
-  >;
+type ButtonProps = CommonProps & {
+  loading?: boolean;
+  align?: ButtonAlign;
+  ref?: Ref<HTMLButtonElement>;
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
 
 // While loading, the text and the icons stay where they are, only unseen, so the button keeps its
 // size and a screen reader still reads its name; the spinner stands in the middle of the button.
@@ -59,6 +70,7 @@ export function Button({
   fullWidth = false,
   loading = false,
   disabled = false,
+  align = 'center',
   icon,
   children,
   type = 'button',
@@ -69,10 +81,16 @@ export function Button({
       type={type}
       aria-busy={loading || undefined}
       disabled={disabled || loading}
-      className={buildClassName(variant, fullWidth, loading)}
+      className={buildClassName(variant, fullWidth, loading, align)}
       {...rest}
     >
-      <span className={joinClassNames(CONTENT_CLASS, loading ? 'opacity-0' : '')}>
+      <span
+        className={joinClassNames(
+          CONTENT_CLASS,
+          CONTENT_GAP_CLASSES[align],
+          loading ? 'opacity-0' : '',
+        )}
+      >
         {icon}
         {children}
       </span>

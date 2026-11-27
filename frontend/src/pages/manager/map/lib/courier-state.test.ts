@@ -3,10 +3,12 @@ import type { CourierMapItem } from '@/shared/staff-api';
 import { MAP_FILTER } from '../config/map';
 import {
   compareCouriers,
+  countForFilter,
   filterChips,
   isInFilter,
   liveCounts,
   liveState,
+  nextRadioIndex,
   statesOf,
 } from './courier-state';
 import { toLiveCouriers } from './live-couriers';
@@ -40,14 +42,30 @@ test('should ask for the free couriers and those with an offer under one chip', 
 });
 
 test('should sum the four states of the API into the chips of the design', () => {
-  const chips = filterChips({ free: 5, offer: 2, on_order: 4, no_signal: 1 });
+  const counts = { free: 5, offer: 2, on_order: 4, no_signal: 1 };
+  const chips = filterChips(counts);
 
+  expect(countForFilter(counts, null)).toBe(12);
+  expect(countForFilter(counts, MAP_FILTER.FREE)).toBe(7);
+  expect(countForFilter(counts, MAP_FILTER.ON_ORDER)).toBe(4);
+  expect(countForFilter(counts, MAP_FILTER.NO_SIGNAL)).toBe(1);
   expect(chips).toEqual([
     { filter: null, count: 12 },
     { filter: MAP_FILTER.FREE, count: 7 },
     { filter: MAP_FILTER.ON_ORDER, count: 4 },
     { filter: MAP_FILTER.NO_SIGNAL, count: 1 },
   ]);
+});
+
+test('should move across the state radio group with arrows, home and end keys', () => {
+  expect(nextRadioIndex('ArrowRight', 0, 4)).toBe(1);
+  expect(nextRadioIndex('ArrowDown', 3, 4)).toBe(0);
+  expect(nextRadioIndex('ArrowLeft', 0, 4)).toBe(3);
+  expect(nextRadioIndex('ArrowUp', 2, 4)).toBe(1);
+  expect(nextRadioIndex('Home', 2, 4)).toBe(0);
+  expect(nextRadioIndex('End', 1, 4)).toBe(3);
+  expect(nextRadioIndex('Enter', 1, 4)).toBeNull();
+  expect(nextRadioIndex('ArrowRight', 0, 0)).toBeNull();
 });
 
 test('should take the state from the order, the offer and the age of the position', () => {

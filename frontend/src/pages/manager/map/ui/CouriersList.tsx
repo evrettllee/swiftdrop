@@ -10,17 +10,26 @@ type CouriersListProps = {
   now: number;
   selectedId: number | null;
   search: string | null;
-  isFiltered: boolean;
+  hasStateFilter: boolean;
+  hasVehicleFilter: boolean;
   isLoading: boolean;
   onSelect: (courierId: number) => void;
 };
 
-function emptyText(search: string | null, isFiltered: boolean): string | null {
+function emptyText(
+  search: string | null,
+  hasStateFilter: boolean,
+  hasVehicleFilter: boolean,
+): string | null {
   if (search !== null) {
     return TEXTS.bySearch(search);
   }
 
-  return isFiltered ? TEXTS.BY_FILTER : null;
+  if (hasVehicleFilter) {
+    return TEXTS.BY_FILTERS;
+  }
+
+  return hasStateFilter ? TEXTS.BY_FILTER : null;
 }
 
 export function CouriersList({
@@ -28,12 +37,13 @@ export function CouriersList({
   now,
   selectedId,
   search,
-  isFiltered,
+  hasStateFilter,
+  hasVehicleFilter,
   isLoading,
   onSelect,
 }: CouriersListProps) {
   if (couriers.length === 0) {
-    const text = emptyText(search, isFiltered);
+    const text = emptyText(search, hasStateFilter, hasVehicleFilter);
 
     return text === null ? (
       <EmptyState icon={UsersIcon} title={TEXTS.NOBODY_TITLE} text={TEXTS.NOBODY_TEXT} />

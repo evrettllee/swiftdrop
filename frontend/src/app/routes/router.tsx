@@ -6,6 +6,7 @@ import { PLACEHOLDER_TEXTS, PlaceholderPage } from '@/pages/placeholder';
 import { APP_ROUTES, CATCH_ALL_ROUTE, ORDER_DETAILS_PATTERN } from '@/shared/routes';
 import { ROLE } from '@/shared/session';
 import { PageLoader } from '@/shared/ui/page-loader';
+import { adminRoutes } from './admin-routes';
 import { courierRoutes } from './courier-routes';
 import { GuestRoute } from './GuestRoute';
 import { managerRoutes } from './manager-routes';
@@ -124,6 +125,15 @@ export const router = createBrowserRouter([
           },
           courierRoutes,
           managerRoutes,
+          adminRoutes,
+          {
+            path: APP_ROUTES.SET_PASSWORD,
+            Component: lazy(() =>
+              import('@/pages/set-password').then((module) => ({
+                default: module.SetPasswordPage,
+              })),
+            ),
+          },
           {
             path: APP_ROUTES.FORGOT_PASSWORD,
             element: <PlaceholderPage title={PLACEHOLDER_TEXTS.FORGOT_PASSWORD_TITLE} />,

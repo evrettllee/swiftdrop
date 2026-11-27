@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { minutesAgo, type RawMessage } from './manager-support-fixtures';
+import { minutesAgo, type RawMessage } from './manager/manager-support-fixtures';
 
 export const ORDER_ID = 48232;
 export const OTHER_ORDER_ID = 48230;

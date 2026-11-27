@@ -18,6 +18,7 @@ import { managedRole, USER_ROW_COLUMNS } from '../utils/admin-user-columns';
 import { clientOrderCounts, courierPageStats } from '../utils/admin-user-stats';
 import { ADMIN_USERS_SORT_SPEC, NAME_ORDER } from '../utils/admin-users-sort';
 import { userSearchCondition } from '../utils/user-search';
+import { vehicleCondition } from '../utils/vehicle-filter';
 import { deriveUserStatus, statusCondition } from '../utils/user-status';
 
 function fetchUserRows(db: Database, options: ListFetch) {
@@ -67,6 +68,7 @@ export class AdminUsersService {
       eq(roles.name, query.role),
       statusCondition(query.statuses),
       userSearchCondition(query.search),
+      vehicleCondition(query.vehicles),
     );
     const page = asPage(
       await paginate(query, {

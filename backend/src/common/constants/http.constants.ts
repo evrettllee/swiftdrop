@@ -20,3 +20,11 @@ export const INTERNAL_ERROR_MESSAGE = 'Внутренняя ошибка сер�
 // Validation
 export const VALIDATION_ERROR_MESSAGE = 'Ошибка валидации';
 export const ISSUE_PATH_SEPARATOR = '.';
+
+export const X_POWERED_BY_SETTING = 'x-powered-by';
+
+export const SECURITY_RESPONSE_HEADERS: ReadonlyArray<readonly [string, string]> = [
+  ['X-Content-Type-Options', 'nosniff'],
+  ['X-Frame-Options', 'DENY'],
+  ['Referrer-Policy', 'no-referrer'],
+];

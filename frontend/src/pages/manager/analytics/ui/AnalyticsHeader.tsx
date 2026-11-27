@@ -1,18 +1,28 @@
 import type { ReactNode } from 'react';
+import {
+  AnalyticsPeriodControl,
+  type AnalyticsPeriodControlState,
+} from '@/features/analytics-period';
 import { PageTitle } from '@/shared/ui/page-title';
 import { Skeleton } from '@/shared/ui/skeleton';
-import type { PeriodControl as Period } from '../model/useAnalyticsPeriod';
-import { PeriodControl } from './PeriodControl';
 
 type AnalyticsHeaderProps = {
   title: string;
-  period: Period;
+  period: AnalyticsPeriodControlState;
   line: string | null;
   isLoading: boolean;
   before?: ReactNode;
+  action?: ReactNode;
 };
 
-export function AnalyticsHeader({ title, period, line, isLoading, before }: AnalyticsHeaderProps) {
+export function AnalyticsHeader({
+  title,
+  period,
+  line,
+  isLoading,
+  before,
+  action,
+}: AnalyticsHeaderProps) {
   let shown: ReactNode = null;
 
   if (line !== null) {
@@ -28,7 +38,7 @@ export function AnalyticsHeader({ title, period, line, isLoading, before }: Anal
         <PageTitle>{title}</PageTitle>
         {shown}
       </div>
-      <PeriodControl period={period} />
+      <AnalyticsPeriodControl period={period} action={action} />
     </header>
   );
 }

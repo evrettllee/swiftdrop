@@ -22,11 +22,13 @@ export function useManagerMap() {
   const live = useLiveCouriers(map.answer, state);
   const { selectedId, select } = useSelectedCourier();
   const selected = live.shown.find(({ courierId }) => courierId === selectedId) ?? null;
+  const committedCount = live.chips?.find((chip) => chip.filter === state)?.count ?? null;
 
   return {
     ...live,
     params,
     query,
+    committedCount,
     isLoading: map.isLoading,
     isFailed: map.answer?.isFailed === true,
     hasData: (map.answer?.data ?? null) !== null,

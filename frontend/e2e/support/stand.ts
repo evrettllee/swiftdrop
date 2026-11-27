@@ -3,6 +3,8 @@ export const STAND = {
   BACKEND_PORT: 8081,
   COURIER_EMAIL: 'stand-courier@swiftdrop.test',
   COURIER_PASSWORD: 'Stand-Courier-2026',
+  ADMIN_EMAIL: 'stand-admin@swiftdrop.test',
+  ADMIN_PASSWORD: 'Stand-Admin-2026',
   WEBHOOK_SECRET: 'whsec_swiftdrop_e2e_stand',
 } as const;
 

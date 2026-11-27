@@ -73,16 +73,51 @@ export function liveCounts(
   return next;
 }
 
-export function filterChips(counts: StateCounts): FilterChip[] {
-  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+export function countForFilter(counts: StateCounts, filter: MapFilter | null): number {
+  const states = filter === null ? Object.values(COURIER_MAP_STATE) : FILTER_STATES[filter];
 
+  return states.reduce((sum, state) => sum + counts[state], 0);
+}
+
+export function filterChips(counts: StateCounts): FilterChip[] {
   return [
-    { filter: null, count: total },
+    { filter: null, count: countForFilter(counts, null) },
     ...MAP_FILTER_ORDER.map((filter) => ({
       filter,
-      count: FILTER_STATES[filter].reduce((sum, state) => sum + counts[state], 0),
+      count: countForFilter(counts, filter),
     })),
   ];
+}
+
+const RADIO_KEY_NEXT_RIGHT = 'ArrowRight';
+const RADIO_KEY_NEXT_DOWN = 'ArrowDown';
+const RADIO_KEY_PREV_LEFT = 'ArrowLeft';
+const RADIO_KEY_PREV_UP = 'ArrowUp';
+const RADIO_KEY_FIRST = 'Home';
+const RADIO_KEY_LAST = 'End';
+
+export function nextRadioIndex(key: string, current: number, count: number): number | null {
+  if (count <= 0) {
+    return null;
+  }
+
+  if (key === RADIO_KEY_FIRST) {
+    return 0;
+  }
+
+  if (key === RADIO_KEY_LAST) {
+    return count - 1;
+  }
+
+  if (key === RADIO_KEY_NEXT_RIGHT || key === RADIO_KEY_NEXT_DOWN) {
+    return (current + 1) % count;
+  }
+
+  if (key === RADIO_KEY_PREV_LEFT || key === RADIO_KEY_PREV_UP) {
+    return (current - 1 + count) % count;
+  }
+
+  return null;
 }
 
 export function pointOf(courier: LiveCourier | null): GeoPoint | null {

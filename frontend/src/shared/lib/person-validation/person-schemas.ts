@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  EMAIL_MAX_LENGTH,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
   NAME_PATTERN,
@@ -30,3 +31,12 @@ export const buildPhoneSchema = (required: string, invalid: string) =>
     .min(1, required)
     .transform((value) => value.replace(PHONE_SEPARATORS_REGEX, PHONE_SEPARATOR_REPLACEMENT))
     .pipe(z.string().regex(PHONE_REGEX, invalid));
+
+export const buildEmailSchema = (required: string, invalid: string, tooLong: string) =>
+  z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, required)
+    .max(EMAIL_MAX_LENGTH, tooLong)
+    .pipe(z.email(invalid));

@@ -1,6 +1,7 @@
 // Name and phone limits: must match backend/src/common/constants/person-validation.constants.ts
 export const NAME_MIN_LENGTH = 2;
 export const NAME_MAX_LENGTH = 100;
+export const EMAIL_MAX_LENGTH = 255;
 export const PHONE_MIN_DIGITS = 10;
 export const PHONE_MAX_DIGITS = 15;
 
